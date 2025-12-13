@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>חידון ויקרא פרק י"ט - פירושי פסוקים</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1a33;
+      --card2:#0c162d;
+      --text:#e9eefc;
+      --muted:#b8c3e6;
+      --accent:#7dd3fc;
+      --good:#34d399;
+      --bad:#fb7185;
+      --warn:#fbbf24;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --maxw: 980px;
+      --ring: 0 0 0 3px rgba(125, 211, 252, 0.25);
+      font-synthesis-weight: none;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, "Noto Sans Hebrew", "Heebo", sans-serif;
+      background: radial-gradient(1200px 600px at 80% -10%, rgba(125,211,252,.18), transparent 65%),
+                  radial-gradient(900px 500px at 10% 110%, rgba(52,211,153,.14), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      padding:24px 14px 64px;
+    }
+    .wrap{
+      max-width: var(--maxw);
+      margin:0 auto;
+    }
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+    }
+    .titlebox{
+      background: linear-gradient(180deg, rgba(15,26,51,.85), rgba(15,26,51,.65));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 16px 16px 14px;
+      flex:1;
+    }
+    h1{
+      font-size: 20px;
+      margin:0 0 6px;
+      letter-spacing:.2px;
+    }
+    .sub{
+      color: var(--muted);
+      font-size: 14px;
+      margin:0;
+      line-height: 1.4;
+    }
+    .pill{
+      background: rgba(125,211,252,.12);
+      border: 1px solid rgba(125,211,252,.25);
+      color: var(--accent);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      white-space:nowrap;
+      box-shadow: 0 8px 22px rgba(0,0,0,.25);
+      user-select:none;
+      height: fit-content;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(15,26,51,.88), rgba(12,22,45,.88));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 14px;
+    }
+    .qhead{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 10px;
+    }
+    .qnum{
+      color: rgba(255,255,255,.85);
+      font-weight: 700;
+      font-size: 14px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 999px;
+      padding: 6px 10px;
+      min-width: 82px;
+      text-align:center;
+    }
+    .quote{
+      margin: 6px 0 10px;
+      color: rgba(233,238,252,.95);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .opts{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top: 10px;
+    }
+    .opt{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      cursor:pointer;
+      transition: transform .08s ease, border-color .12s ease, background .12s ease;
+    }
+    .opt:hover{
+      transform: translateY(-1px);
+      border-color: rgba(125,211,252,.25);
+      background: rgba(125,211,252,.06);
+    }
+    input[type="radio"]{
+      margin-top: 3px;
+      transform: scale(1.05);
+      accent-color: var(--accent);
+      cursor:pointer;
+    }
+    .opt span{
+      line-height: 1.5;
+      font-size: 14.5px;
+      color: rgba(233,238,252,.95);
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top: 14px;
+    }
+    button{
+      border:none;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 14px;
+      cursor:pointer;
+      color: #06101f;
+      background: var(--accent);
+      box-shadow: 0 10px 20px rgba(0,0,0,.25);
+      transition: transform .08s ease, filter .12s ease;
+      font-weight: 700;
+    }
+    button:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+    button:active{ transform: translateY(0px); }
+    button.secondary{
+      background: rgba(255,255,255,.10);
+      color: rgba(233,238,252,.95);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: none;
+      font-weight: 650;
+    }
+    .feedback{
+      margin-top: 10px;
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+      display:none;
+    }
+    .feedback.good{
+      display:block;
+      border-color: rgba(52,211,153,.30);
+      background: rgba(52,211,153,.10);
+      color: rgba(223,255,245,.95);
+    }
+    .feedback.bad{
+      display:block;
+      border-color: rgba(251,113,133,.30);
+      background: rgba(251,113,133,.10);
+      color: rgba(251,113,133,.95);
+    }
+    .feedback.warn{
+      display:block;
+      border-color: rgba(251,191,36,.30);
+      background: rgba(251,191,36,.10);
+      color: rgba(255,248,230,.95);
+    }
+    .summary{
+      display:none;
+      margin-top: 16px;
+      padding: 14px 14px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      line-height: 1.6;
+    }
+    .scoreline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .score{
+      font-weight: 800;
+      font-size: 16px;
+      color: rgba(233,238,252,.98);
+    }
+    .tiny{
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+    }
+    .bar{
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .bar > div{
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(125,211,252,.95), rgba(52,211,153,.95));
+      border-radius: 999px;
+      transition: width .35s ease;
+    }
+    .footerhint{
+      margin-top: 18px;
+      color: rgba(184,195,230,.9);
+      font-size: 13px;
+      line-height: 1.5;
+      opacity:.95;
+    }
+    .kbd{
+      display:inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.15);
+      background: rgba(255,255,255,.07);
+      font-weight: 700;
+      font-size: 12px;
+      color: rgba(233,238,252,.95);
+    }
+    @media (max-width: 520px){
+      .qhead{flex-direction:column; align-items:flex-start;}
+      .qnum{min-width:auto;}
+      header{flex-direction:column;}
+      .pill{width:fit-content;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="titlebox">
+        <h1>חידון ויקרא פרק י"ט - פירושי פסוקים</h1>
+        <p class="sub">מסמנים תשובה לכל שאלה ואז לוחצים "סיום ובדיקה". אפשר גם לבדוק כל שאלה בנפרד.</p>
+      </div>
+      <div class="pill" id="progressPill">0 מתוך 7 נענו</div>
+    </header>
+
+    <div id="quiz"></div>
+
+    <div class="card">
+      <div class="actions">
+        <button id="finishBtn">סיום ובדיקה</button>
+        <button class="secondary" id="resetBtn" title="מאפס את כל הבחירות">התחלה מחדש</button>
+        <button class="secondary" id="shareBtn" title="מעתיק קישור לעמוד (אם העמוד נמצא באתר)">העתקת קישור</button>
+      </div>
+      <div class="summary" id="summary">
+        <div class="scoreline">
+          <div class="score" id="scoreText">ציון: 0 מתוך 7</div>
+          <p class="tiny" id="remark"></p>
+        </div>
+        <div class="bar"><div id="barFill"></div></div>
+        <p class="footerhint">טיפ: אפשר לשמור את הקובץ ואז לפתוח בדפדפן גם בלי אינטרנט. אם שמים אותו באתר (כמו Google Sites או GitHub Pages), כפתור <span class="kbd">העתקת קישור</span> יהיה שימושי.</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const data = [
+    {
+      q: 'מהו הפירוש הנכון לפסוק: "אַל תִּפְנוּ אֶל הָאֱלִילִם וֵאלֹהֵי מַסֵּכָה לֹא תַעֲשׂוּ לָכֶם"?',
+      options: [
+        'אסור להאמין באלוהים אחרים ואסור לבנות להם פסלים.',
+        'אסור להפנות את הגב לחברים בזמן שהם מדברים איתך.',
+        'אסור להסתכל על דברים יפים ומסיחות דעת בזמן התפילה.'
+      ],
+      correct: 0
+    },
+    {
+      q: 'מהו הפירוש הנכון לפסוק: "לֹא תְקַלֵּל חֵרֵשׁ וְלִפְנֵי עִוֵּר לֹא תִתֵּן מִכְשֹׁל"?',
+      options: [
+        'אסור לצעוק חזק ליד אדם חרש כדי לא להעליב אותו.',
+        'אסור לקלל אדם שלא שומע, ואסור לשים מכשול שמפיל אדם שלא רואה.',
+        'אם רואים אדם עיוור ברחוב, חובה לעזור לו לחצות את הכביש.'
+      ],
+      correct: 1
+    },
+    {
+      q: 'מהו הפירוש הנכון לפסוק: "מִפְּנֵי שֵׂיבָה תָּקוּם וְהָדַרְתָּ פְּנֵי זָקֵן"?',
+      options: [
+        'צריך לקום מוקדם בבוקר כדי להספיק הרבה דברים.',
+        'צריך לכבד את המורים בבית הספר ולעמוד כשהם נכנסים.',
+        'יש לכבד אנשים מבוגרים וזקנים (למשל לקום לכבודם).'
+      ],
+      correct: 2
+    },
+    {
+      q: 'מהו הפירוש הנכון לפסוק: "וְכִי יָגוּר אִתְּךָ גֵּר בְּאַרְצְכֶם לֹא תוֹנוּ אֹתוֹ"?',
+      options: [
+        'אסור להציק, לפגוע או לקפח אנשים זרים שבאים לגור בארץ.',
+        'אם גר אצלך חבר בחדר, אסור לך להעיר לו על אי הסדר.',
+        'אסור לגור ליד אנשים שאיננו מכירים כדי לא לריב איתם.'
+      ],
+      correct: 0
+    },
+    {
+      q: 'מהו הפירוש הנכון לפסוק: "לֹא תַעֲשׂוּ עָוֶל בַּמִּשְׁפָּט בַּמִּדָּה בַּמִּשְׁקָל וּבַמְּשׂוּרָה"?',
+      options: [
+        'השופט בבית המשפט חייב להקשיב לשני הצדדים לפני שהוא מחליט.',
+        'חובה לשמור על יושר במסחר: לא לרמות בכמות, במשקל או במידות של המוצרים.',
+        'אסור לאכול יותר מדי אוכל, צריך לאכול במידה הנכונה.'
+      ],
+      correct: 1
+    },
+    {
+      q: 'מהו הפירוש הנכון לפסוק: "וְלֹא תִשָּׁבְעוּ בִשְׁמִי לַשָּׁקֶר"?',
+      options: [
+        "אסור להישבע בשם ה' על משהו שהוא שקר, כי זה מחלל את שמו.",
+        'אסור לשקר לחברים, גם אם לא נשבעים.',
+        "אסור להגיד את שם ה' סתם כך באמצע היום."
+      ],
+      correct: 0
+    },
+    {
+      q: 'מהו הפירוש הנכון לפסוק: "לֹא תִשְׂנָא אֶת אָחִיךָ בִּלְבָבֶך הוכיח ותוכיח את עמיתך ולא תישא עליו חטא..."?',
+      options: [
+        'אם חבר פגע בך, תשמור את הכעס בלב ואל תגיד לו כלום.',
+        'חובה לאהוב את כולם תמיד, ואסור לכעוס אף פעם.',
+        'אסור לשמור שנאה בלב. אם מישהו פגע בך, צריך לדבר איתו ולהסביר לו (להוכיח אותו).'
+      ],
+      correct: 2
+    }
+  ];
+
+  const quizEl = document.getElementById('quiz');
+  const progressPill = document.getElementById('progressPill');
+  const finishBtn = document.getElementById('finishBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const summaryEl = document.getElementById('summary');
+  const scoreText = document.getElementById('scoreText');
+  const barFill = document.getElementById('barFill');
+  const remark = document.getElementById('remark');
+
+  function makeQuestion(i){
+    const item = data[i];
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.qindex = i;
+
+    const head = document.createElement('div');
+    head.className = 'qhead';
+
+    const qnum = document.createElement('div');
+    qnum.className = 'qnum';
+    qnum.textContent = `שאלה ${i+1}`;
+
+    const qtextWrap = document.createElement('div');
+    const qtext = document.createElement('div');
+    qtext.className = 'quote';
+    qtext.textContent = item.q;
+    qtextWrap.appendChild(qtext);
+
+    head.appendChild(qnum);
+    head.appendChild(qtextWrap);
+
+    const opts = document.createElement('div');
+    opts.className = 'opts';
+
+    item.options.forEach((txt, k) => {
+      const lab = document.createElement('label');
+      lab.className = 'opt';
+      lab.setAttribute('for', `q${i}_o${k}`);
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = `q${i}`;
+      radio.id = `q${i}_o${k}`;
+      radio.value = k;
+
+      radio.addEventListener('change', () => {
+        updateProgress();
+        const fb = card.querySelector('.feedback');
+        if (fb && fb.dataset.checked === '1'){
+          checkOne(i);
+        }
+      });
+
+      const span = document.createElement('span');
+      span.textContent = txt;
+
+      lab.appendChild(radio);
+      lab.appendChild(span);
+      opts.appendChild(lab);
+    });
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+
+    const checkBtn = document.createElement('button');
+    checkBtn.className = 'secondary';
+    checkBtn.textContent = 'בדוק שאלה';
+    checkBtn.addEventListener('click', () => checkOne(i));
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback';
+    fb.id = `fb${i}`;
+
+    actions.appendChild(checkBtn);
+
+    card.appendChild(head);
+    card.appendChild(opts);
+    card.appendChild(actions);
+    card.appendChild(fb);
+
+    return card;
+  }
+
+  function getAnswer(i){
+    const picked = document.querySelector(`input[name="q${i}"]:checked`);
+    return picked ? Number(picked.value) : null;
+  }
+
+  function checkOne(i){
+    const ans = getAnswer(i);
+    const fb = document.getElementById(`fb${i}`);
+    fb.dataset.checked = '1';
+
+    if (ans === null){
+      fb.className = 'feedback warn';
+      fb.textContent = 'עוד לא סימנת תשובה. בחר/י אפשרות ואז נסה/י שוב.';
+      return;
+    }
+    if (ans === data[i].correct){
+      fb.className = 'feedback good';
+      fb.textContent = 'נכון! מצוין.';
+    } else {
+      fb.className = 'feedback bad';
+      const correctTxt = data[i].options[data[i].correct];
+      fb.textContent = `לא בדיוק. התשובה הנכונה היא: "${correctTxt}"`;
+    }
+  }
+
+  function updateProgress(){
+    let answered = 0;
+    for (let i=0;i<data.length;i++){
+      if (getAnswer(i) !== null) answered++;
+    }
+    progressPill.textContent = `${answered} מתוך ${data.length} נענו`;
+  }
+
+  function finish(){
+    let score = 0;
+    let answered = 0;
+    for (let i=0;i<data.length;i++){
+      const ans = getAnswer(i);
+      if (ans !== null) answered++;
+      if (ans === data[i].correct) score++;
+      checkOne(i);
+    }
+
+    summaryEl.style.display = 'block';
+    scoreText.textContent = `ציון: ${score} מתוך ${data.length}`;
+    const pct = Math.round((score / data.length) * 100);
+    barFill.style.width = `${pct}%`;
+
+    let msg = '';
+    if (answered < data.length){
+      msg = `ענית על ${answered} שאלות. אפשר להשלים את כולן ואז לבדוק שוב.`;
+    } else if (pct === 100){
+      msg = 'וואו. 100%. זה כבר רמת "מורה לספר ויקרא".';
+    } else if (pct >= 80){
+      msg = 'מעולה! עוד קצת ואת/ה אלוף/ה של הפרק.';
+    } else if (pct >= 60){
+      msg = 'יפה! שווה לעבור על השאלות שטעית בהן ולנסות שוב.';
+    } else {
+      msg = 'הכל טוב, זה פרק עם מילים רציניות. נסה/י שוב אחרי שמסתכלים על הפירושים הנכונים.';
+    }
+    remark.textContent = msg;
+
+    summaryEl.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function resetAll(){
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    document.querySelectorAll('.feedback').forEach(fb => {
+      fb.className = 'feedback';
+      fb.textContent = '';
+      fb.style.display = 'none';
+      fb.dataset.checked = '0';
+    });
+    summaryEl.style.display = 'none';
+    barFill.style.width = '0%';
+    updateProgress();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function copyLink(){
+    const url = window.location.href;
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+      .then(() => {
+        shareBtn.textContent = 'הקישור הועתק!';
+        setTimeout(() => shareBtn.textContent = 'העתקת קישור', 1300);
+      })
+      .catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        try{
+          document.execCommand('copy');
+          shareBtn.textContent = 'הקישור הועתק!';
+          setTimeout(() => shareBtn.textContent = 'העתקת קישור', 1300);
+        }catch(e){
+          shareBtn.textContent = 'לא הצלחתי להעתיק';
+          setTimeout(() => shareBtn.textContent = 'העתקת קישור', 1300);
+        }
+        document.body.removeChild(ta);
+      });
+  }
+
+  data.forEach((_, i) => quizEl.appendChild(makeQuestion(i)));
+  updateProgress();
+
+  finishBtn.addEventListener('click', finish);
+  resetBtn.addEventListener('click', resetAll);
+  shareBtn.addEventListener('click', copyLink);
+</script>
+</body>
+</html>
