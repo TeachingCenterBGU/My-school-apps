@@ -31,6 +31,7 @@
             margin-bottom: 10px;
         }
 
+        /* הוספתי כאן את ה-ID שחסר כדי שהקוד יזהה את המסגרת */
         .game-container {
             background: var(--card-bg);
             padding: 40px;
@@ -43,7 +44,6 @@
             overflow: hidden;
         }
 
-        /* סרגל התקדמות */
         .progress-bar {
             width: 100%;
             height: 10px;
@@ -104,7 +104,12 @@
             transform: scale(0.95);
         }
 
-        /* משוב */
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none !important;
+        }
+
         .feedback {
             margin-top: 20px;
             height: 30px;
@@ -121,7 +126,6 @@
             color: #636e72;
         }
 
-        /* אנימציות */
         .shake {
             animation: shake 0.5s;
         }
@@ -175,7 +179,7 @@
     <h1>בלש האותיות 🔎</h1>
     <p>השלימי את האות החסרה במילה</p>
 
-    <div class="game-container">
+    <div class="game-container" id="game-container">
         <div id="game-screen">
             <div class="score-display">ניקוד: <span id="score">0</span></div>
             <div class="category-badge" id="category-label">א או ע?</div>
@@ -202,27 +206,20 @@
     </div>
 
     <script>
-        // מאגר המילים מחולק לקטגוריות
-        // המבנה: חלק ראשון של מילה, חלק שני של מילה, התשובה הנכונה, והמסיח (התשובה השגויה)
         const allWords = [
-            // א / ע
-            { pre: "אַמ", post: "טְיָה", correct: "בָּ", wrong: "וּ", displayCorrect: "א", displayWrong: "ע", type: "א/ע" }, // אמבטיה - תיקון לוגיקה למטה
-            // פשוט נכתוב את המילים עם האות החסרה מיוצגת בנפרד
-            
             // א - ע
             { word: "מ__טיה", correct: "א", wrong: "ע", full: "אַמְבַּטְיָה", type: "א' או ע'" },
             { word: "צִב__וֹנִי", correct: "ע", wrong: "א", full: "צִבְעוֹנִי", type: "א' או ע'" },
             { word: "__רְנָב", correct: "אַ", wrong: "עַ", full: "אַרְנָב", type: "א' או ע'" },
-            { word: "גַעֲ__וּעַ", correct: "גּ", wrong: "א", full: "גַּעֲגוּעַ", type: "א' או ע'" }, // תיקון, הכוונה לגעגוע (ע) מול א
+            { word: "גַעֲ__וּעַ", correct: "גּ", wrong: "א", full: "גַּעֲגוּעַ", type: "א' או ע'" },
             { word: "פִּת__וֹם", correct: "א", wrong: "ע", full: "פִּתְאוֹם", type: "א' או ע'" },
             { word: "__וּגָה", correct: "ע", wrong: "א", full: "עוּגָה", type: "א' או ע'" },
             
-            // ט - ת
-            { word: "מַבְ__חָה", correct: "ט", wrong: "ת", full: "מַבְטִיחָה", type: "ט' או ת'" },
+            // ט - ת (תוקן: מבטיחה עם י')
+            { word: "מַבְ__ִיחָה", correct: "ט", wrong: "ת", full: "מַבְטִיחָה", type: "ט' או ת'" },
             { word: "__וּכִּי", correct: "תּ", wrong: "טּ", full: "תּוּכִּי", type: "ט' או ת'" },
             { word: "__לְוִיזְיָה", correct: "ט", wrong: "ת", full: "טֶלֶוִיזְיָה", type: "ט' או ת'" },
             { word: "הַחְלָ__ה", correct: "ט", wrong: "ת", full: "הַחְלָטָה", type: "ט' או ת'" },
-            { word: "מִטְ__רִיָּה", correct: "רִיָּה", wrong: "x", ignore:true }, // Skip logic fix
             { word: "__וֹתָךְ", correct: "א", wrong: "ע", full: "אוֹתָךְ", type: "א' או ע'" }, 
             { word: "כִּי__ָה", correct: "ת", wrong: "ט", full: "כִּיתָּה", type: "ט' או ת'" },
             { word: "שְׁלִי__ָה", correct: "ט", wrong: "ת", full: "שְׁלִיטָה", type: "ט' או ת'" },
@@ -235,7 +232,6 @@
             { word: "וִיכּוּ__", correct: "ח", wrong: "ך", full: "וִיכּוּחַ", type: "ח' או ך'" }
         ];
 
-        // נקה את המערך ממילים בעייתיות בלוגיקה (שורת ignore)
         const words = allWords.filter(w => !w.ignore);
 
         let currentQuestionIndex = 0;
@@ -245,7 +241,7 @@
         function startGame() {
             score = 0;
             currentQuestionIndex = 0;
-            shuffledWords = [...words].sort(() => Math.random() - 0.5); // ערבוב מילים
+            shuffledWords = [...words].sort(() => Math.random() - 0.5);
             
             document.getElementById('end-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
@@ -261,23 +257,18 @@
 
             const q = shuffledWords[currentQuestionIndex];
             
-            // עדכון ממשק
             document.getElementById('category-label').textContent = q.type;
             document.getElementById('feedback-text').textContent = '';
             
-            // חישוב אחוז התקדמות
             const progress = (currentQuestionIndex / shuffledWords.length) * 100;
             document.getElementById('progress').style.width = `${progress}%`;
 
-            // הצגת המילה
             const wordDisplay = document.getElementById('word-display');
             wordDisplay.innerHTML = q.word.replace('__', '<span class="missing-letter">?</span>');
 
-            // יצירת כפתורים
             const container = document.getElementById('buttons-container');
             container.innerHTML = '';
 
-            // ערבוב כפתורים כדי שהתשובה הנכונה לא תהיה תמיד באותו צד
             const options = [
                 { text: q.correct, isCorrect: true },
                 { text: q.wrong, isCorrect: false }
@@ -294,7 +285,8 @@
 
         function handleAnswer(btn, isCorrect, questionData) {
             const container = document.getElementById('buttons-container');
-            // ביטול לחיצות נוספות
+            
+            // נועלים את כל הכפתורים זמנית
             Array.from(container.children).forEach(b => b.disabled = true);
 
             if (isCorrect) {
@@ -320,15 +312,23 @@
                 btn.style.borderColor = '#d63031';
                 btn.style.color = '#fff';
                 
-                document.getElementById('game-container').classList.add('shake');
+                const gameContainer = document.getElementById('game-container');
+                if(gameContainer) {
+                    gameContainer.classList.add('shake');
+                }
+                
                 document.getElementById('feedback-text').textContent = 'אופס, נסי שוב...';
                 document.getElementById('feedback-text').style.color = '#d63031';
                 
                 setTimeout(() => {
-                    document.getElementById('game-container').classList.remove('shake');
-                    // מאפשרים לנסות שוב באותה שאלה (לא מעבירים הלאה)
-                     Array.from(container.children).forEach(b => {
-                        if (b !== btn) b.disabled = false; // מאפשרים ללחוץ על השני
+                    if(gameContainer) {
+                        gameContainer.classList.remove('shake');
+                    }
+                    // משחררים את הכפתורים האחרים כדי לאפשר ניסיון נוסף
+                    Array.from(container.children).forEach(b => {
+                        if (b !== btn) {
+                            b.disabled = false;
+                        }
                     });
                 }, 800);
             }
@@ -345,9 +345,7 @@
             document.getElementById('final-score').textContent = score;
         }
 
-        // התחלת משחק ראשונית
         startGame();
-
     </script>
 </body>
 </html>
