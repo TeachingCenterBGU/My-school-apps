@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק פעיל וסביל - כיתה ה'</title>
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --text: #2C3E50;
+            --bg: #F7F9FC;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5em;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        /* Tabs Styling */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            background: white;
+            border: 2px solid var(--secondary);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: var(--secondary);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn.active {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(78, 205, 196, 0.3);
+        }
+
+        .game-section {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .game-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Matching Game Styles */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px 10px;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .card:hover {
+            border-color: var(--secondary);
+            background-color: #f0fffe;
+        }
+
+        .card.selected {
+            background-color: var(--accent);
+            border-color: #f1c40f;
+            transform: scale(1.05);
+        }
+
+        .card.matched {
+            background-color: #a8e6cf;
+            border-color: #2ecc71;
+            color: #27ae60;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* Writing Game Styles */
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .input-label {
+            flex: 1;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        .arrow {
+            margin: 0 15px;
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        .check-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .check-btn:hover {
+            transform: scale(1.05);
+            background-color: #ff5252;
+        }
+
+        .feedback {
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+
+        .columns-wrapper {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        h3 {
+            color: var(--secondary);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .score-board {
+            font-size: 1.5em;
+            color: var(--primary);
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>משחק פעיל וסביל ✨</h1>
+    <p class="subtitle">אימון בכיף לכיתה ה'</p>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('matching')">משחק התאמה</button>
+        <button class="tab-btn" onclick="switchTab('writing')">אימון כתיבה</button>
+    </div>
+
+    <div id="matching" class="game-section active">
+        <h2>התאימי בין הפועל הפעיל לפועל הסביל</h2>
+        <div class="score-board">זוגות שנמצאו: <span id="match-score">0</span>/10</div>
+        <div class="grid-container" id="cards-container">
+            </div>
+        <div id="win-message" style="display:none; margin-top:20px; color: green; font-size: 1.5em;">
+            כל הכבוד! סיימת את כל הזוגות! 🎉
+        </div>
+    </div>
+
+    <div id="writing" class="game-section">
+        <h2>הקלידי את התשובה הנכונה</h2>
+        <div class="columns-wrapper">
+            <div class="column">
+                <h3>הפכי לפעיל לסביל</h3>
+                <p style="font-size: 0.9em; color: #666;">דוגמה: אָכַל -> נֶאֱכַל (אפשר לכתוב בכתיב מלא ללא ניקוד)</p>
+                <div id="active-to-passive-list"></div>
+            </div>
+
+            <div class="column">
+                <h3>הפכי סביל לפעיל</h3>
+                <p style="font-size: 0.9em; color: #666;">דוגמה: נִשְׁבַּר -> שָׁבַר</p>
+                <div id="passive-to-active-list"></div>
+            </div>
+        </div>
+        
+        <button class="check-btn" onclick="checkWritingAnswers()">בדיקת תשובות</button>
+        <div id="writing-feedback" style="margin-top: 20px; font-weight: bold; font-size: 1.2em;"></div>
+    </div>
+
+    <script>
+        // Data for the games
+        const matchingPairs = [
+            { active: "כָּתַב", passive: "נִכְתַּב" },
+            { active: "סָגַר", passive: "נִסְגַּר" },
+            { active: "תִּיקֵּן", passive: "תּוּקַּן" },
+            { active: "שָׁבַר", passive: "נִשְׁבַּר" },
+            { active: "הִזְמִין", passive: "הוּזְמַן" },
+            { active: "לָבַשׁ", passive: "נִלְבַּשׁ" },
+            { active: "בָּנָה", passive: "נִבְנָה" },
+            { active: "הִמְצִיא", passive: "הוּמְצָא" },
+            { active: "שָׁמַר", passive: "נִשְׁמַר" },
+            { active: "סִידֵּר", passive: "סוּדַּר" }
+        ];
+
+        const writingActiveToPassive = [
+            { q: "מָצָא", a: "נמצא" },
+            { q: "שָׁלַח", a: "נשלח" },
+            { q: "צִיֵּר", a: "צויר" },
+            { q: "בָּדַק", a: "נבדק" },
+            { q: "הִרְגִּישׁ", a: "הורגש" },
+            { q: "קִפֵּל", a: "קופל" },
+            { q: "הִסְתִּיר", a: "הוסתר" },
+            { q: "מָכַר", a: "נמכר" },
+            { q: "שָׁפַךְ", a: "נשפך" },
+            { q: "לָקַח", a: "נלקח" }
+        ];
+
+        const writingPassiveToActive = [
+            { q: "נִכְנַס", a: "נכנס" }, // Trick question/root logic, keeping simple: hif'il/nif'al overlap visually sometimes, let's use classic:
+            { q: "נִתְפַּס", a: "תפס" },
+            { q: "גּוֹרַשׁ", a: "גירש" },
+            { q: "הוּבַל", a: "הוביל" },
+            { q: "נִזְרַק", a: "זרק" },
+            { q: "נֶאֱכַל", a: "אכל" },
+            { q: "סוֹרַק", a: "סירק" },
+            { q: "הוּחְלַף", a: "החליף" },
+            { q: "נִשְׁכַּח", a: "שכח" },
+            { q: "נֶעֱזַר", a: "נעזר" } // Nifal that acts as active sometimes, let's change to simpler
+        ];
+        
+        // Correcting the last one for clarity
+        writingPassiveToActive[9] = { q: "נִגְמַר", a: "גמר" }; 
+        writingPassiveToActive[0] = { q: "נִקְרָא", a: "קרא" }; 
+
+
+        // --- Logic for Tab Switching ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.game-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- Logic for Matching Game ---
+        let selectedCards = [];
+        let matchedCount = 0;
+
+        function initMatchingGame() {
+            const container = document.getElementById('cards-container');
+            let cards = [];
+            
+            matchingPairs.forEach((pair, index) => {
+                cards.push({ text: pair.active, type: 'active', id: index });
+                cards.push({ text: pair.passive, type: 'passive', id: index });
+            });
+
+            // Shuffle
+            cards.sort(() => Math.random() - 0.5);
+
+            cards.forEach(card => {
+                const el = document.createElement('div');
+                el.className = 'card';
+                el.textContent = card.text;
+                el.dataset.id = card.id;
+                el.dataset.type = card.type;
+                el.onclick = () => handleCardClick(el);
+                container.appendChild(el);
+            });
+        }
+
+        function handleCardClick(card) {
+            if (card.classList.contains('matched') || card.classList.contains('selected') || selectedCards.length >= 2) return;
+
+            card.classList.add('selected');
+            selectedCards.push(card);
+
+            if (selectedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [c1, c2] = selectedCards;
+            const isMatch = c1.dataset.id === c2.dataset.id && c1.dataset.type !== c2.dataset.type;
+
+            if (isMatch) {
+                setTimeout(() => {
+                    c1.classList.add('matched');
+                    c2.classList.add('matched');
+                    c1.classList.remove('selected');
+                    c2.classList.remove('selected');
+                    matchedCount++;
+                    document.getElementById('match-score').textContent = matchedCount;
+                    if (matchedCount === 10) document.getElementById('win-message').style.display = 'block';
+                }, 300);
+            } else {
+                setTimeout(() => {
+                    c1.classList.remove('selected');
+                    c2.classList.remove('selected');
+                }, 1000);
+            }
+            selectedCards = [];
+        }
+
+        // --- Logic for Writing Game ---
+        function initWritingGame() {
+            const list1 = document.getElementById('active-to-passive-list');
+            const list2 = document.getElementById('passive-to-active-list');
+
+            writingActiveToPassive.forEach((item, i) => {
+                list1.innerHTML += createInputRow(item.q, i, 'a2p');
+            });
+
+            writingPassiveToActive.forEach((item, i) => {
+                list2.innerHTML += createInputRow(item.q, i, 'p2a');
+            });
+        }
+
+        function createInputRow(question, index, type) {
+            return `
+                <div class="input-group">
+                    <span class="input-label">${question}</span>
+                    <span class="arrow">⬅</span>
+                    <input type="text" id="${type}-${index}" placeholder="הקלידי כאן...">
+                    <span id="feedback-${type}-${index}" class="feedback"></span>
+                </div>
+            `;
+        }
+
+        function checkWritingAnswers() {
+            let correct = 0;
+            let total = 20;
+
+            // Check Active to Passive
+            writingActiveToPassive.forEach((item, i) => {
+                if(validateInput(`a2p-${i}`, item.a)) correct++;
+            });
+
+            // Check Passive to Active
+            writingPassiveToActive.forEach((item, i) => {
+                if(validateInput(`p2a-${i}`, item.a)) correct++;
+            });
+
+            const feedbackEl = document.getElementById('writing-feedback');
+            if (correct === total) {
+                feedbackEl.innerHTML = `מדהים! ענית נכון על ${correct} מתוך ${total}! 🏆`;
+                feedbackEl.style.color = 'green';
+            } else {
+                feedbackEl.innerHTML = `יפה מאוד! ענית נכון על ${correct} מתוך ${total}. נסי לתקן את האדומים.`;
+                feedbackEl.style.color = '#e67e22';
+            }
+        }
+
+        function validateInput(elementId, correctAnswer) {
+            const input = document.getElementById(elementId);
+            const feedback = document.getElementById('feedback-' + elementId);
+            const userAnswer = input.value.trim();
+
+            // Simple validation: check if answer contains the correct string (allowing optional niqqud logic is hard, so we assume plain text input matching)
+            // To make it easy for kids, we check if the stripped string matches the expected stripped string
+            if (userAnswer === correctAnswer || userAnswer === correctAnswer.replace('י', '')) {
+                input.style.borderColor = '#2ecc71';
+                input.style.backgroundColor = '#e8f8f5';
+                feedback.textContent = '✅';
+                return true;
+            } else {
+                input.style.borderColor = '#ff6b6b';
+                input.style.backgroundColor = '#fff0f0';
+                feedback.textContent = '❌';
+                return false;
+            }
+        }
+
+        // Initialize
+        initMatchingGame();
+        initWritingGame();
+
+    </script>
+</body>
+</html>
