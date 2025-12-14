@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>בלש האותיות - משחק כתיב</title>
+    <title>בלש האותיות - עם תמונות</title>
     <style>
         :root {
-            --primary: #6c5ce7;
-            --secondary: #00cec9;
-            --wrong: #ff7675;
-            --correct: #55efc4;
-            --bg: #dfe6e9;
+            --primary: #FF9F43;
+            --secondary: #54a0ff;
+            --wrong: #ff6b6b;
+            --correct: #1dd1a1;
+            --bg: #feca57; /* רקע צהוב שמח יותר */
             --card-bg: #ffffff;
         }
 
@@ -26,30 +26,29 @@
         }
 
         h1 {
-            color: var(--primary);
-            font-size: 2em;
+            color: #fff;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
             margin-bottom: 10px;
         }
 
-        /* הוספתי כאן את ה-ID שחסר כדי שהקוד יזהה את המסגרת */
         .game-container {
             background: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             text-align: center;
             max-width: 500px;
             width: 90%;
             position: relative;
-            overflow: hidden;
         }
 
         .progress-bar {
             width: 100%;
-            height: 10px;
-            background-color: #eee;
-            border-radius: 5px;
-            margin-bottom: 30px;
+            height: 12px;
+            background-color: #f1f2f6;
+            border-radius: 10px;
+            margin-bottom: 20px;
             overflow: hidden;
         }
 
@@ -60,19 +59,32 @@
             transition: width 0.3s ease;
         }
 
+        /* עיצוב התמונה (אימוג'י) */
+        .emoji-display {
+            font-size: 100px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
         .word-display {
-            font-size: 3.5em;
-            margin-bottom: 40px;
+            font-size: 3em;
+            margin-bottom: 30px;
             color: #2d3436;
-            letter-spacing: 2px;
+            font-weight: bold;
         }
 
         .missing-letter {
             color: var(--primary);
-            border-bottom: 3px solid var(--primary);
-            padding: 0 10px;
+            border-bottom: 4px solid var(--primary);
+            padding: 0 5px;
             display: inline-block;
-            min-width: 50px;
+            min-width: 40px;
         }
 
         .options-container {
@@ -83,110 +95,103 @@
 
         .option-btn {
             background: white;
-            border: 3px solid var(--primary);
-            color: var(--primary);
-            font-size: 2em;
-            padding: 15px 40px;
-            border-radius: 15px;
+            border: 3px solid #ced6e0;
+            color: #2d3436;
+            font-size: 2.2em;
+            padding: 10px 35px;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s;
             font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 0px #ced6e0;
         }
 
         .option-btn:hover {
-            transform: translateY(-3px);
-            background: var(--primary);
-            color: white;
+            transform: translateY(-2px);
+            border-color: var(--secondary);
+            color: var(--secondary);
         }
 
         .option-btn:active {
-            transform: scale(0.95);
-        }
-
-        .option-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-            transform: none !important;
+            transform: translateY(2px);
+            box-shadow: none;
         }
 
         .feedback {
             margin-top: 20px;
             height: 30px;
-            font-size: 1.2em;
+            font-size: 1.4em;
             font-weight: bold;
         }
 
         .score-display {
             position: absolute;
-            top: 20px;
+            top: 15px;
             left: 20px;
             font-size: 1.2em;
             font-weight: bold;
             color: #636e72;
+            background: #f1f2f6;
+            padding: 5px 15px;
+            border-radius: 20px;
         }
 
-        .shake {
-            animation: shake 0.5s;
+        .category-badge {
+            background: #ff9f43;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
         }
 
+        /* אנימציות שגיאה/הצלחה */
+        .shake { animation: shake 0.5s; }
         @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
         }
 
-        .pulse {
-            animation: pulse 0.3s;
-        }
-
+        .pulse { animation: pulse 0.4s; }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
 
-        .category-badge {
-            background: #ffeaa7;
-            padding: 5px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-bottom: 20px;
-            font-weight: bold;
-            color: #d63031;
-        }
-
-        #end-screen {
-            display: none;
-        }
-
+        /* מסך סיום */
+        #end-screen { display: none; }
+        
         button.restart-btn {
             background-color: var(--secondary);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 15px 40px;
             border-radius: 50px;
-            font-size: 1.2em;
+            font-size: 1.5em;
             cursor: pointer;
             margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(84, 160, 255, 0.4);
         }
     </style>
 </head>
 <body>
 
-    <h1>בלש האותיות 🔎</h1>
-    <p>השלימי את האות החסרה במילה</p>
+    <h1>בלש האותיות 🖼️</h1>
 
     <div class="game-container" id="game-container">
         <div id="game-screen">
             <div class="score-display">ניקוד: <span id="score">0</span></div>
-            <div class="category-badge" id="category-label">א או ע?</div>
+            <div class="category-badge" id="category-label">קטגוריה</div>
             
             <div class="progress-bar">
                 <div class="progress-fill" id="progress"></div>
             </div>
+
+            <div class="emoji-display" id="emoji-display">❓</div>
 
             <div class="word-display" id="word-display">
                 </div>
@@ -198,41 +203,53 @@
         </div>
 
         <div id="end-screen">
-            <h2 style="font-size: 3em;">כל הכבוד! 🎉</h2>
-            <p style="font-size: 1.5em;">הצלחת לתקן את כל המילים!</p>
-            <p>הציון הסופי שלך: <span id="final-score" style="color: var(--primary); font-weight: bold;"></span></p>
+            <div style="font-size: 80px;">🏆</div>
+            <h2 style="font-size: 2.5em; color: var(--secondary);">כל הכבוד!</h2>
+            <p style="font-size: 1.3em;">סיימת את כל המילים!</p>
+            <p>הציון הסופי שלך: <span id="final-score" style="color: var(--primary); font-weight: bold; font-size: 1.5em;"></span></p>
             <button class="restart-btn" onclick="startGame()">שחקי שוב</button>
         </div>
     </div>
 
     <script>
-        const allWords = [
-            // א - ע
-            { word: "מ__טיה", correct: "א", wrong: "ע", full: "אַמְבַּטְיָה", type: "א' או ע'" },
-            { word: "צִב__וֹנִי", correct: "ע", wrong: "א", full: "צִבְעוֹנִי", type: "א' או ע'" },
-            { word: "__רְנָב", correct: "אַ", wrong: "עַ", full: "אַרְנָב", type: "א' או ע'" },
-            { word: "גַעֲ__וּעַ", correct: "גּ", wrong: "א", full: "גַּעֲגוּעַ", type: "א' או ע'" },
-            { word: "פִּת__וֹם", correct: "א", wrong: "ע", full: "פִּתְאוֹם", type: "א' או ע'" },
-            { word: "__וּגָה", correct: "ע", wrong: "א", full: "עוּגָה", type: "א' או ע'" },
-            
-            // ט - ת (תוקן: מבטיחה עם י')
-            { word: "מַבְ__ִיחָה", correct: "ט", wrong: "ת", full: "מַבְטִיחָה", type: "ט' או ת'" },
-            { word: "__וּכִּי", correct: "תּ", wrong: "טּ", full: "תּוּכִּי", type: "ט' או ת'" },
-            { word: "__לְוִיזְיָה", correct: "ט", wrong: "ת", full: "טֶלֶוִיזְיָה", type: "ט' או ת'" },
-            { word: "הַחְלָ__ה", correct: "ט", wrong: "ת", full: "הַחְלָטָה", type: "ט' או ת'" },
-            { word: "__וֹתָךְ", correct: "א", wrong: "ע", full: "אוֹתָךְ", type: "א' או ע'" }, 
-            { word: "כִּי__ָה", correct: "ת", wrong: "ט", full: "כִּיתָּה", type: "ט' או ת'" },
-            { word: "שְׁלִי__ָה", correct: "ט", wrong: "ת", full: "שְׁלִיטָה", type: "ט' או ת'" },
+        // מאגר 30 מילים (שמות עצם) עם אימוג'יז
+        const wordsData = [
+            // --- א' או ע' ---
+            { emoji: "🍉", full: "אֲבַטִּיחַ", word: "__בַטִּיחַ", correct: "אֲ", wrong: "עֲ", type: "א/ע" },
+            { emoji: "🎂", full: "עוּגָה", word: "__וּגָה", correct: "ע", wrong: "א", type: "א/ע" },
+            { emoji: "🐰", full: "אַרְנָב", word: "__רְנָב", correct: "אַ", wrong: "עַ", type: "א/ע" },
+            { emoji: "⌚", full: "שָׁעוֹן", word: "שָׁ__וֹן", correct: "ע", wrong: "א", type: "א/ע" },
+            { emoji: "✏️", full: "עִיפָּרוֹן", word: "__ִיפָּרוֹן", correct: "ע", wrong: "א", type: "א/ע" },
+            { emoji: "🚌", full: "אוֹטוֹבּוּס", word: "__וֹטוֹבּוּס", correct: "א", wrong: "ע", type: "א/ע" },
+            { emoji: "🦁", full: "אַרְיֵה", word: "__רְיֵה", correct: "אַ", wrong: "עַ", type: "א/ע" },
+            { emoji: "🌳", full: "עֵץ", word: "__ֵץ", correct: "ע", wrong: "א", type: "א/ע" },
+            { emoji: "🎧", full: "אוֹזְנִיּוֹת", word: "__וֹזְנִיּוֹת", correct: "א", wrong: "ע", type: "א/ע" },
+            { emoji: "🕷️", full: "עַכָּבִישׁ", word: "__ַכָּבִישׁ", correct: "עַ", wrong: "אַ", type: "א/ע" },
 
-            // כ - ח - ק
-            { word: "__תּוּל", correct: "ח", wrong: "כ", full: "חָתוּל", type: "ח' או כ'" },
-            { word: "__דּוּר", correct: "כּ", wrong: "ק", full: "כַּדּוּר", type: "כּ' או ק'" },
-            { word: "מִשְׂ__ָק", correct: "ח", wrong: "כ", full: "מִשְׂחָק", type: "ח' או כ'" },
-            { word: "__טָן", correct: "ק", wrong: "כּ", full: "קָטָן", type: "כּ' או ק'" },
-            { word: "וִיכּוּ__", correct: "ח", wrong: "ך", full: "וִיכּוּחַ", type: "ח' או ך'" }
+            // --- ט' או ת' ---
+            { emoji: "🦜", full: "תּוּכִּי", word: "__וּכִּי", correct: "תּ", wrong: "טּ", type: "ט/ת" },
+            { emoji: "☔", full: "מִטְרִיָּה", word: "מִ__רִיָּה", correct: "טְ", wrong: "תְ", type: "ט/ת" },
+            { emoji: "🍓", full: "תּוּת", word: "__וּת", correct: "תּ", wrong: "טּ", type: "ט/ת" },
+            { emoji: "📺", full: "טֶלֶוִיזְיָה", word: "__ֶלֶוִיזְיָה", correct: "ט", wrong: "ת", type: "ט/ת" },
+            { emoji: "🍎", full: "תַּפּוּחַ", word: "__ַפּוּחַ", correct: "תּ", wrong: "טּ", type: "ט/ת" },
+            { emoji: "✈️", full: "מָטוֹס", word: "מָ__וֹס", correct: "ט", wrong: "ת", type: "ט/ת" },
+            { emoji: "🔑", full: "מַפְתֵּחַ", word: "מַפְ__ֵחַ", correct: "תּ", wrong: "טּ", type: "ט/ת" },
+            { emoji: "🐊", full: "תַּנִּין", word: "__ַנִּין", correct: "תּ", wrong: "טּ", type: "ט/ת" },
+            { emoji: "👶", full: "תִּינוֹק", word: "__ִינוֹק", correct: "תּ", wrong: "טּ", type: "ט/ת" },
+            { emoji: "💍", full: "טַבַּעַת", word: "__ַבַּעַת", correct: "ט", wrong: "ת", type: "ט/ת" },
+
+            // --- כ' או ק' ---
+            { emoji: "⚽", full: "כַּדּוּר", word: "__ַדּוּר", correct: "כּ", wrong: "ק", type: "כ/ק" },
+            { emoji: "🧢", full: "כּוֹבַע", word: "__וֹבַע", correct: "כּ", wrong: "ק", type: "כ/ק" },
+            { emoji: "🐒", full: "קוֹף", word: "__וֹף", correct: "ק", wrong: "כּ", type: "כ/ק" },
+            { emoji: "🚂", full: "רַכֶּבֶת", word: "רַ__ֶבֶת", correct: "כּ", wrong: "ק", type: "כ/ק" },
+            { emoji: "🐶", full: "כֶּלֶב", word: "__ֶלֶב", correct: "כּ", wrong: "ק", type: "כ/ק" },
+            { emoji: "🌈", full: "קֶשֶׁת", word: "__ֶשֶׁת", correct: "ק", wrong: "כּ", type: "כ/ק" },
+            { emoji: "⭐", full: "כּוֹכָב", word: "__וֹכָב", correct: "כּ", wrong: "ק", type: "כ/ק" },
+            { emoji: "🌵", full: "קַקְטוּס", word: "__ַקְטוּס", correct: "ק", wrong: "כּ", type: "כ/ק" },
+            { emoji: "🥄", full: "כַּף", word: "__ַף", correct: "כּ", wrong: "ק", type: "כ/ק" },
+            { emoji: "⛑️", full: "קַסְדָּה", word: "__ַסְדָּה", correct: "ק", wrong: "כּ", type: "כ/ק" }
         ];
-
-        const words = allWords.filter(w => !w.ignore);
 
         let currentQuestionIndex = 0;
         let score = 0;
@@ -241,7 +258,7 @@
         function startGame() {
             score = 0;
             currentQuestionIndex = 0;
-            shuffledWords = [...words].sort(() => Math.random() - 0.5);
+            shuffledWords = [...wordsData].sort(() => Math.random() - 0.5);
             
             document.getElementById('end-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
@@ -257,15 +274,20 @@
 
             const q = shuffledWords[currentQuestionIndex];
             
-            document.getElementById('category-label').textContent = q.type;
+            // עדכון טקסטים
+            document.getElementById('category-label').textContent = "זוגות: " + q.type;
             document.getElementById('feedback-text').textContent = '';
+            document.getElementById('emoji-display').textContent = q.emoji;
             
+            // עדכון פס התקדמות
             const progress = (currentQuestionIndex / shuffledWords.length) * 100;
             document.getElementById('progress').style.width = `${progress}%`;
 
+            // הצגת המילה עם קו תחתון
             const wordDisplay = document.getElementById('word-display');
             wordDisplay.innerHTML = q.word.replace('__', '<span class="missing-letter">?</span>');
 
+            // יצירת הכפתורים
             const container = document.getElementById('buttons-container');
             container.innerHTML = '';
 
@@ -286,49 +308,46 @@
         function handleAnswer(btn, isCorrect, questionData) {
             const container = document.getElementById('buttons-container');
             
-            // נועלים את כל הכפתורים זמנית
+            // נעל כפתורים זמנית
             Array.from(container.children).forEach(b => b.disabled = true);
 
             if (isCorrect) {
+                // תשובה נכונה
                 btn.style.backgroundColor = 'var(--correct)';
-                btn.style.borderColor = '#00b894';
-                btn.style.color = '#fff';
+                btn.style.borderColor = 'var(--correct)';
+                btn.style.color = 'white';
+                btn.style.boxShadow = 'none';
                 
                 document.getElementById('word-display').innerHTML = questionData.full;
                 document.getElementById('word-display').classList.add('pulse');
                 
-                document.getElementById('feedback-text').textContent = 'נכון מאוד! 👏';
-                document.getElementById('feedback-text').style.color = '#00b894';
+                document.getElementById('feedback-text').textContent = 'מעולה! 😄';
+                document.getElementById('feedback-text').style.color = 'var(--correct)';
                 score += 10;
                 
                 setTimeout(() => {
                     document.getElementById('word-display').classList.remove('pulse');
                     currentQuestionIndex++;
                     loadQuestion();
-                }, 1200);
+                }, 1000);
 
             } else {
+                // תשובה שגויה
                 btn.style.backgroundColor = 'var(--wrong)';
-                btn.style.borderColor = '#d63031';
-                btn.style.color = '#fff';
+                btn.style.borderColor = 'var(--wrong)';
+                btn.style.color = 'white';
                 
                 const gameContainer = document.getElementById('game-container');
-                if(gameContainer) {
-                    gameContainer.classList.add('shake');
-                }
+                gameContainer.classList.add('shake');
                 
-                document.getElementById('feedback-text').textContent = 'אופס, נסי שוב...';
-                document.getElementById('feedback-text').style.color = '#d63031';
+                document.getElementById('feedback-text').textContent = 'לא נורא, נסי שוב...';
+                document.getElementById('feedback-text').style.color = 'var(--wrong)';
                 
                 setTimeout(() => {
-                    if(gameContainer) {
-                        gameContainer.classList.remove('shake');
-                    }
-                    // משחררים את הכפתורים האחרים כדי לאפשר ניסיון נוסף
+                    gameContainer.classList.remove('shake');
+                    // שחרור הכפתור השני ללחיצה
                     Array.from(container.children).forEach(b => {
-                        if (b !== btn) {
-                            b.disabled = false;
-                        }
+                        if (b !== btn) b.disabled = false;
                     });
                 }, 800);
             }
@@ -345,7 +364,9 @@
             document.getElementById('final-score').textContent = score;
         }
 
+        // התחלה
         startGame();
+
     </script>
 </body>
 </html>
