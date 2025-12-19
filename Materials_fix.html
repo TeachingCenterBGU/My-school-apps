@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מבחן במדעים - כיתה ג'</title>
+    <title>מבחן במדעים - כיתה ג' (גרסת הקלפים)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -15,24 +15,22 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
             background-color: white;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            padding: 20px;
+            padding: 30px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
         }
 
         h1 {
             color: #2c3e50;
             text-align: center;
-            font-size: 2em;
-        }
-
-        .intro {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 1.2em;
+            font-size: 1.8em;
+            margin-bottom: 10px;
         }
 
         /* Tabs styling */
@@ -48,11 +46,11 @@
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 1.1em;
-            transition: background 0.3s;
+            font-size: 0.9em;
+            transition: all 0.3s;
         }
 
         .tab-button:hover {
@@ -61,375 +59,298 @@
 
         .tab-button.active {
             background-color: #e67e22;
+            transform: scale(1.05);
             font-weight: bold;
         }
 
-        .section {
-            display: none;
-            animation: fadeIn 0.5s;
+        .mixed-btn {
+            background-color: #9b59b6;
+        }
+        .mixed-btn:hover { background-color: #8e44ad; }
+
+        /* Card Style */
+        .quiz-card {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: slideIn 0.4s ease-out;
         }
 
-        .section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Question Styles */
-        .question-card {
-            background-color: #f9f9f9;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
+        @keyframes slideIn {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .question-text {
             font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 10px;
+            font-size: 1.3em;
+            margin-bottom: 20px;
             color: #2c3e50;
+            line-height: 1.4;
+        }
+
+        .options-area {
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin: 5px 0;
+            margin: 10px 0;
             cursor: pointer;
-            padding: 5px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            border: 2px solid #eee;
+            transition: 0.2s;
         }
 
         label:hover {
             background-color: #e8f4f8;
         }
 
-        input[type="radio"] {
-            margin-left: 10px;
-        }
+        input[type="radio"] { margin-left: 10px; }
 
         select {
-            padding: 5px;
-            font-size: 1em;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background-color: white;
+            padding: 10px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            width: 100%;
+            margin-top: 10px;
         }
 
         textarea {
             width: 100%;
-            height: 80px;
+            height: 100px;
             padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
             font-family: inherit;
+            box-sizing: border-box;
         }
 
-        /* Buttons */
-        .check-btn {
-            background-color: #27ae60;
-            color: white;
+        /* Controls */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        .btn {
             border: none;
-            padding: 12px 30px;
-            font-size: 1.2em;
+            padding: 12px;
+            font-size: 1.1em;
             border-radius: 8px;
             cursor: pointer;
-            display: block;
-            margin: 20px auto;
             width: 100%;
-            max-width: 300px;
+            transition: 0.3s;
         }
 
-        .check-btn:hover {
-            background-color: #219150;
-        }
-
-        /* Feedback */
-        .correct {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-
-        .incorrect {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-
-        .feedback-msg {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        .parent-check {
-            background-color: #fff3cd;
-            border: 2px dashed #ffeeba;
-            padding: 15px;
+        .check-btn { background-color: #27ae60; color: white; }
+        .next-btn { background-color: #34495e; color: white; display: none; }
+        
+        .progress-bar {
             text-align: center;
-            border-radius: 10px;
-            margin-top: 20px;
-            font-size: 1.2em;
-            color: #856404;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 15px;
         }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .incorrect { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .open-note { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
 
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🔬 חזרה למבחן במדעים - כיתה ג' 🌍</h1>
-    <div class="intro">בחרי איזה סוג שאלות את רוצה לתרגל:</div>
-
+    <h1>🔬 חזרת המדעים שלי 🌍</h1>
+    
     <div class="tabs">
-        <button class="tab-button active" onclick="showTab('partA')">חלק א': שאלות אמריקאיות</button>
-        <button class="tab-button" onclick="showTab('partB')">חלק ב': השלמת מילים</button>
-        <button class="tab-button" onclick="showTab('partC')">חלק ג': שאלות פתוחות</button>
+        <button class="tab-button" onclick="startQuiz('A')">חלק א'</button>
+        <button class="tab-button" onclick="startQuiz('B')">חלק ב'</button>
+        <button class="tab-button" onclick="startQuiz('C')">חלק ג'</button>
+        <button class="tab-button mixed-btn" onclick="startQuiz('Mixed')">🎲 ערבב הכל!</button>
     </div>
 
-    <div id="partA" class="section active">
-        <h2>חלק א': הקיפי את התשובה הנכונה</h2>
-        <form id="quizA">
-            </form>
-        <button class="check-btn" onclick="checkPartA()">בִּדְקִי אֶת הַתְּשׁוּבוֹת!</button>
-    </div>
-
-    <div id="partB" class="section">
-        <h2>חלק ב': השלמת מילים (מחסן מילים)</h2>
-        <div style="background:#eef; padding:10px; border-radius:5px; margin-bottom:15px; font-size:0.9em;">
-            <strong>מחסן מילים:</strong> חומר גלם, מתמוסס, שימוש חוזר, תערובת, מוצר, מגנטיות, מסננת, צמצום צריכה, תמיסה, הטבע, מוליך חום, ברזל, מבודד, נחושת, מתקרב.
-        </div>
-        <form id="quizB">
-            </form>
-        <button class="check-btn" onclick="checkPartB()">בִּדְקִי אֶת הַתְּשׁוּבוֹת!</button>
-    </div>
-
-    <div id="partC" class="section">
-        <h2>חלק ג': שאלות פתוחות</h2>
-        <p>בחלק זה עלייך לכתוב את התשובה המלאה.</p>
-        <div id="openQuestionsArea"></div>
-        
-        <div class="parent-check">
-            👩‍🏫 סיימת לכתוב? <br>
-            <strong>קראי לאמא או אבא שיבדקו את התשובות שלך!</strong>
+    <div id="quiz-container">
+        <div style="text-align: center; margin-top: 50px; color: #7f8c8d;">
+            בחרי קטגוריה כדי להתחיל לתרגל!
         </div>
     </div>
 
+    <div id="controls-area" class="controls" style="display: none;">
+        <button id="check-btn" class="btn check-btn" onclick="handleCheck()">בדיקה</button>
+        <button id="next-btn" class="btn next-btn" onclick="renderNextQuestion()">השאלה הבאה ⮕</button>
+        <div class="progress-bar" id="progress"></div>
+    </div>
 </div>
 
 <script>
     // --- DATA ---
-
     const questionsA = [
-        {
-            q: "1. מהו מוצר?",
-            options: ["דבר שנמצא בטבע כמו שהוא.", "חפץ שנוצר על ידי האדם מחומרים שונים כדי לשמש אותו.", "סוג של אדמה.", "פסולת שצריך לזרוק."],
-            ans: 1 // Index 1 is option 2
-        },
-        {
-            q: "2. איזה מהבאים הוא חומר ולא מוצר?",
-            options: ["שולחן עץ", "בקבוק פלסטיק", "צמר", "סוודר"],
-            ans: 2 
-        },
-        {
-            q: "3. מהי תערובת?",
-            options: ["חומר אחד בלבד שנמצא בכלי", "ערבוב של שני חומרים או יותר יחד", "חומר שנעלם במים", "מוצר חדש שקונים בחנות"],
-            ans: 1
-        },
-        {
-            q: "4. כיצד ניתן להפריד תערובת של חול וברגים?",
-            options: ["בעזרת חימום", "בעזרת מגנט (מגנטיות)", "בעזרת אידוי המים", "אי אפשר להפריד ביניהם"],
-            ans: 1
-        },
-        {
-            q: "5. מהי התכונה המבדילה שמאפשרת להפריד אבנים מחול בעזרת כברה (מסננת גדולה)?",
-            options: ["צבע", "ריח", "גודל הגרגרים", "מסיסות במים"],
-            ans: 2
-        },
-        {
-            q: "6. מה קורה לסוכר כשאנחנו מערבבים אותו בתה חם?",
-            options: ["הוא נעלם ולא קיים יותר", "הוא שוקע לקרקעית ולא משתנה", "הוא ניתך והופך לנוזל", "הוא מתמוסס ונוצרת תמיסה"],
-            ans: 3
-        },
-        {
-            q: "7. איזה מהחומרים לא מתמוסס במים??",
-            options: ["סוכר", "מלח", "שמן", "כולם לא מתמוססים במים"],
-            ans: 2 // Assuming "Paper -> Notebook" based on Raw -> Product order
-        },
-        {
-            q: "8. למה חשוב למחזר חומרים?",
-            options: ["כדי שיהיה לנו יותר זבל בפחים", "כדי לשמור על משאבי הטבע ולצמצם את הפסולת", "כי זה מבזבז זמן", "כדי ללכלך את הסביבה"],
-            ans: 1
-        },
-        {
-            q: "9. מהי הדרך הטובה ביותר להפריד תערובת של מי מלח לקבלת המלח?",
-            options: ["סינון", "הצפה", "אידוי (חימום המים)", "שימוש במגנט"],
-            ans: 2
-        },
-        {
-            q: "10. איזה חפץ יימשך למגנט?",
-            options: ["כוס זכוכית", "סיכת ביטחון מברזל", "מחק גומי", "כפית פלסטיק"],
-            ans: 1
-        },
-        {
-            q: "11. מדוע הידיות של סירים עשויות בדרך כלל מפלסטיק או עץ?",
-            options: ["כי אלו חומרים יפים", "כי הם מוליכים חום היטב", "כי הם מבודדים (לא מוליכים חום טוב)", "כי הם חזקים ממתכת"],
-            ans: 2
-        }
+        { type: 'A', q: "מהו מוצר?", options: ["דבר שנמצא בטבע כמו שהוא.", "חפץ שנוצר על ידי האדם מחומרים שונים כדי לשמש אותו.", "סוג של אדמה.", "פסולת שצריך לזרוק."], ans: 1 },
+        { type: 'A', q: "איזה מהבאים הוא חומר ולא מוצר?", options: ["שולחן עץ", "בקבוק פלסטיק", "צמר", "סוודר"], ans: 2 },
+        { type: 'A', q: "מהי תערובת?", options: ["חומר אחד בלבד שנמצא בכלי", "ערבוב של שני חומרים או יותר יחד", "חומר שנעלם במים", "מוצר חדש שקונים בחנות"], ans: 1 },
+        { type: 'A', q: "כיצד ניתן להפריד תערובת של חול וברגים?", options: ["בעזרת מסננת (סינון)", "בעזרת מגנט (מגנטיות)", "בעזרת אידוי המים", "אי אפשר להפריד ביניהם"], ans: 1 },
+        { type: 'A', q: "מהי התכונה המבדילה שמאפשרת להפריד אבנים מחול בעזרת כברה?", options: ["צבע", "ריח", "גודל הגרגרים", "מסיסות במים"], ans: 2 },
+        { type: 'A', q: "מה קורה לסוכר כשאנחנו מערבבים אותו בתה חם?", options: ["הוא נעלם ולא קיים יותר", "הוא שוקע לקרקעית ולא משתנה", "הוא ניתך והופך לנוזל", "הוא מתמוסס ונוצרת תמיסה"], ans: 3 },
+        { type: 'A', q: "איזה מהחומרים לא מתמוסס במים?", options: ["סוכר", "מלח", "שמן", "כולם לא מתמוססים"], ans: 2 },
+        { type: 'A', q: "למה חשוב למחזר חומרים?", options: ["כדי שיהיה לנו יותר זבל", "כדי לשמור על משאבי הטבע", "כי זה מבזבז זמן", "כדי ללכלך את הסביבה"], ans: 1 },
+        { type: 'A', q: "מהי הדרך הטובה ביותר להפריד מי מלח לקבלת המלח?", options: ["סינון", "הצפה", "אידוי (חימום)", "מגנט"], ans: 2 },
+        { type: 'A', q: "איזה חפץ יימשך למגנט?", options: ["כוס זכוכית", "סיכת ביטחון מברזל", "מחק גומי", "כפית פלסטיק"], ans: 1 },
+        { type: 'A', q: "מדוע ידיות של סירים עשויות מפלסטיק או עץ?", options: ["כי אלו חומרים יפים", "כי הם מוליכים חום היטב", "כי הם מבודדים", "כי הם חזקים ממתכת"], ans: 2 }
     ];
 
     const questionsB = [
-        { text: "השולחן הוא ___ שהנגר הכין מעץ.", ans: "מוצר" },
-        { text: "העץ הוא ___ שמשמש לבניית רהיטים.", ans: "חומר גלם" },
-        { text: "סלט ירקות הוא דוגמה ל___ של מוצקים.", ans: "תערובת" },
-        { text: "כאשר מערבבים מלח במים, המלח ___ במים.", ans: "מתמוסס" },
-        { text: "מים שמומס בתוכם סוכר נקראים ___.", ans: "תמיסה" },
-        { text: "כדי להפריד אטבים מברזל מתוך חול, נשתמש בתכונת ה___.", ans: "מגנטיות" },
-        { text: "כשאנחנו משתמשים בצנצנת ריקה לאחסון עפרונות, אנו עושים ___.", ans: "שימוש חוזר" },
-        { text: "כדי להפריד בין גרגירי אורז לקמח, כדאי להשתמש ב___.", ans: "מסננת" },
-        { text: "חומרים רבים שאנו משתמשים בהם נלקחים מן ___.", ans: "הטבע" },
-        { text: "קניית רק מה שצריך ולא דברים מיותרים נקראת ___.", ans: "צמצום צריכה" },
-        { text: "המגנט מושך אליו חפצים העשויים מ___.", ans: "ברזל" },
-        { text: "המתכת היא חומר שהוא ___ טוב, ולכן הסיר עשוי ממנה.", ans: "מוליך חום" },
-        { text: "הקלקר הוא חומר ___, ולכן שומרים איתו על קור.", ans: "מבודד" }
+        { type: 'B', text: "השולחן הוא ___ שהנגר הכין מעץ.", ans: "מוצר" },
+        { type: 'B', text: "העץ הוא ___ שמשמש לבניית רהיטים.", ans: "חומר גלם" },
+        { type: 'B', text: "סלט ירקות הוא דוגמה ל___ של מוצקים.", ans: "תערובת" },
+        { type: 'B', text: "כאשר מערבבים מלח במים, המלח ___ במים.", ans: "מתמוסס" },
+        { type: 'B', text: "מים שמומס בתוכם סוכר נקראים ___.", ans: "תמיסה" },
+        { type: 'B', text: "כדי להפריד אטבים מברזל מחול, נשתמש בתכונת ה___.", ans: "מגנטיות" },
+        { type: 'B', text: "כשאנחנו משתמשים בצנצנת ריקה לאחסון עפרונות, אנו עושים ___.", ans: "שימוש חוזר" },
+        { type: 'B', text: "המגנט מושך אליו חפצים העשויים מ___.", ans: "ברזל" },
+        { type: 'B', text: "המתכת היא חומר שהוא ___ טוב.", ans: "מוליך חום" }
     ];
-
-    const wordBank = ["חומר גלם", "מתמוסס", "שימוש חוזר", "תערובת", "מוצר", "מגנטיות", "מסננת", "צמצום צריכה", "תמיסה", "הטבע", "מוליך חום", "ברזל", "מבודד", "נחושת", "מתקרב"];
 
     const questionsC = [
-        "1. הסבירו במילים שלכם: מה ההבדל בין 'חומר' לבין 'מוצר'? תנו דוגמה.",
-        "2. תארו את השלבים להפרדת תערובת של מים, חול ומלח.",
-        "3. ציינו שתי תכונות של הזכוכית שהופכות אותה למתאימה לחלונות.",
-        "4. דני הכין תערובת שמן ומים. האם התערבבו? הסבירו בעזרת המושג 'צף'.",
-        "5. בחרו מוצר מהקלמר. מאיזה חומר הוא עשוי ולמה בחרו בחומר זה?",
-        "6. מהי 'תכונה מבדילה'? תנו דוגמה.",
-        "7. הסבירו מהו 'שימוש חוזר' ותנו דוגמה.",
-        "8. מה יקרה אם נשאיר כוס מי-ים בשמש לזמן רב?",
-        "9. הציעו רעיון לשמירה על הסביבה בבית הספר.",
-        "10. באיזו כפית כדאי לערבב שוקו חם (מתכת או פלסטיק)? נמקו עם המילים 'מוליך' או 'מבודד'.",
-        "11. כיצד תוציאו מפתח מברזל מדלי מים בלי להרטיב ידיים?",
-        "12. מיינו לטבלה: מסמר, עיפרון, מהדק, טבעת זהב, פקק שעם (נמשך/לא נמשך למגנט).",
-        "13. איך מעיל צמר מחמם אותנו? הסבירו בעזרת 'בידוד'."
+        { type: 'C', q: "הסבירו במילים שלכם: מה ההבדל בין 'חומר' לבין 'מוצר'? תנו דוגמה." },
+        { type: 'C', q: "תארו את השלבים להפרדת תערובת של מים, חול ומלח." },
+        { type: 'C', q: "ציינו שתי תכונות של הזכוכית שהופכות אותה למתאימה לחלונות." },
+        { type: 'C', q: "בחרו מוצר מהקלמר. מאיזה חומר הוא עשוי ולמה בחרו בחומר זה?" },
+        { type: 'C', q: "באיזו כפית כדאי לערבב שוקו חם (מתכת או פלסטיק)? נמקו." }
     ];
 
-    // --- RENDER FUNCTIONS ---
+    const wordBank = ["חומר גלם", "מתמוסס", "שימוש חוזר", "תערובת", "מוצר", "מגנטיות", "תמיסה", "מוליך חום", "ברזל", "מבודד"];
 
-    function init() {
-        // Render Part A
-        const quizA = document.getElementById('quizA');
-        questionsA.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'question-card';
-            card.id = `qA_${index}`;
-            let html = `<div class="question-text">${item.q}</div>`;
-            item.options.forEach((opt, optIndex) => {
-                html += `<label><input type="radio" name="q${index}" value="${optIndex}"> ${opt}</label>`;
-            });
-            html += `<div class="feedback-msg" id="fbA_${index}"></div>`;
-            card.innerHTML = html;
-            quizA.appendChild(card);
-        });
+    // --- STATE ---
+    let currentDeck = [];
+    let currentIndex = 0;
 
-        // Render Part B
-        const quizB = document.getElementById('quizB');
-        questionsB.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'question-card';
-            card.id = `qB_${index}`;
-            
-            // Generate Options for Select
-            let optionsHtml = `<option value="">בחרו מילה...</option>`;
-            // Shuffle word bank roughly or just list
-            wordBank.sort().forEach(word => {
-                optionsHtml += `<option value="${word}">${word}</option>`;
-            });
+    // --- LOGIC ---
 
-            const sentence = item.text.replace('___', `<select id="sel_${index}">${optionsHtml}</select>`);
-            
-            card.innerHTML = `<div class="question-text">${sentence}</div><div class="feedback-msg" id="fbB_${index}"></div>`;
-            quizB.appendChild(card);
-        });
-
-        // Render Part C
-        const areaC = document.getElementById('openQuestionsArea');
-        questionsC.forEach((q, index) => {
-            const card = document.createElement('div');
-            card.className = 'question-card';
-            card.innerHTML = `<div class="question-text">${q}</div><textarea placeholder="כתבי כאן את התשובה..."></textarea>`;
-            areaC.appendChild(card);
-        });
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
     }
 
-    // --- LOGIC FUNCTIONS ---
+    function startQuiz(mode) {
+        currentIndex = 0;
+        if (mode === 'A') currentDeck = shuffle([...questionsA]);
+        else if (mode === 'B') currentDeck = shuffle([...questionsB]);
+        else if (mode === 'C') currentDeck = shuffle([...questionsC]);
+        else if (mode === 'Mixed') {
+            currentDeck = shuffle([...questionsA, ...questionsB, ...questionsC]);
+        }
 
-    function showTab(tabId) {
-        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+        document.getElementById('controls-area').style.display = 'block';
         
-        document.getElementById(tabId).classList.add('active');
-        // Highlight button
-        const btnIndex = tabId === 'partA' ? 0 : tabId === 'partB' ? 1 : 2;
-        document.querySelectorAll('.tab-button')[btnIndex].classList.add('active');
+        // UI Highlight
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        event?.target.classList.add('active');
+
+        renderNextQuestion();
     }
 
-    function checkPartA() {
-        let score = 0;
-        questionsA.forEach((item, index) => {
-            const selected = document.querySelector(`input[name="q${index}"]:checked`);
-            const feedback = document.getElementById(`fbA_${index}`);
-            const card = document.getElementById(`qA_${index}`);
-            
-            card.classList.remove('correct', 'incorrect');
-            
-            if (selected) {
-                if (parseInt(selected.value) === item.ans) {
-                    score++;
-                    card.classList.add('correct');
-                    feedback.innerText = "כל הכבוד! תשובה נכונה ✅";
-                    feedback.style.color = "green";
-                } else {
-                    card.classList.add('incorrect');
-                    feedback.innerText = "לא בדיוק... נסי שוב ❌";
-                    feedback.style.color = "red";
-                }
-            } else {
-                feedback.innerText = "לא נבחרה תשובה";
-                feedback.style.color = "orange";
-            }
-        });
-        alert(`סיימת את חלק א'! ענית נכון על ${score} מתוך ${questionsA.length} שאלות.`);
+    function renderNextQuestion() {
+        if (currentIndex >= currentDeck.length) {
+            document.getElementById('quiz-container').innerHTML = `
+                <div style="text-align:center;">
+                    <h2>כל הכבוד! 🎉</h2>
+                    <p>סיימת את כל החפיסה.</p>
+                    <button class="btn" style="background:#3498db; color:white;" onclick="location.reload()">תרגול חדש</button>
+                </div>`;
+            document.getElementById('controls-area').style.display = 'none';
+            return;
+        }
+
+        const q = currentDeck[currentIndex];
+        const container = document.getElementById('quiz-container');
+        const nextBtn = document.getElementById('next-btn');
+        const checkBtn = document.getElementById('check-btn');
+        
+        nextBtn.style.display = 'none';
+        checkBtn.style.display = 'block';
+        
+        let html = `<div class="quiz-card">`;
+        
+        if (q.type === 'A') {
+            html += `<div class="question-text">${q.q}</div><div class="options-area">`;
+            q.options.forEach((opt, i) => {
+                html += `<label><input type="radio" name="opt" value="${i}"> ${opt}</label>`;
+            });
+            html += `</div>`;
+        } 
+        else if (q.type === 'B') {
+            let selectHtml = `<select id="ans-select"><option value="">בחרי מילה...</option>`;
+            wordBank.sort().forEach(w => selectHtml += `<option value="${w}">${w}</option>`);
+            selectHtml += `</select>`;
+            html += `<div class="question-text">${q.text.replace('___', '______')}</div>`;
+            html += `<div class="options-area">${selectHtml}</div>`;
+        }
+        else if (q.type === 'C') {
+            html += `<div class="question-text">${q.q}</div>`;
+            html += `<textarea id="open-ans" placeholder="כתבי כאן את התשובה שלך..."></textarea>`;
+        }
+
+        html += `<div id="feedback" class="feedback"></div></div>`;
+        container.innerHTML = html;
+
+        document.getElementById('progress').innerText = `שאלה ${currentIndex + 1} מתוך ${currentDeck.length}`;
     }
 
-    function checkPartB() {
-        let score = 0;
-        questionsB.forEach((item, index) => {
-            const select = document.getElementById(`sel_${index}`);
-            const feedback = document.getElementById(`fbB_${index}`);
-            const card = document.getElementById(`qB_${index}`);
-            const val = select.value;
+    function handleCheck() {
+        const q = currentDeck[currentIndex];
+        const feedback = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const checkBtn = document.getElementById('check-btn');
+        let isCorrect = false;
+        let isSpecial = false;
 
-            card.classList.remove('correct', 'incorrect');
+        if (q.type === 'A') {
+            const selected = document.querySelector('input[name="opt"]:checked');
+            if (!selected) return alert("אנא בחרי תשובה");
+            if (parseInt(selected.value) === q.ans) isCorrect = true;
+        } 
+        else if (q.type === 'B') {
+            const val = document.getElementById('ans-select').value;
+            if (!val) return alert("אנא בחרי מילה מהרשימה");
+            if (val === q.ans) isCorrect = true;
+        }
+        else if (q.type === 'C') {
+            isSpecial = true; // Open questions don't have auto-check
+        }
 
-            if (val === item.ans) {
-                score++;
-                card.classList.add('correct');
-                feedback.innerText = "נכון מאוד! ✅";
-                feedback.style.color = "green";
-            } else {
-                card.classList.add('incorrect');
-                feedback.innerText = "נסו מילה אחרת ❌";
-                feedback.style.color = "red";
-            }
-        });
-        alert(`סיימת את חלק ב'! ענית נכון על ${score} מתוך ${questionsB.length} שאלות.`);
+        feedback.style.display = 'block';
+        if (isSpecial) {
+            feedback.innerHTML = "נשמע מעולה! השאלה הזו פתוחה - הראי לאמא או אבא שבדקו את הניסוח שלך. ⭐";
+            feedback.className = "feedback open-note";
+        } else if (isCorrect) {
+            feedback.innerText = "נכון מאוד! כל הכבוד! ✅";
+            feedback.className = "feedback correct";
+        } else {
+            feedback.innerText = "לא בדיוק, כדאי לנסות שוב או לבדוק בחומר הלימוד. ❌";
+            feedback.className = "feedback incorrect";
+        }
+
+        checkBtn.style.display = 'none';
+        nextBtn.style.display = 'block';
+        currentIndex++;
     }
-
-    // Run on load
-    init();
-
 </script>
 
 </body>
