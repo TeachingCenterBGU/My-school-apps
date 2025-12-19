@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>תרגול גיאוגרפיה - כיתה ה</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#121a33;
+      --card2:#0f1730;
+      --text:#e9ecff;
+      --muted:#aeb6e8;
+      --good:#2ecc71;
+      --bad:#ff5c7c;
+      --accent:#7c5cff;
+      --accent2:#37c6ff;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 18px;
+      --btnRadius: 14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Arial;
+      background: radial-gradient(1200px 700px at 80% 10%, rgba(124,92,255,.22), transparent 60%),
+                  radial-gradient(1000px 600px at 10% 80%, rgba(55,198,255,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .app{
+      width:min(1000px, 96vw);
+      margin: 22px auto;
+      padding: 18px;
+    }
+    header{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 14px;
+      flex-wrap:wrap;
+    }
+    .title{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .badge{
+      width:44px;height:44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(55,198,255,.85));
+      display:grid; place-items:center;
+      box-shadow: var(--shadow);
+      font-weight:800;
+    }
+    h1{
+      margin:0;
+      font-size: 20px;
+      letter-spacing: .2px;
+    }
+    .sub{
+      margin:2px 0 0;
+      color:var(--muted);
+      font-size: 13px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin: 10px 0 16px;
+    }
+    .tabBtn{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(18,26,51,.7);
+      color:var(--text);
+      padding: 10px 12px;
+      border-radius: var(--btnRadius);
+      cursor:pointer;
+      transition:.15s transform, .15s background, .15s border;
+      user-select:none;
+    }
+    .tabBtn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.22);}
+    .tabBtn.active{
+      background: linear-gradient(135deg, rgba(124,92,255,.35), rgba(55,198,255,.25));
+      border-color: rgba(124,92,255,.55);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.3fr .9fr;
+      gap:14px;
+    }
+    @media (max-width: 900px){
+      .grid{grid-template-columns: 1fr;}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(18,26,51,.92), rgba(15,23,48,.9));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHeader{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .cardHeader h2{
+      margin:0;
+      font-size: 16px;
+    }
+    .cardHeader p{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.35;
+    }
+    .cardBody{ padding: 14px; }
+
+    .pillRow{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    }
+    .pill{
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+    }
+    .pill strong{font-weight:800}
+    .pill.good{border-color: rgba(46,204,113,.35); background: rgba(46,204,113,.10);}
+    .pill.bad{border-color: rgba(255,92,124,.40); background: rgba(255,92,124,.12);}
+    .pill.accent{border-color: rgba(124,92,255,.45); background: rgba(124,92,255,.12);}
+
+    .btn{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: var(--btnRadius);
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      transition:.15s transform, .15s background, .15s border;
+      font-weight:700;
+    }
+    .btn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.24);}
+    .btn.primary{
+      border-color: rgba(124,92,255,.55);
+      background: linear-gradient(135deg, rgba(124,92,255,.42), rgba(55,198,255,.20));
+    }
+    .btnRow{display:flex; gap:10px; flex-wrap:wrap;}
+    .btnRow .btn{flex:1; min-width: 180px;}
+    .smallBtn{
+      padding: 9px 10px;
+      width:auto;
+      font-size: 13px;
+    }
+
+    /* Map */
+    .mapWrap{
+      border-radius: 16px;
+      background: radial-gradient(800px 400px at 60% 30%, rgba(55,198,255,.13), transparent 60%),
+                  rgba(10,16,34,.55);
+      border:1px solid rgba(255,255,255,.10);
+      padding: 10px;
+    }
+
+    .mapStage{ position:relative; border-radius:14px; overflow:hidden; }
+    #worldMapImg{ width:100%; height:auto; display:block; user-select:none; -webkit-user-drag:none; }
+    svg.overlay{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+    /* נקודות */
+    .hitPoint{
+      cursor:pointer;
+      transition: .12s filter, .12s transform;
+      transform-origin: center;
+      stroke: rgba(255,255,255,.70);
+      stroke-width: 2;
+    }
+    .hitPoint.continent{ fill: rgba(124,92,255,.88); }
+    .hitPoint.ocean{ fill: rgba(55,198,255,.82); }
+    .hitPoint:hover{ filter: brightness(1.10); }
+
+    /* תוויות (לא בשימוש כברירת מחדל) */
+    .labelsOff .label{ display:none; }
+
+    .flashGood{animation: flashGood .55s ease;}
+    .flashBad{animation: flashBad .55s ease;}
+    @keyframes flashGood{
+      0%{filter:none}
+      50%{filter: drop-shadow(0 0 12px rgba(46,204,113,.75));}
+      100%{filter:none}
+    }
+    @keyframes flashBad{
+      0%{filter:none}
+      50%{filter: drop-shadow(0 0 12px rgba(255,92,124,.75));}
+      100%{filter:none}
+    }
+
+    /* Quiz */
+    .qTitle{margin:0 0 8px; font-size: 16px;}
+    .qText{margin:0 0 10px; color: var(--text); line-height: 1.45;}
+    .options{display:grid; gap:10px; margin-top: 10px;}
+    .optBtn{
+      text-align:right;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      transition:.12s transform, .12s border, .12s background;
+      color: var(--text);
+      font-weight:650;
+    }
+    .optBtn:hover{transform: translateY(-1px); border-color: rgba(255,255,255,.24);}
+    .optBtn.correct{border-color: rgba(46,204,113,.55); background: rgba(46,204,113,.12);}
+    .optBtn.wrong{border-color: rgba(255,92,124,.55); background: rgba(255,92,124,.12);}
+    .inputRow{display:flex; gap:10px; margin-top: 10px; flex-wrap:wrap;}
+    input[type="text"]{
+      flex:1;
+      min-width: 220px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.15);
+      color: var(--text);
+      outline:none;
+    }
+    input[type="text"]:focus{border-color: rgba(55,198,255,.55);}
+    .hint{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .toast{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+    }
+    .toast.good{border-color: rgba(46,204,113,.40); background: rgba(46,204,113,.10);}
+    .toast.bad{border-color: rgba(255,92,124,.45); background: rgba(255,92,124,.12);}
+    .divider{height:1px; background: rgba(255,255,255,.08); margin: 12px 0;}
+    .tiny{font-size: 12px; color: var(--muted);}
+
+    .hidden{display:none !important;}
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <div class="badge">Geo</div>
+        <div>
+          <h1>תרגול גיאוגרפיה - כיתה ה</h1>
+          <div class="sub">מפה אינטראקטיבית עם נקודות + שאלות מסוגים שונים (ניקוד, התקדמות, חזרה)</div>
+        </div>
+      </div>
+      <div class="pillRow">
+        <div class="pill accent"><strong id="globalScore">0</strong> נק׳</div>
+        <div class="pill"><span id="globalStreak">רצף: 0</span></div>
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button class="tabBtn active" id="tabMap">חלק 1 - מפת העולם</button>
+      <button class="tabBtn" id="tabQuiz">חלק 2 - שאלות</button>
+    </div>
+
+    <!-- MAP SECTION -->
+    <section id="mapSection" class="grid">
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <h2>משחק מפת העולם</h2>
+            <p>בחרי מצב (יבשות / אוקיינוסים). המשחק יבקש “מצאי את…”, ואת לוחצת על נקודה מסומנת.</p>
+            <p class="tiny">טיפ: אפשר להקטין או להגדיל את גודל הנקודות על ידי שינוי r של .dot ושל .halo ב-SVG.</p>
+          </div>
+          <div class="pillRow">
+            <div class="pill good">נכון: <strong id="mapCorrect">0</strong></div>
+            <div class="pill bad">טעויות: <strong id="mapWrong">0</strong></div>
+          </div>
+        </div>
+        <div class="cardBody">
+          <div class="pillRow" style="margin-bottom:10px;">
+            <span class="pill">מצב:</span>
+            <button class="btn smallBtn primary" id="modeContinents">יבשות</button>
+            <button class="btn smallBtn" id="modeOceans">אוקיינוסים</button>
+            <button class="btn smallBtn" id="mapReset">איפוס</button>
+          </div>
+
+          <div class="mapWrap" aria-label="מפת עולם עם נקודות">
+            <div class="mapStage">
+              <img id="worldMapImg" src="world-map.jpg" alt="מפת העולם" />
+              <svg class="overlay labelsOff" viewBox="0 0 2000 1039" preserveAspectRatio="none" aria-hidden="true">
+                <!-- יבשות -->
+                <circle class="hitPoint continent" data-type="continent" data-name="אמריקה הצפונית" cx="332" cy="283" r="10"></circle>
+                <circle class="hitPoint continent" data-type="continent" data-name="אמריקה הדרומית" cx="508" cy="668" r="10"></circle>
+                <circle class="hitPoint continent" data-type="continent" data-name="אירופה" cx="996" cy="270" r="9"></circle>
+                <circle class="hitPoint continent" data-type="continent" data-name="אפריקה" cx="1055" cy="552" r="10"></circle>
+                <circle class="hitPoint continent" data-type="continent" data-name="אסיה" cx="1445" cy="321" r="10"></circle>
+                <circle class="hitPoint continent" data-type="continent" data-name="אוסטרליה" cx="1743" cy="771" r="9"></circle>
+                <circle class="hitPoint continent" data-type="continent" data-name="אנטארקטיקה" cx="1016" cy="976" r="11"></circle>
+
+                <!-- אוקיינוסים (השקט מסומן בשני צדדים) -->
+                <circle class="hitPoint ocean" data-type="ocean" data-name="האוקיינוס השקט" cx="166" cy="424" r="10"></circle>
+                <circle class="hitPoint ocean" data-type="ocean" data-name="האוקיינוס השקט" cx="1914" cy="424" r="10"></circle>
+                <circle class="hitPoint ocean" data-type="ocean" data-name="האוקיינוס האטלנטי" cx="750" cy="462" r="10"></circle>
+                <circle class="hitPoint ocean" data-type="ocean" data-name="האוקיינוס ההודי" cx="1328" cy="668" r="10"></circle>
+                <circle class="hitPoint ocean" data-type="ocean" data-name="האוקיינוס הארקטי" cx="1016" cy="103" r="9"></circle>
+                <circle class="hitPoint ocean" data-type="ocean" data-name="האוקיינוס הדרומי" cx="1016" cy="925" r="9"></circle>
+              </svg>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="pillRow">
+            <div class="pill accent">משימה:</div>
+            <div class="pill" style="flex:1; min-width: 240px;"><strong id="mapPrompt">לחצי על “יבשות” כדי להתחיל.</strong></div>
+          </div>
+
+          <div id="mapFeedback" class="toast hidden" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <h2>הסברים מהירים</h2>
+            <p>כי המוח אוהב חזרות קצרות, ואז משחק.</p>
+          </div>
+        </div>
+        <div class="cardBody">
+          <div class="pillRow">
+            <div class="pill">יבשות: 7</div>
+            <div class="pill">אוקיינוסים: 5</div>
+          </div>
+          <div class="divider"></div>
+          <div class="tiny">
+            כדי להראות את התוויות (שמות ליד הנקודות) הסירי מה-SVG את המחלקה labelsOff.
+          </div>
+          <div class="divider"></div>
+          <button class="btn primary" id="jumpToQuiz">יאללה, לשאלות!</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ SECTION -->
+    <section id="quizSection" class="grid hidden">
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <h2>שאלות תרגול</h2>
+            <p>20 שאלות. ערבוב אקראי. סוגים שונים: רב-ברירה, נכון/לא נכון, והשלמת משפט.</p>
+          </div>
+          <div class="pillRow">
+            <div class="pill accent">שאלה <strong id="qIndex">0</strong>/<strong id="qTotal">0</strong></div>
+            <div class="pill good">נכון: <strong id="qCorrect">0</strong></div>
+            <div class="pill bad">טעויות: <strong id="qWrong">0</strong></div>
+          </div>
+        </div>
+        <div class="cardBody">
+          <h3 class="qTitle" id="qTitle">בואו נתחיל</h3>
+          <div class="qText" id="qText">לחצי "שאלה הבאה" כדי להתחיל.</div>
+
+          <div id="quizArea"></div>
+
+          <div id="qFeedback" class="toast hidden" aria-live="polite"></div>
+
+          <div class="divider"></div>
+
+          <div class="btnRow">
+            <button class="btn primary" id="nextQuestion">שאלה הבאה</button>
+            <button class="btn" id="restartQuiz">איפוס שאלות</button>
+          </div>
+          <div class="hint" id="qHint"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <h2>מה תרגלנו כאן?</h2>
+            <p>לפי הרשימה: יבשות, אוקיינוסים, סוגי מפות (פיזית/מדינית), והשוואה ביניהן, ומושגים.</p>
+          </div>
+        </div>
+        <div class="cardBody">
+          <div class="pillRow">
+            <span class="pill">מושגים:</span>
+            <span class="pill">אי</span>
+            <span class="pill">ארכיפלג</span>
+            <span class="pill">מיצר</span>
+            <span class="pill">מפרץ</span>
+            <span class="pill">חצי אי</span>
+          </div>
+          <div class="divider"></div>
+          <div class="tiny">
+            אם תרצי להוסיף שאלות על חומר ספציפי מהמורה אפשר פשוט להוסיף לשאלון עוד פריטים.
+          </div>
+          <div class="divider"></div>
+          <button class="btn" id="jumpToMap">חזרה למפה</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+  // ---------- Global score ----------
+  const globalScoreEl = document.getElementById("globalScore");
+  const globalStreakEl = document.getElementById("globalStreak");
+  let globalScore = 0;
+  let streak = 0;
+
+  function addPoints(n){
+    globalScore += n;
+    globalScoreEl.textContent = globalScore;
+  }
+  function setStreak(n){
+    streak = n;
+    globalStreakEl.textContent = "רצף: " + streak;
+  }
+
+  // ---------- Tabs ----------
+  const tabMap = document.getElementById("tabMap");
+  const tabQuiz = document.getElementById("tabQuiz");
+  const mapSection = document.getElementById("mapSection");
+  const quizSection = document.getElementById("quizSection");
+  const jumpToQuiz = document.getElementById("jumpToQuiz");
+  const jumpToMap = document.getElementById("jumpToMap");
+
+  function showTab(which){
+    const isMap = which === "map";
+    tabMap.classList.toggle("active", isMap);
+    tabQuiz.classList.toggle("active", !isMap);
+    mapSection.classList.toggle("hidden", !isMap);
+    quizSection.classList.toggle("hidden", isMap);
+  }
+
+  tabMap.addEventListener("click", () => showTab("map"));
+  tabQuiz.addEventListener("click", () => showTab("quiz"));
+  jumpToQuiz.addEventListener("click", () => showTab("quiz"));
+  jumpToMap.addEventListener("click", () => showTab("map"));
+
+  // ---------- Map Game ----------
+  const modeContinentsBtn = document.getElementById("modeContinents");
+  const modeOceansBtn = document.getElementById("modeOceans");
+  const mapResetBtn = document.getElementById("mapReset");
+  const mapPromptEl = document.getElementById("mapPrompt");
+  const mapFeedback = document.getElementById("mapFeedback");
+  const mapCorrectEl = document.getElementById("mapCorrect");
+  const mapWrongEl = document.getElementById("mapWrong");
+
+  let mapMode = null; // "continent" | "ocean"
+  let mapPool = [];
+  let currentTarget = null;
+  let mapCorrect = 0;
+  let mapWrong = 0;
+
+  const continents = [
+    "אמריקה הצפונית",
+    "אמריקה הדרומית",
+    "אירופה",
+    "אפריקה",
+    "אסיה",
+    "אוסטרליה",
+    "אנטארקטיקה"
+  ];
+
+  const oceans = [
+    "האוקיינוס השקט",
+    "האוקיינוס האטלנטי",
+    "האוקיינוס ההודי",
+    "האוקיינוס הארקטי",
+    "האוקיינוס הדרומי"
+  ];
+
+  function shuffle(arr){
+    const a = [...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function startMap(mode){
+    mapMode = mode;
+    mapPool = shuffle(mode === "continent" ? continents : oceans);
+    mapCorrect = 0; mapWrong = 0;
+    mapCorrectEl.textContent = mapCorrect;
+    mapWrongEl.textContent = mapWrong;
+
+    modeContinentsBtn.classList.toggle("primary", mode === "continent");
+    modeOceansBtn.classList.toggle("primary", mode === "ocean");
+
+    nextMapTarget(true);
+    toastMap("", null, true);
+  }
+
+  function nextMapTarget(isStart=false){
+    if(mapPool.length === 0){
+      mapPromptEl.textContent = "סיימת את כל המשימות במצב הזה! אפשר לאפס או להחליף מצב.";
+      toastMap("כל הכבוד! סיימת את הסבב. קיבלת בונוס 10 נקודות.", "good");
+      addPoints(10);
+      setStreak(streak + 1);
+      currentTarget = null;
+      return;
+    }
+    currentTarget = mapPool.pop();
+    const label = (mapMode === "continent") ? "יבשת" : "אוקיינוס";
+    mapPromptEl.textContent = "מצאי את " + label + ": " + currentTarget;
+    if(!isStart) setStreak(streak + 1);
+  }
+
+  function toastMap(text, kind, hide=false){
+    if(hide){
+      mapFeedback.classList.add("hidden");
+      mapFeedback.textContent = "";
+      mapFeedback.classList.remove("good","bad");
+      return;
+    }
+    mapFeedback.classList.remove("hidden","good","bad");
+    if(kind) mapFeedback.classList.add(kind);
+    mapFeedback.textContent = text;
+  }
+
+  function flash(el, good){
+    el.classList.remove("flashGood","flashBad");
+    void el.offsetWidth;
+    el.classList.add(good ? "flashGood" : "flashBad");
+  }
+
+  // Click handling for SVG points
+  document.querySelectorAll("[data-type]").forEach(el => {
+    el.addEventListener("click", () => {
+      if(!mapMode || !currentTarget){
+        toastMap("בחרי מצב (יבשות/אוקיינוסים) כדי להתחיל.", "bad");
+        return;
+      }
+      const type = el.getAttribute("data-type");
+      const name = el.getAttribute("data-name");
+
+      const isCorrect = (type === mapMode) && (name === currentTarget);
+
+      if(isCorrect){
+        mapCorrect++;
+        mapCorrectEl.textContent = mapCorrect;
+        toastMap("נכון! " + currentTarget + " זוהתה.", "good");
+        addPoints(3);
+        setStreak(streak + 1);
+        flash(el, true);
+        nextMapTarget();
+      } else {
+        mapWrong++;
+        mapWrongEl.textContent = mapWrong;
+        toastMap("לא בדיוק. נסי שוב. (טיפ: קראי את המשימה למעלה)", "bad");
+        setStreak(0);
+        flash(el, false);
+      }
+    });
+  });
+
+  modeContinentsBtn.addEventListener("click", () => startMap("continent"));
+  modeOceansBtn.addEventListener("click", () => startMap("ocean"));
+  mapResetBtn.addEventListener("click", () => {
+    mapMode = null;
+    mapPool = [];
+    currentTarget = null;
+    mapPromptEl.textContent = "לחצי על “יבשות” או “אוקיינוסים” כדי להתחיל.";
+    toastMap("", null, true);
+    mapCorrect = 0; mapWrong = 0;
+    mapCorrectEl.textContent = 0;
+    mapWrongEl.textContent = 0;
+    modeContinentsBtn.classList.add("primary");
+    modeOceansBtn.classList.remove("primary");
+  });
+
+  // ---------- Quiz ----------
+  const qIndexEl = document.getElementById("qIndex");
+  const qTotalEl = document.getElementById("qTotal");
+  const qCorrectEl = document.getElementById("qCorrect");
+  const qWrongEl = document.getElementById("qWrong");
+  const qTitleEl = document.getElementById("qTitle");
+  const qTextEl = document.getElementById("qText");
+  const quizArea = document.getElementById("quizArea");
+  const nextQuestionBtn = document.getElementById("nextQuestion");
+  const restartQuizBtn = document.getElementById("restartQuiz");
+  const qFeedback = document.getElementById("qFeedback");
+  const qHint = document.getElementById("qHint");
+
+  let quiz = [];
+  let qi = -1;
+  let qCorrect = 0;
+  let qWrong = 0;
+  let answered = false;
+
+  function norm(s){
+    return (s ?? "")
+      .toString()
+      .trim()
+      .replace(/[״"]/g,"")
+      .replace(/[’']/g,"")
+      .replace(/\s+/g," ");
+  }
+
+  function toastQuiz(text, kind, hide=false){
+    if(hide){
+      qFeedback.classList.add("hidden");
+      qFeedback.textContent = "";
+      qFeedback.classList.remove("good","bad");
+      return;
+    }
+    qFeedback.classList.remove("hidden","good","bad");
+    if(kind) qFeedback.classList.add(kind);
+    qFeedback.textContent = text;
+  }
+
+  function setQuizStats(){
+    qIndexEl.textContent = Math.max(qi+1, 0);
+    qTotalEl.textContent = quiz.length;
+    qCorrectEl.textContent = qCorrect;
+    qWrongEl.textContent = qWrong;
+  }
+
+  function buildQuiz(){
+    const questions = [
+      { type:"mc", title:"יבשות", text:"כמה יבשות יש בעולם?", options:["5","6","7","8"], answer:"7",
+        hint:"יבשות: אפריקה, אירופה, אסיה, אמריקה הצפונית, אמריקה הדרומית, אוסטרליה, אנטארקטיקה." },
+      { type:"mc", title:"אוקיינוסים", text:"כמה אוקיינוסים מקובל ללמוד (ברוב הספרים) בבית ספר יסודי?", options:["3","4","5","6"], answer:"5",
+        hint:"השקט, האטלנטי, ההודי, הארקטי, הדרומי." },
+      { type:"mc", title:"מיקום היבשות", text:"באיזו יבשת נמצאת ישראל?", options:["אירופה","אסיה","אפריקה","אוסטרליה"], answer:"אסיה",
+        hint:"ישראל נמצאת במערב יבשת אסיה." },
+      { type:"mc", title:"שמות יבשות", text:"איזו יבשת היא הגדולה ביותר בשטח?", options:["אפריקה","אירופה","אסיה","אמריקה הדרומית"], answer:"אסיה",
+        hint:"אסיה היא היבשת הגדולה ביותר." },
+      { type:"mc", title:"שמות אוקיינוסים", text:"איזה אוקיינוס נמצא בין אמריקה לאירופה/אפריקה?", options:["האוקיינוס השקט","האוקיינוס האטלנטי","האוקיינוס ההודי","האוקיינוס הארקטי"], answer:"האוקיינוס האטלנטי",
+        hint:"האטלנטי מפריד בין אמריקה לבין אירופה ואפריקה." },
+      { type:"tf", title:"מיקום אוקיינוסים", text:"נכון או לא נכון: האוקיינוס ההודי נמצא מדרום לאסיה ובין אפריקה לאוסטרליה.", answer:true,
+        hint:"כן - בדיוק שם הוא נמצא." },
+      { type:"tf", title:"השוואת מפות", text:"נכון או לא נכון: מפה מדינית מציגה גבולות בין מדינות ושמות מדינות.", answer:true,
+        hint:"מפה מדינית = מדינות, גבולות, ערי בירה לעיתים." },
+      { type:"tf", title:"השוואת מפות", text:"נכון או לא נכון: מפה פיזית מציגה הרים, נהרות, מדבריות וגבהים.", answer:true,
+        hint:"מפה פיזית עוסקת בטבע ובתבליט (גובה-נמוך)." },
+      { type:"mc", title:"סוגי מפות", text:"איזה סוג מפה הכי מתאים כדי לראות רכסי הרים ועמקים?", options:["מפה מדינית","מפה פיזית","מפת כבישים","מפת מזג אוויר"], answer:"מפה פיזית",
+        hint:"הרים ועמקים = תבליט = מפה פיזית." },
+      { type:"mc", title:"סוגי מפות", text:"איזה סוג מפה הכי מתאים כדי לראות גבולות בין מדינות?", options:["מפה פיזית","מפה מדינית","מפת כוכבים","מפת אקלים"], answer:"מפה מדינית",
+        hint:"גבולות ושמות מדינות = מפה מדינית." },
+      { type:"fill", title:"מושגים", text:"השלימי: ______ הוא שטח יבשה שמוקף מים מכל הצדדים.", answer:["אי"], hint:"דוגמה: קפריסין היא אי." },
+      { type:"fill", title:"מושגים", text:"השלימי: ______ הוא קבוצת איים.", answer:["ארכיפלג"], hint:"דוגמה: יפן היא ארכיפלג (הרבה איים יחד)." },
+      { type:"fill", title:"מושגים", text:"השלימי: ______ הוא מעבר מים צר שמחבר בין שני גופי מים גדולים.", answer:["מיצר"], hint:"טיפ: 'צר' כמו מיצר." },
+      { type:"fill", title:"מושגים", text:"השלימי: ______ הוא חלק של ים שנכנס לתוך היבשה.", answer:["מפרץ"], hint:"דוגמה: מפרץ אילת." },
+      { type:"fill", title:"מושגים", text:"השלימי: ______ הוא שטח יבשה שמוקף מים משלושה כיוונים ומחובר ליבשה מצד אחד.", answer:["חצי אי","חצי-אי"], hint:"דוגמה: חצי האי סיני." },
+      { type:"mc", title:"מיקום היבשות", text:"איזו יבשת נמצאת צפונית לאנטארקטיקה (ממש מעליה) - הכי קרובה בחלק הדרומי שלה?", options:["אוסטרליה","אירופה","אסיה","אמריקה הצפונית"], answer:"אוסטרליה",
+        hint:"אוסטרליה היא היבשת הדרומית ביותר אחרי אנטארקטיקה." },
+      { type:"mc", title:"מיקום היבשות", text:"אילו שתי יבשות מחוברות ביניהן ברצועת אדמה (איסתמוס)?", options:["אירופה ואסיה","אפריקה ואירופה","אמריקה הצפונית ואמריקה הדרומית","אסיה ואוסטרליה"], answer:"אמריקה הצפונית ואמריקה הדרומית",
+        hint:"יש חיבור יבשתי בין הצפון לדרום." },
+      { type:"tf", title:"שמות יבשות", text:"נכון או לא נכון: אירופה היא היבשת הקטנה ביותר.", answer:false,
+        hint:"אוסטרליה היא הקטנה ביותר (כאשר מחשיבים אותה כיבשת)." },
+      { type:"mc", title:"אוקיינוסים", text:"איזה אוקיינוס הוא הגדול ביותר בעולם?", options:["האוקיינוס האטלנטי","האוקיינוס השקט","האוקיינוס ההודי","האוקיינוס הדרומי"], answer:"האוקיינוס השקט",
+        hint:"'שקט' - אבל ענק." },
+      { type:"mc", title:"השוואת מפות", text:"במפה פיזית, מה בדרך כלל מסמנים בעזרת צבעים (למשל ירוק, צהוב, חום)?", options:["שפות שמדברים במדינות","גובה פני השטח (תבליט)","שמות נשיאים","מספר התושבים"], answer:"גובה פני השטח (תבליט)",
+        hint:"ירוק נמוך יחסית, חום גבוה (הרים) - זה רעיון נפוץ." }
+    ];
+    return shuffle(questions);
+  }
+
+  function renderQuestion(q){
+    quizArea.innerHTML = "";
+    answered = false;
+    toastQuiz("", null, true);
+
+    qTitleEl.textContent = q.title;
+    qTextEl.textContent = q.text;
+    qHint.textContent = q.hint ? ("רמז: " + q.hint) : "";
+
+    if(q.type === "mc"){
+      const wrap = document.createElement("div");
+      wrap.className = "options";
+      q.options.forEach(opt => {
+        const b = document.createElement("button");
+        b.className = "optBtn";
+        b.textContent = opt;
+        b.addEventListener("click", () => {
+          if(answered) return;
+          answered = true;
+
+          const isRight = norm(opt) === norm(q.answer);
+          if(isRight){
+            b.classList.add("correct");
+            toastQuiz("נכון! +4 נקודות", "good");
+            qCorrect++; addPoints(4); setStreak(streak + 1);
+          } else {
+            b.classList.add("wrong");
+            [...wrap.querySelectorAll(".optBtn")].forEach(x => {
+              if(norm(x.textContent) === norm(q.answer)) x.classList.add("correct");
+            });
+            toastQuiz("כמעט. התשובה הנכונה: " + q.answer, "bad");
+            qWrong++; setStreak(0);
+          }
+          setQuizStats();
+        });
+        wrap.appendChild(b);
+      });
+      quizArea.appendChild(wrap);
+      return;
+    }
+
+    if(q.type === "tf"){
+      const wrap = document.createElement("div");
+      wrap.className = "options";
+
+      const mk = (label, val) => {
+        const b = document.createElement("button");
+        b.className = "optBtn";
+        b.textContent = label;
+        b.addEventListener("click", () => {
+          if(answered) return;
+          answered = true;
+
+          const isRight = (val === q.answer);
+          if(isRight){
+            b.classList.add("correct");
+            toastQuiz("נכון! +3 נקודות", "good");
+            qCorrect++; addPoints(3); setStreak(streak + 1);
+          } else {
+            b.classList.add("wrong");
+            toastQuiz("לא נכון. התשובה היא: " + (q.answer ? "נכון" : "לא נכון"), "bad");
+            qWrong++; setStreak(0);
+            [...wrap.querySelectorAll(".optBtn")].forEach(x => {
+              if(x.textContent === (q.answer ? "נכון" : "לא נכון")) x.classList.add("correct");
+            });
+          }
+          setQuizStats();
+        });
+        return b;
+      };
+
+      wrap.appendChild(mk("נכון", true));
+      wrap.appendChild(mk("לא נכון", false));
+      quizArea.appendChild(wrap);
+      return;
+    }
+
+    if(q.type === "fill"){
+      const row = document.createElement("div");
+      row.className = "inputRow";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "כתבי כאן את התשובה…";
+
+      const btn = document.createElement("button");
+      btn.className = "btn primary smallBtn";
+      btn.textContent = "בדיקה";
+
+      btn.addEventListener("click", () => {
+        if(answered) return;
+        answered = true;
+
+        const user = norm(input.value);
+        const ok = q.answer.some(a => norm(a) === user);
+
+        if(ok){
+          toastQuiz("מצוין! +4 נקודות", "good");
+          qCorrect++; addPoints(4); setStreak(streak + 1);
+        } else {
+          toastQuiz("כמעט. תשובה נכונה לדוגמה: " + q.answer[0], "bad");
+          qWrong++; setStreak(0);
+        }
+        setQuizStats();
+      });
+
+      input.addEventListener("keydown", (e) => {
+        if(e.key === "Enter") btn.click();
+      });
+
+      row.appendChild(input);
+      row.appendChild(btn);
+      quizArea.appendChild(row);
+      return;
+    }
+  }
+
+  function nextQuestion(){
+    if(quiz.length === 0) return;
+    qi++;
+    if(qi >= quiz.length){
+      qTitleEl.textContent = "סיום!";
+      qTextEl.textContent = "סיימת את כל השאלות. אפשר לעשות איפוס כדי לתרגל שוב.";
+      quizArea.innerHTML = "";
+      toastQuiz("כל הכבוד! בונוס 15 נקודות על סיום הסבב.", "good");
+      addPoints(15);
+      setStreak(streak + 1);
+      setQuizStats();
+      return;
+    }
+    renderQuestion(quiz[qi]);
+    setQuizStats();
+  }
+
+  function restartQuiz(){
+    quiz = buildQuiz();
+    qi = -1;
+    qCorrect = 0; qWrong = 0;
+    toastQuiz("", null, true);
+    qTitleEl.textContent = "בואו נתחיל";
+    qTextEl.textContent = "לחצי \"שאלה הבאה\" כדי להתחיל.";
+    quizArea.innerHTML = "";
+    setQuizStats();
+  }
+
+  nextQuestionBtn.addEventListener("click", nextQuestion);
+  restartQuizBtn.addEventListener("click", restartQuiz);
+
+  // init
+  restartQuiz();
+  modeContinentsBtn.classList.add("primary");
+</script>
+</body>
+</html>
