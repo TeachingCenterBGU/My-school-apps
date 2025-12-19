@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מרכז הלמידה של ABNDG</title>
+    <style>
+        :root {
+            --primary: #FF6F61;
+            --secondary: #4ECDC4;
+            --accent: #FFD166;
+            --bg: #F0F4F8;
+            --white: #ffffff;
+        }
+
+        body { 
+            font-family: 'Assistant', 'Segoe UI', sans-serif; 
+            background-color: var(--bg); 
+            text-align: center; margin: 0; padding: 10px;
+        }
+
+        .container { 
+            max-width: 800px; margin: auto; background: var(--white); 
+            padding: 25px; border-radius: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 4px solid var(--secondary);
+        }
+
+        /* תפריט ניווט */
+        .nav-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
+            gap: 10px; margin-bottom: 25px; 
+        }
+        .tab-btn { 
+            padding: 10px; border: none; border-radius: 15px; 
+            cursor: pointer; font-size: 14px; font-weight: bold;
+            background: #e0e0e0; transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--primary); color: white; transform: scale(1.05); }
+
+        .mission { display: none; animation: fadeIn 0.4s; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* עיצוב כללי לכפתורים */
+        button:active { transform: scale(0.95); }
+        .feedback { font-size: 22px; font-weight: bold; margin-top: 15px; height: 30px; }
+
+        /* משימה 1: אותיות */
+        .letter-btn { 
+            width: 60px; height: 60px; font-size: 28px; margin: 5px;
+            border: none; border-radius: 12px; background: var(--accent); 
+            cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #d4a017;
+        }
+        .word-display { 
+            font-size: 50px; min-height: 70px; margin: 20px auto; 
+            background: #f9f9f9; border: 2px dashed #ccc; border-radius: 15px;
+            color: var(--primary); width: 80%;
+        }
+
+        /* משימה 3: התאמת אותיות */
+        .match-container { display: flex; justify-content: space-around; margin-top: 20px; }
+        .match-col { display: flex; flex-direction: column; gap: 10px; }
+        .match-item { 
+            padding: 15px 30px; font-size: 24px; background: #fff; 
+            border: 2px solid var(--secondary); border-radius: 10px; cursor: pointer;
+        }
+        .match-item.selected { background: var(--accent); }
+        .match-item.hidden { visibility: hidden; }
+
+        /* משימות מספרים */
+        .num-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
+        .num-btn { 
+            padding: 20px; font-size: 24px; border: none; 
+            border-radius: 10px; background: var(--secondary); color: white; cursor: pointer;
+        }
+        input.num-input { 
+            font-size: 40px; width: 80px; text-align: center; 
+            border: 3px solid var(--primary); border-radius: 10px; padding: 10px;
+        }
+
+        .action-btn { 
+            background: var(--primary); color: white; padding: 10px 20px; 
+            border: none; border-radius: 10px; font-size: 18px; cursor: pointer; margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 style="color: var(--primary);">הכיף של האנגלית! ✨</h1>
+    
+    <div class="nav-grid">
+        <button class="tab-btn active" onclick="showMission(1)">1. בונים מילים</button>
+        <button class="tab-btn" onclick="showMission(2)">2. מה הפירוש?</button>
+        <button class="tab-btn" onclick="showMission(3)">3. אבא וילד (A-a)</button>
+        <button class="tab-btn" onclick="showMission(4)">4. בחרי מספר</button>
+        <button class="tab-btn" onclick="showMission(5)">5. הקלידי מספר</button>
+    </div>
+
+    <div id="mission1" class="mission active">
+        <h3>מרכיבים מילים מהאותיות שקיבלנו</h3>
+              <h3>אם הקריין מקריא את האותיות בנפרד, סימן שזו לא מילה</h3>
+        <div class="letter-grid">
+            <button class="letter-btn" onclick="addL('A')">A</button>
+            <button class="letter-btn" onclick="addL('B')">B</button>
+            <button class="letter-btn" onclick="addL('N')">N</button>
+            <button class="letter-btn" onclick="addL('D')">D</button>
+            <button class="letter-btn" onclick="addL('G')">G</button>
+        </div>
+        <div class="word-display" id="displayWord"></div>
+        <button class="action-btn" style="background:var(--secondary)" onclick="speak(document.getElementById('displayWord').innerText)">השמיעי מילה 🔊</button>
+        <button class="action-btn" style="background:#ff4d4d" onclick="document.getElementById('displayWord').innerText=''; currentWord=''">מחיקה 🗑️</button>
+    </div>
+
+    <div id="mission2" class="mission">
+        <h3>מה הפירוש של המילה?</h3>
+        <div id="targetWord" style="font-size:40px; color:var(--primary); cursor:pointer; margin-bottom:20px;" onclick="speak(this.innerText)">apple</div>
+        <div id="optionsArea" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"></div>
+        <div id="feedback2" class="feedback"></div>
+    </div>
+
+    <div id="mission3" class="mission">
+        <h3>התאימי בין אות גדולה לאות קטנה</h3>
+              <h3>יש לבחור קודם כל את האות הגדולה</h3>
+        <div class="match-container">
+            <div class="match-col" id="upperCol"></div>
+            <div class="match-col" id="lowerCol"></div>
+        </div>
+        <div id="feedback3" class="feedback"></div>
+    </div>
+
+    <div id="mission4" class="mission">
+        <h3>הקשיבי למספר ובחרי אותו</h3>
+        <button class="action-btn" onclick="playNumber()">השמיעי מספר 🔊</button>
+        <div class="num-grid" id="numGrid4"></div>
+        <div id="feedback4" class="feedback"></div>
+    </div>
+
+    <div id="mission5" class="mission">
+        <h3>הקשיבי למספר והקלידי את הספרה</h3>
+        <button class="action-btn" onclick="playNumber()">השמיעי מספר 🔊</button>
+        <br>
+        <input type="number" id="numInput5" class="num-input" min="1" max="10">
+        <br>
+        <button class="action-btn" onclick="checkTypedNumber()">בדיקה ✅</button>
+        <div id="feedback5" class="feedback"></div>
+    </div>
+
+</div>
+
+<script>
+    let currentWord = "";
+    let targetNum = 0;
+    const vocab = [
+        {en: "apple", he: "תפוח"}, {en: "man", he: "איש"}, {en: "woman", he: "אישה"},
+        {en: "green", he: "ירוק"}, {en: "yellow", he: "צהוב"}, {en: "orange", he: "כתום"},
+        {en: "baby", he: "תינוק"}, {en: "bag", he: "תיק"}, {en: "book", he: "ספר"},
+        {en: "box", he: "קופסה"}, {en: "big", he: "גדול"}, {en: "small", he: "קטן"},
+        {en: "notebook", he: "מחברת"}, {en: "nose", he: "אף"}, {en: "mouth", he: "פה"},
+        {en: "computer", he: "מחשב"}, {en: "sister", he: "אחות"}, {en: "brother", he: "אח"},
+        {en: "dad", he: "אבא"}, {en: "desk", he: "שולחן כתיבה"}, {en: "duck", he: "ברווז"},
+        {en: "help", he: "עזרה"}, {en: "sad", he: "עצוב"}, {en: "bad", he: "רע"},
+        {en: "grandma", he: "סבתא"}, {en: "grandpa", he: "סבא"}, {en: "gift", he: "מתנה"},
+        {en: "gray", he: "אפור"}, {en: "door", he: "דלת"}, {en: "house", he: "בית"}
+    ];
+    const numWords = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+
+    function speak(text) {
+        const ut = new SpeechSynthesisUtterance(text);
+        ut.lang = 'en-US';
+        ut.rate = 0.8;
+        window.speechSynthesis.speak(ut);
+    }
+
+    function showMission(num) {
+        document.querySelectorAll('.mission').forEach(m => m.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('mission' + num).classList.add('active');
+        event.target.classList.add('active');
+        
+        if(num === 2) initVocab();
+        if(num === 3) initMatching();
+        if(num === 4) initNumbersChoice();
+        if(num === 5) { document.getElementById('numInput5').value = ''; playNumber(); }
+    }
+
+    function addL(l) { document.getElementById('displayWord').innerText += l; }
+
+    // --- משימה 2: מילון ---
+    function initVocab() {
+        const item = vocab[Math.floor(Math.random()*vocab.length)];
+        document.getElementById('targetWord').innerText = item.en;
+        let options = [item.he];
+        while(options.length < 4) {
+            let r = vocab[Math.floor(Math.random()*vocab.length)].he;
+            if(!options.includes(r)) options.push(r);
+        }
+        options.sort(() => Math.random() - 0.5);
+        const area = document.getElementById('optionsArea');
+        area.innerHTML = "";
+        options.forEach(o => {
+            const b = document.createElement('button');
+            b.className = "tab-btn";
+            b.style.fontSize = "20px";
+            b.innerText = o;
+            b.onclick = () => {
+                if(o === item.he) { 
+                    document.getElementById('feedback2').innerText = "נכון! 🎉"; 
+                    speak("Correct"); 
+                    setTimeout(initVocab, 1000); 
+                }
+                else document.getElementById('feedback2').innerText = "נסי שוב 🤔";
+            };
+            area.appendChild(b);
+        });
+    }
+
+    // --- משימה 3: התאמה ---
+    let selectedUpper = null;
+    function initMatching() {
+        const letters = ['A', 'B', 'N', 'D', 'G'];
+        const uCol = document.getElementById('upperCol');
+        const lCol = document.getElementById('lowerCol');
+        uCol.innerHTML = ""; lCol.innerHTML = "";
+        
+        letters.forEach(l => {
+            const d = document.createElement('div');
+            d.className = "match-item"; d.innerText = l;
+            d.onclick = () => { selectedUpper = l; speak(l); highlight(uCol, d); };
+            uCol.appendChild(d);
+        });
+
+        [...letters].sort(() => Math.random() - 0.5).forEach(l => {
+            const d = document.createElement('div');
+            d.className = "match-item"; d.innerText = l.toLowerCase();
+            d.onclick = () => {
+                if(selectedUpper === l) {
+                    d.classList.add('hidden');
+                    findAndHide(uCol, l);
+                    speak("Good job");
+                } else { speak("Try again"); }
+            };
+            lCol.appendChild(d);
+        });
+    }
+
+    function highlight(parent, el) {
+        parent.querySelectorAll('.match-item').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+    function findAndHide(parent, txt) {
+        parent.querySelectorAll('.match-item').forEach(i => {
+            if(i.innerText === txt) i.classList.add('hidden');
+        });
+    }
+
+    // --- משימות מספרים ---
+    function playNumber() {
+        targetNum = Math.floor(Math.random() * 10) + 1;
+        speak(numWords[targetNum]);
+    }
+
+    function initNumbersChoice() {
+        const grid = document.getElementById('numGrid4');
+        grid.innerHTML = "";
+        for(let i=1; i<=10; i++) {
+            const b = document.createElement('button');
+            b.className = "num-btn"; b.innerText = i;
+            b.onclick = () => {
+                if(i === targetNum) {
+                    document.getElementById('feedback4').innerText = "מעולה! 🌟";
+                    speak("Yes, " + i);
+                    setTimeout(() => { document.getElementById('feedback4').innerText = ""; playNumber(); }, 1500);
+                } else { document.getElementById('feedback4').innerText = "לא, זה " + i + ". נסי שוב!"; }
+            };
+            grid.appendChild(b);
+        }
+        playNumber();
+    }
+
+    function checkTypedNumber() {
+        const val = parseInt(document.getElementById('numInput5').value);
+        if(val === targetNum) {
+            document.getElementById('feedback5').innerText = "נכון מאוד! 🏆";
+            speak("Perfect");
+            setTimeout(() => { 
+                document.getElementById('feedback5').innerText = ""; 
+                document.getElementById('numInput5').value = '';
+                playNumber(); 
+            }, 1500);
+        } else {
+            document.getElementById('feedback5').innerText = "לא בדיוק, נסי שוב...";
+        }
+    }
+</script>
+
+</body>
+</html>
