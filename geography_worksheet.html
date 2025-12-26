@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דף עבודה: הכרת מפת העולם (מורחב)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #0277bd; text-align: center; font-size: 2.2em; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #555; margin-bottom: 30px; }
+        
+        .instructions { 
+            background: #e1f5fe; 
+            padding: 20px; 
+            border-radius: 15px; 
+            border: 2px solid #b3e5fc; 
+            margin-bottom: 30px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .question-block { 
+            background: white; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            border-radius: 12px; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05); 
+            border-right: 5px solid #0277bd; 
+        }
+
+        .question-title { 
+            font-weight: bold; 
+            font-size: 1.15em; 
+            margin-bottom: 10px; 
+            display: block; 
+            color: #01579b;
+        }
+
+        .map-container {
+            text-align: center;
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: white;
+        }
+        
+        .map-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .word-bank {
+            background: #fff9c4;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px dashed #fbc02d;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .word-item {
+            display: inline-block;
+            background: white;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+        }
+
+        textarea { width: 100%; height: 50px; margin-top: 5px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+        
+        .btn-container { text-align: center; margin: 40px 0; }
+        button { background-color: #0277bd; color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 1.1em; margin: 0 10px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        button:hover { background-color: #01579b; transform: translateY(-2px); }
+        .print-btn { background-color: #4caf50; }
+        .print-btn:hover { background-color: #388e3c; }
+
+        #answers-section { display: none; margin-top: 50px; border-top: 3px dashed #ccc; padding-top: 30px; }
+        .answer { color: #2e7d32; font-weight: bold; background: #e8f5e9; padding: 10px; margin-top: 5px; border-radius: 4px; }
+
+        @media print {
+            body { background: white; padding: 0; max-width: 100%; }
+            button, textarea { display: none; }
+            .question-block { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; margin-bottom: 15px; padding: 15px; }
+            .lines-for-print { display: block; border-bottom: 1px solid #ccc; margin-top: 25px; height: 25px; }
+            #answers-section { display: block !important; page-break-before: always; }
+            .instructions { display: none; } /* חיסכון בדיו */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌍 גיאוגרפיה: היבשות והאוקיינוסים</h1>
+    <div class="subtitle">כיתה ה' - תרגול מסכם למבחן</div>
+    
+    <div class="instructions">
+        <strong>הוראות:</strong>
+        בחלק הראשון השלימו את השמות על גבי המפה. בחלק השני ענו על 10 השאלות הפתוחות.
+    </div>
+
+    <div id="worksheet">
+        
+        <div class="question-block">
+            <span class="question-title">חלק א': התמצאות במפה</span>
+            <p>כתבו את שמות היבשות והאוקיינוסים במקום המתאים על המפה (היעזרו בבנק המילים).</p>
+            
+            <div class="word-bank">
+                <strong>יבשות:</strong> אסיה, אירופה, אפריקה, אמריקה הצפונית, אמריקה הדרומית, אוסטרליה, אנטארקטיקה.
+                <br>
+                <strong>אוקיינוסים:</strong> השקט, האטלנטי, ההודי.
+            </div>
+
+            <div class="map-container">
+                <img src="world-map.jpg" alt="מפת העולם אילמת" class="map-img">
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-title">חלק ב': שאלות ידע והבנה</span>
+            
+            <p><strong>1. איזו יבשת היא הגדולה ביותר בשטחה, ואיזו יבשת היא הקטנה ביותר?</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+
+            <p><strong>2. איזה אוקיינוס נמצא בין יבשת אמריקה לבין אירופה ואפריקה?</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+
+            <p><strong>3. הסבירו במילים שלכם: מהו "קו המשווה" ואילו יבשות הוא חוצה?</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+
+            <p><strong>4. מהו ההבדל הגיאוגרפי בין "אי" לבין "חצי אי"? (תנו דוגמה אחת לכל מושג)</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+
+            <p><strong>5. דמיינו שאתם טסים מישראל (אסיה) לארצות הברית (אמריקה הצפונית) דרך האוקיינוס האטלנטי. לאיזה כיוון עליכם לטוס?</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+
+            <p><strong>6. מדוע רוב המפות הפיזיות משתמשות בצבעים שונים (ירוק, חום, כחול)? מה מייצג כל צבע?</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+
+            <p><strong>7. איזו יבשת נמצאת בקוטב הדרומי של כדור הארץ, ומה מיוחד בה מבחינת התיישבות בני אדם?</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+
+            <p><strong>8. אילו שלוש יבשות מחוברות זו לזו ויוצרות גוש יבשתי אחד גדול? (נקרא לעיתים "העולם הישן")</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+
+            <p><strong>9. אם נפליג מיבשת אפריקה מזרחה (ימינה במפה), לאיזה אוקיינוס נגיע?</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+
+            <p><strong>10. מהו ההבדל בין "מדינה" לבין "יבשת"?</strong></p>
+            <textarea placeholder="תשובה..."></textarea>
+            <div class="lines-for-print" style="display:none;"></div>
+        </div>
+
+    </div>
+
+    <div class="btn-container">
+        <button class="print-btn" onclick="window.print()">🖨️ הדפסת הדף</button>
+        <button onclick="toggleAnswers()">👁️ הצגת תשובון להורים</button>
+        <button onclick="window.location.href='index.html'">🏠 חזרה לראשי</button>
+    </div>
+
+    <div id="answers-section">
+        <h2>🔑 תשובון לבדיקה</h2>
+        
+        <div class="question-block">
+            <strong>1. גודל יבשות:</strong>
+            <div class="answer">הגדולה ביותר: אסיה. הקטנה ביותר: אוסטרליה (אוקיאניה).</div>
+        </div>
+
+        <div class="question-block">
+            <strong>2. האוקיינוס המפריד:</strong>
+            <div class="answer">האוקיינוס האטלנטי.</div>
+        </div>
+
+        <div class="question-block">
+            <strong>3. קו המשווה:</strong>
+            <div class="answer">קו דמיוני המקיף את כדור הארץ לרוחבו ומחלק אותו לצפון ודרום. הוא עובר באפריקה, דרום אמריקה ואסיה (אינדונזיה).</div>
+        </div>
+
+        <div class="question-block">
+            <strong>4. אי מול חצי אי:</strong>
+            <div class="answer">אי מוקף מים מכל צדדיו (למשל קפריסין). חצי אי מוקף מים רק משלושה כיוונים ומחובר ליבשת (למשל סיני, איטליה).</div>
+        </div>
+
+        <div class="question-block">
+            <strong>5. כיוון טיסה:</strong>
+            <div class="answer">מערבה.</div>
+        </div>
+
+        <div class="question-block">
+            <strong>6. צבעים במפה:</strong>
+            <div class="answer">כחול = מים (ים/אגמים), ירוק = מקומות נמוכים (עמקים/מישור החוף), חום = מקומות גבוהים (הרים).</div>
+        </div>
+
+        <div class="question-block">
+            <strong>7. הקוטב הדרומי:</strong>
+            <div class="answer">יבשת אנטארקטיקה. אין בה מדינות או תושבים קבועים בגלל הקור הקיצוני, רק חוקרים.</div>
+        </div>
+
+        <div class="question-block">
+            <strong>8. הגוש היבשתי:</strong>
+            <div class="answer">אסיה, אירופה ואפריקה.</div>
+        </div>
+
+        <div class="question-block">
+            <strong>9. הפלגה מאפריקה מזרחה:</strong>
+            <div class="answer">לאוקיינוס ההודי.</div>
+        </div>
+
+        <div class="question-block">
+            <strong>10. יבשת מול מדינה:</strong>
+            <div class="answer">יבשת היא שטח אדמה ענק המופרד מיבשות אחרות על ידי ים. מדינה היא שטח פוליטי עם גבולות וממשלה שנמצא בתוך יבשת (למשל: ישראל היא מדינה בתוך יבשת אסיה).</div>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleAnswers() {
+            var x = document.getElementById("answers-section");
+            if (x.style.display === "block") {
+                x.style.display = "none";
+            } else {
+                x.style.display = "block";
+                x.scrollIntoView({behavior: "smooth"});
+            }
+        }
+    </script>
+
+</body>
+</html>
