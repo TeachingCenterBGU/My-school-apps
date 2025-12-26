@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דף עבודה מסכם: עולם המתכות</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #5c6bc0; text-align: center; }
+        .instructions { background: #e8eaf6; padding: 15px; border-radius: 8px; border: 1px solid #c5cae9; margin-bottom: 30px; }
+        .question-block { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-right: 4px solid #5c6bc0; }
+        .question-title { font-weight: bold; font-size: 1.1em; margin-bottom: 10px; display: block; }
+        textarea { width: 100%; height: 80px; margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+        
+        /* כפתורים */
+        .btn-container { text-align: center; margin: 40px 0; }
+        button { background-color: #5c6bc0; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 1em; margin: 0 10px; transition: 0.3s; }
+        button:hover { background-color: #3f51b5; }
+        .print-btn { background-color: #4caf50; }
+        .print-btn:hover { background-color: #388e3c; }
+
+        /* אזור תשובות */
+        #answers-section { display: none; margin-top: 50px; border-top: 2px dashed #ccc; padding-top: 20px; }
+        .answer { color: #2e7d32; font-weight: bold; background: #e8f5e9; padding: 10px; margin-top: 5px; border-radius: 4px; }
+        
+        /* התאמה להדפסה - מסתיר כפתורים ותיבות טקסט מיותרות */
+        @media print {
+            body { background: white; max-width: 100%; }
+            button, textarea { display: none; }
+            .question-block { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .lines { display: block; height: 80px; border-bottom: 1px solid #ccc; margin-top: 20px; }
+            #answers-section { display: block !important; page-break-before: always; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📝 דף עבודה: עולם המתכות</h1>
+    
+    <div class="instructions">
+        <strong>הוראות:</strong> נסו לענות על השאלות בכתב מלא ומפורט מבלי להסתכל בחומר. לאחר מכן, תוכלו ללחוץ על כפתור התשובון ולבדוק את עצמכם.
+    </div>
+
+    <div id="worksheet">
+        <div class="question-block">
+            <span class="question-title">1. מהו ההבדל העיקרי במראה ובתכונות בין "עפרת מתכת" לבין "מתכת" מעובדת?</span>
+            <textarea placeholder="כתבו את התשובה כאן..."></textarea>
+            <div class="lines" style="display:none;"></div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-title">2. מדוע נהוג לייצר חוטי חשמל דווקא ממתכת הנחושת? (ציינו שתי תכונות)</span>
+            <textarea placeholder="כתבו את התשובה כאן..."></textarea>
+            <div class="lines" style="display:none;"></div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-title">3. תארו את תהליך ה"צריפה" בתנור ההיתוך: מה קורה למתכת ומה קורה לפסולת?</span>
+            <textarea placeholder="כתבו את התשובה כאן..."></textarea>
+            <div class="lines" style="display:none;"></div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-title">4. מהי שיטת ה"יציקה" וכיצד היא פועלת?</span>
+            <textarea placeholder="כתבו את התשובה כאן..."></textarea>
+            <div class="lines" style="display:none;"></div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-title">5. נתון שכדי להפיק 1 ק"ג נחושת, צריך לחצוב כ-222 ק"ג סלעים. מהי הבעיה הסביבתית הנובעת מכך?</span>
+            <textarea placeholder="כתבו את התשובה כאן..."></textarea>
+            <div class="lines" style="display:none;"></div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-title">6. ציינו שני נזקים נוספים שהכרייה גורמת לסביבה (מלבד ערימות הפסולת).</span>
+            <textarea placeholder="כתבו את התשובה כאן..."></textarea>
+            <div class="lines" style="display:none;"></div>
+        </div>
+        
+        <div class="question-block">
+            <span class="question-title">7. הסבירו: מהו ההבדל בין "מכרה פתוח" ל"מכרה תת-קרקעי"?</span>
+            <textarea placeholder="כתבו את התשובה כאן..."></textarea>
+            <div class="lines" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button class="print-btn" onclick="window.print()">🖨️ הדפסת הדף</button>
+        <button onclick="toggleAnswers()">👁️ הצגת תשובון להורים</button>
+        <button onclick="window.location.href='index.html'">🏠 חזרה לדף הראשי</button>
+    </div>
+
+    <div id="answers-section">
+        <h2>🔑 תשובון לבדיקה</h2>
+        
+        <div class="question-block">
+            <strong>1. הבדל בין עפרה למתכת:</strong>
+            <div class="answer">עפרת מתכת היא משאב טבע (סלע) שנראה לרוב חסר ברק ומעורבב עם חומרים אחרים. המתכת המעובדת (לאחר הפקה) היא בעלת ברק אופייני, ובעלת תכונות כמו הולכת חשמל וחום.</div>
+        </div>
+
+        <div class="question-block">
+            <strong>2. נחושת וחשמל:</strong>
+            <div class="answer">1. מוליכות חשמלית מצוינת (הכי טובה מבין המתכות הזולות). <br> 2. כושר משיכות (ניתן למשוך אותה לחוטים דקים וגמישים).</div>
+        </div>
+
+        <div class="question-block">
+            <strong>3. תנור ההיתוך:</strong>
+            <div class="answer">מחממים את העפרה לטמפרטורה עצומה. המתכת ניתכת והופכת לנוזל כבד ששוקע למטה, ואילו הפסולת ("סיגים") צפה למעלה ומורחקת.</div>
+        </div>
+
+        <div class="question-block">
+            <strong>4. שיטת היציקה:</strong>
+            <div class="answer">תהליך שבו מתיכים מתכת לנוזל, שופכים אותו לתוך תבנית בעלת צורה רצויה, ומחכים שהמתכת תתקרר ותתמצק מחדש בצורת התבנית.</div>
+        </div>
+
+        <div class="question-block">
+            <strong>5. פסולת סלעים:</strong>
+            <div class="answer">נוצרות כמויות עצומות של פסולת סלעים שאין בהם צורך, הנערמות בערימות ענק ומכערות את הנוף (ולעיתים משחררות חומרים מזיקים).</div>
+        </div>
+
+        <div class="question-block">
+            <strong>6. נזקי כרייה נוספים:</strong>
+            <div class="answer">אבק רב המזהם את האוויר ופוגע בנשימה, רעש חזק ממכונות ופיצוצים, פגיעה בנוף ("צלקות"), זיהום מי תהום.</div>
+        </div>
+
+        <div class="question-block">
+            <strong>7. סוגי מכרות:</strong>
+            <div class="answer">מכרה פתוח נמצא על פני השטח (בור ענק). מכרה תת-קרקעי הוא מנהרות שנחפרות עמוק בתוך האדמה כדי להגיע למחצב.</div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAnswers() {
+            var x = document.getElementById("answers-section");
+            if (x.style.display === "block") {
+                x.style.display = "none";
+            } else {
+                x.style.display = "block";
+                // גלילה אוטומטית לתשובות
+                x.scrollIntoView({behavior: "smooth"});
+            }
+        }
+    </script>
+
+</body>
+</html>
