@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הגיאוגרף הצעיר - מערכת למידה</title>
+    <style>
+        :root {
+            --primary: #2980b9;
+            --secondary: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+            --bg: #f0f2f5;
+            --surface: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* ניווט בין הטאבים */
+        .nav-bar {
+            background: var(--secondary);
+            width: 100%;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            background: white;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .container {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            max-width: 800px;
+            width: 90%;
+            margin-top: 2rem;
+            text-align: center;
+            display: none;
+        }
+
+        .container.active-view {
+            display: block;
+        }
+
+        h2 { color: var(--secondary); margin-bottom: 1.5rem; }
+
+        .score-box {
+            background: #dfe6e9;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 1.5em;
+        }
+        
+        button.action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        button.action-btn:hover { background: #1c5980; }
+
+        /* --- אלמנטים לחלק 1 --- */
+        .map-ref {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            max-height: 250px;
+            object-fit: contain;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .opt-btn {
+            padding: 15px;
+            border: 2px solid #bdc3c7;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .opt-btn:hover { background: #ecf0f1; }
+        .opt-btn.correct { background: var(--success); color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error); color: white; border-color: var(--error); }
+
+        /* --- אלמנטים לחלק 2 (מפה) --- */
+        .map-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .map-interactive {
+            width: 100%;
+            display: block;
+            border-radius: 10px;
+            border: 2px solid #ccc;
+        }
+        .map-point {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s, background 0.2s;
+            z-index: 10;
+        }
+        .map-point:hover {
+            transform: translate(-50%, -50%) scale(1.3);
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .map-point.correct-anim {
+            background: var(--success);
+            border-color: #1e8449;
+            animation: pulse 1s infinite;
+        }
+        .map-point.wrong-anim {
+            background: var(--error);
+            border-color: #922b21;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(39, 174, 96, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+        }
+
+        /* --- אלמנטים לחלק 3 (מושגים - הקלדה) --- */
+        .concept-card {
+            background: #eef2f3;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .input-area {
+            display: none; /* מוסתר כברירת מחדל */
+            margin-top: 15px;
+        }
+        
+        .answer-input {
+            padding: 10px;
+            font-size: 1.2rem;
+            width: 60%;
+            border: 2px solid var(--secondary);
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .check-btn {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <button class="nav-btn active" onclick="switchTab('directions')">1. כיוונים</button>
+        <button class="nav-btn" onclick="switchTab('map')">2. הכרת המפה</button>
+        <button class="nav-btn" onclick="switchTab('concepts')">3. מושגים</button>
+    </nav>
+
+    <div id="directions" class="container active-view">
+        <h2>🧭 ניווט עולמי</h2>
+        <div class="score-box">ניקוד: <span id="score1">0</span></div>
+        <img src="continents.jpg" alt="מפת עזר" class="map-ref">
+        <div class="concept-card" id="q1-text">השאלה...</div>
+        <div class="options-grid" id="q1-options"></div>
+        <div class="feedback" id="f1"></div>
+        <button class="action-btn" onclick="nextQ1()" id="btn1" style="display:none">הבא</button>
+    </div>
+
+    <div id="map" class="container">
+        <h2>📍 אתר במפה: <span id="target-name" style="color:var(--primary); font-size:1.5em; text-decoration: underline;">...</span></h2>
+        <div class="score-box">ניקוד: <span id="score2">0</span></div>
+        
+        <div class="map-container">
+            <img src="continents_blank.jpg" alt="מפה אילמת" class="map-interactive">
+            
+            <div class="map-point" style="top: 25%; left: 20%;" onclick="checkMap(this, 'צפון אמריקה')"></div>
+            <div class="map-point" style="top: 65%; left: 30%;" onclick="checkMap(this, 'דרום אמריקה')"></div>
+            <div class="map-point" style="top: 25%; left: 52%;" onclick="checkMap(this, 'אירופה')"></div>
+            <div class="map-point" style="top: 50%; left: 53%;" onclick="checkMap(this, 'אפריקה')"></div>
+            <div class="map-point" style="top: 25%; left: 75%;" onclick="checkMap(this, 'אסיה')"></div>
+            <div class="map-point" style="top: 72%; left: 88%;" onclick="checkMap(this, 'אוסטרליה')"></div>
+            <div class="map-point" style="top: 92%; left: 50%;" onclick="checkMap(this, 'אנטארקטיקה')"></div>
+
+            <div class="map-point" style="top: 45%; left: 38%; background: rgba(135, 206, 235, 0.6); border-color:blue;" onclick="checkMap(this, 'האוקיינוס האטלנטי')"></div>
+            <div class="map-point" style="top: 50%; left: 5%; background: rgba(135, 206, 235, 0.6); border-color:blue;" onclick="checkMap(this, 'האוקיינוס השקט')"></div>
+            <div class="map-point" style="top: 50%; left: 95%; background: rgba(135, 206, 235, 0.6); border-color:blue;" onclick="checkMap(this, 'האוקיינוס השקט')"></div>
+            <div class="map-point" style="top: 60%; left: 70%; background: rgba(135, 206, 235, 0.6); border-color:blue;" onclick="checkMap(this, 'האוקיינוס ההודי')"></div>
+            <div class="map-point" style="top: 5%; left: 60%; background: rgba(135, 206, 235, 0.6); border-color:blue;" onclick="checkMap(this, 'האוקיינוס הארקטי')"></div>
+            <div class="map-point" style="top: 85%; left: 20%; background: rgba(135, 206, 235, 0.6); border-color:blue;" onclick="checkMap(this, 'האוקיינוס הדרומי')"></div>
+        </div>
+        
+        <div class="feedback" id="f2">לחץ על העיגול המתאים במפה</div>
+    </div>
+
+    <div id="concepts" class="container">
+        <h2>📖 מילון מושגים</h2>
+        <div class="score-box">ניקוד: <span id="score3">0</span></div>
+        
+        <div class="concept-card" id="q3-text">השאלה...</div>
+        
+        <div class="options-grid" id="q3-options"></div>
+        
+        <div class="input-area" id="q3-input-area">
+            <input type="text" id="user-input" class="answer-input" placeholder="הקלד כאן את התשובה...">
+            <button class="check-btn" onclick="checkTypeAnswer()">בדיקה</button>
+        </div>
+
+        <div class="feedback" id="f3"></div>
+        <button class="action-btn" onclick="nextQ3()" id="btn3" style="display:none">הבא</button>
+    </div>
+
+    <script>
+        // --- ניהול טאבים ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.container').forEach(el => el.classList.remove('active-view'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active-view');
+            
+            const index = tabId === 'directions' ? 0 : tabId === 'map' ? 1 : 2;
+            document.querySelectorAll('.nav-btn')[index].classList.add('active');
+
+            if(tabId === 'map' && mapTargets.length > 0) loadMapTarget();
+        }
+
+        // --- לוגיקה משותפת ---
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // --- חלק 1: כיוונים ---
+        const q1Data = [
+            { t: "איזו יבשת נמצאת מדרום לאירופה?", c: "אפריקה", o: ["אפריקה", "אסיה", "אוסטרליה"] },
+            { t: "איזה אוקיינוס נמצא בין אמריקה לאירופה?", c: "האוקיינוס האטלנטי", o: ["האוקיינוס האטלנטי", "האוקיינוס השקט", "האוקיינוס ההודי"] },
+            { t: "איזו יבשת היא הדרומית ביותר?", c: "אנטארקטיקה", o: ["אפריקה", "דרום אמריקה", "אנטארקטיקה"] },
+            { t: "היכן נמצאת ישראל ביחס לים התיכון?", c: "מזרח", o: ["מערב", "מזרח", "צפון"] },
+            { t: "אסיה נמצאת ממזרח ל...", c: "אירופה", o: ["אירופה", "אמריקה", "אוסטרליה"] }
+        ];
+        let idx1 = 0, sc1 = 0;
+        
+        function loadQ1() {
+            if (idx1 >= q1Data.length) {
+                document.getElementById('directions').innerHTML = `<h2>סיימת את חלק הכיוונים!</h2><p>ציון: ${sc1}</p><button class='action-btn' onclick='location.reload()'>התחל מחדש</button>`;
+                return;
+            }
+            const q = q1Data[idx1];
+            document.getElementById('q1-text').innerText = q.t;
+            const opts = document.getElementById('q1-options');
+            opts.innerHTML = '';
+            document.getElementById('f1').innerText = '';
+            document.getElementById('btn1').style.display = 'none';
+            
+            let allOpts = [q.c, ...q.o];
+            shuffle(allOpts);
+            
+            allOpts.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(document.getElementById('btn1').style.display !== 'none') return;
+                    if(opt === q.c) {
+                        btn.classList.add('correct');
+                        sc1 += 10;
+                        document.getElementById('f1').innerText = 'נכון מאוד!';
+                    } else {
+                        btn.classList.add('wrong');
+                        document.getElementById('f1').innerText = 'לא נכון. התשובה היא: ' + q.c;
+                    }
+                    document.getElementById('score1').innerText = sc1;
+                    document.getElementById('btn1').style.display = 'inline-block';
+                };
+                opts.appendChild(btn);
+            });
+        }
+        function nextQ1() { idx1++; loadQ1(); }
+
+
+        // --- חלק 2: מפה אילמת ---
+        const mapTargetsOrig = [
+            "צפון אמריקה", "דרום אמריקה", "אירופה", "אפריקה", "אסיה", "אוסטרליה", "אנטארקטיקה",
+            "האוקיינוס האטלנטי", "האוקיינוס השקט", "האוקיינוס ההודי", "האוקיינוס הארקטי"
+        ];
+        let mapTargets = [...mapTargetsOrig];
+        shuffle(mapTargets);
+        let sc2 = 0;
+        let currentTarget = "";
+        let mapLocked = false;
+
+        function loadMapTarget() {
+            if (mapTargets.length === 0) {
+                document.getElementById('target-name').innerText = "סיימת את כל המפה!";
+                document.getElementById('f2').innerText = `ציון סופי: ${sc2}`;
+                return;
+            }
+            currentTarget = mapTargets[0];
+            document.getElementById('target-name').innerText = currentTarget;
+            document.getElementById('f2').innerText = "לחץ על העיגול המתאים";
+            document.getElementById('f2').style.color = "black";
+            mapLocked = false;
+            document.querySelectorAll('.map-point').forEach(p => {
+                p.classList.remove('correct-anim', 'wrong-anim');
+            });
+        }
+
+        function checkMap(el, locationName) {
+            if(mapLocked || mapTargets.length === 0) return;
+            mapLocked = true;
+
+            if (locationName === currentTarget) {
+                el.classList.add('correct-anim');
+                document.getElementById('f2').innerText = "מעולה! מצאת.";
+                document.getElementById('f2').style.color = "var(--success)";
+                sc2 += 10;
+                document.getElementById('score2').innerText = sc2;
+                setTimeout(() => { mapTargets.shift(); loadMapTarget(); }, 1500);
+            } else {
+                el.classList.add('wrong-anim');
+                document.getElementById('f2').innerText = "טעות, זה " + locationName;
+                document.getElementById('f2').style.color = "var(--error)";
+                setTimeout(() => { el.classList.remove('wrong-anim'); mapLocked = false; }, 1000);
+            }
+        }
+
+
+        // --- חלק 3: מושגים (לוגיקה חדשה) ---
+        // מאגר המושגים וההגדרות
+        const conceptsDB = [
+            { term: "אי", def: "שטח יבשה המוקף מים מכל צדדיו" },
+            { term: "חצי אי", def: "שטח יבשה המוקף מים משלושה כיוונים" },
+            { term: "ארכיפלג", def: "קבוצה של איים סמוכים" },
+            { term: "מיצר", def: "רצועת מים צרה המחברת בין שני ימים גדולים" },
+            { term: "מפרץ", def: "לשון ים החודרת אל היבשה" },
+            { term: "אוקיינוס", def: "מקווה מים מלוחים ענק המפריד בין יבשות" },
+            { term: "יבשת", def: "שטח יבשה עצום ורציף על פני כדור הארץ" }
+        ];
+
+        let questionsQ3 = []; 
+        let currentQ3 = null;
+        let idx3 = 0, sc3 = 0;
+
+        // בניית רשימת שאלות מעורבת
+        function initQ3() {
+            questionsQ3 = [];
+            // יצירת 2 סוגי שאלות עבור כל מושג = 14 שאלות סה"כ (אפשר לקצר)
+            conceptsDB.forEach(item => {
+                // סוג 1: בחירת הגדרה (אמריקאי)
+                questionsQ3.push({ type: 'select_def', term: item.term, correctDef: item.def });
+                // סוג 2: הקלדת מושג
+                questionsQ3.push({ type: 'type_term', term: item.term, def: item.def });
+            });
+            shuffle(questionsQ3);
+            loadQ3();
+        }
+
+        function loadQ3() {
+            if (idx3 >= questionsQ3.length) {
+                document.getElementById('concepts').innerHTML = `<h2>סיימת את המילון!</h2><p>ציון: ${sc3}</p><button class='action-btn' onclick='location.reload()'>התחל מחדש</button>`;
+                return;
+            }
+            
+            currentQ3 = questionsQ3[idx3];
+            document.getElementById('f3').innerText = '';
+            document.getElementById('btn3').style.display = 'none';
+            document.getElementById('user-input').value = '';
+
+            const textField = document.getElementById('q3-text');
+            const optionsDiv = document.getElementById('q3-options');
+            const inputArea = document.getElementById('q3-input-area');
+
+            if (currentQ3.type === 'select_def') {
+                // תצוגה: המושג ניתן, בחר את ההגדרה
+                inputArea.style.display = 'none';
+                optionsDiv.style.display = 'grid';
+                
+                textField.innerHTML = `מהו <b>${currentQ3.term}</b>?`;
+                
+                // יצירת מסיחים
+                let distractors = conceptsDB.filter(c => c.def !== currentQ3.correctDef).map(c => c.def);
+                shuffle(distractors);
+                let options = [currentQ3.correctDef, distractors[0], distractors[1], distractors[2]];
+                shuffle(options);
+
+                optionsDiv.innerHTML = '';
+                options.forEach(opt => {
+                    const btn = document.createElement('div');
+                    btn.className = 'opt-btn';
+                    btn.innerText = opt;
+                    btn.onclick = () => checkSelectDef(btn, opt);
+                    optionsDiv.appendChild(btn);
+                });
+
+            } else {
+                // תצוגה: ההגדרה ניתנת, הקלד את המושג
+                optionsDiv.style.display = 'none';
+                inputArea.style.display = 'block';
+                
+                textField.innerHTML = `איך נקרא: <b>${currentQ3.def}</b>?`;
+            }
+        }
+
+        function checkSelectDef(btn, selectedDef) {
+            if (document.getElementById('btn3').style.display !== 'none') return; // מניעת לחיצה כפולה
+
+            if (selectedDef === currentQ3.correctDef) {
+                btn.classList.add('correct');
+                document.getElementById('f3').innerText = 'נכון מאוד!';
+                document.getElementById('f3').style.color = 'var(--success)';
+                sc3 += 10;
+            } else {
+                btn.classList.add('wrong');
+                document.getElementById('f3').innerText = 'לא נכון. נסה לזכור לפעם הבאה.';
+                document.getElementById('f3').style.color = 'var(--error)';
+                
+                // סימון התשובה הנכונה
+                document.querySelectorAll('#q3-options .opt-btn').forEach(b => {
+                    if (b.innerText === currentQ3.correctDef) b.classList.add('correct');
+                });
+            }
+            document.getElementById('score3').innerText = sc3;
+            document.getElementById('btn3').style.display = 'inline-block';
+        }
+
+        function checkTypeAnswer() {
+            if (document.getElementById('btn3').style.display !== 'none') return;
+
+            const userText = document.getElementById('user-input').value.trim();
+            if (!userText) return; // לא לבדוק אם ריק
+
+            if (userText === currentQ3.term) {
+                document.getElementById('f3').innerText = 'כל הכבוד! תשובה מדויקת.';
+                document.getElementById('f3').style.color = 'var(--success)';
+                sc3 += 10;
+            } else {
+                document.getElementById('f3').innerText = 'לא בדיוק... התשובה היא: ' + currentQ3.term;
+                document.getElementById('f3').style.color = 'var(--error)';
+            }
+            document.getElementById('score3').innerText = sc3;
+            document.getElementById('btn3').style.display = 'inline-block';
+        }
+
+        function nextQ3() { idx3++; loadQ3(); }
+
+        // אתחול
+        loadQ1();
+        loadMapTarget();
+        initQ3();
+
+    </script>
+</body>
+</html>
