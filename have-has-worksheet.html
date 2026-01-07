@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>דף עבודה באנגלית - Have & Has</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+        
+        body {
+            font-family: 'Varela Round', sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: white;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #4a90e2;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 { margin: 0; color: #2c3e50; }
+        .sub-title { color: #7f8c8d; font-size: 1.1em; margin-top: 5px; }
+
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+        
+        .line { border-bottom: 1px solid black; width: 150px; display: inline-block; }
+
+        /* Cheat Sheet Box */
+        .reminder-box {
+            border: 2px dashed #ff9800;
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 40px;
+        }
+        
+        .rule { text-align: left; direction: ltr; font-size: 1.1em; }
+        .rule strong { color: #e91e63; font-size: 1.3em; display: block; margin-bottom: 5px;}
+
+        /* Sections */
+        .section { margin-bottom: 40px; }
+        .section-title {
+            background-color: #e3f2fd;
+            color: #1565C0;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .questions {
+            direction: ltr; /* English questions */
+            font-size: 1.2em;
+            line-height: 2em;
+        }
+
+        .q-item { margin-bottom: 15px; }
+        .blank { border-bottom: 1px solid black; width: 80px; display: inline-block; text-align: center; }
+        
+        /* For part 3 (Scramble) */
+        .scramble-box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-family: monospace;
+            background: #fafafa;
+        }
+        .write-line {
+            border-bottom: 1px solid #999;
+            height: 30px;
+            width: 100%;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* Print adjustments */
+        @media print {
+            body { padding: 20px; }
+            .reminder-box { background-color: white; border: 1px solid #999; }
+            .section-title { background-color: #eee; color: black; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Practice Worksheet: Have / Has</h1>
+        <div class="sub-title">הכנה למבחן באנגלית לכיתה ה'</div>
+    </div>
+
+    <div class="student-info">
+        <div>Name: <span class="line"></span></div>
+        <div>Date: <span class="line"></span></div>
+    </div>
+
+    <div class="reminder-box">
+        <div class="rule">
+            <strong>Have</strong>
+            I, You, We, They<br>
+            (Plural / רבים)
+        </div>
+        <div class="rule">
+            <strong>Has</strong>
+            He, She, It<br>
+            (Singular / יחיד)
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Part 1: Write 'have' or 'has' (השלימי את המילה החסרה)</div>
+        <div class="questions">
+            <div class="q-item">1. I <span class="blank"></span> a red apple in my bag.</div>
+            <div class="q-item">2. She <span class="blank"></span> beautiful green eyes.</div>
+            <div class="q-item">3. The boys <span class="blank"></span> a football game today.</div>
+            <div class="q-item">4. It <span class="blank"></span> a long tail.</div>
+            <div class="q-item">5. My teacher <span class="blank"></span> a new computer.</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Part 2: Circle the correct answer (הקיפי את הנושא המתאים)</div>
+        <div class="questions">
+            <div class="q-item">1. ( <strong>He</strong> / <strong>I</strong> ) has a big dog.</div>
+            <div class="q-item">2. ( <strong>The cat</strong> / <strong>The cats</strong> ) have milk in the bowl.</div>
+            <div class="q-item">3. ( <strong>We</strong> / <strong>She</strong> ) have homework.</div>
+            <div class="q-item">4. ( <strong>You</strong> / <strong>It</strong> ) have a nice smile.</div>
+            <div class="q-item">5. ( <strong>Dan</strong> / <strong>Dan and Gal</strong> ) has a sister.</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Part 3: Order the sentence (סדרי את המילים למשפט נכון)</div>
+        <div style="font-size: 0.9em; margin-bottom: 10px;">* שימי לב: בחרי Have או Has (רק אחד מהם נכון!)</div>
+        
+        <div class="questions">
+            <div class="q-item">
+                <div class="scramble-box">book /  I /  (have / has) /  a /  good</div>
+                <div class="write-line"></div>
+            </div>
+
+            <div class="q-item">
+                <div class="scramble-box">long /  She /  hair /  (have / has)</div>
+                <div class="write-line"></div>
+            </div>
+
+            <div class="q-item">
+                <div class="scramble-box">a /  We /  test /  (have / has) /  big</div>
+                <div class="write-line"></div>
+            </div>
+
+            <div class="q-item">
+                <div class="scramble-box">The /  (have / has) /  dog /  brown /  ears</div>
+                <div class="write-line"></div>
+            </div>
+
+            <div class="q-item">
+                <div class="scramble-box">They /  house /  (have / has) /  new /  a</div>
+                <div class="write-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px; font-size: 2em;">
+        Good Luck! ⭐
+    </div>
+
+</body>
+</html>
