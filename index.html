@@ -226,6 +226,57 @@
             white-space: nowrap;
         }
 
+    
+        /* תגית "חדש" על כרטיס */
+        .new-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #2e7d32;
+            color: white;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        /* תגית "חדש" על כותרת קטגוריה (summary) */
+        .subject-new-badge {
+            background: #2e7d32;
+            color: white;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        /* מצב "בוצע" על כרטיס (זיכרון מקומי) */
+        .done-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: #1b5e20;
+            color: white;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .score-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #0d47a1;
+            color: white;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .card.done {
+            opacity: 0.92;
+            border-color: #c8e6c9;
+        }
+
     </style>
 </head>
 <body>
@@ -245,24 +296,12 @@
             <details class="subject-box">
                 <summary class="subject-title">🔢 חשבון ושפה</summary>
                 <div class="apps-grid">
-                    <a href="calc8.html" class="card">
-                        <span class="icon">✖️</span>
-                        <span class="card-title">לוח הכפל</span>
-                        <span class="card-desc">חזרה על כפולות לפי מספרים</span>
-                    </a>
-
                     <a href="milim.html" class="card">
                         <span class="icon">📚</span>
                         <span class="card-title">סדר במילון</span>
                         <span class="card-desc">סידור מילים לפי א'-ב'</span>
                     </a>
-
-                    <a href="english.html" class="card">
-                        <span class="icon">🔡</span>
-                        <span class="card-title">אנגלית</span>
-                        <span class="card-desc">אותיות Aa, Bb, Dd...</span>
-                    </a>
-                    <a href="grammer.html" class="card">
+<a href="grammer.html" class="card">
                         <span class="icon">⌨️</span>
                         <span class="card-title">משחק השגיאות</span>
                         <span class="card-desc">תיקון שגיאות כתיב</span>
@@ -270,7 +309,19 @@
 </div>
             </details>
 
+            
+
             <details class="subject-box">
+                <summary class="subject-title">🗣️ אנגלית</summary>
+                <div class="apps-grid">
+<a href="english.html" class="card">
+                        <span class="icon">🔡</span>
+                        <span class="card-title">אנגלית</span>
+                        <span class="card-desc">אותיות Aa, Bb, Dd...</span>
+                    </a>
+                </div>
+            </details>
+<details class="subject-box">
                 <summary class="subject-title">⚗️ מדעים</summary>
                 <div class="apps-grid">
                     <a href="Materials_fix.html" class="card">
@@ -285,7 +336,11 @@
             <details class="subject-box">
                 <summary class="subject-title">📐 חשבון והנדסה</summary>
                 <div class="apps-grid">
-                    <!-- הוסיפי כאן אפליקציות -->
+                    <a href="calc8.html" class="card" date-added="2026-01-07">
+                        <span class="icon">✖️</span>
+                        <span class="card-title">לוח הכפל</span>
+                        <span class="card-desc">חזרה על כפולות לפי מספרים</span>
+                    </a>
                 </div>
             </details>
 </section>
@@ -296,16 +351,16 @@
 
 
             <details class="subject-box">
-                <summary class="subject-title">🇬🇧 אנגלית</summary>
+                <summary class="subject-title">🗣️ אנגלית</summary>
                 <div class="apps-grid">
                 <a href="have-has.html" class="card" data-exam-date="2026-01-22">
-                        <span class="icon">🇬🇧</span>
+                        <span class="icon">🗣️</span>
                         <span class="card-title">אנגלית: have / has</span>
                         <span class="card-desc">תרגול לקראת מבחן</span>
                     </a>
          
                 <a href="have-has-worksheet.html" class="card worksheet" data-exam-date="2026-01-22">
-                        <span class="icon">🇬🇧</span>
+                        <span class="icon">🗣️</span>
                         <span class="card-title">אנגלית: have / has</span>
                         <span class="card-desc">תרגול לקראת מבחן</span>
                     </a>
@@ -391,54 +446,132 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const now = new Date();
-    // Normalize "today" to start of day (local) to avoid timezone surprises.
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // תחילת היום
 
-    // 1) Handle exam cards: remove expired, highlight upcoming and add badge on the card
-    document.querySelectorAll(".card[data-exam-date]").forEach(card => {
-        const examDateStr = card.dataset.examDate; // YYYY-MM-DD
-        const examDate = new Date(examDateStr);
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const EXAM_WINDOW_DAYS = 7; // להציג התראת מבחן רק בשבוע שלפני
+  const NEW_WINDOW_DAYS = 7;  // "חדש" לשבוע
 
-        if (isNaN(examDate)) return;
+  function toDay(d){
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
 
-        const examDay = new Date(examDate.getFullYear(), examDate.getMonth(), examDate.getDate());
+  function parseISODate(iso){
+    // מצפה ל- YYYY-MM-DD
+    const d = new Date(iso);
+    if (isNaN(d)) return null;
+    return toDay(d);
+  }
 
-        if (examDay < today) {
-            card.remove();
-        } else {
-            const badge = document.createElement("div");
-            badge.className = "exam-badge";
-            badge.textContent = "מבחן בתאריך " + examDay.toLocaleDateString("he-IL");
-            card.appendChild(badge);
-            card.classList.add("exam");
+  function daysBetween(a, b){
+    // b - a בימים שלמים
+    return Math.round((b.getTime() - a.getTime()) / MS_PER_DAY);
+  }
+
+  function addCornerBadge(card, cls, text){
+    if (card.querySelector("." + cls)) return;
+    const badge = document.createElement("div");
+    badge.className = cls;
+    badge.textContent = text;
+    card.appendChild(badge);
+  }
+
+  // 1) מבחנים: למחוק אחרי התאריך, ולהציג תגית/הדגשה רק בשבוע שלפני
+  document.querySelectorAll(".card[data-exam-date]").forEach(card => {
+    const examDay = parseISODate(card.dataset.examDate);
+    if (!examDay) return;
+
+    const until = daysBetween(today, examDay); // 0 = היום
+    if (until < 0) {
+      card.remove();
+      return;
+    }
+
+    if (until <= EXAM_WINDOW_DAYS) {
+      addCornerBadge(card, "exam-badge", "מבחן בתאריך " + examDay.toLocaleDateString("he-IL"));
+      card.classList.add("exam");
+    }
+  });
+
+  // 2) חדש: אם יש data-added="YYYY-MM-DD" אז להציג "חדש" לשבוע
+  document.querySelectorAll(".card[data-added]").forEach(card => {
+    const addedDay = parseISODate(card.dataset.added);
+    if (!addedDay) return;
+
+    const age = daysBetween(addedDay, today); // 0 = נוסף היום
+    if (age < 0) return;
+    if (age <= NEW_WINDOW_DAYS) {
+      addCornerBadge(card, "new-badge", "חדש");
+    }
+  });
+
+  // 3) זיכרון (localStorage): להציג בוצע + ציון
+  // שימוש: להוסיף data-app-id="unique_id" לכרטיס
+  // ובאפליקציה עצמה לכתוב:
+  // localStorage.setItem("mySchoolApp:unique_id", JSON.stringify({done:true, score:100, ts:"2026-01-07"}))
+  document.querySelectorAll(".card[data-app-id]").forEach(card => {
+    const id = card.dataset.appId;
+    const raw = localStorage.getItem("mySchoolApp:" + id);
+    if (!raw) return;
+
+    try{
+      const data = JSON.parse(raw);
+      if (data && data.done){
+        card.classList.add("done");
+        addCornerBadge(card, "done-badge", "בוצע");
+        if (typeof data.score === "number"){
+          if (!card.querySelector(".score-badge")){
+            const b = document.createElement("div");
+            b.className = "score-badge";
+            b.textContent = data.score + "%";
+            card.appendChild(b);
+          }
         }
-    });
+      }
+    } catch(e){
+      // להתעלם
+    }
+  });
 
-    // 2) Add exam badge to the CATEGORY (details > summary) if it contains upcoming exam cards
-    document.querySelectorAll("details.subject-box").forEach(box => {
-        const cards = Array.from(box.querySelectorAll(".card[data-exam-date]"));
-        const dates = cards
-            .map(c => new Date(c.dataset.examDate))
-            .filter(d => !isNaN(d))
-            .map(d => new Date(d.getFullYear(), d.getMonth(), d.getDate()))
-            .filter(d => d >= today)
-            .sort((a, b) => a - b);
+  // 4) תגיות על קטגוריות: מבחן (רק בשבוע שלפני) + חדש (אם יש משהו חדש)
+  document.querySelectorAll("details.subject-box").forEach(box => {
+    const summary = box.querySelector("summary.subject-title");
+    if (!summary) return;
 
-        // Remove existing badge if any (avoid duplicates on refresh)
-        const summary = box.querySelector("summary.subject-title");
-        if (!summary) return;
-        const existing = summary.querySelector(".subject-exam-badge");
-        if (existing) existing.remove();
+    summary.querySelectorAll(".subject-exam-badge, .subject-new-badge").forEach(x => x.remove());
 
-        if (dates.length > 0) {
-            const nearest = dates[0];
-            const sBadge = document.createElement("span");
-            sBadge.className = "subject-exam-badge";
-            sBadge.textContent = "מבחן בתאריך " + nearest.toLocaleDateString("he-IL");
-            summary.appendChild(sBadge);
-        }
-    });
+    // מבחן בקטגוריה
+    const examCards = Array.from(box.querySelectorAll(".card[data-exam-date]"));
+    const examDates = examCards
+      .map(c => parseISODate(c.dataset.examDate))
+      .filter(Boolean)
+      .map(d => ({ d, until: daysBetween(today, d) }))
+      .filter(x => x.until >= 0 && x.until <= EXAM_WINDOW_DAYS)
+      .sort((a,b) => a.until - b.until);
+
+    if (examDates.length > 0) {
+      const nearest = examDates[0].d;
+      const badge = document.createElement("span");
+      badge.className = "subject-exam-badge";
+      badge.textContent = "מבחן בתאריך " + nearest.toLocaleDateString("he-IL");
+      summary.appendChild(badge);
+    }
+
+    // חדש בקטגוריה
+    const newAges = Array.from(box.querySelectorAll(".card[data-added]"))
+      .map(c => parseISODate(c.dataset.added))
+      .filter(Boolean)
+      .map(d => daysBetween(d, today))
+      .filter(age => age >= 0 && age <= NEW_WINDOW_DAYS);
+
+    if (newAges.length > 0) {
+      const badge = document.createElement("span");
+      badge.className = "subject-new-badge";
+      badge.textContent = "חדש";
+      summary.appendChild(badge);
+    }
+  });
 });
 </script></body>
 </html>
