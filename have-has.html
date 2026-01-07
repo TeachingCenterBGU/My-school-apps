@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מתרגלים אנגלית: Have & Has</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
+        body {
+            font-family: 'Varela Round', sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 { color: #4a90e2; margin-bottom: 10px; font-size: 1.8em; }
+        h2 { color: #e91e63; font-size: 1.2em; }
+
+        .explanation {
+            background-color: #e8f4fd;
+            border: 2px solid #b6dbfb;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .rule-box {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 5px;
+            direction: ltr;
+        }
+
+        .rule {
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            width: 45%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-size: 0.9em;
+        }
+
+        .rule strong { color: #e91e63; display: block; }
+
+        .menu-btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 1.1em;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 8px 0;
+            width: 100%;
+            transition: transform 0.1s;
+            font-family: 'Varela Round', sans-serif;
+            box-shadow: 0 4px #1565C0;
+            text-align: center;
+        }
+        
+        .menu-btn:active { transform: translateY(2px); box-shadow: 0 1px #1565C0; }
+
+        /* Game Area Styles */
+        .game-area, .end-screen { display: none; }
+
+        /* Styles for Fill & Subject Games */
+        .question-card {
+            font-size: 1.4em;
+            margin: 15px 0;
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 15px;
+            direction: ltr;
+            font-weight: bold;
+        }
+
+        .options { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        
+        .option-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Varela Round', sans-serif;
+            min-width: 80px;
+        }
+
+        /* Styles for Sentence Builder Game */
+        .sentence-board {
+            min-height: 60px;
+            border-bottom: 3px dashed #ccc;
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            direction: ltr;
+            background-color: #fafafa;
+            border-radius: 8px;
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            direction: ltr;
+        }
+
+        .word-chip {
+            background-color: #e3f2fd;
+            border: 2px solid #2196F3;
+            color: #1565C0;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .word-chip:hover { background-color: #bbdefb; }
+        
+        .check-btn {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px #e65100;
+        }
+        .check-btn:active { transform: translateY(2px); box-shadow: 0 1px #e65100; }
+
+        /* General UI */
+        .feedback { margin-top: 15px; font-size: 1.2em; height: 30px; font-weight: bold; }
+        .score { margin-top: 10px; color: #666; font-size: 0.9em; }
+        .progress-bar { width: 100%; background-color: #ddd; border-radius: 10px; margin-top: 10px; height: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background-color: #4CAF50; width: 0%; transition: width 0.3s; }
+        .correct { color: green; } .wrong { color: red; }
+        .home-btn { background: transparent; border: 1px solid #999; color: #666; padding: 5px 15px; border-radius: 20px; margin-top: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="intro-screen">
+            <h1>מתכוננים למבחן באנגלית! 🇬🇧</h1>
+            
+            <div class="explanation">
+                <div class="rule-box">
+                    <div class="rule"><strong>Have</strong>I, You, We, They</div>
+                    <div class="rule"><strong>Has</strong>He, She, It</div>
+                </div>
+            </div>
+
+            <h2>במה תרצי לשחק?</h2>
+            <button class="menu-btn" onclick="initGame('fill')">1. משלימים Have / Has ✍️</button>
+            <button class="menu-btn" onclick="initGame('subject')">2. מי הנושא? (Subject) 👧</button>
+            <button class="menu-btn" style="background-color: #9C27B0; box-shadow: 0 4px #7B1FA2;" onclick="initGame('build')">3. בניית משפטים 🧩</button>
+        </div>
+
+        <div id="game-screen" class="game-area">
+            <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+            <p style="margin:5px 0;">שאלה <span id="q-num">1</span> מתוך <span id="total-q">10</span></p>
+            
+            <div id="standard-game-area" style="display:none;">
+                <div class="question-card" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+            </div>
+
+            <div id="builder-game-area" style="display:none;">
+                <p style="font-size:0.9em; color:#666;">הקליקי על המילים לפי הסדר:</p>
+                <div class="sentence-board" id="sentence-board"></div>
+                <div class="word-bank" id="word-bank"></div>
+                <button class="check-btn" onclick="checkBuilderAnswer()">בִּדְקִי!</button>
+            </div>
+
+            <div class="feedback" id="feedback-msg"></div>
+            <div class="score">ניקוד: <span id="current-score">0</span></div>
+            
+            <button class="home-btn" onclick="location.reload()">חזרה לתפריט ראשי</button>
+        </div>
+
+        <div id="end-screen" class="end-screen">
+            <div style="font-size:3em;">🎉🏆🎉</div>
+            <h2 id="end-title">כל הכבוד!</h2>
+            <p id="final-score-msg"></p>
+            <button class="menu-btn" onclick="location.reload()">חזרה לתפריט ראשי</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const questionsFill = [
+            { text: "I ___ a cute dog.", answer: "have", options: ["have", "has"] },
+            { text: "She ___ a pink bag.", answer: "has", options: ["have", "has"] },
+            { text: "They ___ a big house.", answer: "have", options: ["have", "has"] },
+            { text: "He ___ a new bike.", answer: "has", options: ["have", "has"] },
+            { text: "The cat ___ green eyes.", answer: "has", options: ["have", "has"] },
+            { text: "We ___ a test today.", answer: "have", options: ["have", "has"] },
+            { text: "Dan ___ two sisters.", answer: "has", options: ["have", "has"] },
+            { text: "You ___ a beautiful smile.", answer: "have", options: ["have", "has"] }
+        ];
+
+        const questionsSubject = [
+            { text: "___ has a blue pen.", answer: "He", options: ["He", "I"] },
+            { text: "___ have a great teacher.", answer: "We", options: ["We", "She"] },
+            { text: "___ has long hair.", answer: "Tali", options: ["Tali", "Tali and Gal"] },
+            { text: "___ have homework today.", answer: "They", options: ["It", "They"] },
+            { text: "___ has four legs.", answer: "The dog", options: ["The dog", "The dogs"] }
+        ];
+
+        const questionsBuild = [
+            { sentence: "I have a red pen" },
+            { sentence: "She has a little cat" },
+            { sentence: "We have a big class" },
+            { sentence: "He has blue eyes" },
+            { sentence: "They have a ball" },
+            { sentence: "The dog has a bone" },
+            { sentence: "You have a nice book" }
+        ];
+
+        // --- STATE ---
+        let currentGameType = '';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let canClick = true;
+        let currentBuilderWords = []; // To track user's built sentence
+
+        // --- GAME LOGIC ---
+
+        function initGame(type) {
+            currentGameType = type;
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('current-score').innerText = "0";
+            
+            // Setup data based on game type
+            if (type === 'fill') currentQuestions = questionsFill;
+            else if (type === 'subject') currentQuestions = questionsSubject;
+            else currentQuestions = questionsBuild;
+
+            // UI Setup
+            document.getElementById('intro-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            document.getElementById('total-q').innerText = currentQuestions.length;
+            
+            // Toggle Areas
+            if (type === 'build') {
+                document.getElementById('standard-game-area').style.display = 'none';
+                document.getElementById('builder-game-area').style.display = 'block';
+            } else {
+                document.getElementById('standard-game-area').style.display = 'block';
+                document.getElementById('builder-game-area').style.display = 'none';
+            }
+
+            showQuestion();
+        }
+
+        function showQuestion() {
+            canClick = true;
+            document.getElementById('feedback-msg').innerText = "";
+            document.getElementById('q-num').innerText = currentQuestionIndex + 1;
+            
+            // Progress Bar
+            const percentage = (currentQuestionIndex / currentQuestions.length) * 100;
+            document.getElementById('progress').style.width = percentage + "%";
+
+            if (currentGameType === 'build') {
+                setupBuilderRound();
+            } else {
+                setupStandardRound();
+            }
+        }
+
+        // --- Standard Game (Fill / Subject) ---
+        function setupStandardRound() {
+            const q = currentQuestions[currentQuestionIndex];
+            document.getElementById('question-text').innerText = q.text;
+            const optionsDiv = document.getElementById('options-container');
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkStandardAnswer(opt);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function checkStandardAnswer(userChoice) {
+            if (!canClick) return;
+            
+            const correct = currentQuestions[currentQuestionIndex].answer;
+            const feedbackEl = document.getElementById('feedback-msg');
+
+            if (userChoice === correct) {
+                score += 10;
+                feedbackEl.innerHTML = "נכון מאוד! 👏";
+                feedbackEl.className = "feedback correct";
+                canClick = false;
+                setTimeout(nextQuestion, 1500);
+            } else {
+                feedbackEl.innerHTML = "אופס, התשובה היא " + correct;
+                feedbackEl.className = "feedback wrong";
+                score = Math.max(0, score - 5); // Penalty for wrong answer but try again
+            }
+            document.getElementById('current-score').innerText = score;
+        }
+
+        // --- Builder Game ---
+        function setupBuilderRound() {
+            const q = currentQuestions[currentQuestionIndex];
+            const sentence = q.sentence;
+            
+            // 1. Break sentence into words
+            let words = sentence.split(" ");
+            
+            // 2. Add distractor (Have/Has)
+            if (words.includes("have") || words.includes("Have")) {
+                words.push("has");
+            } else if (words.includes("has") || words.includes("Has")) {
+                words.push("have");
+            }
+
+            // 3. Shuffle
+            words = words.sort(() => Math.random() - 0.5);
+
+            // 4. Render
+            const bank = document.getElementById('word-bank');
+            const board = document.getElementById('sentence-board');
+            bank.innerHTML = '';
+            board.innerHTML = '';
+            currentBuilderWords = []; // Reset user answer
+
+            words.forEach((word, index) => {
+                createWordChip(word, bank, board);
+            });
+        }
+
+        function createWordChip(text, parentBank, parentBoard) {
+            const chip = document.createElement('div');
+            chip.className = 'word-chip';
+            chip.innerText = text;
+            
+            // Logic: Click to move between Bank and Board
+            chip.onclick = function() {
+                if (!canClick) return;
+                
+                if (chip.parentElement === parentBank) {
+                    parentBoard.appendChild(chip);
+                } else {
+                    parentBank.appendChild(chip);
+                }
+            };
+            
+            parentBank.appendChild(chip);
+        }
+
+        function checkBuilderAnswer() {
+            if (!canClick) return;
+
+            const board = document.getElementById('sentence-board');
+            // Get words from board in order
+            const userSentence = Array.from(board.children).map(c => c.innerText).join(" ");
+            const targetSentence = currentQuestions[currentQuestionIndex].sentence;
+            
+            const feedbackEl = document.getElementById('feedback-msg');
+
+            if (userSentence === targetSentence) {
+                score += 10;
+                feedbackEl.innerHTML = "משפט מושלם! ⭐";
+                feedbackEl.className = "feedback correct";
+                canClick = false;
+                setTimeout(nextQuestion, 2000);
+            } else {
+                feedbackEl.innerHTML = "עדיין לא... נסי לשנות את הסדר 🤔";
+                feedbackEl.className = "feedback wrong";
+            }
+            document.getElementById('current-score').innerText = score;
+        }
+
+        // --- Common ---
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuestions.length) {
+                showQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('end-screen').style.display = 'block';
+            document.getElementById('progress').style.width = "100%";
+            
+            let msg = score > 50 ? "אלופה! 👑" : "כל הכבוד על המאמץ!";
+            document.getElementById('final-score-msg').innerHTML = `הציון הסופי: <strong>${score}</strong><br>${msg}`;
+        }
+    </script>
+</body>
+</html>
