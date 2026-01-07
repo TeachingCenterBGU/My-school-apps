@@ -168,8 +168,8 @@
 
         /* דפי עבודה - ירוק בהיר */
         .card.worksheet {
-            border-top: 4px solid var(--worksheet-border);
-            background: var(--worksheet-bg);
+            border-top: 4px solid #64b5f6;
+            background: #e3f2fd;
         }
 
         .icon {
@@ -277,6 +277,107 @@
             border-color: #c8e6c9;
         }
 
+    
+        /* פעולות סימון עצמי */
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .mark-btn {
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            color: #333;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: transform 0.08s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .mark-btn:active {
+            transform: scale(0.98);
+        }
+
+        .mark-btn.partial {
+            border-color: #a5d6a7;
+            color: #1b5e20;
+        }
+
+        .mark-btn.done {
+            border-color: #81c784;
+            background: #e8f5e9;
+            color: #1b5e20;
+            font-weight: 600;
+        }
+
+        /* להפוך את גוף הכרטיס ללחיץ (קישור) בלי לשבור את הכפתורים */
+        .card-main {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card.partial-state {
+            border-color: #a5d6a7;
+            background: #f1fbf2;
+        }
+
+        .card.done-state {
+            border-color: #81c784;
+            background: #e8f5e9;
+        }
+
+        .partial-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: #2e7d32;
+            color: white;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .done-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: #1b5e20;
+            color: white;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+    
+        /* תגית חדש - צהוב/כתום עדין */
+        .new-badge, .subject-new-badge {
+            background: #fff3cd;
+            color: #8a6d3b;
+            border: 1px solid #ffe69c;
+        }
+
+        /* בוצע חלקית */
+        .partial-badge {
+            background: #66bb6a;
+        }
+
+        /* סיימתי */
+        .done-badge {
+            background: #2e7d32;
+        }
+
+        .partial-badge::before {
+            content: "✔︎ ";
+        }
+
+        .done-badge::before {
+            content: "✔︎✔︎ ";
+        }
+
     </style>
 </head>
 <body>
@@ -296,16 +397,40 @@
             <details class="subject-box">
                 <summary class="subject-title">🔢 חשבון ושפה</summary>
                 <div class="apps-grid">
-                    <a href="milim.html" class="card">
-                        <span class="icon">📚</span>
-                        <span class="card-title">סדר במילון</span>
-                        <span class="card-desc">סידור מילים לפי א'-ב'</span>
-                    </a>
-<a href="grammer.html" class="card">
-                        <span class="icon">⌨️</span>
-                        <span class="card-title">משחק השגיאות</span>
-                        <span class="card-desc">תיקון שגיאות כתיב</span>
-                    </a>
+                    <div class="card" data-app-id="calc8">
+                        <a class="card-main" href="calc8.html">
+                            <span class="icon">✖️</span>
+                                                    <span class="card-title">לוח הכפל</span>
+                                                    <span class="card-desc">חזרה על כפולות לפי מספרים</span>
+                        </a>
+                        <div class="card-actions" data-app-id="milim">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
+
+                    <div class="card" data-app-id="milim">
+                        <a class="card-main" href="milim.html">
+                            <span class="icon">📚</span>
+                                                    <span class="card-title">סדר במילון</span>
+                                                    <span class="card-desc">סידור מילים לפי א'-ב'</span>
+                        </a>
+                        <div class="card-actions" data-app-id="grammer">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
+<div class="card" data-app-id="grammer">
+                        <a class="card-main" href="grammer.html">
+                            <span class="icon">⌨️</span>
+                                                    <span class="card-title">משחק השגיאות</span>
+                                                    <span class="card-desc">תיקון שגיאות כתיב</span>
+                        </a>
+                        <div class="card-actions" data-app-id="english">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
 </div>
             </details>
 
@@ -314,21 +439,33 @@
             <details class="subject-box">
                 <summary class="subject-title">🗣️ אנגלית</summary>
                 <div class="apps-grid">
-<a href="english.html" class="card">
-                        <span class="icon">🔡</span>
-                        <span class="card-title">אנגלית</span>
-                        <span class="card-desc">אותיות Aa, Bb, Dd...</span>
-                    </a>
+<div class="card" data-app-id="english">
+                        <a class="card-main" href="english.html">
+                            <span class="icon">🔡</span>
+                                                    <span class="card-title">אנגלית</span>
+                                                    <span class="card-desc">אותיות Aa, Bb, Dd...</span>
+                        </a>
+                        <div class="card-actions" data-app-id="Materials_fix">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
                 </div>
             </details>
 <details class="subject-box">
                 <summary class="subject-title">⚗️ מדעים</summary>
                 <div class="apps-grid">
-                    <a href="Materials_fix.html" class="card">
-                        <span class="icon">🧪</span>
-                        <span class="card-title">חומרים</span>
-                        <span class="card-desc">תכונות חומרים ושימושיהם</span>
-                    </a>
+                    <div class="card" data-app-id="Materials_fix">
+                        <a class="card-main" href="Materials_fix.html">
+                            <span class="icon">🧪</span>
+                                                    <span class="card-title">חומרים</span>
+                                                    <span class="card-desc">תכונות חומרים ושימושיהם</span>
+                        </a>
+                        <div class="card-actions">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
                 </div>
             </details>
         
@@ -336,11 +473,7 @@
             <details class="subject-box">
                 <summary class="subject-title">📐 חשבון והנדסה</summary>
                 <div class="apps-grid">
-                    <a href="calc8.html" class="card" data-added="2026-01-07">
-                        <span class="icon">✖️</span>
-                        <span class="card-title">לוח הכפל</span>
-                        <span class="card-desc">חזרה על כפולות לפי מספרים</span>
-                    </a>
+                    <!-- הוסיפי כאן אפליקציות -->
                 </div>
             </details>
 </section>
@@ -353,86 +486,152 @@
             <details class="subject-box">
                 <summary class="subject-title">🗣️ אנגלית</summary>
                 <div class="apps-grid">
-                <a href="have-has.html" class="card" data-exam-date="2026-01-22">
-                        <span class="icon">🗣️</span>
-                        <span class="card-title">אנגלית: have / has</span>
-                        <span class="card-desc">תרגול לקראת מבחן</span>
-                    </a>
+                <div class="card" data-app-id="have-has" data-exam-date="2026-01-22">
+                        <a class="card-main" href="have-has.html">
+                            <span class="icon">🗣️</span>
+                                                    <span class="card-title">אנגלית: have / has</span>
+                                                    <span class="card-desc">תרגול לקראת מבחן</span>
+                        </a>
+                        <div class="card-actions" data-app-id="have-has-worksheet">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
          
-                <a href="have-has-worksheet.html" class="card worksheet" data-exam-date="2026-01-22">
-                        <span class="icon">🗣️</span>
-                        <span class="card-title">אנגלית: have / has</span>
-                        <span class="card-desc">תרגול לקראת מבחן</span>
-                    </a>
+                <div class="card worksheet" data-exam-date="2026-01-22" data-app-id="have-has-worksheet">
+                        <a class="card-main" href="have-has-worksheet.html">
+                            <span class="icon">🗣️</span>
+                                                    <span class="card-title">אנגלית: have / has</span>
+                                                    <span class="card-desc">תרגול לקראת מבחן</span>
+                        </a>
+                        <div class="card-actions" data-app-id="geometry">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
                 </div>
             </details>
             
             <details class="subject-box">
                 <summary class="subject-title">📐 מתמטיקה</summary>
                 <div class="apps-grid">
-                    <a href="geometry.html" class="card">
-                        <span class="icon">🔷</span>
-                        <span class="card-title">מרובעים וזוויות</span>
-                        <span class="card-desc">סיווג מרובעים וחישוב זווית</span>
-                    </a>
+                    <div class="card" data-app-id="geometry">
+                        <a class="card-main" href="geometry.html">
+                            <span class="icon">🔷</span>
+                                                    <span class="card-title">מרובעים וזוויות</span>
+                                                    <span class="card-desc">סיווג מרובעים וחישוב זווית</span>
+                        </a>
+                        <div class="card-actions" data-app-id="geometry2">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
 
-                    <a href="geometry2.html" class="card">
-                        <span class="icon">🔺</span>
-                        <span class="card-title">משולשים וישרים</span>
-                        <span class="card-desc">זיהוי משולשים, מאונכים ומקבילים</span>
-                    </a>
+                    <div class="card" data-app-id="geometry2">
+                        <a class="card-main" href="geometry2.html">
+                            <span class="icon">🔺</span>
+                                                    <span class="card-title">משולשים וישרים</span>
+                                                    <span class="card-desc">זיהוי משולשים, מאונכים ומקבילים</span>
+                        </a>
+                        <div class="card-actions" data-app-id="Leviticus19">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
                 </div>
             </details>
 
             <details class="subject-box">
                 <summary class="subject-title">📚 שפה, תנ&quot;ך ומורשת</summary>
                 <div class="apps-grid">
-                <a href="Leviticus19.html" class="card">
-                        <span class="icon">📜</span>
-                        <span class="card-title">תנ&quot;ך: ויקרא י&quot;ט</span>
-                        <span class="card-desc">שאלות הבנה על הפרק</span>
-                    </a>
+                <div class="card" data-app-id="Leviticus19">
+                        <a class="card-main" href="Leviticus19.html">
+                            <span class="icon">📜</span>
+                                                    <span class="card-title">תנ&quot;ך: ויקרא י&quot;ט</span>
+                                                    <span class="card-desc">שאלות הבנה על הפרק</span>
+                        </a>
+                        <div class="card-actions" data-app-id="VerbsGame">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
 
-                    <a href="VerbsGame.html" class="card">
-                        <span class="icon">🏃</span>
-                        <span class="card-title">לשון: פעיל וסביל</span>
-                        <span class="card-desc">תרגול הבחנה בין פעלים</span>
-                    </a>
+                    <div class="card" data-app-id="VerbsGame">
+                        <a class="card-main" href="VerbsGame.html">
+                            <span class="icon">🏃</span>
+                                                    <span class="card-title">לשון: פעיל וסביל</span>
+                                                    <span class="card-desc">תרגול הבחנה בין פעלים</span>
+                        </a>
+                        <div class="card-actions" data-app-id="metals">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
 </div>
             </details>
 
 <details class="subject-box">
                 <summary class="subject-title">🔬 מדעים וגיאוגרפיה</summary>
                 <div class="apps-grid">
-                    <a href="metals.html" class="card">
-                        <span class="icon">🪙</span>
-                        <span class="card-title">תרגול: עולם המתכות</span>
-                        <span class="card-desc">תכונות, הפקה ומשאבים</span>
-                    </a>
+                    <div class="card" data-app-id="metals">
+                        <a class="card-main" href="metals.html">
+                            <span class="icon">🪙</span>
+                                                    <span class="card-title">תרגול: עולם המתכות</span>
+                                                    <span class="card-desc">תכונות, הפקה ומשאבים</span>
+                        </a>
+                        <div class="card-actions" data-app-id="metals2">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
 
-                    <a href="metals2.html" class="card worksheet">
-                        <span class="icon">📝</span>
-                        <span class="card-title">דף עבודה: מתכות</span>
-                        <span class="card-desc">שאלות פתוחות להדפסה + תשובון</span>
-                    </a>
+                    <div class="card worksheet" data-app-id="metals2">
+                        <a class="card-main" href="metals2.html">
+                            <span class="icon">📝</span>
+                                                    <span class="card-title">דף עבודה: מתכות</span>
+                                                    <span class="card-desc">שאלות פתוחות להדפסה + תשובון</span>
+                        </a>
+                        <div class="card-actions" data-app-id="geography3">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
 
-                    <a href="geography3.html" class="card">
-                        <span class="icon">🌍</span>
-                        <span class="card-title">גיאוגרפיה</span>
-                        <span class="card-desc">תרגול נוסף, כיוונים ומושגים</span>
-                    </a>
+                    <div class="card" data-app-id="geography3">
+                        <a class="card-main" href="geography3.html">
+                            <span class="icon">🌍</span>
+                                                    <span class="card-title">גיאוגרפיה</span>
+                                                    <span class="card-desc">תרגול נוסף, כיוונים ומושגים</span>
+                        </a>
+                        <div class="card-actions" data-app-id="geography">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
 
-                    <a href="geography.html" class="card">
-                        <span class="icon">🌍</span>
-                        <span class="card-title">גיאוגרפיה</span>
-                        <span class="card-desc">מפות, יבשות ואוקיינוסים</span>
-                    </a>
+                    <div class="card" data-app-id="geography">
+                        <a class="card-main" href="geography.html">
+                            <span class="icon">🌍</span>
+                                                    <span class="card-title">גיאוגרפיה</span>
+                                                    <span class="card-desc">מפות, יבשות ואוקיינוסים</span>
+                        </a>
+                        <div class="card-actions" data-app-id="geography_worksheet">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
 
-                    <a href="geography_worksheet.html" class="card worksheet">
-                        <span class="icon">🗺️</span>
-                        <span class="card-title">דף עבודה: מפה</span>
-                        <span class="card-desc">מיקום יבשות ואוקיינוסים (להדפסה)</span>
-                    </a>
+                    <div class="card worksheet" data-app-id="geography_worksheet">
+                        <a class="card-main" href="geography_worksheet.html">
+                            <span class="icon">🗺️</span>
+                                                    <span class="card-title">דף עבודה: מפה</span>
+                                                    <span class="card-desc">מיקום יבשות ואוקיינוסים (להדפסה)</span>
+                        </a>
+                        <div class="card-actions">
+                            <button class="mark-btn partial" type="button">בוצע חלקית</button>
+                            <button class="mark-btn done" type="button">סיימתי</button>
+                        </div>
+                    </div>
                 </div>
             </details>
 </section>
@@ -447,29 +646,34 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // תחילת היום
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
-  const EXAM_WINDOW_DAYS = 7; // להציג התראת מבחן רק בשבוע שלפני
-  const NEW_WINDOW_DAYS = 7;  // "חדש" לשבוע
+  const EXAM_WINDOW_DAYS = 7;
+  const NEW_WINDOW_DAYS = 7;
 
-  function toDay(d){
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  }
+  function toDay(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
 
   function parseISODate(iso){
-    // מצפה ל- YYYY-MM-DD
     const d = new Date(iso);
     if (isNaN(d)) return null;
     return toDay(d);
   }
 
   function daysBetween(a, b){
-    // b - a בימים שלמים
     return Math.round((b.getTime() - a.getTime()) / MS_PER_DAY);
   }
 
-  function addCornerBadge(card, cls, text){
+  function setBadge(card, cls, text){
+    // remove conflicting bottom badges
+    card.querySelectorAll(".partial-badge, .done-badge").forEach(x => x.remove());
+    const b = document.createElement("div");
+    b.className = cls;
+    b.textContent = text;
+    card.appendChild(b);
+  }
+
+  function addTopBadge(card, cls, text){
     if (card.querySelector("." + cls)) return;
     const badge = document.createElement("div");
     badge.className = cls;
@@ -477,71 +681,97 @@ document.addEventListener("DOMContentLoaded", () => {
     card.appendChild(badge);
   }
 
-  // 1) מבחנים: למחוק אחרי התאריך, ולהציג תגית/הדגשה רק בשבוע שלפני
+  function getKey(id){ return "mySchoolApp:" + id; }
+
+  // 1) מבחנים: למחוק אחרי תאריך, ולהציג תגית רק בשבוע שלפני
   document.querySelectorAll(".card[data-exam-date]").forEach(card => {
     const examDay = parseISODate(card.dataset.examDate);
     if (!examDay) return;
 
-    const until = daysBetween(today, examDay); // 0 = היום
+    const until = daysBetween(today, examDay);
     if (until < 0) {
       card.remove();
       return;
     }
-
     if (until <= EXAM_WINDOW_DAYS) {
-      addCornerBadge(card, "exam-badge", "מבחן בתאריך " + examDay.toLocaleDateString("he-IL"));
+      addTopBadge(card, "exam-badge", "מבחן בתאריך " + examDay.toLocaleDateString("he-IL"));
       card.classList.add("exam");
     }
   });
 
-  // 2) חדש: אם יש data-added="YYYY-MM-DD" אז להציג "חדש" לשבוע
+  // 2) חדש: לשבוע אחרי data-added
   document.querySelectorAll(".card[data-added]").forEach(card => {
     const addedDay = parseISODate(card.dataset.added);
     if (!addedDay) return;
 
-    const age = daysBetween(addedDay, today); // 0 = נוסף היום
+    const age = daysBetween(addedDay, today);
     if (age < 0) return;
     if (age <= NEW_WINDOW_DAYS) {
-      addCornerBadge(card, "new-badge", "חדש");
+      addTopBadge(card, "new-badge", "חדש");
     }
   });
 
-  // 3) זיכרון (localStorage): להציג בוצע + ציון
-  // שימוש: להוסיף data-app-id="unique_id" לכרטיס
-  // ובאפליקציה עצמה לכתוב:
-  // localStorage.setItem("mySchoolApp:unique_id", JSON.stringify({done:true, score:100, ts:"2026-01-07"}))
+  // 3) טעינת מצב זיכרון (סימון עצמי) + חיבור כפתורים
   document.querySelectorAll(".card[data-app-id]").forEach(card => {
     const id = card.dataset.appId;
-    const raw = localStorage.getItem("mySchoolApp:" + id);
-    if (!raw) return;
 
-    try{
-      const data = JSON.parse(raw);
-      if (data && data.done){
-        card.classList.add("done");
-        addCornerBadge(card, "done-badge", "בוצע");
-        if (typeof data.score === "number"){
-          if (!card.querySelector(".score-badge")){
-            const b = document.createElement("div");
-            b.className = "score-badge";
-            b.textContent = data.score + "%";
-            card.appendChild(b);
-          }
+    function applyState(){
+      // תמיד לנקות קודם כדי שלא יישארו תגיות ישנות
+      card.classList.remove("partial-state", "done-state");
+      card.querySelectorAll(".partial-badge, .done-badge").forEach(x => x.remove());
+
+      const raw = localStorage.getItem(getKey(id));
+      if (!raw) return;
+
+      try{
+        const data = JSON.parse(raw);
+        if (data.status === "partial"){
+          card.classList.add("partial-state");
+          setBadge(card, "partial-badge", "בוצע חלקית");
         }
-      }
-    } catch(e){
-      // להתעלם
+        if (data.status === "done"){
+          card.classList.add("done-state");
+          setBadge(card, "done-badge", "סיימתי");
+        }
+      } catch(e){}
     }
+
+    function toggleStatus(status){
+      const raw = localStorage.getItem(getKey(id));
+      let current = null;
+      if (raw){
+        try{
+          const d = JSON.parse(raw);
+          current = d.status || null;
+        } catch(e){}
+      }
+      // אם לוחצים על אותו סטטוס שוב -> לנקות
+      if (current === status){
+        localStorage.removeItem(getKey(id));
+      } else {
+        localStorage.setItem(getKey(id), JSON.stringify({
+          status: status,
+          ts: new Date().toISOString()
+        }));
+      }
+      applyState();
+    }
+
+    const btnPartial = card.querySelector(".mark-btn.partial");
+    const btnDone = card.querySelector(".mark-btn.done");
+    if (btnPartial) btnPartial.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); toggleStatus("partial"); });
+    if (btnDone) btnDone.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); toggleStatus("done"); });
+
+    applyState();
   });
 
-  // 4) תגיות על קטגוריות: מבחן (רק בשבוע שלפני) + חדש (אם יש משהו חדש)
+  // 4) תגיות על קטגוריות: מבחן (רק בשבוע שלפני) + חדש
   document.querySelectorAll("details.subject-box").forEach(box => {
     const summary = box.querySelector("summary.subject-title");
     if (!summary) return;
 
     summary.querySelectorAll(".subject-exam-badge, .subject-new-badge").forEach(x => x.remove());
 
-    // מבחן בקטגוריה
     const examCards = Array.from(box.querySelectorAll(".card[data-exam-date]"));
     const examDates = examCards
       .map(c => parseISODate(c.dataset.examDate))
@@ -558,7 +788,6 @@ document.addEventListener("DOMContentLoaded", () => {
       summary.appendChild(badge);
     }
 
-    // חדש בקטגוריה
     const newAges = Array.from(box.querySelectorAll(".card[data-added]"))
       .map(c => parseISODate(c.dataset.added))
       .filter(Boolean)
@@ -575,7 +804,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script></body>
 </html>
-
 
 
 
