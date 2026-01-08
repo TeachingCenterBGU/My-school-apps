@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -87,6 +88,16 @@
         }
 
         /* Part 3: Match (English to Icon) */
+        .match-box{
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 10px;
+            background: #fff;
+        }
+        @media print{
+            .match-box{ page-break-inside: avoid; }
+        }
+
         .match-container {
             display: flex;
             justify-content: space-between;
@@ -153,7 +164,14 @@
             .section { page-break-inside: avoid; }
             h1 { font-size: 1.8em; }
         }
-    </style>
+    
+/* --- FIX: keep sound sections in order --- */
+.section.sound-section{
+  clear: both;
+  width: 100%;
+}
+
+</style>
 </head>
 <body>
 
@@ -170,58 +188,97 @@
         <div class="section-header">1. Write the Small Letter (כתבי את האות הקטנה)</div>
         <div class="instruction">השלימי את האות הקטנה המתאימה (למשל: A -> a):</div>
         <div class="letters-grid">
+            <div class="letter-pair">C <span class="missing"></span></div>
             <div class="letter-pair">B <span class="missing"></span></div>
             <div class="letter-pair">T <span class="missing"></span></div>
+            <div class="letter-pair">S <span class="missing"></span></div>
             <div class="letter-pair">E <span class="missing"></span></div>
-            <div class="letter-pair">G <span class="missing"></span></div>
-            <div class="letter-pair">Q <span class="missing"></span></div>
-            <div class="letter-pair">R <span class="missing"></span></div>
+        </div>
         </div>
     </div>
 
-    <div class="section">
+    <div class="section sound-section">
         <div class="section-header">2. Beginning Sound (צליל פותח)</div>
         <div class="instruction">מהי האות הראשונה של המילה בציור? הקיפי בעיגול:</div>
         <div class="sound-grid">
+
             <div class="sound-item">
                 <div class="sound-icon">🐈</div>
                 <div class="sound-options">C / K / S</div>
             </div>
             <div class="sound-item">
-                <div class="sound-icon">🐍</div>
-                <div class="sound-options">C / S / Z</div>
+                <div class="sound-icon">🚌</div>
+                <div class="sound-options">B / D / P</div>
             </div>
             <div class="sound-item">
-                <div class="sound-icon">🍎</div>
-                <div class="sound-options">E / A / U</div>
+                <div class="sound-icon">🐍</div>
+                <div class="sound-options">S / C / Z</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🥚</div>
+                <div class="sound-options">E / A / I</div>
+            </div>
+
+</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section sound-section">
+        <div class="section-header">3. Ending Sound (צליל סוגר)</div>
+        <div class="instruction">מהי האות האחרונה של המילה בציור? הקיפי בעיגול:</div>
+        <div class="sound-grid">
+
+            <div class="sound-item">
+                <div class="sound-icon">🐈</div>
+                <div class="sound-options">T / D / P</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🚌</div>
+                <div class="sound-options">S / C / Z</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🎒</div>
+                <div class="sound-options">G / D / B</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🥚</div>
+                <div class="sound-options">G / K / J</div>
+            </div>
+
+</div>
+           
+
+    <div class="section sound-section">
+        <div class="section-header">4. Middle Sound (צליל באמצע המילה)</div>
+        <div class="instruction">מהי התנועה (הצליל) באמצע המילה? הקיפי בעיגול:</div>
+        <div class="sound-grid">
+
+            <div class="sound-item">
+                <div class="sound-icon">🐈</div>
+                <div class="sound-options">A / E / I</div>
             </div>
             <div class="sound-item">
                 <div class="sound-icon">🖊️</div>
-                <div class="sound-options">B / P / F</div>
+                <div class="sound-options">E / A / I</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🎒</div>
+                <div class="sound-options">I / E / A</div>
             </div>
             <div class="sound-item">
                 <div class="sound-icon">🥚</div>
                 <div class="sound-options">E / A / O</div>
             </div>
-            <div class="sound-item">
-                <div class="sound-icon">🐘</div>
-                <div class="sound-options">E / I / L</div>
-            </div>
-            <div class="sound-item">
-                <div class="sound-icon">🔟</div>
-                <div class="sound-options">T / D / P</div>
-            </div>
-            <div class="sound-item">
-                <div class="sound-icon">🚌</div>
-                <div class="sound-options">B / D / P</div>
-            </div>
-        </div>
-    </div>
+    
 
+</div>
+ 
     <div class="section">
-        <div class="section-header">3. Match (מתחי קו)</div>
+        <div class="section-header">5. Match (מתחי קו)</div>
         <div class="instruction">מתחי קו בין המילה לציור המתאים:</div>
         
+        <div class="match-box">
         <div class="match-container">
             <div class="col">
                 <div class="match-item">1. Read <span class="dot"></span></div>
@@ -239,7 +296,7 @@
     </div>
 
     <div class="section">
-        <div class="section-header">4. Colors (צבעים)</div>
+        <div class="section-header">6. Colors (צבעים)</div>
         <div class="instruction">קראי את המילה וצבעי את הצורה בצבע הנכון:</div>
         <div class="colors-row">
             <div class="color-task">
@@ -262,8 +319,8 @@
     </div>
 
 <div class="section">
-        <div class="section-header">5. Odd One Out (צלילים - יוצא דופן)</div>
-        <div class="instruction">אמרי את המילים בקול. הקיפי את הציור שמתחיל ב<strong>צליל אחר</strong>:</div>
+        <div class="section-header">7. Odd One Out (צלילים - יוצא דופן)</div>
+        <div class="instruction">הקיפי את הציור שמתחיל ב<strong>צליל אחר</strong>:</div>
         
         <div class="odd-row">
             <span class="odd-label">1</span>
@@ -284,10 +341,20 @@
         <div class="odd-row">
             <span class="odd-label">5</span>
             <span class="odd-icon">🐍</span> <span class="odd-icon">⭐</span> <span class="odd-icon">✂️</span> <span class="odd-icon">🖊️</span> </div>
-    </div>
+    
+        <div class="odd-row">
+            <span class="odd-label">6</span>
+            <span class="odd-icon">🐘</span> <span class="odd-icon">🐜</span> <span class="odd-icon">🎒</span> <span class="odd-icon">🍌</span>
+        </div>
+
+        <div class="odd-row">
+            <span class="odd-label">7</span>
+            <span class="odd-icon">📏</span> <span class="odd-icon">✂️</span> <span class="odd-icon">🧴</span> <span class="odd-icon">🐍</span>
+        </div>
+</div>
 
     <div class="section">
-        <div class="section-header">6. Reading (קריאה)</div>
+        <div class="section-header">8. Reading (קריאה)</div>
         <div class="instruction">השלימי את המילה החסרה:</div>
         
         <div class="reading-box">
