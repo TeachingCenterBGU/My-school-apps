@@ -294,7 +294,71 @@
         let gameMode = ""; 
         let initialDeckSize = 0;
         let canClick = true;
-        let currentAudio = null;
+
+        // בחירת קול דיבור 
+        let selectedVoice = null;
+
+        // בוחרים "קול גברי" אם קיים במכשיר
+        function pickPreferredVoice() {
+            const voices = window.speechSynthesis?.getVoices?.() || [];
+            if (!voices.length) return null;
+
+            // רשימת העדפה לקולות גבריים נפוצים (ישתנה בין מחשבים/טלפונים)
+            const preferredNames = [
+                "Google US English",
+                "Microsoft David",
+                "Daniel",
+                "Alex",
+                "Mark",
+                "David"
+            ];
+
+            // קודם מנסים לפי שם
+            for (const name of preferredNames) {
+                const v = voices.find(v => (v.name || "").includes(name) && (v.lang || "").startsWith("en"));
+                if (v) return v;
+            }
+
+            // אחר כך כל קול אנגלית שמופיע "male" בשם (לא תמיד קיים)
+            const maleHint = voices.find(v =>
+                (v.lang || "").startsWith("en") &&
+                /male|man|david|daniel|alex/i.test(v.name || "")
+            );
+            if (maleHint) return maleHint;
+
+            // fallback: כל קול en-US / en-GB
+            return voices.find(v => (v.lang || "").startsWith("en-US"))
+                || voices.find(v => (v.lang || "").startsWith("en"))
+                || voices[0];
+        }
+
+        function initVoices() {
+            selectedVoice = pickPreferredVoice();
+        }
+
+        // חשוב: בדפדפנים שונים הקולות נטענים באיחור
+        if ("speechSynthesis" in window) {
+            window.speechSynthesis.onvoiceschanged = initVoices;
+            initVoices();
+        }
+
+        function speakText(text) {
+            if (!text) return;
+
+            // מפסיקים דיבור קודם, כדי שלא יצטבר
+            if ("speechSynthesis" in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = "en-US";
+                u.rate = 0.9;
+                if (selectedVoice) u.voice = selectedVoice;
+
+                window.speechSynthesis.speak(u);
+            } else {
+                console.log("SpeechSynthesis לא נתמך בדפדפן הזה");
+            }
+        }
+        // סוף בחירת דיבור
 
         function startGame(mode) {
             gameMode = mode;
