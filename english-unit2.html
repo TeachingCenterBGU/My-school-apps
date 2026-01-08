@@ -423,10 +423,8 @@
         }
 
         function speakCurrent() {
-            if (currentAudio) {
-                currentAudio.currentTime = 0;
-                currentAudio.play().catch(e => console.log("Audio play error", e));
-            }
+            const textToSpeak = getSpeakableText();
+            speakText(textToSpeak);
         }
 
         function checkAnswer(isCorrect) {
