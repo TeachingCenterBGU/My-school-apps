@@ -218,26 +218,74 @@
     <script>
         // --- DATA ---
         const vocab1 = [
-            { word: "bag", icon: "🎒" }, { word: "book", icon: "📖" }, { word: "pen", icon: "🖊️" },
-            { word: "pencil", icon: "✏️" }, { word: "glue", icon: "🧴" }, { word: "paper", icon: "📄" },
-            { word: "ruler", icon: "📏" }, { word: "scissors", icon: "✂️" }, { word: "chair", icon: "🪑" },
-            { word: "desk", icon: "שולחן" }, { word: "classroom", icon: "👩‍🏫" }, { word: "school", icon: "🏫" },
-            { word: "library", icon: "📚" }, { word: "pink", icon: "🩷" }, { word: "white", icon: "⚪" },
-            { word: "black", icon: "⚫" }, { word: "green", icon: "🟢" }, { word: "orange", icon: "🟠" },
-            { word: "bus", icon: "🚌" }, { word: "television", icon: "📺" }, { word: "star", icon: "⭐" }
-        ];
+            // Classroom
+            { word: "classroom", icon: "🏫" },
+            { word: "desk", icon: "🪑" },
+            { word: "chair", icon: "שולחן" },
+            { word: "crayons", icon: "🖍️" },
+            { word: "pencil", icon: "✏️" },
+            { word: "pen", icon: "🖊️" },
+            { word: "ruler", icon: "📏" },
+            { word: "scissors", icon: "✂️" },
+            { word: "glue", icon: "🧴" },
+            { word: "paper", icon: "📄" },
+            { word: "book", icon: "📖" },
+            { word: "bag", icon: "🎒" },
+            { word: "library", icon: "📚" },
+            { word: "school", icon: "🏫" },
+            { word: "teacher", icon: "👩‍🏫" },
+            { word: "pupil", icon: "👧" },
 
+            // Colors
+            { word: "red", icon: "🔴" },
+            { word: "blue", icon: "🔵" },
+            { word: "yellow", icon: "🟡" },
+            { word: "green", icon: "🟢" },
+            { word: "black", icon: "⚫" },
+            { word: "white", icon: "⚪" },
+
+            // Numbers
+            { word: "one", icon: "1️⃣" },
+            { word: "two", icon: "2️⃣" },
+            { word: "three", icon: "3️⃣" },
+            { word: "four", icon: "4️⃣" },
+            { word: "five", icon: "5️⃣" }
+        ];
         const vocab2 = [
-            { word: "ant", icon: "🐜" }, { word: "alligator", icon: "🐊" }, { word: "bat", icon: "🦇" },
-            { word: "cat", icon: "🐈" }, { word: "elephant", icon: "🐘" }, { word: "snake", icon: "🐍" },
-            { word: "apple", icon: "🍎" }, { word: "banana", icon: "🍌" }, { word: "egg", icon: "🥚" },
-            { word: "cake", icon: "🎂" }, { word: "teacher", icon: "👩‍🏫" }, { word: "pupil", icon: "👦" },
-            { word: "woman", icon: "👩" }, { word: "clown", icon: "🤡" }, { word: "read", icon: "📖" },
-            { word: "ask", icon: "❓" }, { word: "talk", icon: "🗣️" }, { word: "cut", icon: "✂️" },
-            { word: "big", icon: "🐘" }, { word: "small", icon: "🐜" }, { word: "happy", icon: "😃" },
-            { word: "sad", icon: "😢" }, { word: "mad", icon: "😡" }, { word: "afraid", icon: "😨" }
-        ];
+            // Animals
+            { word: "ant", icon: "🐜" },
+            { word: "alligator", icon: "🐊" },
+            { word: "bat", icon: "🦇" },
+            { word: "snake", icon: "🐍" },
+            { word: "elephant", icon: "🐘" },
 
+            // Food / objects
+            { word: "apple", icon: "🍎" },
+            { word: "banana", icon: "🍌" },
+            { word: "egg", icon: "🥚" },
+
+            // People
+            { word: "woman", icon: "👩" },
+
+            // Actions
+            { word: "ask", icon: "❓" },
+            { word: "talk", icon: "🗣️" },
+            { word: "cut", icon: "✂️" },
+            { word: "drink", icon: "🥤" },
+            { word: "eat", icon: "🍽️" },
+            { word: "run", icon: "🏃‍♀️" },
+
+            // Feelings
+            { word: "happy", icon: "😃" },
+            { word: "sad", icon: "😢" },
+            { word: "mad", icon: "😡" },
+            { word: "scared", icon: "😨" },
+            { word: "surprised", icon: "😲" },
+
+            // Descriptions
+            { word: "big", icon: "גדול" },
+            { word: "small", icon: "קטן" }
+        ];
         // Syllables Data - UPDATED (No Hyphens for visual help)
         const syllablesData = [
             { word: "bag", count: 1 }, { word: "cat", count: 1 }, { word: "pen", count: 1 },
@@ -254,11 +302,8 @@
         const lettersData = [
             // Matching Big/Small
             { type: "match", q: "B", a: "b", opts: ["b","d","p"] },
-            { type: "match", q: "D", a: "d", opts: ["b","d","p"] },
             { type: "match", q: "E", a: "e", opts: ["e","c","o"] },
-            { type: "match", q: "G", a: "g", opts: ["g","q","p"] },
-            { type: "match", q: "A", a: "a", opts: ["a","o","e"] },
-            { type: "match", q: "Q", a: "q", opts: ["q","g","p"] },
+            { type: "match", q: "C", a: "c", opts: ["c","q","p"] },
             { type: "match", q: "T", a: "t", opts: ["f","t","j"] },
             { type: "match", q: "S", a: "s", opts: ["s","z","c"] },
 
