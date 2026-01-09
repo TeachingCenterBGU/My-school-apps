@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -71,6 +70,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr); /* 4 in a row */
             gap: 15px;
+            margin-bottom: 20px; /* Added spacing between grids */
         }
         .sound-item {
             border: 1px solid #eee;
@@ -165,13 +165,13 @@
             h1 { font-size: 1.8em; }
         }
     
-/* --- FIX: keep sound sections in order --- */
-.section.sound-section{
-  clear: both;
-  width: 100%;
-}
+        /* --- FIX: keep sound sections in order --- */
+        .section.sound-section{
+            clear: both;
+            width: 100%;
+        }
 
-</style>
+    </style>
 </head>
 <body>
 
@@ -194,14 +194,13 @@
             <div class="letter-pair">S <span class="missing"></span></div>
             <div class="letter-pair">E <span class="missing"></span></div>
         </div>
-        </div>
     </div>
 
     <div class="section sound-section">
-        <div class="section-header">2. Beginning Sound (צליל פותח)</div>
+        <div class="section-header">2. Sound (צליל פותח)</div>
+        
         <div class="instruction">מהי האות הראשונה של המילה בציור? הקיפי בעיגול:</div>
         <div class="sound-grid">
-
             <div class="sound-item">
                 <div class="sound-icon">🐈</div>
                 <div class="sound-options">C / K / S</div>
@@ -218,17 +217,10 @@
                 <div class="sound-icon">🥚</div>
                 <div class="sound-options">E / A / I</div>
             </div>
-
-</div>
-            </div>
         </div>
-    </div>
 
-    <div class="section sound-section">
-        <div class="section-header">3. Ending Sound (צליל סוגר)</div>
         <div class="instruction">מהי האות האחרונה של המילה בציור? הקיפי בעיגול:</div>
         <div class="sound-grid">
-
             <div class="sound-item">
                 <div class="sound-icon">🐈</div>
                 <div class="sound-options">T / D / P</div>
@@ -245,15 +237,10 @@
                 <div class="sound-icon">🥚</div>
                 <div class="sound-options">G / K / J</div>
             </div>
+        </div>
 
-</div>
-           
-
-    <div class="section sound-section">
-        <div class="section-header">4. Middle Sound (צליל באמצע המילה)</div>
         <div class="instruction">מהי התנועה (הצליל) באמצע המילה? הקיפי בעיגול:</div>
         <div class="sound-grid">
-
             <div class="sound-item">
                 <div class="sound-icon">🐈</div>
                 <div class="sound-options">A / E / I</div>
@@ -270,33 +257,38 @@
                 <div class="sound-icon">🥚</div>
                 <div class="sound-options">E / A / O</div>
             </div>
-    
-
-</div>
- 
-    <div class="section">
-        <div class="section-header">5. Match (מתחי קו)</div>
+        </div>
+    </div> <div class="section">
+        <div class="section-header">3. Match (מתחי קו)</div>
         <div class="instruction">מתחי קו בין המילה לציור המתאים:</div>
         
         <div class="match-box">
-        <div class="match-container">
-            <div class="col">
-                <div class="match-item">1. Paper <span class="dot"></span></div>
-                <div class="match-item">2. Book <span class="dot"></span></div>
-                <div class="match-item">3. Scissors <span class="dot"></span></div>
-                <div class="match-item">4. ask <span class="dot"></span></div>
-                <div class="match-item">5. Snake <span class="dot"></span></div>
-                <div class="match-item">6. elephant <span class="dot"></span></div>
-                <div class="match-item">7. Bag <span class="dot"></span></div>
+            <div class="match-container">
+                <div class="col">
+                    <div class="match-item">1. Paper <span class="dot"></span></div>
+                    <div class="match-item">2. Book <span class="dot"></span></div>
+                    <div class="match-item">3. Scissors <span class="dot"></span></div>
+                    <div class="match-item">4. ask <span class="dot"></span></div>
+                    <div class="match-item">5. Snake <span class="dot"></span></div>
+                    <div class="match-item">6. elephant <span class="dot"></span></div>
+                    <div class="match-item">7. Bag <span class="dot"></span></div>
+                </div>
+                
+                <div class="col">
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🐍</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">❓</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">📄</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🎒</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🐘</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">📕</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">✂️</span></div>
+                </div>
             </div>
-            
-            <div class="col">
-                <div class="match-item"><span class="dot"></span> <span class="match-icon">🐍</span></div> <div class="match-item"><span class="dot"></span> <span class="match-icon">❓</span></div> <div class="match-item"><span class="dot"></span> <span class="match-icon">📄</span></div> <div class="match-item"><span class="dot"></span> <span class="match-icon">🎒</span></div> <div class="match-item"><span class="dot"></span> <span class="match-icon">🐘</span></div> <div class="match-item"><span class="dot"></span> <span class="match-icon">📕</span></div> <div class="match-item"><span class="dot"></span> <span class="match-icon">✂️</span></div> </div>
         </div>
     </div>
 
     <div class="section">
-        <div class="section-header">6. Colors (צבעים)</div>
+        <div class="section-header">4. Colors (צבעים)</div>
         <div class="instruction">קראי את המילה וצבעי את הצורה בצבע הנכון:</div>
         <div class="colors-row">
             <div class="color-task">
@@ -318,29 +310,34 @@
         </div>
     </div>
 
-<div class="section">
-        <div class="section-header">7. Odd One Out (צלילים - יוצא דופן)</div>
+    <div class="section">
+        <div class="section-header">5. Odd One Out (צלילים - יוצא דופן)</div>
         <div class="instruction">הקיפי את הציור שמתחיל ב<strong>צליל אחר</strong>:</div>
         
         <div class="odd-row">
             <span class="odd-label">1</span>
-            <span class="odd-icon">🚌</span> <span class="odd-icon">🍎</span> <span class="odd-icon">📕</span> <span class="odd-icon">🍌</span> </div>
+            <span class="odd-icon">🚌</span> <span class="odd-icon">🍎</span> <span class="odd-icon">📕</span> <span class="odd-icon">🍌</span> 
+        </div>
 
         <div class="odd-row">
             <span class="odd-label">2</span>
-            <span class="odd-icon">🖊️</span> <span class="odd-icon">✏️</span> <span class="odd-icon">📄</span> <span class="odd-icon">✂️</span> </div>
+            <span class="odd-icon">🖊️</span> <span class="odd-icon">✏️</span> <span class="odd-icon">📄</span> <span class="odd-icon">✂️</span> 
+        </div>
 
         <div class="odd-row">
             <span class="odd-label">3</span>
-            <span class="odd-icon">🐜</span> <span class="odd-icon">🐊</span> <span class="odd-icon">🐘</span> <span class="odd-icon">🍎</span> </div>
+            <span class="odd-icon">🐜</span> <span class="odd-icon">🐊</span> <span class="odd-icon">🐘</span> <span class="odd-icon">🍎</span> 
+        </div>
 
         <div class="odd-row">
             <span class="odd-label">4</span>
-            <span class="odd-icon">🐈</span> <span class="odd-icon">🤡</span> <span class="odd-icon">🦇</span> <span class="odd-icon">🎂</span> </div>
+            <span class="odd-icon">🐈</span> <span class="odd-icon">🤡</span> <span class="odd-icon">🦇</span> <span class="odd-icon">🎂</span> 
+        </div>
 
         <div class="odd-row">
             <span class="odd-label">5</span>
-            <span class="odd-icon">🐍</span> <span class="odd-icon">⭐</span> <span class="odd-icon">✂️</span> <span class="odd-icon">🖊️</span> </div>
+            <span class="odd-icon">🐍</span> <span class="odd-icon">⭐</span> <span class="odd-icon">✂️</span> <span class="odd-icon">🖊️</span> 
+        </div>
     
         <div class="odd-row">
             <span class="odd-label">6</span>
@@ -351,10 +348,10 @@
             <span class="odd-label">7</span>
             <span class="odd-icon">📏</span> <span class="odd-icon">✂️</span> <span class="odd-icon">🧴</span> <span class="odd-icon">🐍</span>
         </div>
-</div>
+    </div>
 
     <div class="section">
-        <div class="section-header">8. Reading (קריאה)</div>
+        <div class="section-header">6. Reading (קריאה)</div>
         <div class="instruction">השלימי את המילה החסרה:</div>
         
         <div class="reading-box">
