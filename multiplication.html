@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מגיני הגלקסיה V2</title>
+    <title>מגיני הגלקסיה V2 - איטי</title>
     <style>
         body {
             margin: 0;
@@ -143,8 +143,7 @@
     let lives = 3;
     let meteors = [];
     let particles = [];
-    let spawnRate = 2000;
-    let lastSpawnTime = 0;
+    // spawnRate כבר לא בשימוש בגרסה הזו כי יש רק כדור אחד
     let difficultySpeed = 1;
 
     class Meteor {
@@ -152,7 +151,10 @@
             this.radius = 40;
             this.x = Math.random() * (canvas.width - 100) + 50;
             this.y = -50;
-            this.speed = (Math.random() * 0.5 + 0.5) * difficultySpeed; // מהירות
+            
+            // --- שינוי 1: האטת המהירות ---
+            // במקום 0.5, הורדנו ל-0.1 ו-0.2 כדי שיהיה ממש איטי
+            this.speed = (Math.random() * 0.2 + 0.1) * difficultySpeed; 
             
             this.n1 = Math.floor(Math.random() * 9) + 2;
             this.n2 = Math.floor(Math.random() * 9) + 2;
@@ -212,7 +214,6 @@
         lives = 3;
         meteors = [];
         particles = [];
-        spawnRate = 2000;
         difficultySpeed = 1;
         gameActive = true;
         
@@ -238,12 +239,10 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // יצירת מטאורים
-        if (timestamp - lastSpawnTime > spawnRate) {
+        // --- שינוי 2: כדור אחד כל פעם ---
+        // אנו יוצרים מטאור חדש רק אם המערך ריק לגמרי
+        if (meteors.length === 0) {
             meteors.push(new Meteor());
-            lastSpawnTime = timestamp;
-            // הגברת קושי קלה
-            if (spawnRate > 500) spawnRate -= 10;
         }
 
         // ציור ועדכון מטאורים
@@ -256,7 +255,7 @@
             if (m.y - m.radius > canvas.height) {
                 lives--;
                 livesVal.innerText = lives;
-                meteors.splice(i, 1);
+                meteors.splice(i, 1); // המטאור נמחק, מה שיגרום ליצירת חדש בסיבוב הבא
                 
                 // אפקט רעידה
                 canvas.style.transform = 'translate(5px, 5px)';
@@ -282,14 +281,12 @@
         const val = parseInt(input.value);
         if (isNaN(val)) return;
 
-        // חיפוש המטאור הנכון (הכי נמוך קודם)
+        // מכיוון שיש רק כדור אחד, הקוד פשוט יחפש אותו
         let hitIndex = -1;
-        let lowestY = -1000;
-
+        
         meteors.forEach((m, index) => {
-            if (m.answer === val && m.y > lowestY) {
+            if (m.answer === val) {
                 hitIndex = index;
-                lowestY = m.y;
             }
         });
 
@@ -303,8 +300,8 @@
             score += 10;
             scoreVal.innerText = score;
             
-            // העלאת רמה כל 100 נקודות
-            if (score % 100 === 0) difficultySpeed += 0.2;
+            // העלאת רמה כל 100 נקודות (המהירות תעלה ממש במעט)
+            if (score % 100 === 0) difficultySpeed += 0.1;
             
             input.value = '';
             input.style.borderColor = '#2ecc71'; // ירוק לרגע
