@@ -12,8 +12,8 @@ YEAR = 2026
 # --- המיפוי שלך ---
 # ודאי שהשמות כאן תואמים בול למשוב
 KIDS_MAPPING = {
-    "יעל": 3,      # דוגמה - תחליפי לשם האמיתי
-    "מעיין": 5     # דוגמה - תחליפי לשם האמיתי
+    "יעל": 3,      
+    "מעיין": 5     
 }
 # ------------------
 
@@ -25,9 +25,10 @@ def login_and_get_homework():
     
     print(f"🔄 מנסה להתחבר למשוב (שנה {YEAR})...")
     
-    # 1. התחברות ראשונית לקבלת טוקן זמני
+    # 1. קבלת טוקן ראשוני
     try:
         init_resp = session.get(f"{BASE_URL}/login", headers={"User-Agent": user_agent})
+        # מנסים למצוא את הטוקן בכל מקום אפשרי
         csrf_token = init_resp.cookies.get("csrf_token") or init_resp.headers.get("X-Csrf-Token")
     except Exception as e:
         print(f"❌ שגיאה בהתחברות ראשונית: {e}")
@@ -42,34 +43,40 @@ def login_and_get_homework():
         "loginType": 1 
     }
     
-    headers = {
+    # הגדרת כותרות קבועות לכל הסשן
+    session.headers.update({
         "User-Agent": user_agent,
-        "X-Csrf-Token": csrf_token,
         "Content-Type": "application/json"
-    }
+    })
+    
+    if csrf_token:
+        session.headers.update({"X-Csrf-Token": csrf_token})
 
-    login_resp = session.post(f"{BASE_URL}/login", json=login_data, headers=headers)
+    login_resp = session.post(f"{BASE_URL}/login", json=login_data)
 
     if login_resp.status_code != 200:
         print(f"❌ ההתחברות נכשלה (קוד {login_resp.status_code}): {login_resp.text}")
         return []
 
-    print("✅ התחברות הצליחה! מעדכן כרטיס כניסה...")
+    print("✅ התחברות הצליחה! בודק עוגיות...")
 
-    # --- התיקון הקריטי: עדכון ה-Token החדש לאחר ההתחברות ---
-    # המשוב נותן עוגיה חדשה אחרי ה-Login, חייבים לקחת אותה לבקשות הבאות
-    new_csrf = session.cookies.get("csrf_token")
+    # --- דיבאג: הדפסת כל העוגיות שהתקבלו כדי להבין איפה הטוקן ---
+    print("🍪 עוגיות שהתקבלו מהשרת:")
+    for cookie in session.cookies:
+        print(f"   - {cookie.name}: {cookie.value[:10]}...") # מדפיס רק התחלה לביטחון
+    
+    # נסיון חכם יותר למצוא את הטוקן החדש
+    new_csrf = session.cookies.get("csrf_token") or login_resp.headers.get("X-Csrf-Token") or login_resp.cookies.get("csrf_token")
+    
     if new_csrf:
-        headers["X-Csrf-Token"] = new_csrf
-        print("🔄 עודכן CSRF Token חדש להמשך הפעילות.")
+        session.headers.update({"X-Csrf-Token": new_csrf})
+        print("🔄 עודכן CSRF Token חדש!")
     else:
-        print("⚠️ לא נמצא טוקן חדש, ממשיך עם הישן (עלול להיכשל).")
-    # ---------------------------------------------------------
+        print("⚠️ לא נמצא טוקן חדש, מנסה להמשיך עם הישן...")
 
     print("🔎 מנסה לשלוף רשימת תלמידים...")
     
-    # נסיון לשלוף דרך /students (יותר יציב מ-/user/children)
-    students_resp = session.get(f"{BASE_URL}/students", headers=headers)
+    students_resp = session.get(f"{BASE_URL}/students")
     
     if students_resp.status_code != 200:
          print(f"❌ שגיאה בשליפת תלמידים (קוד {students_resp.status_code}): {students_resp.text}")
@@ -82,19 +89,19 @@ def login_and_get_homework():
 
     for child in children:
         name = child['privateName']
-        child_id = child.get('childGuid') or child.get('studentId') # תמיכה בשני סוגי מזהים
+        child_id = child.get('childGuid') or child.get('studentId')
         
         grade = KIDS_MAPPING.get(name)
         
         if not grade:
-            print(f"⚠️ מדלג על: '{name}' (השם לא מופיע במיפוי)")
+            print(f"⚠️ מדלג על: '{name}' (לא במיפוי)")
             continue
 
         print(f"🔎 מושך שיעורים עבור {name} (כיתה {grade})...")
         
         try:
             hw_url = f"{BASE_URL}/students/{child_id}/homework"
-            hw_resp = session.get(hw_url, headers=headers)
+            hw_resp = session.get(hw_url)
             
             if hw_resp.status_code == 200:
                 hw_list = hw_resp.json()
@@ -109,10 +116,10 @@ def login_and_get_homework():
                     }
                     all_tasks.append(task_obj)
             else:
-                print(f"❌ שגיאה במשיכת שיעורים (קוד {hw_resp.status_code})")
+                print(f"❌ שגיאה (קוד {hw_resp.status_code})")
                 
         except Exception as e:
-            print(f"❌ שגיאה טכנית במשיכת שיעורים ל{name}: {e}")
+            print(f"❌ שגיאה טכנית: {e}")
 
     return all_tasks
 
@@ -124,6 +131,6 @@ if __name__ == "__main__":
         f.write(js_content)
     
     if tasks:
-        print(f"💾 הקובץ עודכן בהצלחה עם {len(tasks)} משימות.")
+        print(f"💾 הקובץ עודכן עם {len(tasks)} משימות.")
     else:
         print("📁 הקובץ עודכן (רשימה ריקה).")
