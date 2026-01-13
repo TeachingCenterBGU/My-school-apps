@@ -33,8 +33,8 @@ def update_homework():
     # CSRF ראשוני
     try:
         init_resp = dirty_session.get(f"{BASE_URL}/login", headers=headers)
-        csrf = init_resp.cookies.get("csrf_token") or init_resp.headers.get("X-Csrf-Token")
-        if csrf: headers["X-Csrf-Token"] = csrf
+        initial_csrf = init_resp.cookies.get("csrf_token") or init_resp.headers.get("X-Csrf-Token")
+        if initial_csrf: headers["X-Csrf-Token"] = initial_csrf
     except Exception as e:
         print(f"Connection error: {e}")
         return []
@@ -47,16 +47,24 @@ def update_homework():
         print(f"Login failed: {login_resp.status_code}")
         return []
 
-    print("Login success! Extracting children...")
+    print("Login success! Extracting data...")
 
-    # חילוץ הילדים (זה עבד בפעם הקודמת!)
+    # 1. חילוץ הטוקן הכי עדכני (התיקון!)
+    # אנחנו מחפשים אותו בכותרות של התשובה, שם הוא מתחבא
+    fresh_csrf = login_resp.headers.get("X-Csrf-Token") or login_resp.cookies.get("csrf_token") or initial_csrf
+    
+    if fresh_csrf:
+        print(f"🎫 Captured Fresh CSRF Token: {fresh_csrf[:5]}...")
+    else:
+        print("⚠️ Warning: Could not find a fresh CSRF token.")
+
+    # 2. חילוץ הילדים
     children = []
     try:
         login_json = login_resp.json()
         user_data = login_json.get('accessToken')
         if isinstance(user_data, dict):
             children = user_data.get('children', [])
-        
         if not children:
             children = login_json.get('credential', {}).get('children', [])
     except:
@@ -68,23 +76,22 @@ def update_homework():
 
     print(f"🎉 Found {len(children)} children! Switching to CLEAN session...")
 
-    # --- יצירת סשן נקי והעתקת עוגיות בטוחות בלבד ---
+    # --- יצירת סשן נקי ---
     clean_session = requests.Session()
     clean_session.headers.update(headers)
     
-    # עדכון CSRF עדכני מהסשן המלוכלך
-    current_csrf = dirty_session.cookies.get("csrf_token")
-    if current_csrf and is_safe_ascii(current_csrf):
-        clean_session.headers["X-Csrf-Token"] = current_csrf
+    # הגדרת הטוקן בסשן החדש (קריטי!)
+    if fresh_csrf and is_safe_ascii(fresh_csrf):
+        clean_session.headers["X-Csrf-Token"] = fresh_csrf
+        # לפעמים צריך אותו גם כעוגייה
+        clean_session.cookies.set("csrf_token", fresh_csrf)
 
-    # העתקת עוגיות: רק אנגלית!
+    # העתקת עוגיות בטוחות בלבד
     safe_cookies_count = 0
     for cookie in dirty_session.cookies:
         if is_safe_ascii(cookie.name) and is_safe_ascii(cookie.value):
             clean_session.cookies.set(cookie.name, cookie.value)
             safe_cookies_count += 1
-        else:
-            print(f"   🗑️ Skipping bad cookie: {cookie.name}")
 
     print(f"Clean session ready with {safe_cookies_count} safe cookies.")
 
@@ -93,7 +100,6 @@ def update_homework():
     for child in children:
         name = child['privateName']
         clean_name = name.strip()
-        
         child_id = child.get('childGuid') or child.get('studentId')
         
         grade = None
@@ -109,6 +115,7 @@ def update_homework():
         print(f"Fetching homework for {clean_name}...")
         try:
             hw_resp = clean_session.get(f"{BASE_URL}/students/{child_id}/homework")
+            
             if hw_resp.status_code == 200:
                 hw_list = hw_resp.json()
                 print(f"   ✅ Found {len(hw_list)} tasks!")
@@ -120,6 +127,7 @@ def update_homework():
                         "task": hw['message']
                     })
             else:
+                # הדפסה מפורטת יותר של השגיאה
                 print(f"   ❌ Failed (Code {hw_resp.status_code}): {hw_resp.text}")
         except Exception as e:
             print(f"   Error: {e}")
