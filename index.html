@@ -24,6 +24,16 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
+        /* עיצוב לתאריך של השיעורים */
+        .hw-date {
+            font-size: 0.8em;
+            color: #666;
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
         .homework-item {
             background: white;
             border-radius: 8px;
@@ -891,7 +901,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // --- ניהול שיעורי בית (חדש!) ---
   const tasks = (typeof homeworkData !== 'undefined') ? homeworkData : [];
 
-  function renderHomework(grade, containerId) {
+function renderHomework(grade, containerId) {
       const container = document.getElementById(containerId);
       if (!container) return;
 
@@ -911,11 +921,19 @@ document.addEventListener("DOMContentLoaded", () => {
       let html = '<h3 style="margin:0 0 10px 0; font-size:1.1em;">📝 שיעורי בית:</h3>';
       
       pendingTasks.forEach(task => {
+          // בדיקה אם יש תאריך להצגה
+          const dateHtml = task.date ? `<span class="hw-date">${task.date}</span>` : '';
+
           html += `
             <div class="homework-item" id="task-${task.id}">
-                <div class="homework-info">
-                    <span class="homework-subject">${task.subject}:</span>
-                    <span>${task.task}</span>
+                <div class="homework-info" style="width: 100%;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span class="homework-subject">
+                            ${task.subject}
+                        </span>
+                        ${dateHtml}
+                    </div>
+                    <div style="color:#555; line-height:1.4;">${task.task}</div>
                 </div>
                 <button class="hw-done-btn" onclick="markHomeworkDone('${task.id}')" title="סיימתי!">✓</button>
             </div>
@@ -923,7 +941,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       container.innerHTML = html;
   }
-
     // הפעלה
     renderHomework(3, 'hw-container-3');
     renderHomework(5, 'hw-container-5');
