@@ -1,0 +1,32 @@
+name: Update Homework
+
+on:
+  schedule:
+    - cron: '0 14 * * *' # רץ כל יום ב-16:00 שעון ישראל בערך
+  workflow_dispatch: # מאפשר הרצה ידנית
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: pip install requests
+      - name: Run Script
+        env:
+          MASHOV_ID: ${{ secrets.MASHOV_ID }}
+          MASHOV_PASS: ${{ secrets.MASHOV_PASS }}
+          MASHOV_SEMEL: ${{ secrets.MASHOV_SEMEL }}
+        run: python update_homework.py
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Bot"
+          git config --global user.email "bot@github.com"
+          git add homework_data.js
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update homework" && git push)
