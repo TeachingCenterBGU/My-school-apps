@@ -1,28 +1,28 @@
 import requests
 import json
 import os
-import datetime
 
 # --- קריאת נתונים מהכספת ---
 MASHOV_ID = os.environ["MASHOV_ID"]
 MASHOV_PASS = os.environ["MASHOV_PASS"]
 MASHOV_SEMEL = os.environ["MASHOV_SEMEL"]
 
-# שינוי קריטי: המערכת הפנימית עובדת לפי שנת ההתחלה (2025) ולא הסיום (2026)
-YEAR = 2025  
+# חזרנו ל-2026 כי זה מה שמופיע אצלך במסך הראשי
+YEAR = 2026
 
-# --- ודאי שהשמות כאן זהים בדיוק למה שמופיע במשוב ---
+# --- המיפוי שלך ---
+# ודאי שהשמות כאן תואמים בול למשוב
 KIDS_MAPPING = {
-    "יעל": 3,  
-    "מעיין": 5   
+    "יעל": 3,      # דוגמה - תחליפי לשם האמיתי
+    "מעיין": 5     # דוגמה - תחליפי לשם האמיתי
 }
-# ----------------------------------------------------
+# ------------------
 
 BASE_URL = "https://web.mashov.info/api"
 
 def login_and_get_homework():
     session = requests.Session()
-    # התחפושת לדפדפן (כדי שלא יחסמו אותנו)
+    # התחפושת לדפדפן (קריטי!)
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     
     print(f"🔄 מנסה להתחבר למשוב (שנה {YEAR})...")
@@ -54,42 +54,47 @@ def login_and_get_homework():
         print(f"❌ ההתחברות נכשלה (קוד {login_resp.status_code}): {login_resp.text}")
         return []
 
-    print("✅ התחברות הצליחה! מנסה לשלוף ילדים...")
+    print("✅ התחברות הצליחה! מנסה לשלוף רשימת תלמידים...")
 
-    # שליפת רשימת הילדים
-    children_resp = session.get(f"{BASE_URL}/user/children", headers=headers)
+    # שינוי אסטרטגיה: שימוש ב-/students במקום /user/children
+    students_resp = session.get(f"{BASE_URL}/students", headers=headers)
     
-    if children_resp.status_code != 200:
-         # כאן נראה את השגיאה האמיתית אם זה נכשל
-         print(f"❌ שגיאה בשליפת ילדים (Status {children_resp.status_code}):")
-         print(children_resp.text)
+    if students_resp.status_code != 200:
+         print(f"❌ שגיאה בשליפת תלמידים (קוד {students_resp.status_code}): {students_resp.text}")
+         # נסיון הדפסת פרטי המשתמש כדי להבין מי מחובר
+         try:
+             user_info = login_resp.json()
+             print(f"👀 פרטי משתמש מחובר: {user_info.get('credential', {}).get('userId', 'unknown')}")
+         except:
+             pass
          return []
     
-    try:
-        children = children_resp.json()
-    except:
-        print(f"❌ התקבל תוכן שאינו JSON: {children_resp.text}")
-        return []
-
-    print(f"✅ נמצאו {len(children)} ילדים. מתחיל לעבור עליהם...")
+    children = students_resp.json()
+    print(f"✅ נמצאו {len(children)} תלמידים ברשימה.")
     
     all_tasks = []
 
     for child in children:
         name = child['privateName']
-        grade = KIDS_MAPPING.get(name) # כאן אנחנו בודקים אם השם קיים ברשימה שלנו
+        # לפעמים המזהה הוא studentId ולפעמים childGuid - ננסה את שניהם
+        child_id = child.get('childGuid') or child.get('studentId')
+        
+        grade = KIDS_MAPPING.get(name)
         
         if not grade:
-            print(f"⚠️ מדלג על הילד/ה: '{name}' (כי השם הזה לא מופיע ב-KIDS_MAPPING)")
+            print(f"⚠️ מדלג על: '{name}' (השם הזה לא מופיע במיפוי שבקוד)")
             continue
 
         print(f"🔎 מושך שיעורים עבור {name} (כיתה {grade})...")
         
         try:
-            hw_resp = session.get(f"{BASE_URL}/students/{child['childGuid']}/homework", headers=headers)
+            # הכתובת למשיכת שיעורי בית
+            hw_url = f"{BASE_URL}/students/{child_id}/homework"
+            hw_resp = session.get(hw_url, headers=headers)
+            
             if hw_resp.status_code == 200:
                 hw_list = hw_resp.json()
-                print(f"   found {len(hw_list)} tasks") # נראה כמה משימות הוא מצא
+                print(f"   🎉 נמצאו {len(hw_list)} משימות!")
                 
                 for hw in hw_list:
                     task_obj = {
@@ -110,10 +115,12 @@ def login_and_get_homework():
 if __name__ == "__main__":
     tasks = login_and_get_homework()
     
+    # תמיד ניצור את הקובץ, גם אם הרשימה ריקה (כדי לנקות שיעורים ישנים)
+    js_content = f"const homeworkData = {json.dumps(tasks, ensure_ascii=False, indent=4)};"
+    with open("homework_data.js", "w", encoding="utf-8") as f:
+        f.write(js_content)
+    
     if tasks:
-        js_content = f"const homeworkData = {json.dumps(tasks, ensure_ascii=False, indent=4)};"
-        with open("homework_data.js", "w", encoding="utf-8") as f:
-            f.write(js_content)
-        print(f"🎉 הצלחנו! הקובץ homework_data.js עודכן עם {len(tasks)} משימות.")
+        print(f"💾 הקובץ עודכן בהצלחה עם {len(tasks)} משימות.")
     else:
-        print("⚠️ התהליך הסתיים ללא משימות (או שהייתה שגיאה, או שבאמת אין שיעורים).")
+        print("📁 הקובץ עודכן (רשימה ריקה - אין שיעורים או שלא נמצאו התאמות).")
