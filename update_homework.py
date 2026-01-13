@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import uuid # לטובת יצירת מזהה אם חסר
 
 MASHOV_ID = os.environ["MASHOV_ID"]
 MASHOV_PASS = os.environ["MASHOV_PASS"]
@@ -14,7 +15,6 @@ KIDS_MAPPING = {
 BASE_URL = "https://web.mashov.info/api"
 
 def is_safe_ascii(s):
-    """ בודק אם מחרוזת בטוחה (אנגלית בלבד) """
     try:
         if not isinstance(s, str): return False
         s.encode('latin-1')
@@ -23,14 +23,13 @@ def is_safe_ascii(s):
         return False
 
 def update_homework():
-    print("Step 1: Login (Dirty Session)...")
+    print("Step 1: Login...")
     dirty_session = requests.Session()
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Content-Type": "application/json"
     }
     
-    # CSRF ראשוני
     try:
         init_resp = dirty_session.get(f"{BASE_URL}/login", headers=headers)
         initial_csrf = init_resp.cookies.get("csrf_token") or init_resp.headers.get("X-Csrf-Token")
@@ -41,24 +40,17 @@ def update_homework():
 
     login_data = {"semel": MASHOV_SEMEL, "year": 2026, "username": MASHOV_ID, "password": MASHOV_PASS, "loginType": 1}
     
-    # התחברות
     login_resp = dirty_session.post(f"{BASE_URL}/login", json=login_data, headers=headers)
     if login_resp.status_code != 200:
         print(f"Login failed: {login_resp.status_code}")
         return []
 
-    print("Login success! Extracting data...")
+    print("Login success! Getting Token & Children...")
 
-    # 1. חילוץ הטוקן הכי עדכני (התיקון!)
-    # אנחנו מחפשים אותו בכותרות של התשובה, שם הוא מתחבא
+    # 1. חילוץ טוקן
     fresh_csrf = login_resp.headers.get("X-Csrf-Token") or login_resp.cookies.get("csrf_token") or initial_csrf
     
-    if fresh_csrf:
-        print(f"🎫 Captured Fresh CSRF Token: {fresh_csrf[:5]}...")
-    else:
-        print("⚠️ Warning: Could not find a fresh CSRF token.")
-
-    # 2. חילוץ הילדים
+    # 2. חילוץ ילדים
     children = []
     try:
         login_json = login_resp.json()
@@ -76,24 +68,17 @@ def update_homework():
 
     print(f"🎉 Found {len(children)} children! Switching to CLEAN session...")
 
-    # --- יצירת סשן נקי ---
+    # --- סשן נקי ---
     clean_session = requests.Session()
     clean_session.headers.update(headers)
     
-    # הגדרת הטוקן בסשן החדש (קריטי!)
     if fresh_csrf and is_safe_ascii(fresh_csrf):
         clean_session.headers["X-Csrf-Token"] = fresh_csrf
-        # לפעמים צריך אותו גם כעוגייה
         clean_session.cookies.set("csrf_token", fresh_csrf)
 
-    # העתקת עוגיות בטוחות בלבד
-    safe_cookies_count = 0
     for cookie in dirty_session.cookies:
         if is_safe_ascii(cookie.name) and is_safe_ascii(cookie.value):
             clean_session.cookies.set(cookie.name, cookie.value)
-            safe_cookies_count += 1
-
-    print(f"Clean session ready with {safe_cookies_count} safe cookies.")
 
     # --- משיכת שיעורים ---
     all_tasks = []
@@ -109,7 +94,6 @@ def update_homework():
                 break
         
         if not grade:
-            print(f"Skipping {clean_name}")
             continue
 
         print(f"Fetching homework for {clean_name}...")
@@ -118,17 +102,27 @@ def update_homework():
             
             if hw_resp.status_code == 200:
                 hw_list = hw_resp.json()
-                print(f"   ✅ Found {len(hw_list)} tasks!")
-                for hw in hw_list:
+                print(f"   ✅ Found {len(hw_list)} raw tasks!")
+                
+                # הדפסת מבנה הנתונים (כדי שנדע איך לסנן תאריכים בפעם הבאה)
+                if len(hw_list) > 0:
+                    print(f"   🔍 Task keys: {list(hw_list[0].keys())}")
+
+                # לקיחת 10 המשימות האחרונות בלבד (זמני)
+                recent_tasks = hw_list[:10]
+                
+                for hw in recent_tasks:
+                    # שימוש ב-uuid אם אין id כדי למנוע קריסה
+                    task_id = str(hw.get('id') or hw.get('homeworkId') or uuid.uuid4())
+                    
                     all_tasks.append({
-                        "id": str(hw['id']),
+                        "id": task_id,
                         "grade": grade,
-                        "subject": hw['subjectName'],
-                        "task": hw['message']
+                        "subject": hw.get('subjectName', 'כללי'),
+                        "task": hw.get('message', 'ללא פירוט')
                     })
             else:
-                # הדפסה מפורטת יותר של השגיאה
-                print(f"   ❌ Failed (Code {hw_resp.status_code}): {hw_resp.text}")
+                print(f"   ❌ Failed (Code {hw_resp.status_code})")
         except Exception as e:
             print(f"   Error: {e}")
             
