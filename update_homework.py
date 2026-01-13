@@ -13,18 +13,24 @@ KIDS_MAPPING = {
 
 BASE_URL = "https://web.mashov.info/api"
 
+def is_safe_ascii(s):
+    """ פונקציה שבודקת האם המחרוזת מכילה רק אנגלית ומספרים """
+    if not s: return False
+    try:
+        s.encode('latin-1')
+        return True
+    except UnicodeEncodeError:
+        return False
+
 def debug_login_and_fetch():
-    # שלב א: התחברות "מלוכלכת" (מקבלים עוגיות בעברית)
+    # שלב א: התחברות ראשונית
+    print("🔄 [שלב 1] מתחבר למשוב...")
     dirty_session = requests.Session()
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Referer": "https://web.mashov.info/students/main",
-        "Origin": "https://web.mashov.info",
-        "Accept": "application/json, text/plain, */*"
+        "Content-Type": "application/json"
     }
     
-    print("🔄 [שלב 1] מתחבר למשוב כדי להשיג מפתח...")
-
     try:
         init_resp = dirty_session.get(f"{BASE_URL}/login", headers=headers)
         csrf = init_resp.cookies.get("csrf_token") or init_resp.headers.get("X-Csrf-Token")
@@ -32,8 +38,9 @@ def debug_login_and_fetch():
         print(f"❌ שגיאה בהתחברות ראשונית: {e}")
         return []
 
-    if csrf: headers["X-Csrf-Token"] = csrf
-    headers["Content-Type"] = "application/json"
+    # אם ה-CSRF בטוח, נוסיף אותו
+    if csrf and is_safe_ascii(csrf): 
+        headers["X-Csrf-Token"] = csrf
     
     login_data = {"semel": MASHOV_SEMEL, "year": 2026, "username": MASHOV_ID, "password": MASHOV_PASS, "loginType": 1}
     
@@ -43,53 +50,45 @@ def debug_login_and_fetch():
         print(f"❌ ההתחברות נכשלה (קוד {login_resp.status_code})")
         return []
 
-    print("✅ התחברות ראשונית הצליחה. מחלץ מפתחות...")
+    print("✅ התחברות הצליחה. מנתח מפתחות...")
     
-    # חילוץ הטוקן
+    # חילוץ נתונים
     access_token = None
     user_id = None
     try:
         login_json = login_resp.json()
         access_token = login_json.get('accessToken')
-        credential = login_json.get('credential', {})
-        user_id = credential.get('userId')
+        user_id = login_json.get('credential', {}).get('userId')
     except:
         pass
 
     if not access_token:
-        print("❌ לא נמצא Access Token בתשובה. אי אפשר להמשיך.")
+        print("❌ לא התקבל Access Token.")
         return []
 
-    print("🔑 מפתח (Token) חולץ בהצלחה.")
-
-    # --- שלב ב: יצירת סשן נקי לחלוטין ---
-    print("✨ [שלב 2] יוצר סשן חדש ונקי (ללא עוגיות בעברית)...")
+    # --- שלב ב: יצירת סשן סטרילי ---
+    print("✨ [שלב 2] יוצר סשן סטרילי (ללא עוגיות, רק כותרות תקינות)...")
     clean_session = requests.Session()
     
-    # מעבירים לסשן החדש רק את הכותרות ההכרחיות
-    clean_session.headers.update({
-        "User-Agent": headers["User-Agent"],
-        "Authorization": f"Bearer {access_token}", # זה המפתח החשוב
-        "X-Csrf-Token": csrf
-    })
+    # בדיקת כשרות ל-Access Token (כאן הייתה הנפילה!)
+    if is_safe_ascii(access_token):
+        clean_session.headers["Authorization"] = f"Bearer {access_token}"
+        print("🔑 Access Token תקין (אנגלית בלבד) ונוסף.")
+    else:
+        print("⚠️ ה-Access Token מכיל עברית! מנסה לשלוח ללא Authorization...")
+    
+    # הוספת CSRF רק אם הוא תקין
+    if csrf and is_safe_ascii(csrf):
+        clean_session.headers["X-Csrf-Token"] = csrf
 
-    # העתקת עוגיות: מעבירים רק את מה שבטוח באנגלית!
-    print("🍪 מסנן עוגיות...")
-    count = 0
-    for cookie in dirty_session.cookies:
-        try:
-            # בדיקה: האם השם והערך הם באנגלית בלבד?
-            (cookie.name + cookie.value).encode('latin-1')
-            clean_session.cookies.set(cookie.name, cookie.value)
-            count += 1
-        except:
-            print(f"   🗑️ זורק לפח עוגייה בעייתית: {cookie.name}")
+    # הוספת User-Agent
+    clean_session.headers["User-Agent"] = headers["User-Agent"]
 
-    print(f"✅ הסשן הנקי מוכן (הועתקו {count} עוגיות תקינות).")
+    # שימי לב: אני בכוונה *לא* מעתיק עוגיות בשלב הזה.
+    # אנחנו מנסים לעבוד רק עם הטוקן כדי למנוע את הקריסה.
 
-    # --- שלב ג: שליפת הנתונים עם הסשן הנקי ---
-
-    print("🔎 מנסה לשלוף רשימת תלמידים...")
+    # --- שלב ג: שליפה ---
+    print("🔎 מנסה לשלוף רשימת תלמידים (בלי עוגיות)...")
     
     # נסיון 1: נתיב רגיל
     resp = clean_session.get(f"{BASE_URL}/students")
@@ -97,15 +96,27 @@ def debug_login_and_fetch():
     if resp.status_code == 200:
         return process_homework(clean_session, resp.json())
     
-    print(f"   ⚠️ נתיב רגיל נכשל (קוד {resp.status_code}). מנסה נתיב אלטרנטיבי...")
+    print(f"   ⚠️ נסיון ראשון נכשל (קוד {resp.status_code}).")
 
-    # נסיון 2: נתיב עם ID
+    # אם נכשלנו בגלל חוסר הרשאות (401/403), אולי בכל זאת חייבים עוגיות?
+    # רק במקרה כזה, ננסה להעתיק עוגיות בזהירות קיצונית
+    if resp.status_code in [401, 403]:
+        print("🍪 חייבים עוגיות. מעתיק רק עוגיות בטוחות...")
+        for cookie in dirty_session.cookies:
+            if is_safe_ascii(cookie.name) and is_safe_ascii(cookie.value):
+                clean_session.cookies.set(cookie.name, cookie.value)
+        
+        print("🔎 מנסה שוב עם עוגיות...")
+        resp = clean_session.get(f"{BASE_URL}/students")
+        if resp.status_code == 200:
+            return process_homework(clean_session, resp.json())
+
+    # נסיון אחרון דרך ID
     if user_id:
+        print(f"🔎 נסיון אחרון דרך UserID...")
         resp = clean_session.get(f"{BASE_URL}/users/{user_id}/children")
         if resp.status_code == 200:
             return process_homework(clean_session, resp.json())
-        else:
-             print(f"   ❌ נתיב אלטרנטיבי נכשל (קוד {resp.status_code})")
 
     return []
 
@@ -115,19 +126,17 @@ def process_homework(session, children):
     
     for child in children:
         name = child['privateName']
-        clean_name = name.strip() # ניקוי רווחים
-        
+        clean_name = name.strip()
         child_id = child.get('childGuid') or child.get('studentId') or child.get('userId')
         
         grade = None
-        # בדיקת התאמה חכמה לשמות
         for mapped_name, mapped_grade in KIDS_MAPPING.items():
             if mapped_name in clean_name:
                 grade = mapped_grade
                 break
         
         if not grade:
-            print(f"   ⚠️ מדלג על '{clean_name}' (לא נמצא במיפוי שמות)")
+            print(f"   ⚠️ מדלג על {clean_name}")
             continue
 
         print(f"   🔎 מושך שיעורים ל{clean_name}...")
@@ -150,13 +159,11 @@ def process_homework(session, children):
 
 if __name__ == "__main__":
     tasks = debug_login_and_fetch()
-    
-    # יצירת קובץ התוצאה
     js_content = f"const homeworkData = {json.dumps(tasks, ensure_ascii=False, indent=4)};"
     with open("homework_data.js", "w", encoding="utf-8") as f:
         f.write(js_content)
     
     if tasks:
-        print(f"\n💾 הצלחה! הקובץ עודכן עם {len(tasks)} משימות.")
+        print(f"\n💾 הצלחה! {len(tasks)} משימות נשמרו.")
     else:
-        print("\n📁 התהליך הסתיים ללא משימות.")
+        print("\n📁 הסתיים ללא משימות.")
