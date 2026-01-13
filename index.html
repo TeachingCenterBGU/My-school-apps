@@ -14,6 +14,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>כאן לומדות ולומדים בכיף</title>
     <style>
+        /* --- עיצוב קוביית שיעורי בית --- */
+        .homework-box {
+            background: #fff9c4; /* צהוב בהיר כמו פתקית */
+            border: 2px solid #fbc02d;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .homework-item {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-right: 4px solid var(--accent-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            animation: fadeIn 0.5s;
+        }
+
+        .homework-info {
+            font-size: 0.95em;
+        }
+
+        .homework-subject {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 0.9em;
+            display: block;
+        }
+
+        .hw-done-btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #ccc;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hw-done-btn:hover {
+            background: #e8f5e9;
+            border-color: #81c784;
+            color: #2e7d32;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         /* --- משתנים וצבעים --- */
         :root {
             --primary-color: #5c6bc0;
@@ -343,7 +402,11 @@
         <section class="grade-col" aria-label="כיתה ג">
             <div class="grade-header">
                 <h2 class="grade-title">כיתה ג'</h2>
-            </div>
+                </div>
+                <div id="hw-container-3" class="homework-box">
+                     <p style="text-align:center; color:#888;">אין שיעורי בית 🎉</p>
+                </div>
+            
 
             <details class="subject-box">
                 <summary class="subject-title">🔢 שפה</summary>
@@ -478,7 +541,9 @@
             <div class="grade-header">
                 <h2 class="grade-title">כיתה ה'</h2>
             </div>
-
+            <div id="hw-container-5" class="homework-box">
+                <p style="text-align:center; color:#888;">אין שיעורי בית 🎉</p>
+            </div>
             <details class="subject-box">
                 <summary class="subject-title">🗣️ אנגלית</summary>
                 <div class="apps-grid">
@@ -646,6 +711,7 @@
     </footer>
 </div>
 
+<script src="homework_data.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
@@ -822,7 +888,60 @@ document.addEventListener("DOMContentLoaded", () => {
       summary.appendChild(badge);
     }
   });
+// --- ניהול שיעורי בית (חדש!) ---
+  const tasks = (typeof homeworkData !== 'undefined') ? homeworkData : [];
 
+  function renderHomework(grade, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      // מסנן משימות לפי כיתה ולפי מה שעוד לא בוצע
+      const pendingTasks = tasks.filter(t => {
+          const isDone = localStorage.getItem("hw_done_" + t.id);
+          return (t.grade === grade && !isDone);
+      });
+
+      // אם אין שיעורים
+      if (pendingTasks.length === 0) {
+          container.innerHTML = '<p style="text-align:center; color:#888; margin:0;">אין שיעורי בית 🎉</p>';
+          return;
+      }
+
+      // בניית הרשימה
+      let html = '<h3 style="margin:0 0 10px 0; font-size:1.1em;">📝 שיעורי בית:</h3>';
+      
+      pendingTasks.forEach(task => {
+          html += `
+            <div class="homework-item" id="task-${task.id}">
+                <div class="homework-info">
+                    <span class="homework-subject">${task.subject}:</span>
+                    <span>${task.task}</span>
+                </div>
+                <button class="hw-done-btn" onclick="markHomeworkDone('${task.id}')" title="סיימתי!">✓</button>
+            </div>
+          `;
+      });
+      container.innerHTML = html;
+  }
+
+    // הפעלה
+    renderHomework(3, 'hw-container-3');
+    renderHomework(5, 'hw-container-5');
+
+    // פונקציית מחיקה (גלובלית)
+    window.markHomeworkDone = function(id) {
+        if(!confirm("סיימת את המשימה? כל הכבוד! 🌟")) return;
+        localStorage.setItem("hw_done_" + id, "true");
+        
+        // הסרה מהמסך
+        const el = document.getElementById("task-" + id);
+        if(el) {
+            el.style.opacity = "0";
+            setTimeout(() => el.remove(), 500);
+            // רענון כדי לעדכן אם נגמרו כל השיעורים
+            setTimeout(() => location.reload(), 600); 
+        }
+    };
 });
 </script>
 </body>
