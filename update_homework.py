@@ -7,7 +7,6 @@ MASHOV_ID = os.environ["MASHOV_ID"]
 MASHOV_PASS = os.environ["MASHOV_PASS"]
 MASHOV_SEMEL = os.environ["MASHOV_SEMEL"]
 
-# חזרנו ל-2026 כי זה מה שמופיע אצלך במסך הראשי
 YEAR = 2026
 
 # --- המיפוי שלך ---
@@ -22,11 +21,11 @@ BASE_URL = "https://web.mashov.info/api"
 
 def login_and_get_homework():
     session = requests.Session()
-    # התחפושת לדפדפן (קריטי!)
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     
     print(f"🔄 מנסה להתחבר למשוב (שנה {YEAR})...")
     
+    # 1. התחברות ראשונית לקבלת טוקן זמני
     try:
         init_resp = session.get(f"{BASE_URL}/login", headers={"User-Agent": user_agent})
         csrf_token = init_resp.cookies.get("csrf_token") or init_resp.headers.get("X-Csrf-Token")
@@ -34,6 +33,7 @@ def login_and_get_homework():
         print(f"❌ שגיאה בהתחברות ראשונית: {e}")
         return []
 
+    # 2. ביצוע Login
     login_data = {
         "semel": MASHOV_SEMEL,
         "year": YEAR,
@@ -54,19 +54,25 @@ def login_and_get_homework():
         print(f"❌ ההתחברות נכשלה (קוד {login_resp.status_code}): {login_resp.text}")
         return []
 
-    print("✅ התחברות הצליחה! מנסה לשלוף רשימת תלמידים...")
+    print("✅ התחברות הצליחה! מעדכן כרטיס כניסה...")
 
-    # שינוי אסטרטגיה: שימוש ב-/students במקום /user/children
+    # --- התיקון הקריטי: עדכון ה-Token החדש לאחר ההתחברות ---
+    # המשוב נותן עוגיה חדשה אחרי ה-Login, חייבים לקחת אותה לבקשות הבאות
+    new_csrf = session.cookies.get("csrf_token")
+    if new_csrf:
+        headers["X-Csrf-Token"] = new_csrf
+        print("🔄 עודכן CSRF Token חדש להמשך הפעילות.")
+    else:
+        print("⚠️ לא נמצא טוקן חדש, ממשיך עם הישן (עלול להיכשל).")
+    # ---------------------------------------------------------
+
+    print("🔎 מנסה לשלוף רשימת תלמידים...")
+    
+    # נסיון לשלוף דרך /students (יותר יציב מ-/user/children)
     students_resp = session.get(f"{BASE_URL}/students", headers=headers)
     
     if students_resp.status_code != 200:
          print(f"❌ שגיאה בשליפת תלמידים (קוד {students_resp.status_code}): {students_resp.text}")
-         # נסיון הדפסת פרטי המשתמש כדי להבין מי מחובר
-         try:
-             user_info = login_resp.json()
-             print(f"👀 פרטי משתמש מחובר: {user_info.get('credential', {}).get('userId', 'unknown')}")
-         except:
-             pass
          return []
     
     children = students_resp.json()
@@ -76,19 +82,17 @@ def login_and_get_homework():
 
     for child in children:
         name = child['privateName']
-        # לפעמים המזהה הוא studentId ולפעמים childGuid - ננסה את שניהם
-        child_id = child.get('childGuid') or child.get('studentId')
+        child_id = child.get('childGuid') or child.get('studentId') # תמיכה בשני סוגי מזהים
         
         grade = KIDS_MAPPING.get(name)
         
         if not grade:
-            print(f"⚠️ מדלג על: '{name}' (השם הזה לא מופיע במיפוי שבקוד)")
+            print(f"⚠️ מדלג על: '{name}' (השם לא מופיע במיפוי)")
             continue
 
         print(f"🔎 מושך שיעורים עבור {name} (כיתה {grade})...")
         
         try:
-            # הכתובת למשיכת שיעורי בית
             hw_url = f"{BASE_URL}/students/{child_id}/homework"
             hw_resp = session.get(hw_url, headers=headers)
             
@@ -115,7 +119,6 @@ def login_and_get_homework():
 if __name__ == "__main__":
     tasks = login_and_get_homework()
     
-    # תמיד ניצור את הקובץ, גם אם הרשימה ריקה (כדי לנקות שיעורים ישנים)
     js_content = f"const homeworkData = {json.dumps(tasks, ensure_ascii=False, indent=4)};"
     with open("homework_data.js", "w", encoding="utf-8") as f:
         f.write(js_content)
@@ -123,4 +126,4 @@ if __name__ == "__main__":
     if tasks:
         print(f"💾 הקובץ עודכן בהצלחה עם {len(tasks)} משימות.")
     else:
-        print("📁 הקובץ עודכן (רשימה ריקה - אין שיעורים או שלא נמצאו התאמות).")
+        print("📁 הקובץ עודכן (רשימה ריקה).")
