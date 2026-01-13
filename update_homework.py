@@ -24,7 +24,7 @@ def debug_login_and_fetch():
     
     print("🔄 מתחבר למשוב (שנה 2026)...")
 
-    # 1. קריאה ראשונית (CSRF)
+    # 1. קריאה ראשונית
     try:
         init_resp = session.get(f"{BASE_URL}/login", headers=headers)
         csrf = init_resp.cookies.get("csrf_token") or init_resp.headers.get("X-Csrf-Token")
@@ -46,31 +46,42 @@ def debug_login_and_fetch():
 
     print("✅ התחברות הצליחה! מפענח נתונים...")
     
-    # --- התיקון הגדול: שימוש ב-Access Token ---
+    # --- שליפת ה-Token ---
+    user_id = None
     try:
         login_json = login_resp.json()
-        
-        # 1. שליפת ה-Token והוספתו לכותרות
         access_token = login_json.get('accessToken')
         if access_token:
-            headers["Authorization"] = f"Bearer {access_token}" # התוספת הקריטית!
+            headers["Authorization"] = f"Bearer {access_token}"
             print("🔑 Access Token נמצא והוסף לכותרות.")
         
-        # 2. שליפת ה-User ID (אולי צריך אותו בשביל הכתובת)
         credential = login_json.get('credential', {})
         user_id = credential.get('userId')
-        print(f"🆔 זיהינו את ה-User ID שלך: {user_id}")
-        
+        print(f"🆔 User ID: {user_id}")
     except:
         print("⚠️ לא הצלחנו לקרוא את ה-JSON של ההתחברות.")
 
-    # עדכון CSRF אם השתנה
+    # עדכון CSRF
     new_csrf = session.cookies.get("csrf_token") or login_resp.headers.get("X-Csrf-Token")
     if new_csrf: headers["X-Csrf-Token"] = new_csrf
 
-    # --- ניסיונות שליפה עם הכוח החדש (הטוקן) ---
+    # --- התיקון: ניקוי עוגיות בעייתיות (עברית) ---
+    print("🧹 מנקה עוגיות עם תווים בעברית כדי למנוע קריסה...")
+    cookies_to_remove = []
+    for cookie in session.cookies:
+        try:
+            # בדיקה: האם הערך של העוגייה הוא באנגלית בלבד?
+            cookie.value.encode('latin-1')
+        except UnicodeEncodeError:
+            print(f"   🗑️ מוחק עוגייה בעייתית: {cookie.name}")
+            cookies_to_remove.append(cookie)
     
-    # נסיון 1: רגיל
+    # מחיקה בפועל
+    for cookie in cookies_to_remove:
+        session.cookies.clear(domain=cookie.domain, path=cookie.path, name=cookie.name)
+    # ---------------------------------------------
+
+    # נסיון שליפה
     print("🔎 נסיון 1: שליפה דרך /students...")
     resp = session.get(f"{BASE_URL}/students", headers=headers)
     if resp.status_code == 200:
@@ -78,7 +89,6 @@ def debug_login_and_fetch():
     else:
         print(f"   ❌ נכשל (קוד {resp.status_code})")
 
-    # נסיון 2: דרך ה-ID של המשתמש (לפעמים הכתובת היא /user/{id}/students)
     if user_id:
         print(f"🔎 נסיון 2: שליפה דרך /users/{user_id}/children...")
         resp = session.get(f"{BASE_URL}/users/{user_id}/children", headers=headers)
@@ -95,15 +105,24 @@ def process_homework(session, children, headers):
     
     for child in children:
         name = child['privateName']
-        # ננסה למצוא את המזהה בכל דרך אפשרית
+        # שיפור: ניקוי רווחים מיותרים בשם כדי למנוע אי-התאמה
+        clean_name = name.strip()
+        
+        # מציאת המזהה
         child_id = child.get('childGuid') or child.get('studentId') or child.get('userId')
         
-        grade = KIDS_MAPPING.get(name)
+        # בדיקה גמישה יותר לשמות
+        grade = None
+        for mapped_name, mapped_grade in KIDS_MAPPING.items():
+            if mapped_name in clean_name: # אם השם מהמיפוי מוכל בשם מהמשוב
+                grade = mapped_grade
+                break
+        
         if not grade:
-            print(f"   ⚠️ מצאנו את {name}, אבל השם לא מופיע במיפוי בקוד.")
+            print(f"   ⚠️ מדלג על {clean_name} (לא במיפוי)")
             continue
 
-        print(f"   🔎 מושך שיעורים ל{name}...")
+        print(f"   🔎 מושך שיעורים ל{clean_name}...")
         try:
             hw_resp = session.get(f"{BASE_URL}/students/{child_id}/homework", headers=headers)
             if hw_resp.status_code == 200:
