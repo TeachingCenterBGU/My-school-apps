@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-import uuid # לטובת יצירת מזהה אם חסר
+from datetime import datetime, timedelta
 
 MASHOV_ID = os.environ["MASHOV_ID"]
 MASHOV_PASS = os.environ["MASHOV_PASS"]
@@ -22,8 +22,18 @@ def is_safe_ascii(s):
     except:
         return False
 
+def parse_date(date_str):
+    """ המרת תאריך של משוב למשהו שאפשר להשוות """
+    try:
+        # הפורמט של משוב הוא בדרך כלל: 2026-01-13T00:00:00
+        return datetime.fromisoformat(date_str)
+    except:
+        return datetime.now()
+
 def update_homework():
-    print("Step 1: Login...")
+    print("🚀 Starting Homework Update Process...")
+    
+    # --- שלב 1: התחברות וקבלת נתונים ---
     dirty_session = requests.Session()
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -35,22 +45,22 @@ def update_homework():
         initial_csrf = init_resp.cookies.get("csrf_token") or init_resp.headers.get("X-Csrf-Token")
         if initial_csrf: headers["X-Csrf-Token"] = initial_csrf
     except Exception as e:
-        print(f"Connection error: {e}")
+        print(f"❌ Connection error: {e}")
         return []
 
     login_data = {"semel": MASHOV_SEMEL, "year": 2026, "username": MASHOV_ID, "password": MASHOV_PASS, "loginType": 1}
     
     login_resp = dirty_session.post(f"{BASE_URL}/login", json=login_data, headers=headers)
     if login_resp.status_code != 200:
-        print(f"Login failed: {login_resp.status_code}")
+        print(f"❌ Login failed: {login_resp.status_code}")
         return []
 
-    print("Login success! Getting Token & Children...")
+    print("✅ Login success! Extracting data...")
 
-    # 1. חילוץ טוקן
+    # חילוץ טוקן עדכני
     fresh_csrf = login_resp.headers.get("X-Csrf-Token") or login_resp.cookies.get("csrf_token") or initial_csrf
     
-    # 2. חילוץ ילדים
+    # חילוץ רשימת הילדים
     children = []
     try:
         login_json = login_resp.json()
@@ -66,9 +76,9 @@ def update_homework():
         print("❌ Could not find children list.")
         return []
 
-    print(f"🎉 Found {len(children)} children! Switching to CLEAN session...")
+    print(f"✅ Found {len(children)} children. Switching to CLEAN session...")
 
-    # --- סשן נקי ---
+    # --- שלב 2: סשן נקי ---
     clean_session = requests.Session()
     clean_session.headers.update(headers)
     
@@ -80,8 +90,10 @@ def update_homework():
         if is_safe_ascii(cookie.name) and is_safe_ascii(cookie.value):
             clean_session.cookies.set(cookie.name, cookie.value)
 
-    # --- משיכת שיעורים ---
+    # --- שלב 3: משיכת שיעורים וסינון ---
     all_tasks = []
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) # התחלת היום הנוכחי
+    
     for child in children:
         name = child['privateName']
         clean_name = name.strip()
@@ -96,45 +108,60 @@ def update_homework():
         if not grade:
             continue
 
-        print(f"Fetching homework for {clean_name}...")
+        print(f"🔎 Fetching homework for {clean_name}...")
         try:
             hw_resp = clean_session.get(f"{BASE_URL}/students/{child_id}/homework")
             
             if hw_resp.status_code == 200:
                 hw_list = hw_resp.json()
-                print(f"   ✅ Found {len(hw_list)} raw tasks!")
+                print(f"   📥 Raw tasks found: {len(hw_list)}")
                 
-                # הדפסת מבנה הנתונים (כדי שנדע איך לסנן תאריכים בפעם הבאה)
-                if len(hw_list) > 0:
-                    print(f"   🔍 Task keys: {list(hw_list[0].keys())}")
-
-                # לקיחת 10 המשימות האחרונות בלבד (זמני)
-                recent_tasks = hw_list[:10]
-                
-                for hw in recent_tasks:
-                    # שימוש ב-uuid אם אין id כדי למנוע קריסה
-                    task_id = str(hw.get('id') or hw.get('homeworkId') or uuid.uuid4())
+                count_added = 0
+                for hw in hw_list:
+                    # 1. סינון לפי תאריך (רק מהיום והלאה)
+                    task_date_str = hw.get('lessonDate')
+                    if task_date_str:
+                        task_date = parse_date(task_date_str)
+                        # נשמור אם זה מהיום או מהעתיד
+                        if task_date < today:
+                            continue 
                     
+                    # 2. המרה למבנה שלנו
+                    task_content = hw.get('homework') or hw.get('message') or "ללא פירוט"
+                    if not task_content: continue # דילוג על משימות ריקות
+                    
+                    # עיצוב התאריך לתצוגה יפה (DD/MM)
+                    display_date = task_date.strftime("%d/%m") if task_date_str else ""
+
                     all_tasks.append({
-                        "id": task_id,
+                        "id": str(hw.get('lessonId') or hw.get('id')),
                         "grade": grade,
                         "subject": hw.get('subjectName', 'כללי'),
-                        "task": hw.get('message', 'ללא פירוט')
+                        "task": task_content,
+                        "date": display_date # הוספנו תאריך לתצוגה
                     })
+                    count_added += 1
+                
+                print(f"   ✨ Added {count_added} relevant tasks (future/today).")
+                
             else:
-                print(f"   ❌ Failed (Code {hw_resp.status_code})")
+                print(f"   ❌ Failed to fetch (Code {hw_resp.status_code})")
         except Exception as e:
-            print(f"   Error: {e}")
+            print(f"   ⚠️ Error processing child: {e}")
             
     return all_tasks
 
 if __name__ == "__main__":
     tasks = update_homework()
+    
+    # מיון המשימות לפי כיתה ואז לפי מקצוע
+    tasks.sort(key=lambda x: (x['grade'], x['subject']))
+
     js_content = f"const homeworkData = {json.dumps(tasks, ensure_ascii=False, indent=4)};"
     with open("homework_data.js", "w", encoding="utf-8") as f:
         f.write(js_content)
     
     if tasks:
-        print(f"\n💾 DONE! Saved {len(tasks)} tasks.")
+        print(f"\n💾 SUCCESS! Saved {len(tasks)} tasks to homework_data.js")
     else:
-        print("\n📁 Done. No tasks found.")
+        print("\n📁 Done. No future tasks found (File updated to empty list).")
