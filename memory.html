@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>משחק הזיכרון - אותיות</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f7fa;
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+            user-select: none;
+        }
+
+        /* סרגל עליון */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto 10px;
+        }
+
+        h1 { color: #006064; margin: 0; font-size: 1.8em; }
+
+        /* כפתור רמקול */
+        #sound-toggle {
+            background: white;
+            border: 2px solid #00acc1;
+            color: #00838f;
+            font-size: 1.5em;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center; justify-content: center;
+        }
+        #sound-toggle.sound-on {
+            background: #00acc1; color: white;
+        }
+
+        /* כפתורי רמות */
+        .levels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            background: white;
+            border: 2px solid #00acc1;
+            color: #00838f;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .level-btn.active {
+            background: #00acc1;
+            color: white;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+        /* לוח המשחק */
+        .game-board {
+            display: grid;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        /* הקלף */
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            aspect-ratio: 1;
+            position: relative;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.5s, box-shadow 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* קלפים תואמים */
+        .card.matched {
+            transform: rotateY(180deg);
+            cursor: default;
+            box-shadow: 0 0 15px #ffd700, inset 0 0 10px rgba(255,215,0,0.5);
+            border: 3px solid #ffd700;
+            animation: pulse 1s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: rotateY(180deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.05); }
+            100% { transform: rotateY(180deg) scale(1); }
+        }
+
+        /* הצדדים */
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+        }
+
+        .front {
+            background: linear-gradient(135deg, #4dd0e1, #00acc1);
+            font-size: 2.5em;
+            color: white;
+        }
+        .front::after { content: "❓"; }
+
+        .back {
+            background-color: #fff;
+            border: 2px solid transparent;
+            transform: rotateY(180deg);
+            font-size: 4em; 
+            font-weight: bold;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background: #ff7043;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        #celebration {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.98);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 100;
+            font-size: 2em;
+            border: 4px solid #ffd700;
+        }
+        
+        .next-level-btn {
+            margin-top: 20px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <button id="sound-toggle" class="sound-on" title="הפעל/השתק הקראה">🔊</button>
+        <h1>משחק אותיות 🎉</h1>
+    </div>
+
+    <div class="levels">
+        <button class="level-btn" onclick="startGame(4)">4 קלפים</button>
+        <button class="level-btn" onclick="startGame(8)">8 קלפים</button>
+        <button class="level-btn" onclick="startGame(16)">16 קלפים</button>
+        <button class="level-btn" onclick="startGame(20)">20 קלפים</button>
+        <button class="level-btn" onclick="startGame(99)">כל האותיות</button>
+    </div>
+
+    <div class="game-board" id="board"></div>
+
+    <div id="celebration">
+        כל הכבוד! אלופה! 🏆<br>
+        <button class="next-level-btn" onclick="startNextLevel()">לשלב הבא! ➡️</button>
+    </div>
+
+    <br>
+    <a href="index.html" class="back-btn">חזרה למסך הראשי</a>
+
+    <audio id="success-sound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
+
+    <script>
+        const allLetters = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת','ם','ן','ץ','ף','ך'];
+        const colors = ['#d32f2f', '#1976d2', '#388e3c', '#fbc02d', '#8e24aa', '#e64a19', '#5d4037', '#00796b', '#f57c00'];
+
+        const levelsOrder = [4, 8, 16, 20, 99];
+        let currentLevelIndex = 0; 
+
+        // --- המילון הפונטי החדש ---
+        // מילים באנגלית יוקראו במבטא אמריקאי צלול
+        // מילים בעברית יוקראו רגיל
+const letterNames = {
+            'א': 'אָלֶף', 
+            'ב': 'בֵּית', 
+            'ג': 'Ghee-mel', // תיקון ל"גימל"
+            'ד': 'דָּלֶת', 
+            'ה': 'Hey',      // תיקון ל"הא"
+            'ו': 'Vav',      // תיקון ל"וו"
+            'ז': 'Zah-yin',  // תיקון ל"זיין"
+            'ח': 'Chett',    // תיקון ל"חית"
+            'ט': 'Tet',      // תיקון ל"טית"
+            'י': 'Yod',      // תיקון ל"יוד"
+            'כ': 'Kaf',      // תיקון ל"כף"
+            'ל': 'Lamed',
+            'מ': 'Mem', 
+            'נ': 'Noon', 
+            'ס': 'Samech', 
+            'ע': 'Ayin', 
+            'פ': 'Pey', 
+            'צ': 'Tza-dik', 
+            'ק': 'Kuf', 
+            'ר': 'Resh', 
+            'ש': 'Shin', 
+            'ת': 'Tav',
+            'ם': 'Mem Sofit', 
+            'ן': 'Noon Sofit', 
+            'ץ': 'Tza-dik Sofit', 
+            'ף': 'Pey Sofit', 
+            'ך': 'Kaf Sofit'
+        };
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let matchedCount = 0;
+        let totalPairs = 0;
+        let isSoundOn = true; 
+
+        function speakLetter(letter) {
+            if (!isSoundOn) return;
+            window.speechSynthesis.cancel();
+            
+            // בדיקה: האם השם של האות כתוב באנגלית או בעברית?
+            const textToSay = letterNames[letter] || letter;
+            
+            // זיהוי אם הטקסט מכיל אותיות באנגלית (a-z)
+            const isEnglish = /[a-zA-Z]/.test(textToSay);
+
+            const utterance = new SpeechSynthesisUtterance(textToSay);
+            
+            // אם זה אנגלית, נשתמש במבטא אנגלי, אחרת עברי
+            utterance.lang = isEnglish ? 'en-US' : 'he-IL';
+            utterance.rate = 0.9;
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        const soundToggleBtn = document.getElementById('sound-toggle');
+        soundToggleBtn.addEventListener('click', () => {
+            isSoundOn = !isSoundOn;
+            soundToggleBtn.classList.toggle('sound-on', isSoundOn);
+            soundToggleBtn.textContent = isSoundOn ? '🔊' : '🔇';
+        });
+
+        function startGame(numCards) {
+            currentLevelIndex = levelsOrder.indexOf(numCards);
+            
+            document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = Array.from(document.querySelectorAll('.level-btn')).find(b => b.textContent.includes(numCards) || (numCards===99 && b.textContent.includes("כל")));
+            if(activeBtn) activeBtn.classList.add('active');
+
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            document.getElementById('celebration').style.display = 'none';
+            matchedCount = 0;
+            hasFlippedCard = false;
+            lockBoard = false;
+
+            let selectedLetters = [];
+            if (numCards === 99) {
+                selectedLetters = [...allLetters];
+            } else {
+                let tempLetters = [...allLetters];
+                const pairsNeeded = numCards / 2;
+                for (let i = 0; i < pairsNeeded; i++) {
+                    const randomIndex = Math.floor(Math.random() * tempLetters.length);
+                    selectedLetters.push(tempLetters[randomIndex]);
+                    tempLetters.splice(randomIndex, 1);
+                }
+            }
+
+            totalPairs = selectedLetters.length;
+
+            const letterColors = {};
+            selectedLetters.forEach(letter => {
+                if (!letterColors[letter]) {
+                    letterColors[letter] = colors[Math.floor(Math.random() * colors.length)];
+                }
+            });
+
+            const deck = [...selectedLetters, ...selectedLetters];
+            deck.sort(() => 0.5 - Math.random());
+
+            let columns = 4;
+            if (numCards === 4) columns = 2;
+            if (numCards === 8) columns = 4;
+            if (numCards === 99) columns = 6;
+            if (window.innerWidth < 500 && numCards > 8) columns = 3; 
+
+            board.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+            deck.forEach(letter => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.letter = letter;
+                
+                const frontFace = document.createElement('div');
+                frontFace.classList.add('front');
+
+                const backFace = document.createElement('div');
+                backFace.classList.add('back');
+                backFace.textContent = letter;
+                
+                const color = letterColors[letter];
+                backFace.style.color = color;
+                backFace.style.borderColor = color;
+
+                card.appendChild(frontFace);
+                card.appendChild(backFace);
+
+                card.addEventListener('click', flipCard);
+                board.appendChild(card);
+            });
+        }
+
+        function startNextLevel() {
+            if (currentLevelIndex < levelsOrder.length - 1) {
+                currentLevelIndex++;
+                startGame(levelsOrder[currentLevelIndex]);
+            } else {
+                currentLevelIndex = 0;
+                startGame(levelsOrder[0]);
+            }
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.add('flipped');
+            speakLetter(this.dataset.letter);
+
+            if (!hasFlippedCard) {
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            let isMatch = firstCard.dataset.letter === secondCard.dataset.letter;
+
+            if (isMatch) {
+                disableCards();
+            } else {
+                unflipCards();
+            }
+        }
+
+        function disableCards() {
+            if (isSoundOn) {
+                setTimeout(() => {
+                     document.getElementById('success-sound').play();
+                }, 400);
+            }
+
+            firstCard.classList.add('matched');
+            secondCard.classList.add('matched');
+            
+            matchedCount++;
+            if (matchedCount === totalPairs) {
+                setTimeout(() => {
+                    document.getElementById('celebration').style.display = 'block';
+                    if(isSoundOn) {
+                         const winMsg = new SpeechSynthesisUtterance("כל הכבוד! סיימת את השלב");
+                         winMsg.lang = 'he-IL';
+                         window.speechSynthesis.speak(winMsg);
+                    }
+                }, 800);
+            }
+
+            resetBoard();
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                resetBoard();
+            }, 1200);
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+        startGame(4);
+    </script>
+</body>
+</html>

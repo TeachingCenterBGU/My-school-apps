@@ -141,12 +141,17 @@
             color: #666;
         }
 
-        /* --- גריד ראשי (כיתה ג / ה) --- */
+/       * --- עדכון: גריד גמיש ל-3 עמודות --- */
         .grades-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 26px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
             align-items: start;
+        }
+        
+        /* צבע מיוחד לכותרת של גן חובה (כתום) */
+        .grade-col.kindergarten h2.grade-title {
+            background: #ff9800;
         }
 
         @media (max-width: 980px) {
@@ -702,6 +707,54 @@
                             <button class="mark-btn partial" type="button">בוצע חלקית</button>
                             <button class="mark-btn done" type="button">סיימתי</button>
                         </div>
+                    </div>
+
+                </div>
+            </details>
+        </section>
+        <section class="grade-col kindergarten" aria-label="גן חובה">
+            <div class="grade-header">
+                <h2 class="grade-title">גן חובה</h2>
+            </div>
+
+            <div class="homework-box">
+                <h3 style="margin:0 0 10px 0; font-size:1.1em;">📝 המשימות שלי:</h3>
+                
+                <div class="homework-item">
+                    <div class="homework-info" style="width: 100%;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <span class="homework-subject">חשבון</span>
+                        </div>
+                        <div>
+                            <a href="https://www.matific.com/il/he/login-page/" target="_blank" style="text-decoration:none; color:#2c3e50; font-weight:bold;">
+                                🎮 כניסה למתיפיק (לחצי כאן)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="homework-item">
+                    <div class="homework-info" style="width: 100%;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <span class="homework-subject">חוברת עבודה</span>
+                        </div>
+                        <div style="color:#555;">לסיים 4 עמודים בחוברת</div>
+                    </div>
+                    <button class="hw-done-btn" onclick="this.parentElement.style.opacity='0.5'; alert('כל הכבוד! אלופה! 🌟')" title="סיימתי!">✓</button>
+                </div>
+            </div>
+
+            <details class="subject-box" open>
+                <summary class="subject-title">🔤 אותיות ומילים</summary>
+                <div class="apps-grid">
+                    
+                    <div class="card" data-app-id="memory-letters">
+                        <a class="card-main" href="memory.html">
+                            <span class="icon">🧠</span>
+                            <span class="card-title">משחק הזיכרון</span>
+                            <span class="card-desc">מתחילים בקטן וגדלים!</span>
+                        </a>
+                         <div class="badge-top-left badge-new">חדש</div>
                     </div>
 
                 </div>
