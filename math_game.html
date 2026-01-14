@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אלופת הכפל - בעיות מילוליות</title>
+    <style>
+        /* סגנונות בסיס */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            border: 4px solid #8e44ad;
+        }
+
+        h1 { color: #8e44ad; font-size: 2.5em; margin-bottom: 10px; margin-top: 0; }
+
+        /* --- חדש: איזור הכוכבים --- */
+        .stars-container {
+            font-size: 2.5em;
+            height: 50px; /* גובה קבוע כדי שהדף לא יקפוץ */
+            margin-bottom: 10px;
+            color: gold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .star-icon {
+            display: inline-block;
+            /* אנימציית הופעה */
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        /* -------------------------- */
+
+        .progress { font-size: 1.2em; color: #555; margin-bottom: 20px; }
+
+        .question-box {
+            background-color: #e8f6f3;
+            border: 2px dashed #1abc9c;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.6em;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            font-size: 1.5em;
+            padding: 10px;
+            width: 110px;
+            text-align: center;
+            border: 3px solid #bdc3c7;
+            border-radius: 12px;
+            outline: none;
+            -moz-appearance: textfield; /* ביטול חצים בדפדפן */
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"]:focus { border-color: #8e44ad; }
+
+        button {
+            background-color: #8e44ad;
+            color: white;
+            font-size: 1.4em;
+            padding: 12px 35px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: transform 0.2s, background-color 0.2s;
+            font-weight: bold;
+        }
+
+        button:hover { background-color: #732d91; transform: scale(1.05); }
+
+        .feedback {
+            margin-top: 25px;
+            font-size: 1.5em;
+            font-weight: bold;
+            min-height: 1.5em;
+        }
+
+        .correct { color: #27ae60; }
+        .wrong { color: #c0392b; }
+
+        .hidden { display: none !important; }
+
+        .final-score { font-size: 2.2em; color: #d35400; margin: 20px 0; }
+        #end-screen h2 { font-size: 2em; color: #2c3e50; }
+        #encouragement { font-size: 1.5em; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🦄 אלופת הכפל</h1>
+    
+    <div id="game-screen">
+        <div id="stars-container" class="stars-container"></div>
+        
+        <div class="progress">שאלה <span id="q-num">1</span> מתוך 10</div>
+        <div class="question-box" id="question-text">
+            השאלה תופיע כאן...
+        </div>
+        
+        <input type="number" id="user-answer" placeholder="?">
+        <br>
+        <button onclick="checkAnswer()" id="submit-btn">בדיקה</button>
+        <button onclick="nextQuestion()" id="next-btn" class="hidden">לשאלה הבאה</button>
+        
+        <div class="feedback" id="feedback-msg"></div>
+    </div>
+
+    <div id="end-screen" class="hidden">
+        <h2>כל הכבוד, סיימת!</h2>
+        <div class="final-score">צברת <span id="final-stars"></span> כוכבים! ⭐</div>
+        <p id="encouragement"></p>
+        <button onclick="restartGame()">להתחיל מחדש</button>
+    </div>
+</div>
+
+<script>
+    /**
+     * סוגי תבניות:
+     * type: 'mult' -> כפל רגיל. מגריל NUM1 ו-NUM2.
+     * type: 'mult_fixed' -> כפל עם מספר קבוע. מגריל NUM1, משתמש ב-fixedVal כ-NUM2.
+     * type: 'div_fixed' -> שאלת חילוק/גורם חסר. מגריל את ה*תשובה*, כופל ב-divisor כדי לקבל את ה-TOTAL שמוצג בשאלה.
+     */
+    const templates = [
+        // --- שאלות כפל רגילות ---
+        { text: "לדנה יש NUM1 קופסאות. בכל קופסה יש NUM2 עפרונות. כמה עפרונות בסך הכל?", type: 'mult', min: 2, max: 9 },
+        { text: "בכיתה יש NUM1 שורות של כיסאות, ובכל שורה NUM2 כיסאות. כמה כיסאות בכיתה?", type: 'mult', min: 3, max: 8 },
+        { text: "מחיר ארטיק הוא NUM1 שקלים. יואב קנה NUM2 ארטיקים. כמה שילם יואב?", type: 'mult', min: 2, max: 10 },
+        { text: "יוני קורא NUM1 עמודים ביום. כמה עמודים יקרא יוני ב-NUM2 ימים?", type: 'mult', min: 3, max: 9 },
+        { text: "בגינה פורחים NUM1 פרחים בכל ערוגה. ישנן NUM2 ערוגות. כמה פרחים בגינה?", type: 'mult', min: 4, max: 9 },
+        
+        // --- שאלות כפל עם מספר קבוע ---
+        { text: "בכל רכב יש 4 גלגלים. בחניון עומדים NUM1 רכבים. כמה גלגלים יש לכולם יחד?", type: 'mult_fixed', fixedVal: 4, min: 2, max: 10 },
+        { text: "לכל חיפושית יש 6 רגליים. על העלה יש NUM1 חיפושיות. כמה רגליים יש להן יחד?", type: 'mult_fixed', fixedVal: 6, min: 2, max: 8 },
+        
+        // --- חדש: שאלות חילוק / מציאת הגורם החסר ---
+        // כאן TOTAL יוחלף במספר הגדול, והתשובה תהיה מספר הפריטים
+        { text: "באוסף של דני יש בסך הכל TOTAL רגליים של עכבישים. לכל עכביש יש 8 רגליים. כמה עכבישים יש לדני?", type: 'div_fixed', divisor: 8, ansMin: 2, ansMax: 9 },
+        { text: "רוני שילמה בסך הכל TOTAL שקלים על חבילות מדבקות. כל חבילה עולה 5 שקלים. כמה חבילות היא קנתה?", type: 'div_fixed', divisor: 5, ansMin: 3, ansMax: 10 },
+// --- השאלה החדשה (במקום שאלת הסוכריות) ---
+        { text: "בפרדס מילאו NUM1 סלסלות בתפוחים. בכל סלסלה שמו NUM2 תפוחים. כמה תפוחים קטפו בסך הכל?", type: 'mult', min: 3, max: 8 },
+        { text: "בארגז יש TOTAL תפוחים. סידרו אותם ב-3 שורות שוות. כמה תפוחים יש בכל שורה?", type: 'div_fixed', divisor: 3, ansMin: 4, ansMax: 10 }
+    ];
+
+    let currentQuestionIndex = 0;
+    let starsCollected = 0;
+    let currentAnswer = 0;
+    let questionsOrder = [];
+
+    function initGame() {
+        starsCollected = 0;
+        currentQuestionIndex = 0;
+        // איפוס כוכבים ויזואלי
+        document.getElementById('stars-container').innerHTML = '';
+        document.getElementById('game-screen').classList.remove('hidden');
+        document.getElementById('end-screen').classList.add('hidden');
+        
+        // ערבוב ובחירת 10 שאלות
+        questionsOrder = [...templates].sort(() => 0.5 - Math.random()).slice(0, 10);
+        
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        document.getElementById('user-answer').value = '';
+        document.getElementById('feedback-msg').textContent = '';
+        document.getElementById('submit-btn').classList.remove('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+        document.getElementById('user-answer').focus();
+        document.getElementById('q-num').textContent = currentQuestionIndex + 1;
+
+        const template = questionsOrder[currentQuestionIndex];
+        let qText = template.text;
+        let num1, num2;
+
+        // לוגיקה לפי סוג השאלה
+        switch (template.type) {
+            case 'mult':
+                num1 = getRandomInt(template.min, template.max);
+                num2 = getRandomInt(template.min, template.max);
+                currentAnswer = num1 * num2;
+                qText = qText.replace('NUM1', num1).replace('NUM2', num2);
+                break;
+
+            case 'mult_fixed':
+                num1 = getRandomInt(template.min, template.max);
+                currentAnswer = num1 * template.fixedVal;
+                qText = qText.replace('NUM1', num1);
+                break;
+
+            case 'div_fixed':
+                // כאן אנחנו מגרילים את התשובה כדי שהתרגיל יצא שלם
+                currentAnswer = getRandomInt(template.ansMin, template.ansMax);
+                const total = currentAnswer * template.divisor;
+                qText = qText.replace('TOTAL', total);
+                break;
+        }
+        
+        document.getElementById('question-text').textContent = qText;
+    }
+
+    function checkAnswer() {
+        const userInput = document.getElementById('user-answer').value;
+        const feedbackEl = document.getElementById('feedback-msg');
+
+        if (userInput === '') return;
+
+        if (parseInt(userInput) === currentAnswer) {
+            starsCollected++;
+            addStarVisual(); // הוספת כוכב ויזואלית
+            feedbackEl.textContent = getRandomPraise();
+            feedbackEl.className = 'feedback correct';
+        } else {
+            feedbackEl.textContent = "לא נורא, התשובה הנכונה היא " + currentAnswer;
+            feedbackEl.className = 'feedback wrong';
+        }
+
+        document.getElementById('submit-btn').classList.add('hidden');
+        
+        if (currentQuestionIndex === 9) {
+            document.getElementById('next-btn').textContent = "סיום וקבלת תוצאה";
+        } else {
+            document.getElementById('next-btn').textContent = "לשאלה הבאה";
+        }
+        document.getElementById('next-btn').classList.remove('hidden');
+    }
+
+    // פונקציה להוספת כוכב ללוח
+    function addStarVisual() {
+        const starsContainer = document.getElementById('stars-container');
+        const starSpan = document.createElement('span');
+        starSpan.classList.add('star-icon');
+        starSpan.textContent = '⭐'; // אפשר להחליף באייקון אחר אם רוצים
+        starsContainer.appendChild(starSpan);
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < 10) {
+            loadQuestion();
+        } else {
+            showEndScreen();
+        }
+    }
+
+    function showEndScreen() {
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('final-stars').textContent = starsCollected;
+        
+        const encourageEl = document.getElementById('encouragement');
+        if (starsCollected === 10) {
+            encourageEl.textContent = "וואו! מושלם! השגת את כל הכוכבים! 🏆🦄";
+        } else if (starsCollected >= 8) {
+            encourageEl.textContent = "תוצאה מדהימה! את ממש אלופה! ✨";
+        } else {
+            encourageEl.textContent = "כל הכבוד על התרגול! בפעם הבאה תשיגי עוד כוכבים! 💪";
+        }
+    }
+
+    function restartGame() { initGame(); }
+    function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function getRandomPraise() {
+        const praises = ["כל הכבוד!", "תשובה נכונה!", "מעולה!", "את אלופה!", "בול!", "נהדר!", "גאונה!"];
+        return praises[Math.floor(Math.random() * praises.length)];
+    }
+
+    initGame();
+
+    // תמיכה ב-Enter
+    document.getElementById('user-answer').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            if (!document.getElementById('submit-btn').classList.contains('hidden')) {
+                checkAnswer();
+            } else if (!document.getElementById('next-btn').classList.contains('hidden')) {
+                nextQuestion();
+            }
+        }
+    });
+
+</script>
+
+</body>
+</html>

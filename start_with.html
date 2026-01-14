@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>מה מתחיל ב...?</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fff3e0; /* רקע כתום בהיר ונעים */
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 90vh;
+        }
+
+        h1 { color: #e65100; margin-bottom: 10px; font-size: 2em; }
+
+        /* כפתור סאונד בפינה */
+        .sound-toggle {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: white;
+            border: 2px solid #ff9800;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* אזור המשחק המרכזי */
+        .game-area {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+            margin-top: 20px;
+            border: 4px solid #ffb74d;
+        }
+
+        /* האימוג'י הגדול */
+        .big-emoji {
+            font-size: 8rem;
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+        }
+        .big-emoji:active { transform: scale(0.9); }
+        .big-emoji:hover { transform: scale(1.05); }
+
+        /* המילה הכתובה (אופציונלי - עוזר לאוריינות) */
+        .word-display {
+            font-size: 2em;
+            color: #555;
+            margin-bottom: 20px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            visibility: hidden; /* מוסתר עד שעונים נכון */
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .word-display.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* אזור התשובות */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            background: #e0f7fa;
+            border: 3px solid #4dd0e1;
+            border-radius: 15px;
+            font-size: 2.5em;
+            color: #006064;
+            padding: 15px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #00acc1;
+        }
+
+        .option-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* פידבק תשובות */
+        .option-btn.correct {
+            background: #c8e6c9;
+            border-color: #4caf50;
+            box-shadow: 0 4px 0 #388e3c;
+            color: #1b5e20;
+            animation: bounce 0.5s;
+        }
+
+        .option-btn.wrong {
+            background: #ffcdd2;
+            border-color: #ef5350;
+            box-shadow: 0 4px 0 #d32f2f;
+            color: #b71c1c;
+            animation: shake 0.4s;
+        }
+
+        /* אנימציות */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+        @keyframes shake {
+            0%, 100% {transform: translateX(0);}
+            25% {transform: translateX(-5px);}
+            75% {transform: translateX(5px);}
+        }
+
+        /* כפתור "הבא" */
+        .next-btn {
+            margin-top: 25px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 1.5em;
+            border-radius: 50px;
+            cursor: pointer;
+            display: none; /* מוסתר בהתחלה */
+            box-shadow: 0 4px 10px rgba(255,152,0,0.4);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .back-btn {
+            margin-top: auto;
+            color: #777;
+            text-decoration: none;
+            font-size: 0.9em;
+            background: rgba(255,255,255,0.7);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .instruction {
+            color: #777;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button class="sound-toggle" id="sound-toggle" title="סאונד">🔊</button>
+
+    <h1>מה מתחיל ב...? 🍎</h1>
+
+    <div class="game-area">
+        <p class="instruction">לחצי על התמונה לשמוע את המילה</p>
+        
+        <div class="big-emoji" id="emoji-display" onclick="playCurrentWord()">❓</div>
+        
+        <div class="word-display" id="word-display">תפוח</div>
+
+        <div class="options-grid" id="options-grid">
+            </div>
+
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">הבא ➡️</button>
+    </div>
+
+    <br><br>
+    <a href="index.html" class="back-btn">חזרה למסך הראשי</a>
+
+    <audio id="success-sound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
+    <audio id="error-sound" src="https://actions.google.com/sounds/v1/cartoon/clank_car_crash.ogg"></audio>
+
+    <script>
+        // מאגר המילים והאימוג'ים
+        // letter: האות הפותחת
+        // word: המילה בעברית (לכתיבה)
+        // spoken: מה ה-TTS יגיד (לפעמים צריך ניקוד כדי שיישמע טוב)
+        const database = [
+            { emoji: '🍎', letter: 'ת', word: 'תַּפּוּחַ', spoken: 'תַּפּוּחַ' },
+            { emoji: '🎈', letter: 'ב', word: 'בָּלוֹן', spoken: 'בָּלוֹן' },
+            { emoji: '🏠', letter: 'ב', word: 'בַּיִת', spoken: 'בַּיִת' },
+            { emoji: '🐶', letter: 'כ', word: 'כֶּלֶב', spoken: 'כֶּלֶב' },
+            { emoji: '🦁', letter: 'א', word: 'אַרְיֵה', spoken: 'אַרְיֵה' },
+            { emoji: '🍦', letter: 'ג', word: 'גְּלִידָה', spoken: 'גְּלִידָה' },
+            { emoji: '🐘', letter: 'פ', word: 'פִּיל', spoken: 'פִּיל' },
+            { emoji: '🦋', letter: 'פ', word: 'פַּרְפַּר', spoken: 'פַּרְפַּר' },
+            { emoji: '🐢', letter: 'צ', word: 'צָב', spoken: 'צָב' },
+            { emoji: '🐸', letter: 'צ', word: 'צְפַרְדֵּעַ', spoken: 'צְפַרְדֵּעַ' },
+            { emoji: '☀️', letter: 'ש', word: 'שֶׁמֶשׁ', spoken: 'שֶׁמֶשׁ' },
+            { emoji: '⌚', letter: 'ש', word: 'שָׁעוֹן', spoken: 'שָׁעוֹן' },
+            { emoji: '🍼', letter: 'ב', word: 'בַּקְבּוּק', spoken: 'בַּקְבּוּק' },
+            { emoji: '🧀', letter: 'ג', word: 'גְּבִינָה', spoken: 'גְּבִינָה' },
+            { emoji: '🚗', letter: 'א', word: 'אוֹטוֹ', spoken: 'אוֹטוֹ' },
+            { emoji: '🍉', letter: 'א', word: 'אֲבַטִּיחַ', spoken: 'אֲבַטִּיחַ' },
+            { emoji: '🍊', letter: 'ת', word: 'תַּפּוּז', spoken: 'תַּפּוּז' },
+            { emoji: '📚', letter: 'ס', word: 'סֵפֶר', spoken: 'סֵפֶר' },
+            { emoji: '🕯️', letter: 'נ', word: 'נֵר', spoken: 'נֵר' },
+            { emoji: '🖐️', letter: 'י', word: 'יָד', spoken: 'יָד' },
+            { emoji: '🍋', letter: 'ל', word: 'לִימוֹן', spoken: 'לִימוֹן' },
+            { emoji: '🐮', letter: 'פ', word: 'פָּרָה', spoken: 'פָּרָה' },
+            { emoji: '🌸', letter: 'פ', word: 'פֶּרַח', spoken: 'פֶּרַח' },
+            { emoji: '🐒', letter: 'ק', word: 'קוֹף', spoken: 'קוֹף' },
+            { emoji: '🚆', letter: 'ר', word: 'רַכֶּבֶת', spoken: 'רַכֶּבֶת' },
+            { emoji: '🐟', letter: 'ד', word: 'דָּג', spoken: 'דָּג' }
+        ];
+
+        // מילון הגייה לאותיות (כמו במשחק הקודם)
+        const letterSounds = {
+            'א': 'אָלֶף', 'ב': 'בֵּית', 'ג': 'Ghee-mel', 'ד': 'דָּלֶת', 'ה': 'Hey', 
+            'ו': 'Vav', 'ז': 'Zah-yin', 'ח': 'Chett', 'ט': 'Tet', 'י': 'Yod', 
+            'כ': 'Kaf', 'ל': 'Lamed', 'מ': 'Mem', 'נ': 'Noon', 'ס': 'Samech', 
+            'ע': 'Ayin', 'פ': 'Pey', 'צ': 'Tza-dik', 'ק': 'Kuf', 'ר': 'Resh', 
+            'ש': 'Shin', 'ת': 'Tav'
+        };
+
+        // כל האותיות האפשריות (בשביל המסיחים)
+        const allLetters = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת'];
+
+        let currentQuestion = null;
+        let isSoundOn = true;
+        let isLocked = false; // מונע לחיצות בזמן אנימציה
+
+        const emojiEl = document.getElementById('emoji-display');
+        const wordEl = document.getElementById('word-display');
+        const optionsEl = document.getElementById('options-grid');
+        const nextBtn = document.getElementById('next-btn');
+
+        // אתחול
+        function initGame() {
+            nextQuestion();
+        }
+
+        // הגרלת שאלה חדשה
+        function nextQuestion() {
+            isLocked = false;
+            nextBtn.style.display = 'none';
+            wordEl.classList.remove('show');
+            
+            // בחירת פריט רנדומלי
+            const randomIndex = Math.floor(Math.random() * database.length);
+            currentQuestion = database[randomIndex];
+
+            // הצגה
+            emojiEl.textContent = currentQuestion.emoji;
+            emojiEl.style.transform = "scale(0)"; // אנימציית כניסה
+            setTimeout(() => emojiEl.style.transform = "scale(1)", 100);
+            
+            wordEl.textContent = currentQuestion.word;
+
+            generateOptions();
+            
+            // השמעה אוטומטית (עם השהיה קטנה)
+            setTimeout(() => playCurrentWord(), 500);
+        }
+
+        // יצירת 3 אפשרויות (1 נכונה + 2 מסיחים)
+        function generateOptions() {
+            optionsEl.innerHTML = '';
+            
+            const correctLetter = currentQuestion.letter;
+            
+            // בחירת 2 מסיחים שלא זהים לתשובה הנכונה
+            let distractors = [];
+            while(distractors.length < 2) {
+                const randomLetter = allLetters[Math.floor(Math.random() * allLetters.length)];
+                if (randomLetter !== correctLetter && !distractors.includes(randomLetter)) {
+                    distractors.push(randomLetter);
+                }
+            }
+
+            // ערבוב האפשרויות
+            const options = [correctLetter, ...distractors].sort(() => 0.5 - Math.random());
+
+            options.forEach(letter => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.textContent = letter;
+                btn.onclick = () => checkAnswer(letter, btn);
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        // השמעת המילה
+        function playCurrentWord() {
+            if (!isSoundOn || isLocked) return;
+            window.speechSynthesis.cancel();
+            
+            // אומר: "באיזה אות מתחיל... [מילה]?"
+            // ואז אחרי שניה אומר שוב את המילה לבד.
+            
+            const msg1 = new SpeechSynthesisUtterance(`באיזה אות מתחיל... ${currentQuestion.spoken}?`);
+            msg1.lang = 'he-IL';
+            msg1.rate = 0.9;
+            window.speechSynthesis.speak(msg1);
+        }
+
+        function speakLetter(letter) {
+             if (!isSoundOn) return;
+             const textToSay = letterSounds[letter] || letter;
+             const isEnglish = /[a-zA-Z]/.test(textToSay);
+             const u = new SpeechSynthesisUtterance(textToSay);
+             u.lang = isEnglish ? 'en-US' : 'he-IL';
+             window.speechSynthesis.speak(u);
+        }
+
+        // בדיקת תשובה
+        function checkAnswer(selectedLetter, btnElement) {
+            if (isLocked) return;
+            
+            // מקריא את האות שנבחרה
+            speakLetter(selectedLetter);
+
+            if (selectedLetter === currentQuestion.letter) {
+                // תשובה נכונה!
+                isLocked = true;
+                btnElement.classList.add('correct');
+                document.getElementById('success-sound').play();
+                
+                // חשיפת המילה
+                wordEl.classList.add('show');
+                
+                // כפתור הבא
+                setTimeout(() => {
+                    nextBtn.style.display = 'block';
+                }, 500);
+
+            } else {
+                // תשובה לא נכונה
+                btnElement.classList.add('wrong');
+                // document.getElementById('error-sound').play(); // אופציונלי, לפעמים מלחיץ ילדים
+                setTimeout(() => {
+                    btnElement.classList.remove('wrong');
+                }, 500);
+            }
+        }
+
+        // כפתור סאונד
+        document.getElementById('sound-toggle').addEventListener('click', function() {
+            isSoundOn = !isSoundOn;
+            this.textContent = isSoundOn ? '🔊' : '🔇';
+        });
+
+        // התחלה
+        initGame();
+
+    </script>
+</body>
+</html>
