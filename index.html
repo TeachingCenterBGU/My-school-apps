@@ -141,22 +141,21 @@
             color: #666;
         }
 
-/       * --- עדכון: גריד גמיש ל-3 עמודות --- */
+        /* --- הגדרות הגריד הראשי --- */
+        
+        /* ברירת מחדל: תצוגה לטלפונים (טור אחד) */
         .grades-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: 1fr; /* טור אחד שתופס את כל הרוחב */
             gap: 20px;
             align-items: start;
         }
-        
-        /* צבע מיוחד לכותרת של גן חובה (כתום) */
-        .grade-col.kindergarten h2.grade-title {
-            background: #ff9800;
-        }
 
-        @media (max-width: 980px) {
+        /* הגדרה למסכים רחבים (מחשב) - שינוי ל-3 טורים */
+        @media (min-width: 900px) {
             .grades-container {
-                grid-template-columns: 1fr;
+                /* repeat(3, 1fr) אומר: תחלק את המסך ל-3 חלקים שווים בדיוק */
+                grid-template-columns: repeat(3, 1fr); 
             }
         }
 
@@ -395,6 +394,35 @@
             color: #888;
             padding-bottom: 20px;
         }
+        /* --- צבעים לכל כיתה --- */
+
+        /* כיתה ג' - ורוד */
+        .grade-col.grade-3 h2.grade-title {
+            background: #ec407a;
+            box-shadow: 0 4px 10px rgba(236, 64, 122, 0.3);
+        }
+        /* פס עליון בפתקית של כיתה ג' */
+        .grade-col.grade-3 .homework-box {
+            border-color: #ec407a;
+            background: #fce4ec; /* ורוד בהיר מאוד */
+        }
+
+        /* כיתה ה' - כחול/סגול (הצבע הראשי) */
+        .grade-col.grade-5 h2.grade-title {
+            background: #5c6bc0;
+            box-shadow: 0 4px 10px rgba(92, 107, 192, 0.3);
+        }
+
+        /* גן חובה - כתום */
+        .grade-col.kindergarten h2.grade-title {
+            background: #fb8c00;
+            box-shadow: 0 4px 10px rgba(251, 140, 0, 0.3);
+        }
+        /* פס עליון בפתקית של גן חובה */
+        .grade-col.kindergarten .homework-box {
+            border-color: #fb8c00;
+            background: #fff3e0; /* כתום בהיר מאוד */
+        }
     </style>
 </head>
 <body>
@@ -402,12 +430,12 @@
 <div class="container">
     <header class="main-header">
        		<h1>כאן לומדות ולומדים בכיף 🎓</h1>
-        	<p>תרגול, משחקים ודפי עבודה לגן חומה ולכיתות ג' ו-ה'</p>
+        	<p>תרגול, משחקים ודפי עבודה לגן חובה ולכיתות ג' ו-ה'</p>
     </header>
 
     <main class="grades-container">
         
-        <section class="grade-col" aria-label="כיתה ג">
+        <section class="grade-col grade-3" aria-label="כיתה ג">
             <div class="grade-header">
                 <h2 class="grade-title">כיתה ג'</h2>
                 </div>
@@ -545,7 +573,7 @@
 
         </section>
 
-        <section class="grade-col" aria-label="כיתה ה">
+        <section class="grade-col grade-5" aria-label="כיתה ה">
             <div class="grade-header">
                 <h2 class="grade-title">כיתה ה'</h2>
             </div>
@@ -712,6 +740,7 @@
                 </div>
             </details>
         </section>
+
         <section class="grade-col kindergarten" aria-label="גן חובה">
             <div class="grade-header">
                 <h2 class="grade-title">גן חובה</h2>
