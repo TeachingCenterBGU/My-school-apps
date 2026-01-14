@@ -19,7 +19,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 600px;
+            max-width: 1000px; 
             margin: 0 auto 10px;
         }
 
@@ -73,10 +73,10 @@
         /* לוח המשחק */
         .game-board {
             display: grid;
-            gap: 10px;
-            max-width: 600px;
+            gap: 15px; /* קצת רווח יותר בין הקלפים */
             margin: 0 auto;
             perspective: 1000px;
+            /* הרוחב ייקבע עכשיו דינאמית ב-JS */
         }
 
         /* הקלף */
@@ -124,7 +124,7 @@
 
         .front {
             background: linear-gradient(135deg, #4dd0e1, #00acc1);
-            font-size: 2.5em;
+            font-size: 3em; /* גודל סימן שאלה */
             color: white;
         }
         .front::after { content: "❓"; }
@@ -133,7 +133,7 @@
             background-color: #fff;
             border: 2px solid transparent;
             transform: rotateY(180deg);
-            font-size: 4em; 
+            font-size: 3.5em;
             font-weight: bold;
         }
 
@@ -216,38 +216,37 @@
         const levelsOrder = [4, 8, 16, 20, 99];
         let currentLevelIndex = 0; 
 
-        // --- המילון הפונטי החדש ---
-        // מילים באנגלית יוקראו במבטא אמריקאי צלול
-        // מילים בעברית יוקראו רגיל
-const letterNames = {
-            'א': 'אָלֶף', 
-            'ב': 'בֵּית', 
-            'ג': 'Ghee-mel', // תיקון ל"גימל"
-            'ד': 'דָּלֶת', 
-            'ה': 'Hey',      // תיקון ל"הא"
-            'ו': 'Vav',      // תיקון ל"וו"
-            'ז': 'Zah-yin',  // תיקון ל"זיין"
-            'ח': 'Chett',    // תיקון ל"חית"
-            'ט': 'Tet',      // תיקון ל"טית"
-            'י': 'Yod',      // תיקון ל"יוד"
-            'כ': 'Kaf',      // תיקון ל"כף"
-            'ל': 'Lamed',
-            'מ': 'Mem', 
-            'נ': 'Noon', 
-            'ס': 'Samech', 
-            'ע': 'Ayin', 
-            'פ': 'Pey', 
-            'צ': 'Tza-dik', 
-            'ק': 'Kuf', 
-            'ר': 'Resh', 
-            'ש': 'Shin', 
-            'ת': 'Tav',
-            'ם': 'Mem Sofit', 
-            'ן': 'Noon Sofit', 
-            'ץ': 'Tza-dik Sofit', 
-            'ף': 'Pey Sofit', 
-            'ך': 'Kaf Sofit'
+        // מיפוי שמות הקבצים
+        const letterFiles = {
+            'א': 'Aleph1.mp3',
+            'ב': 'beit.mp3',
+            'ג': 'gimel_1.mp3',
+            'ד': 'dalet_1.mp3',
+            'ה': 'hei_1.mp3',
+            'ו': 'vav_1.mp3',
+            'ז': 'zain_1.mp3',
+            'ח': 'chet_1.mp3',
+            'ט': 'tet.mp3',
+            'י': 'yud.mp3',
+            'כ': 'chaf_1.mp3',
+            'ל': 'lamed.mp3',
+            'מ': 'mem_1.mp3',
+            'נ': 'nun.mp3',
+            'ס': 'samech.mp3',
+            'ע': 'ain.mp3',
+            'פ': 'peh_1.mp3',
+            'צ': 'tzadik_1.mp3',
+            'ק': 'kuf.mp3',
+            'ר': 'reish.mp3',
+            'ש': 'shin.mp3',
+            'ת': 'taf_1.mp3',
+            'ם': 'mem sofit.mp3',
+            'ן': 'nun sofit.mp3',
+            'ץ': 'tzadik sofit_1.mp3',
+            'ף': 'peh sofit.mp3',
+            'ך': 'chaf sofit_1.mp3'
         };
+
         let hasFlippedCard = false;
         let lockBoard = false;
         let firstCard, secondCard;
@@ -255,23 +254,13 @@ const letterNames = {
         let totalPairs = 0;
         let isSoundOn = true; 
 
-        function speakLetter(letter) {
+        function playLetterSound(letter) {
             if (!isSoundOn) return;
-            window.speechSynthesis.cancel();
-            
-            // בדיקה: האם השם של האות כתוב באנגלית או בעברית?
-            const textToSay = letterNames[letter] || letter;
-            
-            // זיהוי אם הטקסט מכיל אותיות באנגלית (a-z)
-            const isEnglish = /[a-zA-Z]/.test(textToSay);
-
-            const utterance = new SpeechSynthesisUtterance(textToSay);
-            
-            // אם זה אנגלית, נשתמש במבטא אנגלי, אחרת עברי
-            utterance.lang = isEnglish ? 'en-US' : 'he-IL';
-            utterance.rate = 0.9;
-            
-            window.speechSynthesis.speak(utterance);
+            const filename = letterFiles[letter];
+            if (filename) {
+                const audio = new Audio('letters/' + filename);
+                audio.play().catch(e => console.log("Audio play error:", e));
+            }
         }
 
         const soundToggleBtn = document.getElementById('sound-toggle');
@@ -320,13 +309,46 @@ const letterNames = {
             const deck = [...selectedLetters, ...selectedLetters];
             deck.sort(() => 0.5 - Math.random());
 
+            // --- לוגיקה מעודכנת לגודל הלוח והטורים ---
             let columns = 4;
-            if (numCards === 4) columns = 2;
-            if (numCards === 8) columns = 4;
-            if (numCards === 99) columns = 6;
-            if (window.innerWidth < 500 && numCards > 8) columns = 3; 
+            let maxWidth = '1000px'; // ברירת מחדל
 
+            // 4 קלפים: 2 טורים, רוחב לוח קטן (כדי שהקלפים לא יהיו ענקיים)
+            if (numCards === 4) { 
+                columns = 2; 
+                maxWidth = '400px'; 
+            }
+            // 8 קלפים: 4 טורים, רוחב בינוני
+            if (numCards === 8) { 
+                columns = 4; 
+                maxWidth = '700px'; 
+            }
+            // 16 קלפים: 4 טורים, רוחב בינוני+
+            if (numCards === 16) { 
+                columns = 4; 
+                maxWidth = '700px'; 
+            }
+            // 20 קלפים: 5 טורים
+            if (numCards === 20) { 
+                columns = 5; 
+                maxWidth = '850px'; 
+            }
+            // כל האותיות: 9 טורים, רוחב מקסימלי
+            if (numCards === 99) { 
+                columns = 9; 
+                maxWidth = '1200px'; 
+            }
+
+            // התאמה לנייד
+            if (window.innerWidth < 600) {
+                 maxWidth = '100%'; // בנייד תמיד תפוס הכל
+                 if (numCards > 8) columns = 4;
+                 if (numCards > 20) columns = 4; 
+            }
+
+            // החלת השינויים
             board.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+            board.style.maxWidth = maxWidth;
 
             deck.forEach(letter => {
                 const card = document.createElement('div');
@@ -367,7 +389,7 @@ const letterNames = {
             if (this === firstCard) return;
 
             this.classList.add('flipped');
-            speakLetter(this.dataset.letter);
+            playLetterSound(this.dataset.letter);
 
             if (!hasFlippedCard) {
                 hasFlippedCard = true;
@@ -403,11 +425,6 @@ const letterNames = {
             if (matchedCount === totalPairs) {
                 setTimeout(() => {
                     document.getElementById('celebration').style.display = 'block';
-                    if(isSoundOn) {
-                         const winMsg = new SpeechSynthesisUtterance("כל הכבוד! סיימת את השלב");
-                         winMsg.lang = 'he-IL';
-                         window.speechSynthesis.speak(winMsg);
-                    }
                 }, 800);
             }
 
