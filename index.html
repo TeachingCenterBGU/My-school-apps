@@ -887,20 +887,17 @@ document.addEventListener("DOMContentLoaded", () => {
     card.appendChild(b);
   }
 
-  // --- לוגיקה 1: טיפול במבחנים (מחיקה או תיוג) ---
+// --- לוגיקה 1: טיפול במבחנים (תיוג בלבד) ---
   document.querySelectorAll(".card[data-exam-date]").forEach(card => {
     const examDay = parseISODate(card.dataset.examDate);
     if (!examDay) return;
 
     const daysUntil = daysBetween(today, examDay);
 
-    // אם התאריך עבר - נסיר את הכרטיס
-    if (daysUntil < 0) {
-      card.remove();
-      return;
-    }
-    // אם המבחן קרוב - נוסיף תגית ועיצוב
-    if (daysUntil <= EXAM_WINDOW_DAYS) {
+    // שינוי: ביטלנו את המחיקה האוטומטית!
+    // כעת נבדוק: אם המבחן בעתיד או היום - נוסיף תגית.
+    // אם המבחן עבר - הכרטיסייה תישאר רגילה בלי שום תגית.
+    if (daysUntil >= 0 && daysUntil <= EXAM_WINDOW_DAYS) {
       addTopBadge(card, "badge-exam", "מבחן ב: " + examDay.toLocaleDateString("he-IL"));
       card.classList.add("exam");
     }
