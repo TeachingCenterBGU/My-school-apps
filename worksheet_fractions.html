@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>דף עבודה - ממלכת השברים</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 210mm; /* רוחב A4 */
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            color: black;
+        }
+
+        @media print {
+            body { margin: 0; padding: 10px; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 { margin: 0; font-size: 24px; }
+        h2 { font-size: 18px; margin-top: 30px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .line { border-bottom: 1px solid black; width: 200px; display: inline-block; }
+
+        /* עיצוב שברים */
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 1.1em;
+            margin: 0 8px;
+        }
+        .numer { border-bottom: 1px solid black; padding-bottom: 1px; display: block; }
+        .denom { padding-top: 1px; display: block; }
+
+        /* גריד לתרגילים */
+        .exercises-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* התיקון הגדול: התרגילים עצמם משמאל לימין */
+        .exercise-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            height: 60px;
+            direction: ltr; /* <--- התיקון: כיוון משמאל לימין */
+            justify-content: flex-start; /* הצמדה לשמאל */
+            font-family: sans-serif;
+        }
+
+        .exercise-number {
+            font-weight: bold;
+            margin-right: 15px; /* שיניתי ל-right כי הכיוון התהפך */
+            color: #555;
+            min-width: 25px;
+        }
+
+        /* טקסט עברי בתוך תרגיל (כמו "כפלנו ב...") */
+        .hebrew-in-math {
+            direction: rtl;
+            unicode-bidi: embed;
+            font-size: 0.8em;
+            margin: 0 10px;
+        }
+
+        /* קופסאות כתיבה */
+        .box {
+            width: 30px;
+            height: 30px;
+            border: 1px solid black;
+            display: inline-block;
+            margin: 0 5px;
+        }
+        
+        .circle-box {
+            width: 30px;
+            height: 30px;
+            border: 1px solid black;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        /* בעיות מילוליות */
+        .story-container {
+            margin-bottom: 25px;
+            border: 1px solid #eee;
+            padding: 15px;
+            page-break-inside: avoid;
+        }
+        .story-text { font-size: 16px; margin-bottom: 15px; font-weight: bold; }
+        
+        /* אזור העבודה בבעיות מילוליות - גם הוא משמאל לימין כדי שיהיה נוח לכתוב תרגיל */
+        .work-area {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            direction: ltr; /* כיוון משמאל לימין לכתיבת המשוואה */
+        }
+        .work-box {
+            flex: 1;
+            border: 1px solid #999;
+            height: 80px;
+            position: relative;
+        }
+        .work-label {
+            position: absolute;
+            top: -10px;
+            left: 10px; /* תווית בצד שמאל למעלה (באנגלית/מתמטיקה) או ימין? נשאיר ימין שיהיה ברור */
+            right: 10px;
+            text-align: right;
+            background: white;
+            padding: 0 5px;
+            font-size: 12px;
+            color: #666;
+            direction: rtl; /* הטקסט של התווית נשאר בעברית */
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>דף עבודה - ממלכת השברים 👑</h1>
+        <div class="student-info">
+            <div>שם התלמידה: <span class="line"></span></div>
+            <div>תאריך: <span class="line"></span></div>
+        </div>
+    </header>
+
+    <h2>חלק 1: הרחבה וצמצום - השלימי את המספרים החסרים</h2>
+    <div class="exercises-grid">
+        <div class="exercise-item"><span class="exercise-number">1.</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">2</span></div>
+            <span>=</span>
+            <div class="fraction"><span class="numer box"></span><span class="denom">10</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">2.</span>
+            <div class="fraction"><span class="numer">2</span><span class="denom">3</span></div>
+            <span>=</span>
+            <div class="fraction"><span class="numer">8</span><span class="denom box"></span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">3.</span>
+            <div class="fraction"><span class="numer">3</span><span class="denom">4</span></div>
+            <span>=</span>
+            <div class="fraction"><span class="numer">9</span><span class="denom box"></span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">4.</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">5</span></div>
+            <span>=</span>
+            <div class="fraction"><span class="numer box"></span><span class="denom">20</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">5.</span>
+            <div class="fraction"><span class="numer">2</span><span class="denom">7</span></div>
+            <span>&rarr;</span>
+            <span class="hebrew-in-math">(כפלנו ב-3)</span>
+            <span>&rarr;</span>
+            <div class="fraction"><span class="numer box"></span><span class="denom box"></span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">6.</span>
+            <div class="fraction"><span class="numer">3</span><span class="denom">5</span></div>
+            <span>&rarr;</span>
+            <span class="hebrew-in-math">(כפלנו ב-4)</span>
+            <span>&rarr;</span>
+            <div class="fraction"><span class="numer box"></span><span class="denom box"></span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">7.</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">3</span></div>
+            <span>=</span>
+            <div class="fraction"><span class="numer">4</span><span class="denom box"></span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">8.</span>
+            <div class="fraction"><span class="numer">5</span><span class="denom">6</span></div>
+            <span>=</span>
+            <div class="fraction"><span class="numer box"></span><span class="denom">18</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">9.</span>
+            <div class="fraction"><span class="numer">4</span><span class="denom">9</span></div>
+            <span>&rarr;</span>
+            <span class="hebrew-in-math">(כפלנו ב-2)</span>
+            <span>&rarr;</span>
+            <div class="fraction"><span class="numer box"></span><span class="denom box"></span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">10.</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">4</span></div>
+            <span>&rarr;</span>
+            <span class="hebrew-in-math">(כפלנו ב-5)</span>
+            <span>&rarr;</span>
+            <div class="fraction"><span class="numer box"></span><span class="denom box"></span></div>
+        </div>
+    </div>
+
+    <h2>חלק 2: השוואת שברים - סמני < או > או = בתוך העיגול</h2>
+    <div class="exercises-grid">
+        <div class="exercise-item"><span class="exercise-number">1.</span>
+            <div class="fraction"><span class="numer">3</span><span class="denom">7</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">5</span><span class="denom">7</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">2.</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">4</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">1</span><span class="denom">8</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">3.</span>
+            <div class="fraction"><span class="numer">2</span><span class="denom">3</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">2</span><span class="denom">5</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">4.</span>
+            <div class="fraction"><span class="numer">4</span><span class="denom">9</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">7</span><span class="denom">9</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">5.</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">2</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">3</span><span class="denom">6</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">6.</span>
+            <div class="fraction"><span class="numer">5</span><span class="denom">8</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">5</span><span class="denom">10</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">7.</span>
+            <div class="fraction"><span class="numer">3</span><span class="denom">4</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">1</span><span class="denom">4</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">8.</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">3</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">1</span><span class="denom">2</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">9.</span>
+            <div class="fraction"><span class="numer">6</span><span class="denom">6</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">5</span><span class="denom">5</span></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">10.</span>
+            <div class="fraction"><span class="numer">2</span><span class="denom">10</span></div>
+            <div class="circle-box"></div>
+            <div class="fraction"><span class="numer">2</span><span class="denom">3</span></div>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>חלק 3: פתרי את התרגילים (מכנים זהים)</h2>
+    <div class="exercises-grid">
+        <div class="exercise-item"><span class="exercise-number">1.</span>
+            <div class="fraction"><span class="numer">2</span><span class="denom">5</span></div>
+            <span>+</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">5</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">2.</span>
+            <div class="fraction"><span class="numer">7</span><span class="denom">9</span></div>
+            <span>-</span>
+            <div class="fraction"><span class="numer">2</span><span class="denom">9</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">3.</span>
+            <div class="fraction"><span class="numer">3</span><span class="denom">8</span></div>
+            <span>+</span>
+            <div class="fraction"><span class="numer">4</span><span class="denom">8</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">4.</span>
+            <div class="fraction"><span class="numer">5</span><span class="denom">6</span></div>
+            <span>-</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">6</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">5.</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">4</span></div>
+            <span>+</span>
+            <div class="fraction"><span class="numer">2</span><span class="denom">4</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">6.</span>
+            <div class="fraction"><span class="numer">9</span><span class="denom">10</span></div>
+            <span>-</span>
+            <div class="fraction"><span class="numer">6</span><span class="denom">10</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">7.</span>
+            <div class="fraction"><span class="numer">2</span><span class="denom">7</span></div>
+            <span>+</span>
+            <div class="fraction"><span class="numer">3</span><span class="denom">7</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">8.</span>
+            <div class="fraction"><span class="numer">4</span><span class="denom">5</span></div>
+            <span>-</span>
+            <div class="fraction"><span class="numer">2</span><span class="denom">5</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">9.</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">3</span></div>
+            <span>+</span>
+            <div class="fraction"><span class="numer">1</span><span class="denom">3</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+        <div class="exercise-item"><span class="exercise-number">10.</span>
+            <div class="fraction"><span class="numer">11</span><span class="denom">12</span></div>
+            <span>-</span>
+            <div class="fraction"><span class="numer">5</span><span class="denom">12</span></div>
+            <span>=</span>
+            <div class="box" style="width:50px; border:none; border-bottom:1px solid black;"></div>
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>חלק 4: בעיות מילוליות (אל תשכחי לכתוב שבר מעורב בתשובה הסופית)</h2>
+    
+    <div class="story-container">
+        <div class="story-text">1. רוני אכלה <div class="fraction"><span class="numer">3</span><span class="denom">8</span></div> מהפיצה, ויוסי אכל <div class="fraction"><span class="numer">2</span><span class="denom">8</span></div> מהפיצה. כמה פיצה אכלו שניהם יחד?</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל:</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+    <div class="story-container">
+        <div class="story-text">2. במיכל היו <div class="fraction"><span class="numer">7</span><span class="denom">10</span></div> ליטר מים. דנה שפכה החוצה <div class="fraction"><span class="numer">3</span><span class="denom">10</span></div> ליטר. כמה מים נשארו במיכל?</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל:</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+    <div class="story-container">
+        <div class="story-text">3. אמא קנתה <div class="fraction"><span class="numer">1</span><span class="denom">4</span></div> ק"ג אגוזים, והוסיפה לעוגה עוד <div class="fraction"><span class="numer">2</span><span class="denom">4</span></div> ק"ג אגוזים. כמה ק"ג אגוזים יש לה סה"כ?</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל:</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+    <div class="story-container">
+        <div class="story-text">4. לדני היה חבל באורך <div class="fraction"><span class="numer">5</span><span class="denom">6</span></div> מטר. הוא גזר ממנו חתיכה באורך <div class="fraction"><span class="numer">1</span><span class="denom">6</span></div> מטר. מה אורך החבל שנשאר?</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל:</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+    <div class="story-container">
+        <div class="story-text">5. ליונתן היו 2 חפיסות שוקולד שלמות. הוא אכל <div class="fraction"><span class="numer">1</span><span class="denom">4</span></div> חפיסה. כמה שוקולד נשאר לו? (רמז: הפכי את ה-2 לשבר עם מכנה 4)</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל:</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+    <div class="story-container">
+        <div class="story-text">6. גלית רצה ביום ראשון <div class="fraction"><span class="numer">2</span><span class="denom">5</span></div> קילומטר, וביום שני רצה <div class="fraction"><span class="numer">4</span><span class="denom">5</span></div> קילומטר. כמה קילומטרים רצה ביומיים? (כתבי כשבר מעורב)</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל:</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+    <div class="story-container">
+        <div class="story-text">7. בבקבוק היו <div class="fraction"><span class="numer">9</span><span class="denom">12</span></div> ליטר מיץ. הילדים שתו <div class="fraction"><span class="numer">4</span><span class="denom">12</span></div> ליטר. כמה מיץ נשאר בבקבוק?</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל:</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+    <div class="story-container">
+        <div class="story-text">8. נועה הכינה שיעורים במשך 3 שעות שלמות. אחיה הקטן הפריע לה במשך <div class="fraction"><span class="numer">1</span><span class="denom">2</span></div> שעה. כמה זמן נטו היא למדה?</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל:</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+    <div class="story-container">
+        <div class="story-text">9. המורה חילקה דפים. לדנה נתנה <div class="fraction"><span class="numer">1</span><span class="denom">3</span></div> מהחבילה, ולרון נתנה <div class="fraction"><span class="numer">1</span><span class="denom">3</span></div> מהחבילה. איזה חלק מהחבילה חילקה בסך הכל?</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל:</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+    <div class="story-container">
+        <div class="story-text">10. אבא אפה עוגה. בבוקר אכלו <div class="fraction"><span class="numer">3</span><span class="denom">8</span></div> מהעוגה, ובערב אכלו עוד <div class="fraction"><span class="numer">4</span><span class="denom">8</span></div> מהעוגה. כמה עוגה נשארה? (שימי לב: השאלה היא כמה **נשארה**, לא כמה אכלו)</div>
+        <div class="work-area">
+            <div class="work-box"><span class="work-label">תרגיל (שלב א' ושלב ב'):</span></div>
+            <div class="work-box"><span class="work-label">תשובה:</span></div>
+        </div>
+    </div>
+
+</body>
+</html>
