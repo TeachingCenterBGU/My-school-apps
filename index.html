@@ -1179,17 +1179,40 @@ function renderHomework(grade, containerId) {
     renderHomework(5, 'hw-container-5');
 
     // פונקציית מחיקה (גלובלית)
-    window.markHomeworkDone = function(id) {
-        if(!confirm("סיימת את המשימה? כל הכבוד! 🌟")) return;
+   // פונקציית מחיקה משודרגת עם קונפטי!
+    window.markHomeworkDone = function(id, btnElement) {
+        // 1. הפעלת קונפטי
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+
+        // 2. שמירה בזיכרון שהמשימה בוצעה
         localStorage.setItem("hw_done_" + id, "true");
         
-        // הסרה מהמסך
-        const el = document.getElementById("task-" + id);
-        if(el) {
-            el.style.opacity = "0";
-            setTimeout(() => el.remove(), 500);
-            // רענון כדי לעדכן אם נגמרו כל השיעורים
-            setTimeout(() => location.reload(), 600); 
+        // 3. מציאת האלמנט של המשימה להסתרה
+        // אנחנו מחפשים את ה-div שעוטף את הכפתור
+        const taskItem = document.getElementById("task-" + id);
+        
+        if(taskItem) {
+            // אנימציית העלמות
+            taskItem.style.transition = "all 0.5s ease";
+            taskItem.style.opacity = "0";
+            taskItem.style.transform = "translateX(50px)"; // זז קצת הצידה ונעלם
+            
+            // מחיקה מלאה מהדף אחרי חצי שנייה
+            setTimeout(() => {
+                taskItem.remove();
+                
+                // בדיקה אם נגמרו כל השיעורים בקופסה הזו
+                // נחפש אם נשארו עוד אלמנטים עם קלאס homework-item בתוך הקופסה של הכיתה הנוכחית
+                // (זה קצת טריקי למצוא את הקופסה המדויקת, אז פשוט נרענן בעדינות אם צריך, או נשאיר ריק)
+                const currentContainer = taskItem.parentElement; 
+                if (currentContainer && currentContainer.querySelectorAll('.homework-item').length === 0) {
+                     currentContainer.innerHTML = '<p style="text-align:center; color:#888; margin:0;">אין שיעורי בית 🎉</p>';
+                }
+            }, 500); 
         }
     };
 });

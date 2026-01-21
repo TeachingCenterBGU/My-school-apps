@@ -92,8 +92,10 @@ def update_homework():
 
     # --- שלב 3: משיכת שיעורים וסינון ---
     all_tasks = []
-    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) # התחלת היום הנוכחי
-    
+    lookback_days = 30 
+        cutoff_date = datetime.now() - timedelta(days=lookback_days)
+        cutoff_date = cutoff_date.replace(hour=0, minute=0, second=0, microsecond=0)  
+
     for child in children:
         name = child['privateName']
         clean_name = name.strip()
@@ -116,15 +118,15 @@ def update_homework():
                 hw_list = hw_resp.json()
                 print(f"   📥 Raw tasks found: {len(hw_list)}")
                 
-                count_added = 0
+                count_added = 0 
                 for hw in hw_list:
-                    # 1. סינון לפי תאריך (רק מהיום והלאה)
+                    # 1. סינון לפי תאריך (רק מתאריך החיתוך והלאה)
                     task_date_str = hw.get('lessonDate')
                     if task_date_str:
                         task_date = parse_date(task_date_str)
-                        # נשמור אם זה מהיום או מהעתיד
-                        if task_date < today:
-                            continue 
+                        
+                        # התיקון: משווים מול תאריך החיתוך החדש במקום מול "היום"
+                        if task_date < cutoff_date:
                     
                     # 2. המרה למבנה שלנו
                     task_content = hw.get('homework') or hw.get('message') or "ללא פירוט"
