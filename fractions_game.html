@@ -60,11 +60,22 @@
             box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
         }
 
+        /* סרגל התקדמות */
+        .progress-indicator {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 15px;
+            background: #f1f2f6;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
         #game-area {
             background: #f1f2f6;
             border-radius: 15px;
             padding: 20px;
-            min-height: 350px; /* קצת הגדלתי */
+            min-height: 350px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -79,6 +90,7 @@
             vertical-align: middle;
             font-size: 1em;
             margin: 0 8px;
+            position: relative;
         }
 
         .numer { border-bottom: 2px solid #2d3436; padding-bottom: 2px; display: block; min-width: 25px;}
@@ -87,9 +99,9 @@
         /* התאמות לשברים בתוך טקסט רץ */
         .story-text .fraction {
             font-size: 0.9em;
-            margin: 0 2px;
+            margin: 0 4px;
+            vertical-align: middle;
         }
-        .story-text .numer { border-bottom-width: 2px; }
 
         /* שדות קלט */
         input[type="number"] {
@@ -117,18 +129,18 @@
         }
         .btn-check:hover { transform: scale(1.05); background: #00a383; }
 
-        /* --- עיצובים ספציפיים --- */
-        
-        /* הרחבה - מבנה חדש */
+        /* --- הרחבה: עיצוב LTR --- */
         .expand-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 30px;
+            gap: 20px;
             margin: 20px 0;
+            direction: ltr; 
         }
+        
         .equation-box {
-            font-size: 2em;
+            font-size: 1.8em;
             display: flex;
             align-items: center;
             background: white;
@@ -136,21 +148,24 @@
             border-radius: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
+
         .factor-box {
             background: var(--yellow-tip);
             border: 2px dashed #e1c34a;
-            padding: 15px;
+            padding: 10px 15px;
             border-radius: 12px;
             text-align: center;
-            min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .factor-label { display: block; font-size: 0.9em; margin-bottom: 5px; color: #856404;}
+        .factor-label { font-size: 0.6em; margin-bottom: 5px; color: #856404; font-weight: bold;}
 
-        /* סיפור */
+        /* --- סיפור --- */
         .story-text {
             font-size: 1.3em;
             text-align: right;
-            line-height: 1.8;
+            line-height: 2.2; 
             width: 100%;
             margin-bottom: 20px;
             padding: 15px;
@@ -199,8 +214,25 @@
         
         .back-link { display: inline-block; margin-top: 30px; text-decoration: none; color: #888; border-bottom: 1px dashed #888;}
         
-        /* קופסת השוואה ישנה */
-        .question-box-simple { font-size: 2.5em; margin: 20px 0; display: flex; align-items: center; gap: 15px; }
+        .question-box-simple { font-size: 2.5em; margin: 20px 0; display: flex; align-items: center; gap: 15px; direction: ltr; }
+
+        /* מסך סיום */
+        .summary-box h2 { font-size: 2.5em; color: var(--accent); margin-bottom: 10px; }
+        .summary-box p { font-size: 1.3em; color: #555; }
+        .summary-box .final-score { font-size: 1.5em; font-weight: bold; color: var(--primary); margin: 20px 0; }
+        .btn-restart { 
+            background: var(--primary); 
+            color: white; 
+            border: none; padding: 15px 40px; 
+            font-size: 1.3em; border-radius: 50px; 
+            cursor: pointer; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -209,10 +241,14 @@
     <h1>👑 ממלכת השברים</h1>
     
     <div class="menu-grid">
-        <button class="menu-btn active" onclick="startGame('expand')">🔍 הרחבה</button>
-        <button class="menu-btn" onclick="startGame('compare')">⚖️ השוואה</button>
-        <button class="menu-btn" onclick="startGame('calc')">➕ חיבור</button>
-        <button class="menu-btn" onclick="startGame('story')">📖 בעיות מילוליות</button>
+        <button class="menu-btn active" onclick="initGame('expand')">🔍 הרחבה</button>
+        <button class="menu-btn" onclick="initGame('compare')">⚖️ השוואה</button>
+        <button class="menu-btn" onclick="initGame('calc')">➕ חיבור</button>
+        <button class="menu-btn" onclick="initGame('story')">📖 בעיות מילוליות</button>
+    </div>
+
+    <div class="progress-indicator" id="progress-box" style="display:none;">
+        שאלה <span id="q-current">1</span> מתוך <span id="q-total">10</span>
     </div>
 
     <div id="game-area"></div>
@@ -231,17 +267,40 @@
     let currentSolution = null;
     let storyData = null;
     let score = 0;
+    
+    // משתנים לניהול סבב שאלות
+    let questionCount = 0;
+    const MAX_QUESTIONS = 10;
 
-    function startGame(mode) {
+    // פונקציה לאתחול משחק חדש (מתאפסת ב-10 שאלות)
+    function initGame(mode) {
         currentMode = mode;
+        // עדכון כפתורי תפריט
         document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-        if(event && event.target) event.target.classList.add('active');
+        // מנסה למצוא את הכפתור לפי הטקסט או אירוע (קצת טריקי בלי ID, נסמוך על ה-onclick)
+        // פשוט נסמן את כולם כלא פעילים, ומי שנלחץ יהיה פעיל אם יש event
+        if(event && event.target && event.target.classList.contains('menu-btn')) {
+            event.target.classList.add('active');
+        }
+
+        // איפוס מונים
+        score = 0;
+        questionCount = 1;
+        document.getElementById('score').innerText = score;
+        
+        // הצגת סרגל התקדמות
+        document.getElementById('progress-box').style.display = 'inline-block';
+        document.getElementById('q-total').innerText = MAX_QUESTIONS;
         
         document.getElementById('feedback').innerText = '';
+        
         generateQuestion();
     }
 
     function generateQuestion() {
+        // עדכון מספר שאלה
+        document.getElementById('q-current').innerText = questionCount;
+
         const area = document.getElementById('game-area');
         area.innerHTML = '';
         document.getElementById('feedback').className = 'feedback';
@@ -255,119 +314,117 @@
         }
     }
 
-    // --- 1. הרחבה וצמצום (עיצוב מתוקן) ---
+    function showSummary() {
+        const area = document.getElementById('game-area');
+        document.getElementById('progress-box').style.display = 'none'; // הסתרת המונה
+        document.getElementById('feedback').innerText = ''; 
+        
+        // פיצוץ קונפטי גדול
+        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+
+        area.innerHTML = `
+            <div class="summary-box">
+                <h2>כל הכבוד! 🎉</h2>
+                <p>סיימת את האימון בהצלחה!</p>
+                <div class="final-score">הניקוד שלך: ${score} מתוך ${MAX_QUESTIONS * 10}</div>
+                <button class="btn-restart" onclick="initGame('${currentMode}')">האם תרצי להתאמן שוב?</button>
+            </div>
+        `;
+    }
+
+    // --- 1. הרחבה וצמצום (הגרסה המתוקנת) ---
     function generateExpand(area) {
         const baseNumer = randomInt(1, 5);
         const baseDenom = randomInt(baseNumer + 1, 9);
         const factor = randomInt(2, 5);
-        
         const expandedNumer = baseNumer * factor;
         const expandedDenom = baseDenom * factor;
-
-        // סוג השאלה: 1 = מצא את הגורם, 2 = מצא את השבר המורחב
-        const questionType = Math.random() > 0.5 ? 'find_factor' : 'find_fraction';
+        const qType = randomInt(1, 3);
 
         let html = `
             <div class="expand-container">
                 <div class="equation-box">
                     ${createFractionHtml(baseNumer, baseDenom)}
-                    <span>=</span>
+                    <span style="margin: 0 10px;">=</span>
         `;
-        
-        // חלק המשוואה
-        if (questionType === 'find_factor') {
-             html += createFractionHtml(expandedNumer, expandedDenom);
-             currentSolution = { type: 'factor', val: factor };
-        } else {
-             html += `<div class="fraction">
-                        <span class="numer"><input type="number" id="ansN" placeholder="?"></span>
-                        <span class="denom"><input type="number" id="ansD" placeholder="?"></span>
-                      </div>`;
-             currentSolution = { type: 'fraction', n: expandedNumer, d: expandedDenom };
+        html += `<div class="fraction">`;
+        if (qType === 1) { 
+            html += `<span class="numer"><input type="number" id="ansN" placeholder="?"></span>
+                     <span class="denom"><input type="number" id="ansD" placeholder="?"></span>`;
+        } else if (qType === 2) { 
+            html += `<span class="numer"><input type="number" id="ansN" placeholder="?"></span>
+                     <span class="denom" style="font-weight:bold; font-size:1.1em;">${expandedDenom}</span>`;
+        } else { 
+            html += `<span class="numer" style="font-weight:bold; font-size:1.1em;">${expandedNumer}</span>
+                     <span class="denom"><input type="number" id="ansD" placeholder="?"></span>`;
         }
-        html += `</div>`; // סגירת equation-box
+        html += `</div></div>`; 
 
-        // חלק קופסת הגורם בצד
         html += `
             <div class="factor-box">
-                <span class="factor-label">גורם ההרחבה:</span>
+                <span class="factor-label">בכמה כפלנו?</span>
                 <div style="font-size: 1.4em; display:flex; align-items:center; justify-content:center;">
                     <span>× </span>
-                    ${questionType === 'find_factor' ? '<input type="number" id="ansFactor" style="width:45px; margin-right:5px;">' : `<b style="margin-right:5px;">${factor}</b>`}
+                    ${qType === 1 ? `<b style="margin-left:5px;">${factor}</b>` : '<input type="number" id="ansFactor" style="width:40px; margin-left:5px;">'}
                 </div>
             </div>
-        </div>`; // סגירת expand-container
+        </div>`;
 
+        currentSolution = { n: expandedNumer, d: expandedDenom, f: factor, type: qType };
         html += '<button class="btn-check" onclick="checkExpand()">בדיקה</button>';
         area.innerHTML = html;
     }
 
     function checkExpand() {
-        let isCorrect = false;
-        if (currentSolution.type === 'factor') {
-            const val = parseInt(document.getElementById('ansFactor').value);
-            if (val === currentSolution.val) isCorrect = true;
+        let isCorrect = true;
+        const s = currentSolution;
+        if (s.type === 1) {
+            if (parseInt(document.getElementById('ansN').value) !== s.n) isCorrect = false;
+            if (parseInt(document.getElementById('ansD').value) !== s.d) isCorrect = false;
         } else {
-            const n = parseInt(document.getElementById('ansN').value);
-            const d = parseInt(document.getElementById('ansD').value);
-            if (n === currentSolution.n && d === currentSolution.d) isCorrect = true;
+            if (parseInt(document.getElementById('ansFactor').value) !== s.f) isCorrect = false;
+            if (s.type === 2 && parseInt(document.getElementById('ansN').value) !== s.n) isCorrect = false;
+            if (s.type === 3 && parseInt(document.getElementById('ansD').value) !== s.d) isCorrect = false;
         }
-        
         if(isCorrect) correct(); else wrong();
     }
 
-    // --- 4. בעיות מילוליות (עם קו שבר ותיקון כיוון) ---
+    // --- 4. בעיות מילוליות ---
     function generateStory(area) {
         const templates = [
-            {
-                text: "רוני אכל {frac1} מהפיצה, ודנה אכלה {frac2} מהפיצה. כמה פיצה אכלו שניהם יחד?",
-                op: '+', type: 'add'
-            },
-            {
-                text: "במיכל היו {frac1} ליטר מים. דני שפך החוצה {frac2} ליטר. כמה מים נשארו במיכל?",
-                op: '-', type: 'sub'
-            }
+            { text: "רוני אכל {frac1} מהפיצה, ודנה אכלה {frac2} מהפיצה. כמה פיצה אכלו שניהם יחד?", op: '+', type: 'add' },
+            { text: "במיכל היו {frac1} ליטר מים. דני שפך החוצה {frac2} ליטר. כמה מים נשארו במיכל?", op: '-', type: 'sub' }
         ];
-
         const t = templates[Math.floor(Math.random() * templates.length)];
         const denom = randomInt(4, 8);
         let n1, n2;
-        
-        if (t.type === 'sub') {
-             n1 = randomInt(2, denom-1);
-             n2 = randomInt(1, n1-1); 
-        } else {
-             n1 = randomInt(denom - 2, denom - 1); 
-             n2 = randomInt(3, denom - 1);
-        }
+        if (t.type === 'sub') { n1 = randomInt(2, denom-1); n2 = randomInt(1, n1-1); } 
+        else { n1 = randomInt(denom - 2, denom - 1); n2 = randomInt(3, denom - 1); }
 
-        // כאן התיקון: שימוש בפונקציה שיוצרת HTML של שבר במקום סתם טקסט
-        const storyText = t.text
-            .replace('{frac1}', createFractionHtml(n1, denom))
-            .replace('{frac2}', createFractionHtml(n2, denom));
-
+        const storyText = t.text.replace('{frac1}', createFractionHtml(n1, denom)).replace('{frac2}', createFractionHtml(n2, denom));
         let resultN = (t.op === '+') ? n1 + n2 : n1 - n2;
-        const resultD = denom;
-        const mixedWhole = Math.floor(resultN / resultD);
-        const mixedRem = resultN % resultD;
-
-        storyData = { n1, n2, d: denom, op: t.op, resN: resultN, resD: resultD, mixW: mixedWhole, mixN: mixedRem };
+        const mixedWhole = Math.floor(resultN / denom);
+        const mixedRem = resultN % denom;
+        storyData = { n1, n2, d: denom, op: t.op, resN: resultN, resD: denom, mixW: mixedWhole, mixN: mixedRem };
 
         let html = `
             <div class="story-text">${storyText}</div>
-            
             <div class="story-step">
                 <span class="step-label">שלב 1: כתבי את התרגיל (משמאל לימין)</span>
-                <div style="display:flex; justify-content:center; align-items:center; gap:5px; direction:ltr;">
-                    <div class="fraction"><input type="number" id="exN1" style="width:40px"><span>/</span><input type="number" id="exD1" style="width:40px"></div>
-                    <select id="exOp" style="font-size:1.2em; padding:5px;"><option value="+">+</option><option value="-">-</option></select>
-                    <div class="fraction"><input type="number" id="exN2" style="width:40px"><span>/</span><input type="number" id="exD2" style="width:40px"></div>
-                    <span>=</span>
+                <div style="display:flex; justify-content:center; align-items:center; gap:8px; direction:ltr;">
+                    <div class="fraction">
+                        <span class="numer"><input type="number" id="exN1" style="width:40px"></span>
+                        <span class="denom"><input type="number" id="exD1" style="width:40px"></span>
+                    </div>
+                    <select id="exOp" style="font-size:1.2em; padding:5px; margin:0 5px;"><option value="+">+</option><option value="-">-</option></select>
+                    <div class="fraction">
+                        <span class="numer"><input type="number" id="exN2" style="width:40px"></span>
+                        <span class="denom"><input type="number" id="exD2" style="width:40px"></span>
+                    </div>
+                    <span style="font-size:1.5em; margin:0 5px;">=</span>
                 </div>
             </div>
-
             <div class="tip-box">💡 רמז: כדי להפוך שלם לשבר מדומה, כופלים את השלם במכנה. למשל: 3 שלמים עם מכנה 4, זה 12 רבעים (12/4).</div>
-
             <div class="story-step">
                 <span class="step-label">שלב 2: פתרי כשבר מדומה (רק מונה ומכנה)</span>
                 <div class="fraction" style="font-size:1.3em;">
@@ -375,7 +432,6 @@
                     <span class="denom"><input type="number" id="impD"></span>
                 </div>
             </div>
-
             <div class="story-step">
                 <span class="step-label">שלב 3: הפכי לשבר מעורב (מספר שלם + שבר)</span>
                 <div style="display:flex; align-items:center; justify-content:center; gap:8px; direction: ltr; font-size:1.3em;">
@@ -387,7 +443,6 @@
                 </div>
                 <div style="font-size:0.8em; color:#888; margin-top:5px; text-align:center;">(אם אין שלם או אין שארית, כתבי 0)</div>
             </div>
-
             <button class="btn-check" onclick="checkStory()">בדיקה</button>
         `;
         area.innerHTML = html;
@@ -396,26 +451,20 @@
     function checkStory() {
         const d = storyData;
         let errors = [];
-
         const uN1 = parseInt(document.getElementById('exN1').value); const uD1 = parseInt(document.getElementById('exD1').value);
         const uOp = document.getElementById('exOp').value;
         const uN2 = parseInt(document.getElementById('exN2').value); const uD2 = parseInt(document.getElementById('exD2').value);
 
         let exCorrect = false;
-        if (d.op === '+') {
-            if (uOp === '+' && uD1 === d.d && uD2 === d.d && ((uN1 === d.n1 && uN2 === d.n2) || (uN1 === d.n2 && uN2 === d.n1))) exCorrect = true;
-        } else {
-            if (uOp === '-' && uN1 === d.n1 && uN2 === d.n2 && uD1 === d.d && uD2 === d.d) exCorrect = true;
-        }
+        if (d.op === '+') { if (uOp === '+' && uD1 === d.d && uD2 === d.d && ((uN1 === d.n1 && uN2 === d.n2) || (uN1 === d.n2 && uN2 === d.n1))) exCorrect = true; } 
+        else { if (uOp === '-' && uN1 === d.n1 && uN2 === d.n2 && uD1 === d.d && uD2 === d.d) exCorrect = true; }
         if (!exCorrect) errors.push("יש טעות בכתיבת התרגיל בשלב 1");
 
-        const impN = parseInt(document.getElementById('impN').value);
-        const impD = parseInt(document.getElementById('impD').value);
+        const impN = parseInt(document.getElementById('impN').value); const impD = parseInt(document.getElementById('impD').value);
         if (impN !== d.resN || impD !== d.resD) errors.push("יש טעות בשבר המדומה בשלב 2");
 
         const mixW = parseInt(document.getElementById('mixW').value) || 0;
         const mixN = parseInt(document.getElementById('mixN').value) || 0;
-        // בדיקה אם השבר המעורב שקול לתוצאה (מאפשר לה לכתוב גם 0/4 אם אין שארית)
         const userImproperNumerator = (mixW * d.d) + mixN;
         if (userImproperNumerator !== d.resN) errors.push("יש טעות בשבר המעורב בשלב 3");
 
@@ -425,7 +474,7 @@
         }
     }
 
-    // --- פונקציות עזר (ללא שינוי בלוגיקה) ---
+    // --- פונקציות עזר ומשחקים אחרים ---
     function generateCompare(area) {
         let n1, d1, n2, d2;
         const strategy = randomInt(1, 3); 
@@ -450,7 +499,6 @@
     function chkCalc(){ if(parseInt(document.getElementById('ansC').value)===currentSolution) correct(); else wrong(); }
 
     function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-    // פונקציה מעודכנת ליצירת שבר
     function createFractionHtml(n, d) { return `<div class="fraction"><span class="numer">${n}</span><span class="denom">${d}</span></div>`; }
     
     function correct() {
@@ -458,14 +506,23 @@
         document.getElementById('feedback').innerText = 'כל הכבוד! אלופה! 🎉';
         document.getElementById('feedback').className = 'feedback correct';
         confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-        setTimeout(generateQuestion, 2500);
+        
+        // בדיקה אם סיימנו 10 שאלות
+        if (questionCount >= MAX_QUESTIONS) {
+            setTimeout(showSummary, 1500); // מעבר למסך סיכום
+        } else {
+            questionCount++;
+            setTimeout(generateQuestion, 2000); // מעבר לשאלה הבאה
+        }
     }
+    
     function wrong() {
         document.getElementById('feedback').innerText = 'אופס, נסי שוב... 💪';
         document.getElementById('feedback').className = 'feedback wrong';
     }
     
-    startGame('expand');
+    // הפעלה ראשונית
+    initGame('expand');
 </script>
 </body>
 </html>
