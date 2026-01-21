@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ממלכת השברים 👑</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #00b894;
+            --wrong: #ff7675;
+            --bg: #dfe6e9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: #2d3436;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin-top: 0; color: var(--primary); }
+
+        /* תפריט ראשי */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .menu-btn {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .menu-btn:hover, .menu-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        /* אזור המשחק */
+        #game-area {
+            background: #f1f2f6;
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .question-box {
+            font-size: 2.5em;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 1em;
+            margin: 0 10px;
+        }
+
+        .numer { border-bottom: 3px solid #2d3436; padding-bottom: 2px; display: block; }
+        .denom { padding-top: 2px; display: block; }
+
+        input[type="number"] {
+            font-size: 0.8em;
+            width: 60px;
+            text-align: center;
+            border: 2px solid var(--secondary);
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .btn-check {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .btn-check:hover { transform: scale(1.05); }
+
+        /* כפתורי השוואה */
+        .compare-btns { display: flex; gap: 15px; }
+        .comp-btn {
+            font-size: 2em;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            background: white;
+            cursor: pointer;
+        }
+        .comp-btn:hover { background: var(--secondary); color: white; }
+
+        /* פידבק */
+        .feedback {
+            font-size: 1.5em;
+            font-weight: bold;
+            height: 40px;
+            margin-top: 15px;
+        }
+        .correct { color: var(--accent); }
+        .wrong { color: var(--wrong); }
+
+        /* ניווט חזרה */
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #666;
+        }
+        
+        .story-text {
+            font-size: 1.2em;
+            text-align: right;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>👑 ממלכת השברים</h1>
+    <p>בחרי נושא לאימון:</p>
+    
+    <div class="menu-grid">
+        <button class="menu-btn active" onclick="startGame('expand')">🔍 הרחבה וצמצום</button>
+        <button class="menu-btn" onclick="startGame('compare')">⚖️ השוואת שברים</button>
+        <button class="menu-btn" onclick="startGame('calc')">➕ חיבור וחיסור</button>
+        <button class="menu-btn" onclick="startGame('story')">📖 בעיות מילוליות</button>
+    </div>
+
+    <div id="game-area">
+        </div>
+    
+    <div id="feedback" class="feedback"></div>
+
+    <div style="margin-top: 30px; font-size: 1.2em;">
+        נקודות: <span id="score">0</span> 🌟
+    </div>
+    
+    <a href="index.html" class="back-link">🔙 חזרה לדף הראשי</a>
+</div>
+
+<script>
+    let currentMode = 'expand';
+    let currentSolution = null;
+    let score = 0;
+
+    // --- אתחול המשחק ---
+    function startGame(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active'); // סימון הכפתור שנלחץ
+        
+        document.getElementById('feedback').innerText = '';
+        generateQuestion();
+    }
+
+    function generateQuestion() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('feedback').innerText = '';
+
+        switch(currentMode) {
+            case 'expand': generateExpand(area); break;
+            case 'compare': generateCompare(area); break;
+            case 'calc': generateCalc(area); break;
+            case 'story': generateStory(area); break;
+        }
+    }
+
+    // --- 1. הרחבה וצמצום ---
+    function generateExpand(area) {
+        // יוצרים שבר בסיס
+        const baseNumer = randomInt(1, 5);
+        const baseDenom = randomInt(baseNumer + 1, 10);
+        
+        // כופלים ב-2, 3, 4, או 5
+        const factor = randomInt(2, 5);
+        const expandedNumer = baseNumer * factor;
+        const expandedDenom = baseDenom * factor;
+
+        // מחליטים מה להסתיר (מונה או מכנה)
+        const hideNumer = Math.random() > 0.5;
+        
+        currentSolution = hideNumer ? expandedNumer : expandedDenom;
+
+        const leftSide = createFractionHtml(baseNumer, baseDenom);
+        const rightSide = hideNumer 
+            ? `<div class="fraction"><span class="numer"><input type="number" id="ans"></span><span class="denom">${expandedDenom}</span></div>`
+            : `<div class="fraction"><span class="numer">${expandedNumer}</span><span class="denom"><input type="number" id="ans"></span></div>`;
+
+        area.innerHTML = `
+            <div class="question-box">
+                ${leftSide} <span>=</span> ${rightSide}
+            </div>
+            <button class="btn-check" onclick="checkAnswer()">בדיקה</button>
+        `;
+    }
+
+    // --- 2. השוואת שברים (5 אסטרטגיות) ---
+    function generateCompare(area) {
+        let n1, d1, n2, d2;
+        const strategy = randomInt(1, 4); 
+
+        // 1. מכנים זהים
+        if (strategy === 1) {
+            d1 = d2 = randomInt(3, 12);
+            n1 = randomInt(1, d1-1);
+            n2 = randomInt(1, d2-1);
+            while(n1 === n2) n2 = randomInt(1, d2-1);
+        }
+        // 2. מונים זהים
+        else if (strategy === 2) {
+            n1 = n2 = randomInt(1, 5);
+            d1 = randomInt(n1+1, 10);
+            d2 = randomInt(n1+1, 12);
+            while(d1 === d2) d2 = randomInt(n1+1, 12);
+        }
+        // 3. השוואה לחצי / אחד (שבר אחד קטן מחצי ושבר אחד גדול מחצי)
+        else {
+            d1 = randomInt(4, 10);
+            n1 = 1; // שבר קטן (כמו 1/4)
+            
+            d2 = randomInt(3, 8);
+            n2 = d2 - 1; // שבר גדול (כמו 2/3 או 4/5)
+            
+            // מערבבים ביניהם
+            if (Math.random() > 0.5) { [n1, n2] = [n2, n1]; [d1, d2] = [d2, d1]; }
+        }
+
+        const val1 = n1/d1;
+        const val2 = n2/d2;
+        
+        if (val1 > val2) currentSolution = '>';
+        else if (val1 < val2) currentSolution = '<';
+        else currentSolution = '=';
+
+        area.innerHTML = `
+            <div class="question-box">
+                ${createFractionHtml(n1, d1)}
+                <div style="width: 50px; text-align: center;">?</div>
+                ${createFractionHtml(n2, d2)}
+            </div>
+            <div class="compare-btns">
+                <button class="comp-btn" onclick="checkCompare('>')">&gt;</button>
+                <button class="comp-btn" onclick="checkCompare('=')">=</button>
+                <button class="comp-btn" onclick="checkCompare('<')">&lt;</button>
+            </div>
+        `;
+    }
+
+    // --- 3. חיבור וחיסור (מכנים זהים) ---
+    function generateCalc(area) {
+        const denom = randomInt(3, 12);
+        const n1 = randomInt(1, denom - 1);
+        let n2 = randomInt(1, denom - n1); // כדי שלא יעבור את השלם בהתחלה
+        const isPlus = Math.random() > 0.4; // יותר חיבור מחיסור
+
+        let sign = '+';
+        let resultNumer;
+
+        if (isPlus) {
+            resultNumer = n1 + n2;
+        } else {
+            // חיסור: מוודאים שהראשון גדול יותר
+            sign = '-';
+            const big = Math.max(n1, n2);
+            const small = Math.min(n1, n2);
+            // עדכון למשתנים לתצוגה
+            // (בחיסור נציג big - small)
+            resultNumer = big - small;
+            // טריק: נשתמש ב-n1 ו-n2 המקוריים בשביל ה-HTML אבל נסדר אותם
+            area.dataset.n1 = big;
+            area.dataset.n2 = small;
+        }
+
+        currentSolution = resultNumer;
+
+        const num1 = isPlus ? n1 : Math.max(n1, n2);
+        const num2 = isPlus ? n2 : Math.min(n1, n2);
+
+        area.innerHTML = `
+            <div class="question-box">
+                ${createFractionHtml(num1, denom)}
+                <span>${sign}</span>
+                ${createFractionHtml(num2, denom)}
+                <span>=</span>
+                <div class="fraction">
+                    <span class="numer"><input type="number" id="ans"></span>
+                    <span class="denom">${denom}</span>
+                </div>
+            </div>
+            <button class="btn-check" onclick="checkAnswer()">בדיקה</button>
+        `;
+    }
+
+    // --- 4. בעיות מילוליות (דו שלבי) ---
+    function generateStory(area) {
+        const templates = [
+            {
+                text: "לדנה היו {whole} חפיסות שוקולד. היא נתנה לחברתה {part1} חפיסה, ואכלה בעצמה {part2} חפיסה. כמה נשאר לה?",
+                calc: (w, p1, p2) => w - (p1 + p2)
+            },
+            {
+                text: "דני רץ ביום ראשון {part1} קילומטר, וביום שני {part2} קילומטר. הוא רוצה להגיע ל-{whole} קילומטרים סה\"כ. כמה עוד נשאר לו לרוץ?",
+                calc: (w, p1, p2) => w - (p1 + p2)
+            }
+        ];
+
+        // בחירת תבנית
+        const t = templates[Math.floor(Math.random() * templates.length)];
+        
+        // יצירת מספרים שיהיה קל לחשב (מכנים זהים)
+        const denom = randomInt(4, 10);
+        const num1 = randomInt(1, 2);
+        const num2 = randomInt(1, 2);
+        const whole = randomInt(2, 4); // מספר שלם
+        
+        // התשובה בשבר
+        const sumParts = num1 + num2; // סכום המונים
+        // נשאר: whole * denom - sumParts (במונה)
+        // אבל כדי לפשט, נבקש תשובה במבנה של שבר מעורב או פשוט מונה ומכנה
+        // בוא נעשה את זה פשוט: כמה *שמיניות/חמישיות* נשארו?
+        
+        // לצורך הפשטות לילדה בכיתה ה', נשאל שאלה שהתשובה היא המונה שנשאר (מתוך המכנה הזהה)
+        // או שנעשה שהיא צריכה להקליד מונה ומכנה.
+        
+        // חישוב התוצאה הסופית כשבר מדומה
+        const totalSlices = whole * denom;
+        const usedSlices = num1 + num2;
+        const leftSlices = totalSlices - usedSlices;
+        
+        currentSolution = { n: leftSlices, d: denom };
+
+        // בניית הטקסט
+        let story = t.text
+            .replace('{whole}', whole)
+            .replace('{part1}', createFractionString(num1, denom))
+            .replace('{part2}', createFractionString(num2, denom));
+
+        area.innerHTML = `
+            <div class="story-text">${story}</div>
+            <div style="font-size: 1.1em; margin-bottom: 10px;">רשמי את התוצאה כשבר מדומה (רק מונה ומכנה):</div>
+            <div class="fraction" style="font-size: 1.5em;">
+                <span class="numer"><input type="number" id="ansN" placeholder="מונה"></span>
+                <span class="denom"><input type="number" id="ansD" placeholder="מכנה"></span>
+            </div>
+            <button class="btn-check" onclick="checkStoryAnswer()">בדיקה</button>
+        `;
+    }
+
+    // --- פונקציות עזר ---
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function createFractionHtml(n, d) {
+        return `<div class="fraction"><span class="numer">${n}</span><span class="denom">${d}</span></div>`;
+    }
+    
+    function createFractionString(n, d) {
+        return `${n}/${d}`;
+    }
+
+    // --- בדיקת תשובות ---
+    function checkAnswer() {
+        const userVal = parseInt(document.getElementById('ans').value);
+        if (userVal === currentSolution) {
+            correct();
+        } else {
+            wrong();
+        }
+    }
+
+    function checkCompare(symbol) {
+        if (symbol === currentSolution) {
+            correct();
+        } else {
+            wrong();
+        }
+    }
+
+    function checkStoryAnswer() {
+        const userN = parseInt(document.getElementById('ansN').value);
+        const userD = parseInt(document.getElementById('ansD').value);
+        
+        // בדיקת שקילות (למשל אם נשאר 4/8 והיא כתבה 1/2 זה גם נכון)
+        if (userN / userD === currentSolution.n / currentSolution.d) {
+            correct();
+        } else {
+            wrong();
+        }
+    }
+
+    function correct() {
+        score += 10;
+        document.getElementById('score').innerText = score;
+        document.getElementById('feedback').innerText = 'מצוין! כל הכבוד! 🎉';
+        document.getElementById('feedback').className = 'feedback correct';
+        
+        confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+
+        setTimeout(generateQuestion, 1500);
+    }
+
+    function wrong() {
+        document.getElementById('feedback').innerText = 'לא נורא, נסי שוב 💪';
+        document.getElementById('feedback').className = 'feedback wrong';
+    }
+
+    // התחלה
+    startGame('expand');
+
+</script>
+
+</body>
+</html>
