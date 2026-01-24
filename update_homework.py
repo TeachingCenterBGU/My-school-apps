@@ -92,9 +92,11 @@ def update_homework():
 
     # --- שלב 3: משיכת שיעורים וסינון ---
     all_tasks = []
-    lookback_days = 30 
-        cutoff_date = datetime.now() - timedelta(days=lookback_days)
-        cutoff_date = cutoff_date.replace(hour=0, minute=0, second=0, microsecond=0)  
+    lookback_days = 30
+    
+    # תיקון הזחה כאן: השורות מיושרות לשמאל כמו lookback_days
+    cutoff_date = datetime.now() - timedelta(days=lookback_days)
+    cutoff_date = cutoff_date.replace(hour=0, minute=0, second=0, microsecond=0)  
 
     for child in children:
         name = child['privateName']
@@ -125,8 +127,9 @@ def update_homework():
                     if task_date_str:
                         task_date = parse_date(task_date_str)
                         
-                        # התיקון: משווים מול תאריך החיתוך החדש במקום מול "היום"
+                        # תיקון לוגיקה: אם התאריך ישן מדי - דלג
                         if task_date < cutoff_date:
+                            continue
                     
                     # 2. המרה למבנה שלנו
                     task_content = hw.get('homework') or hw.get('message') or "ללא פירוט"
@@ -140,7 +143,7 @@ def update_homework():
                         "grade": grade,
                         "subject": hw.get('subjectName', 'כללי'),
                         "task": task_content,
-                        "date": display_date # הוספנו תאריך לתצוגה
+                        "date": display_date 
                     })
                     count_added += 1
                 

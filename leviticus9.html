@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>חידון ספר במדבר 📜</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #d35400; 
+            --secondary: #f39c12;
+            --accent: #27ae60;
+            --wrong: #c0392b;
+            --bg: #fdf5e6; 
+            --card-bg: #fff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(#e6deb9 1px, transparent 1px);
+            background-size: 20px 20px;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: #2d3436;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border: 2px solid #e0c9a6;
+        }
+
+        h1 { color: var(--primary); margin-top: 0; font-size: 2.5em; }
+        .subtitle { color: #7f8c8d; margin-bottom: 20px; font-size: 1.1em; }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #eee;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 25px;
+            min-height: 60px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #dcdcdc;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #444;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            border-color: var(--secondary);
+            background-color: #fff9e6;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct { background-color: #d4edda; border-color: var(--accent); color: var(--accent); }
+        .option-btn.wrong { background-color: #f8d7da; border-color: var(--wrong); color: var(--wrong); }
+
+        .feedback-area {
+            margin-top: 20px;
+            min-height: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .feedback-text { display: none; padding: 10px; border-radius: 8px; }
+        
+        .next-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
+        }
+        .next-btn:hover { background-color: #e67e22; }
+
+        .end-screen { display: none; }
+        .score-circle {
+            width: 120px; height: 120px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 20px auto;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
+        }
+
+        .back-link { display: inline-block; margin-top: 30px; text-decoration: none; color: #888; border-bottom: 1px dashed #888;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="game-screen">
+        <h1>📜 המסע במדבר</h1>
+        <p class="subtitle">הכנה למבחן: פרקים ט'-י"ג (מורחב)</p>
+        
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        
+        <div class="question-box" id="question-text">השאלה תופיע כאן...</div>
+        
+        <div class="options-grid" id="options-area"></div>
+
+        <div class="feedback-area">
+            <div id="feedback-msg" class="feedback-text"></div>
+        </div>
+
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">לשאלה הבאה &larr;</button>
+    </div>
+
+    <div id="end-screen" class="end-screen">
+        <h1>כל הכבוד! 🎉</h1>
+        <p>סיימת את החזרה למבחן בתנ"ך</p>
+        <div class="score-circle" id="final-score">100</div>
+        <p id="end-message" style="font-size:1.2em; margin-top:20px;"></p>
+        <button class="next-btn" style="display:inline-block;" onclick="restartGame()">התחילי מחדש ↺</button>
+    </div>
+    
+    <a href="index.html" class="back-link">חזרה לדף הראשי</a>
+</div>
+
+<script>
+    const questions = [
+        // פרק ט'
+        {
+            q: "מה סימן לבני ישראל מתי לנסוע ומתי לחנות?",
+            options: ["משה אמר להם", "עמוד הענן (ביום) ועמוד האש (בלילה)", "תקיעה בחצוצרות בלבד", "אהרון סימן בידיו"],
+            correct: 1,
+            expl: "נכון! 'על פי ה' יסעו ועל פי ה' יחנו' בעזרת הענן."
+        },
+        {
+            q: "מי היו האנשים שביקשו את 'פסח שני'?",
+            options: ["אנשים שהיו טמאים לנפש ולא יכלו להקריב בזמן", "אנשים ששכחו את התאריך", "אנשים שלא היה להם כבש", "הגרים שהצטרפו לעם"],
+            correct: 0,
+            expl: "יפה. הם באו למשה ואמרו 'למה ניגרע?'. ה' קבע תאריך מיוחד בי\"ד באייר."
+        },
+        // פרק י'
+        {
+            q: "למה שימשו חצוצרות הכסף?",
+            options: ["רק ליופי", "לנגן שירים בחגים", "למקרא העדה (כינוס) ולמסע המחנות", "להפחיד את האויבים"],
+            correct: 2,
+            expl: "נכון! תקיעה אחת לכינוס הנשיאים, ותרועה למסע המחנות."
+        },
+        {
+            q: "את מי ביקש משה להצטרף למסע במדבר והבטיח לו 'והטבנו לך'?",
+            options: ["יתרו (חובב) חותן משה", "פרעה מלך מצרים", "בלעם הרשע", "כלב בן יפונה"],
+            correct: 0,
+            expl: "משה רצה שחובב יהיה להם 'לעיניים' כי הוא מכיר את המדבר."
+        },
+        {
+            q: "מה אמר משה כשהארון נסע?",
+            options: ["שמע ישראל ה' אלוהינו", "קומה ה' ויפוצו אויביך וינוסו משנאיך מפניך", "ה' ילחם לכם", "ברוך אתה בצאתך"],
+            correct: 1,
+            expl: "נכון! פסוק מפורסם שאומרים עד היום בפתיחת הארון."
+        },
+        // פרק י"א
+        {
+            q: "על מה התלוננו ה'מתאוננים'?",
+            options: ["על מחסור במים", "סתם תלונה רעה ללא סיבה ברורה", "על כך שחם להם", "על משה רבינו"],
+            correct: 1,
+            expl: "הם חיפשו עלילה. רש\"י אומר שהם רק חיפשו על מה להתלונן כדי להכעיס."
+        },
+        {
+            q: "מה ביקש העם כשהתאווה תאווה?",
+            options: ["מים", "לחם", "בשר, דגים, קישואים ואבטיחים", "בגדים חדשים"],
+            correct: 2,
+            expl: "הם בכו: 'מי יאכילנו בשר? זכרנו את הדגה אשר נאכל במצרים חינם'."
+        },
+        {
+            q: "מה עשה משה כששמע את תלונות העם?",
+            options: ["שמח שהם מדברים איתו", "אמר לה' שקשה לו מדי ('לא אוכל אנוכי לבדי')", "העניש אותם מיד", "התעלם מהם"],
+            correct: 1,
+            expl: "משה אמר לה': 'האנוכי הריתי את כל העם הזה... כי כבד ממני'."
+        },
+        {
+            q: "מי היו אלדד ומידד?",
+            options: ["שני מרגלים", "שני אנשים שהתנבאו במחנה", "שני אויבים של משה", "הבנים של אהרון"],
+            correct: 1,
+            expl: "נכון. הם נשארו במחנה והתנבאו. יהושע רצה לכלוא אותם, אבל משה שמח."
+        },
+        {
+            q: "איזה אוכל ה' שלח לעם בעקבות הבכי על הבשר?",
+            options: ["עוד מן", "שליו (עופות)", "לחם ומים", "פירות"],
+            correct: 1,
+            expl: "ה' שלח המון שליו, אבל העם אכל בתאוותנות ונענש במקום שנקרא 'קברות התאווה'."
+        },
+        // פרק י"ב
+        {
+            q: "על מה דיברו מרים ואהרון כנגד משה?",
+            options: ["על האישה הכושית אשר לקח", "על הדרך במדבר", "על האוכל", "על חלוקת התפקידים"],
+            correct: 0,
+            expl: "הם דיברו על אשתו ועל כך שה' מדבר גם איתם, לא רק עם משה."
+        },
+        {
+            q: "מהי תכונתו הבולטת של משה המוזכרת בפרק?",
+            options: ["גיבור חיל", "חכם מכל אדם", "עניו מאוד מכל האדם", "יפה תואר"],
+            correct: 2,
+            expl: "נכון. למרות שדיברו עליו, הוא שתק כי היה עניו (צנוע)."
+        },
+        {
+            q: "מה קרה למרים בעקבות הדיבור?",
+            options: ["היא קיבלה פרס", "לקתה בצרעת (הפכה לבנה כשלג)", "איבדה את קולה", "גורשה מהעם לתמיד"],
+            correct: 1,
+            expl: "היא הצטרעה. אהרון ביקש ממשה רחמים, ומשה התפלל 'אל נא רפא נא לה'."
+        },
+        // פרק י"ג (מרגלים)
+        {
+            q: "כמה מרגלים נשלחו?",
+            options: ["2", "10", "12 (איש אחד לכל שבט)", "70"],
+            correct: 2,
+            expl: "נכון. נשיא אחד מכל שבט."
+        },
+        {
+            q: "משה שינה את שמו של הושע בן נון. מה השם החדש ולמה?",
+            options: ["יהושע - כדי שה' יושיע אותו מעצת המרגלים", "כלב - כי הוא היה נאמן", "נחשון - כי קפץ למים", "אליאב - כי היה גבוה"],
+            correct: 0,
+            expl: "הוא הוסיף לו את האות י' (יהושע) - י'ה יושיעך."
+        },
+        {
+            q: "מה הביאו המרגלים מארץ ישראל?",
+            options: ["אבנים", "אשכול ענבים ענק, רימונים ותאנים", "חרבות", "מים"],
+            correct: 1,
+            expl: "הפירות היו ענקיים כדי להראות שהארץ טובה אך 'משונה' ומפחידה."
+        },
+        {
+            q: "איפה ראו המרגלים את הענקים (ילידי הענק)?",
+            options: ["ביריחו", "בירושלים", "בחברון", "באילת"],
+            correct: 2,
+            expl: "בחברון ישבו אחימן, ששי ותלמי ילידי הענק."
+        },
+        {
+            q: "איזה משפט מפורסם אמרו המרגלים בגנות הארץ?",
+            options: ["ארץ זבת חלב ודבש", "ארץ אוכלת יושביה", "טובה הארץ מאוד מאוד", "עם קשה עורף"],
+            correct: 1,
+            expl: "הם טענו שזו ארץ מסוכנת שאנשים מתים בה ('אוכלת יושביה')."
+        },
+        {
+            q: "במה השוו המרגלים את עצמם לעומת הענקים?",
+            options: ["לאריות", "לחגבים", "לנמלים", "לציפורים"],
+            correct: 1,
+            expl: "'ונוהי בעינינו כחגבים וכן היינו בעיניהם'."
+        },
+        {
+            q: "מי היו שני המרגלים שנשארו נאמנים לה'?",
+            options: ["כלב ויהושע", "משה ואהרון", "אלדד ומידד", "נחשון ופרץ"],
+            correct: 0,
+            expl: "רק כלב בן יפונה ויהושע בן נון אמרו 'עלה נעלה וירשנו אותה'."
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let answered = false;
+
+    function initGame() {
+        currentQ = 0;
+        score = 0;
+        answered = false;
+        document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('end-screen').style.display = 'none';
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const qData = questions[currentQ];
+        document.getElementById('question-text').innerText = qData.q;
+        
+        // עדכון סרגל
+        const percent = ((currentQ) / questions.length) * 100;
+        document.getElementById('progress').style.width = percent + '%';
+
+        const optsDiv = document.getElementById('options-area');
+        optsDiv.innerHTML = '';
+        
+        document.getElementById('next-btn').style.display = 'none';
+        const feedMsg = document.getElementById('feedback-msg');
+        feedMsg.style.display = 'none';
+        feedMsg.className = 'feedback-text';
+
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(idx, btn);
+            optsDiv.appendChild(btn);
+        });
+        
+        answered = false;
+    }
+
+    function checkAnswer(selectedIdx, btnElement) {
+        if(answered) return; 
+        answered = true;
+
+        const qData = questions[currentQ];
+        const feedMsg = document.getElementById('feedback-msg');
+        const buttons = document.querySelectorAll('.option-btn');
+        
+        if (selectedIdx === qData.correct) {
+            btnElement.classList.add('correct');
+            score += 5; // 5 נקודות לכל שאלה (כי יש 20 שאלות)
+            feedMsg.innerText = "🌟 " + qData.expl;
+            feedMsg.style.backgroundColor = "#d4edda";
+            feedMsg.style.color = "#155724";
+            confetti({ particleCount: 30, spread: 50, origin: { y: 0.6 }, colors: ['#27ae60', '#f1c40f'] });
+        } else {
+            btnElement.classList.add('wrong');
+            buttons[qData.correct].classList.add('correct');
+            feedMsg.innerText = "לא נורא! התשובה הנכונה היא: " + qData.options[qData.correct] + "\n💡 " + qData.expl;
+            feedMsg.style.backgroundColor = "#f8d7da";
+            feedMsg.style.color = "#721c24";
+        }
+
+        feedMsg.style.display = 'block';
+        document.getElementById('next-btn').style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < questions.length) {
+            renderQuestion();
+        } else {
+            showEndScreen();
+        }
+    }
+
+    function showEndScreen() {
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('end-screen').style.display = 'block';
+        document.getElementById('progress').style.width = '100%';
+        
+        const finalScore = score;
+        document.getElementById('final-score').innerText = finalScore;
+        
+        let msg = "";
+        if (finalScore === 100) msg = "וואו! ציון מושלם! את שולטת בחומר! 🏆";
+        else if (finalScore >= 85) msg = "כל הכבוד! ציון מעולה! 👏";
+        else msg = "יופי של מאמץ, כדאי לחזור שוב על הפרקים 💪";
+        
+        document.getElementById('end-message').innerText = msg;
+        
+        if(finalScore > 80) {
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+        }
+    }
+
+    function restartGame() {
+        initGame();
+    }
+
+    initGame();
+</script>
+
+</body>
+</html>
