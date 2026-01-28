@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>מחולל קוביות לאתר</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #5c6bc0; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 1.1em; }
+        button:hover { background: #3f51b5; }
+        #output { margin-top: 20px; width: 100%; height: 200px; direction: ltr; font-family: monospace; padding: 10px; border: 1px solid #333; background: #eee; }
+        .preview-box { margin-top: 20px; border: 1px solid #ccc; padding: 10px; background: white; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <h2>מחולל קוביות לאתר 🎲</h2>
+
+    <div class="form-group">
+        <label>שם הקובץ (באנגלית, כולל .html):</label>
+        <input type="text" id="filename" placeholder="bible-quiz.html">
+    </div>
+
+    <div class="form-group">
+        <label>מזהה ייחודי (באנגלית, בלי רווחים):</label>
+        <input type="text" id="appId" placeholder="bible-bamidbar">
+    </div>
+
+    <div class="form-group">
+        <label>אייקון (אימוג'י):</label>
+        <input type="text" id="icon" value="📜">
+    </div>
+
+    <div class="form-group">
+        <label>כותרת (נושא):</label>
+        <input type="text" id="title" placeholder="תנ''ך: ספר במדבר">
+    </div>
+
+    <div class="form-group">
+        <label>תיאור קצר:</label>
+        <input type="text" id="desc" placeholder="חזרה למבחן על פרקים י''א-י''ג">
+    </div>
+
+    <div class="form-group">
+        <label>סוג תאריך:</label>
+        <select id="dateType" onchange="toggleDateLabel()">
+            <option value="exam">לקראת מבחן (data-exam-date)</option>
+            <option value="new">סתם חדש (data-added)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label id="dateLabel">תאריך המבחן:</label>
+        <input type="date" id="dateVal">
+    </div>
+
+    <button onclick="generateCode()">צור קוד להעתקה</button>
+
+    <h3>הקוד להעתקה:</h3>
+    <textarea id="output"></textarea>
+
+    <script>
+        // קביעת התאריך של היום כברירת מחדל
+        document.getElementById('dateVal').valueAsDate = new Date();
+
+        function toggleDateLabel() {
+            const type = document.getElementById('dateType').value;
+            document.getElementById('dateLabel').innerText = type === 'exam' ? 'תאריך המבחן:' : 'תאריך העלאה:';
+        }
+
+        function generateCode() {
+            const filename = document.getElementById('filename').value;
+            const appId = document.getElementById('appId').value;
+            const icon = document.getElementById('icon').value;
+            const title = document.getElementById('title').value;
+            const desc = document.getElementById('desc').value;
+            const dateType = document.getElementById('dateType').value;
+            const dateVal = document.getElementById('dateVal').value;
+
+            const dateAttr = dateType === 'exam' ? `data-exam-date="${dateVal}"` : `data-added="${dateVal}"`;
+
+            const code = `
+<div class="card" data-app-id="${appId}" ${dateAttr}>
+    <a class="card-main" href="${filename}">
+        <span class="icon">${icon}</span>
+        <span class="card-title">${title}</span>
+        <span class="card-desc">${desc}</span>
+    </a>
+    <div class="card-actions">
+        <button class="mark-btn partial" type="button">בוצע חלקית</button>
+        <button class="mark-btn done" type="button">סיימתי</button>
+    </div>
+</div>`;
+
+            document.getElementById('output').value = code.trim();
+        }
+    </script>
+
+</body>
+</html>

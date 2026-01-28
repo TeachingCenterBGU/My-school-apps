@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>לומדים במדבר - אפליקציה מתקדמת</title>
+    <style>
+        :root {
+            --primary: #34495e;
+            --secondary: #e67e22;
+            --youtube: #e74c3c;
+            --bg: #fdfbf7;
+            --card-bg: #ffffff;
+            --success: #27ae60;
+            --error: #c0392b;
+            --text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Header Style */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; }
+        header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
+
+        /* Main Layout */
+        .container {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Video Button Style */
+        .video-link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 30px auto;
+            background-color: var(--youtube);
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+        }
+
+        .video-link-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+            background-color: #c0392b;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            animation: fadeIn 0.4s ease-in;
+            min-height: 300px;
+        }
+
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Quiz & Game Interface */
+        .game-card {
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background: #eee;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            text-align: right;
+            position: relative;
+        }
+
+        .option-btn:hover { border-color: var(--primary); background: #f9f9f9; }
+        
+        .option-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .option-btn.wrong { background: #f8d7da; border-color: var(--error); color: #721c24; }
+
+        .feedback-area {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .next-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .next-btn:hover { background: #d35400; }
+
+        /* Cloze Specifics */
+        .cloze-sentence {
+            font-size: 1.2rem;
+            line-height: 2;
+        }
+        
+        .cloze-select {
+            font-size: 1rem;
+            padding: 5px;
+            border: 2px solid var(--secondary);
+            border-radius: 5px;
+            background: #fff;
+            margin: 0 5px;
+        }
+
+        /* Printable Section */
+        .print-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .open-question {
+            background: #fff;
+            border-bottom: 1px dashed #ccc;
+            padding: 15px 0;
+            margin-bottom: 5px;
+        }
+
+        .open-question h3 { margin-top: 0; color: var(--primary); font-size: 1.1rem; }
+        .lines {
+            margin-top: 10px;
+            height: 60px; /* Shorter lines for factual answers */
+            background-image: linear-gradient(#eee 1px, transparent 1px);
+            background-size: 100% 30px; /* Line height */
+        }
+
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                padding: 20px;
+            }
+            .print-btn, header, .nav-tabs, .video-link-btn { display: none; }
+            .open-question { page-break-inside: avoid; border-bottom: 1px solid #000; }
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>לומדים במדבר</h1>
+    <p>פרקים ט' - י"ג | הכנה למבחן</p>
+</header>
+
+<div class="container">
+    
+    <a href="https://www.youtube.com/watch?v=EylBF9nrg4E" target="_blank" class="video-link-btn">
+        <span>🎥</span> סרטון סיכום של פרקים ט'-י"ג
+    </a>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="showSection('quiz')">חידון אמריקאי</button>
+        <button class="tab-btn" onclick="showSection('cloze')">השלמת משפטים</button>
+        <button class="tab-btn" onclick="showSection('open')">שאלות להדפסה</button>
+    </div>
+
+    <div id="quiz" class="section active">
+        <div class="game-card">
+            <div class="progress-bar"><div id="quiz-progress" class="progress-fill"></div></div>
+            <div id="quiz-content">
+                </div>
+            <div id="quiz-feedback" class="feedback-area"></div>
+            <button id="quiz-next" class="next-btn" onclick="nextQuestion()">השאלה הבאה</button>
+        </div>
+    </div>
+
+    <div id="cloze" class="section">
+        <div class="game-card">
+            <p>השלימי את המילה החסרה במשפט:</p>
+            <div class="progress-bar"><div id="cloze-progress" class="progress-fill"></div></div>
+            <div id="cloze-content" class="cloze-sentence">
+                </div>
+            <div id="cloze-feedback" class="feedback-area"></div>
+            <button id="cloze-next" class="next-btn" onclick="nextCloze()">המשפט הבא</button>
+        </div>
+    </div>
+
+    <div id="open" class="section">
+        <div id="printable-area">
+            <div style="text-align:center; border-bottom:2px solid #333; margin-bottom:20px;">
+                <h2>דף עבודה - ספר במדבר</h2>
+                <p>שם התלמידה: ____________________</p>
+            </div>
+            
+            <button class="print-btn" onclick="window.print()">🖨️ הדפיסי דף עבודה</button>
+
+            <div id="open-questions-container">
+                </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Data Sources ---
+    
+    // 1. Multiple Choice Questions (15 items) - Updated to include teacher's requirements
+    const allQuestions = [
+        {
+            q: "כמה מרגלים שלח משה לתור את הארץ?",
+            options: ["12 מרגלים (אחד מכל שבט)", "2 מרגלים בלבד", "70 מרגלים", "10 מרגלים"],
+            correct: 0, // A
+            info: "מקור: במדבר פרק י''ג [פסוק ב] - 'איש אחד איש אחד למטה אבותיו תשלחו'."
+        },
+        {
+            q: "מהו המשפט המפורסם שאמרו המרגלים כדי לתאר את הסכנה בארץ?",
+            options: ["ארץ אוכלת יושביה", "ארץ זבת חלב ודבש", "טובה הארץ מאוד מאוד", "ארץ אשר לא תחסר כל בה"],
+            correct: 0, // A
+            info: "מקור: במדבר י''ג [פסוק לב] - 'הארץ אשר עברנו בה לתור אותה, ארץ אוכלת יושביה היא'."
+        },
+        {
+            q: "מי היו שני המרגלים שהתנגדו לדעת הרוב וניסו להרגיע את העם?",
+            options: ["כלב בן יפונה ויהושע בן נון", "דתן ואבירם", "אלדד ומידד", "משה ואהרון"],
+            correct: 0, // A
+            info: "מקור: במדבר י''ג-י''ד - כלב אמר 'עלה נעלה' ויהושע הצטרף אליו."
+        },
+        {
+            q: "מהו 'אוהל מועד' ומי היה מורשה להיכנס למקום הקדוש ביותר בו?",
+            options: ["מקום המפגש של העם; כולם יכלו להיכנס", "מקום משכן ה'; רק הכהן הגדול נכנס לקודש הקודשים", "אוהל המגורים של משה", "מחסן האוכל של המחנה"],
+            correct: 1, // B
+            info: "מקור: מצגת המשכן [שקף 124] - 'רק לכהן הגדול ביום הכיפורים'."
+        },
+        {
+            q: "בפרק ט', מה היה הסימן לבני ישראל לעצור ולחנות?",
+            options: ["משה תקע בחצוצרה", "נגמרו המים", "הענן עצר ושכן על המשכן", "השמש שקעה"],
+            correct: 2, // C
+            info: "מקור: במדבר פרק ט [פסוק יז] - 'ובמקום אשר ישכן שם הענן שם יחנו בני ישראל'."
+        },
+        {
+            q: "כיצד נראה עמוד הענן במהלך הלילה? (פרק ט')",
+            options: ["כמו מראה אש", "כמו עמוד עשן שחור", "הוא נעלם בלילה", "האיר באור כחול"],
+            correct: 0, // A
+            info: "מקור: מצגת עמוד ענן [שקף 114] - 'ומראה אש לילה'."
+        },
+        {
+            q: "על מה התלונן 'האספסוף' (המתאוננים) בפרק י''א?",
+            options: ["על החום במדבר", "על עבודת הפרך", "על משה ואהרון", "רצו לחזור למצרים בגלל האוכל (בשר)"],
+            correct: 3, // D
+            info: "מקור: דף עבודה י''א [פסוק ד] - 'מי יאכילנו בשר... זכרנו את הדגה'."
+        },
+        {
+            q: "איזה ירק לא הוזכר ברשימת הגעגועים של העם למצרים?",
+            options: ["קישואים", "שומים", "תפוחי אדמה", "אבטיחים"],
+            correct: 2, // C
+            info: "מקור: במדבר י''א ה."
+        },
+        {
+            q: "כיצד פתר ה' את מצוקת הבדידות של משה בהנהגה?",
+            options: ["שלח לו מלאך", "העניש את העם מיד", "האציל מרוחו על 70 זקנים שיעזרו לו", "החליף אותו ביהושע"],
+            correct: 2, // C
+            info: "מקור: דף עבודה י''א [פסוק טז-יז]."
+        },
+        {
+            q: "מה הייתה תגובת יהושע לנבואת אלדד ומידד?",
+            options: ["אמר למשה: 'אדוני משה כלאם'", "הוא שמח מאוד", "הצטרף אליהם", "התעלם מהם"],
+            correct: 0, // A
+            info: "מקור: דף עבודה י''א [פסוק כח]."
+        },
+        {
+            q: "בפרק י''ב, מה הייתה הטענה של מרים ואהרון כלפי משה?",
+            options: ["על האישה הכושית שלקח ועל בלעדיותו כנביא", "על חלוקת האוכל", "שלא יצאו למלחמה בזמן", "שהוא לא מקשיב לעם"],
+            correct: 0, // A
+            info: "מקור: מצגת פרק י''ב [שקף 251]."
+        },
+        {
+            q: "כיצד העניש ה' את מרים?",
+            options: ["בצמא", "בצרעת", "בהרחקה לצמיתות", "לא נענשה"],
+            correct: 1, // B
+            info: "מקור: מצגת פרק י''ב [שקף 263]."
+        },
+        {
+            q: "מה ביקש משה מהמרגלים לבדוק בפרק י''ג?",
+            options: ["אם יש זהב בארץ", "איפה הכי כדאי לבנות בית", "החזק הוא הרפה, הטובה היא אם רעה", "אם המצרים רודפים אחריהם"],
+            correct: 2, // C
+            info: "מקור: דף עבודה י''ג [פסוק יח-יט]."
+        },
+        {
+            q: "מי אמר: 'ונהי בעינינו כחגבים וכן היינו בעיניהם'?",
+            options: ["כלב בן יפונה", "משה רבינו", "עשרת המרגלים (המוציאים דיבה)", "יהושע בן נון"],
+            correct: 2, // C
+            info: "מקור: מצגת מרגלים [שקף 105]."
+        },
+        {
+            q: "איזה פרי יוצא דופן בגודלו הביאו המרגלים?",
+            options: ["אשכול ענבים שנשאו במוט", "אבטיח", "תפוח ענק", "זיתים"],
+            correct: 0, // A
+            info: "מקור: דף עבודה י''ג [פסוק כג]."
+        }
+    ];
+
+    // 2. Cloze Sentences (Shuffled)
+    const clozeSentences = [
+        {
+            text: "השליחים הביאו איתם %word%, תאנים ורימונים.",
+            answer: "ענבים",
+            options: ["ענבים", "תפוחים", "זיתים"]
+        },
+        {
+            text: "המרגלים טענו שהארץ אכן זבת %word% ודבש.",
+            answer: "חלב",
+            options: ["מים", "חלב", "שמן"]
+        },
+        {
+            text: "השליחים אמרו שיש בארץ גם אנשים %word% (ענקים).",
+            answer: "גדולים",
+            options: ["גדולים", "נחמדים", "קטנים"]
+        },
+        {
+            text: "המרגלים סיפרו שראו את עצמם כמו %word% לעומת אנשי הארץ.",
+            answer: "חגבים",
+            options: ["נמלים", "אריות", "חגבים"]
+        },
+        {
+            text: "המרגלים אמרו על הארץ שהיא 'ארץ אוכלת %word%'.",
+            answer: "יושביה",
+            options: ["יושביה", "אנשיה", "פירותיה"]
+        },
+        {
+            text: "היחיד שהשתיק את העם ואמר 'עלה נעלה' הוא %word%.",
+            answer: "כלב",
+            options: ["משה", "כלב", "אהרון"]
+        },
+        {
+            text: "הערים בארץ כנען היו %word% גדולות מאוד.",
+            answer: "בצורות",
+            options: ["פתוחות", "בצורות", "קטנות"]
+        }
+    ];
+
+    // 3. Open Questions (Simple Knowledge Only - UPDATED to cover all topics)
+    const openQuestions = [
+        "מהו 'אוהל מועד' ומה היה תפקידו במדבר?",
+        "מה היה הסימן של בני ישראל לעצור ולחנות? (הקשור לעמוד הענן)",
+        "מי היו ה'מתאוננים' ועל מה הם התלוננו בפרק י''א?",
+        "מהו חטא המרגלים העיקרי (מה הם אמרו שגרם לעם לפחד)?",
+        "כמה מרגלים שלח משה? (מספר)",
+        "רשמי את שמות שני המרגלים שהתנגדו לדעת הרוב ואמרו שהארץ טובה.",
+        "מה משמעות הביטוי 'ארץ אוכלת יושביה'?",
+        "מי דיבר לשון הרע על משה בפרק י''ב ומה היה העונש?",
+        "כמה ימים סיירו המרגלים בארץ?",
+        "למי (לאיזו חיה) דימו המרגלים את עצמם לעומת הענקים?"
+    ];
+
+    // --- State Variables ---
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let quizOrder = [];
+
+    let currentClozeIndex = 0;
+    let clozeOrder = [];
+
+    // --- Utility Functions ---
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        // Find button with onclick containing the id
+        const btns = document.querySelectorAll('.tab-btn');
+        for (let btn of btns) {
+            if (btn.getAttribute('onclick').includes(id)) {
+                btn.classList.add('active');
+            }
+        }
+
+        if (id === 'quiz') startQuiz();
+        if (id === 'cloze') startCloze();
+    }
+
+    // --- Quiz Logic ---
+    function startQuiz() {
+        quizOrder = shuffleArray([...Array(allQuestions.length).keys()]); // Create shuffled indices
+        currentQuizIndex = 0;
+        quizScore = 0;
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const container = document.getElementById('quiz-content');
+        const feedback = document.getElementById('quiz-feedback');
+        const nextBtn = document.getElementById('quiz-next');
+        const progressBar = document.getElementById('quiz-progress');
+
+        feedback.style.display = 'none';
+        nextBtn.style.display = 'none';
+        
+        // Check end of game
+        if (currentQuizIndex >= quizOrder.length) {
+            progressBar.style.width = '100%';
+            container.innerHTML = `
+                <h2>סיימת את החידון!</h2>
+                <p>ענית נכון על ${quizScore} מתוך ${allQuestions.length} שאלות.</p>
+                <button class="tab-btn" onclick="startQuiz()">התחילי מחדש ↺</button>
+            `;
+            return;
+        }
+
+        const qIndex = quizOrder[currentQuizIndex];
+        const qData = allQuestions[qIndex];
+        
+        // Update progress
+        const pct = (currentQuizIndex / allQuestions.length) * 100;
+        progressBar.style.width = `${pct}%`;
+
+        // Render question
+        let html = `<div class="question-text">${currentQuizIndex + 1}. ${qData.q}</div>`;
+        html += `<div class="options-grid">`;
+        
+        qData.options.forEach((opt, idx) => {
+            html += `<button class="option-btn" onclick="checkAnswer(${idx}, ${qData.correct})">${opt}</button>`;
+        });
+        html += `</div>`;
+        
+        container.innerHTML = html;
+    }
+
+    function checkAnswer(selected, correct) {
+        const btns = document.querySelectorAll('.option-btn');
+        const feedback = document.getElementById('quiz-feedback');
+        const nextBtn = document.getElementById('quiz-next');
+        const qIndex = quizOrder[currentQuizIndex];
+        const qData = allQuestions[qIndex];
+
+        // Disable all buttons
+        btns.forEach(btn => btn.disabled = true);
+
+        if (selected === correct) {
+            btns[selected].classList.add('correct');
+            feedback.innerHTML = "✅ תשובה נכונה!<br><small>" + qData.info + "</small>";
+            feedback.style.color = 'var(--success)';
+            feedback.style.background = '#d4edda';
+            quizScore++;
+        } else {
+            btns[selected].classList.add('wrong');
+            btns[correct].classList.add('correct'); // Show correct one
+            feedback.innerHTML = "❌ טעות. התשובה הנכונה היא: " + qData.options[correct] + "<br><small>" + qData.info + "</small>";
+            feedback.style.color = 'var(--error)';
+            feedback.style.background = '#f8d7da';
+        }
+
+        feedback.style.display = 'block';
+        nextBtn.style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        currentQuizIndex++;
+        renderQuestion();
+    }
+
+    // --- Cloze Logic ---
+    function startCloze() {
+        clozeOrder = shuffleArray([...Array(clozeSentences.length).keys()]);
+        currentClozeIndex = 0;
+        renderCloze();
+    }
+
+    function renderCloze() {
+        const container = document.getElementById('cloze-content');
+        const feedback = document.getElementById('cloze-feedback');
+        const nextBtn = document.getElementById('cloze-next');
+        const progressBar = document.getElementById('cloze-progress');
+
+        feedback.style.display = 'none';
+        nextBtn.style.display = 'none';
+
+        if (currentClozeIndex >= clozeOrder.length) {
+            progressBar.style.width = '100%';
+            container.innerHTML = `
+                <h2>כל הכבוד!</h2>
+                <p>השלמת את כל המשפטים.</p>
+                <button class="tab-btn" onclick="startCloze()">שחקי שוב ↺</button>
+            `;
+            return;
+        }
+
+        const cIndex = clozeOrder[currentClozeIndex];
+        const cData = clozeSentences[cIndex];
+
+        // Update progress
+        const pct = (currentClozeIndex / clozeSentences.length) * 100;
+        progressBar.style.width = `${pct}%`;
+
+        // Create Dropdown with shuffled options
+        const shuffledOptions = shuffleArray([...cData.options]);
+        let selectHTML = `<select id="cloze-dropdown" class="cloze-select">`;
+        selectHTML += `<option value="">--- בחרי ---</option>`;
+        shuffledOptions.forEach(opt => {
+            selectHTML += `<option value="${opt}">${opt}</option>`;
+        });
+        selectHTML += `</select>`;
+
+        // Replace placeholder
+        const sentenceHTML = cData.text.replace('%word%', selectHTML);
+        
+        container.innerHTML = `
+            <div>${sentenceHTML}</div>
+            <button class="tab-btn" style="margin-top:15px; background:var(--secondary); color:white;" onclick="checkClozeAnswer('${cData.answer}')">בדיקה</button>
+        `;
+    }
+
+    function checkClozeAnswer(correctWord) {
+        const dropdown = document.getElementById('cloze-dropdown');
+        const feedback = document.getElementById('cloze-feedback');
+        const nextBtn = document.getElementById('cloze-next');
+        const checkBtn = document.querySelector('#cloze-content button'); // The check button
+
+        if (dropdown.value === correctWord) {
+            dropdown.style.borderColor = 'var(--success)';
+            dropdown.style.background = '#d4edda';
+            feedback.innerHTML = "✅ מצוין!";
+            feedback.style.color = 'var(--success)';
+            feedback.style.background = '#d4edda';
+            feedback.style.display = 'block';
+            nextBtn.style.display = 'inline-block';
+            checkBtn.style.display = 'none'; // Hide check button
+            dropdown.disabled = true;
+        } else {
+            dropdown.style.borderColor = 'var(--error)';
+            dropdown.style.background = '#f8d7da';
+            feedback.innerHTML = "נסי שוב...";
+            feedback.style.color = 'var(--error)';
+            feedback.style.display = 'block';
+        }
+    }
+
+    function nextCloze() {
+        currentClozeIndex++;
+        renderCloze();
+    }
+
+    // --- Render Open Questions ---
+    function renderOpenQuestions() {
+        const container = document.getElementById('open-questions-container');
+        let html = '';
+        openQuestions.forEach((q, idx) => {
+            html += `
+                <div class="open-question">
+                    <h3>${idx + 1}. ${q}</h3>
+                    <div class="lines"></div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // Initialize
+    renderOpenQuestions();
+    showSection('quiz'); // Start with quiz
+
+</script>
+
+</body>
+</html>
