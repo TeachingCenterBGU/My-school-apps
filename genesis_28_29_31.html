@@ -72,20 +72,21 @@
     <script>
         // --- מאגר הנתונים ---
         
-const clozeData = [
+    const clozeData = [
             {
                 chapter: "פרק כ'ח - חלום יעקב",
+                song: "https://www.youtube.com/watch?v=TdUP6jGevnY", // הוספתי את הלינק כאן
                 text: "יעקב יצא מבאר שבע והלך ל___. בלילה הוא חלם על ___ שראשו בשמיים ו___ עולים ויורדים בו. ה' הבטיח לתת לו את הארץ ולשמור עליו. בבוקר יעקב לקח את האבן, הפך אותה ל___ (אבן זיכרון) וקרא למקום ___. הוא נדר שאם יחזור בשלום, הוא יתן לה' ___ מכל מה שיהיה לו.",
                 words: ["חרן", "סולם", "מלאכים", "מצבה", "בית אל", "מעשר"]
             },
-    {
-                chapter: "פרק כ'ט - המפגש והחתונה",
-                text: "יעקב הגיע לבאר וראה שלושה עדרי צאן מחכים לשתות מים. הם לא יכלו להזיז את האבן לבד כי היא הייתה ___. כשראו את רחל, יעקב קיבל כוח וגלל את האבן. הוא עבד אצל לבן ___ שנים כדי להתחתן איתה, והן עברו לו מהר 'כ___ אחדים' בגלל אהבתו. בחתונה לבן רימה אותו ונתן לו את ___, בטענה שלא נותנים את ה___ לפני הבכירה.",
-                words: ["כבדה", "שבע", "ימים", "לאה", "צעירה"]
+            {
+                chapter: "פרק כ'ט - המפגש, הרמאות והחתונה",
+                text: "יעקב הגיע לבאר וראה שהרועים מחכים כי האבן הייתה ___. כשראה את ___, הוא קיבל כוח וגלל את האבן לבד. יעקב עבד אצל לבן ___ שנים כדי להתחתן איתה. בחתונה לבן רימה אותו ונתן לו את ___. בסוף יעקב התחתן גם עם רחל, אבל נדרש לעבוד עבורה ___ שנים נוספות.",
+                words: ["כבדה", "רחל", "שבע", "לאה", "שבע"] // המילה 'שבע' מופיעה פעמיים וזה בסדר
             },
             {
                 chapter: "פרק ל'א - הבריחה והברית",
-                text: "אחרי ___ שנה בבית לבן, יעקב ברח. רחל גנבה את ה___ של אביה והחביאה אותם בכרה ה___. לבן רדף אחריו אבל ה' הזהיר אותו בחלום. בסוף הם כרתו ברית בהר ה___ והבטיחו שיהיה ביניהם ___ ולא יפגעו זה בזה.",
+                text: "אחרי ___ שנה בבית לבן, יעקב ברח עם משפחתו. רחל גנבה את ה___ של אביה והחביאה אותם בכרה ה___. לבן רדף אחרי יעקב אבל ה' הזהיר אותו בחלום. בסוף הם כרתו ברית בהר ה___ והבטיחו שיהיה ביניהם ___ ולא יפגעו זה בזה.",
                 words: ["עשרים", "תרפים", "גמל", "גלעד", "שלום"]
             }
         ];
@@ -158,19 +159,29 @@ const triviaQuestions = [
         }
 
         // --- לוגיקה להשלמת סיפור (Select Box) ---
-        function renderCloze(container) {
+function renderCloze(container) {
             if (currentIdx >= clozeData.length) {
                 showFinishScreen(container, "סיימת את כל הסיפורים! אלופה! 📚");
                 return;
             }
 
             const data = clozeData[currentIdx];
+            
+            // כותרת + כפתור שיר אם קיים
             let html = `<div class="text-center w-full max-w-2xl mx-auto">`;
-            html += `<h2 class="text-2xl font-bold mb-6 text-purple-700 underline">${data.chapter}</h2>`;
+            html += `<div class="flex items-center justify-center gap-3 mb-6">`;
+            html += `<h2 class="text-2xl font-bold text-purple-700 underline">${data.chapter}</h2>`;
+            if (data.song) {
+                html += `<a href="${data.song}" target="_blank" class="bg-pink-500 text-white p-2 rounded-full hover:bg-pink-600 shadow-md transition transform hover:scale-110" title="שיר לדרך! 🎵">🎵</a>`;
+            }
+            html += `</div>`;
+            
             html += `<p class="mb-4 text-sm text-gray-500">הוראות: בחרי את המילה הנכונה מתוך הרשימה בכל תיבה.</p>`;
             
-            // הכנת רשימת אפשרויות לכל תיבה (מערבבים את המילים של הפרק הנוכחי)
-            const optionsList = [...data.words].sort(() => Math.random() - 0.5);
+            // יצירת רשימת אפשרויות ללא כפילויות (כדי ש'שבע' לא יופיע פעמיים בבחירה)
+            const uniqueWords = [...new Set(data.words)]; 
+            const optionsList = uniqueWords.sort(() => Math.random() - 0.5);
+            
             let optionsHtml = `<option value="">בחרי...</option>`;
             optionsList.forEach(w => {
                 optionsHtml += `<option value="${w}">${w}</option>`;
@@ -178,14 +189,10 @@ const triviaQuestions = [
 
             // בניית הטקסט
             let textHtml = data.text;
-            let counter = 0;
-            // נחליף כל קו תחתון בתיבת בחירה
-            // אנו מניחים שהסדר של words תואם את סדר ההופעה בטקסט
-            
-            // שיטה בטוחה להחלפה סדרתית
             data.words.forEach((correctWord, i) => {
+                 // משתמשים ב-replace הראשון שמוצאים כל פעם
                  textHtml = textHtml.replace("___", `
-                    <select id="cloze-${i}" class="cloze-select" data-correct="${correctWord}">
+                    <select id="cloze-${i}" class="cloze-select inline-block my-1" data-correct="${correctWord}">
                         ${optionsHtml}
                     </select>
                  `);
@@ -198,7 +205,7 @@ const triviaQuestions = [
             html += `</div>`;
 
             container.innerHTML = html;
-        }
+        }       
 
         function checkCloze() {
             const currentData = clozeData[currentIdx];
