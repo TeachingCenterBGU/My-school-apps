@@ -49,6 +49,20 @@ const homeworkData = [
         "date": "04/02"
     },
     {
+        "id": "7804",
+        "grade": 3,
+        "subject": "חשבון",
+        "task": "לסיים עד עמוד 54",
+        "date": "08/02"
+    },
+    {
+        "id": "7805",
+        "grade": 3,
+        "subject": "חשבון",
+        "task": "לסיים עד עמוד 54",
+        "date": "08/02"
+    },
+    {
         "id": "6356",
         "grade": 3,
         "subject": "לשון",
@@ -175,13 +189,6 @@ const homeworkData = [
         "date": "26/01"
     },
     {
-        "id": "6188",
-        "grade": 5,
-        "subject": "אנגלית",
-        "task": "w. b. p. 64, 65, 66, ex. 4",
-        "date": "08/01"
-    },
-    {
         "id": "6409",
         "grade": 5,
         "subject": "אנגלית",
@@ -278,6 +285,13 @@ const homeworkData = [
         "subject": "מתמטיקה",
         "task": "במחברת",
         "date": "28/01"
+    },
+    {
+        "id": "7795",
+        "grade": 5,
+        "subject": "מתמטיקה",
+        "task": "63-67",
+        "date": "08/02"
     },
     {
         "id": "6606",
