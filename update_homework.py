@@ -92,7 +92,7 @@ def update_homework():
 
     # --- שלב 3: משיכת שיעורים וסינון ---
     all_tasks = []
-    lookback_days = 30
+    lookback_days = 10
     
     # תיקון הזחה כאן: השורות מיושרות לשמאל כמו lookback_days
     cutoff_date = datetime.now() - timedelta(days=lookback_days)

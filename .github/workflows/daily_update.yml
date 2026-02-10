@@ -2,7 +2,7 @@ name: Update Homework
 
 on:
   schedule:
-    - cron: '0 13 * * *' # רץ כל יום ב-15:00 שעון ישראל בערך
+    - cron: '0 12 * * *' # רץ כל יום ב-14:00 שעון ישראל בערך
   workflow_dispatch: # מאפשר הרצה ידנית
 
 permissions:
