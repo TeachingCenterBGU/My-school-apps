@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Mastery - Jump 2</title>
+    <style>
+        :root { --primary: #4a90e2; --success: #2ecc71; --error: #e74c3c; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .menu { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; justify-content: center; }
+        .menu button { background: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 20px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .menu button:hover { transform: scale(1.05); }
+        
+        .game-section { display: none; }
+        .active { display: block; }
+        
+        .en-content { direction: ltr; text-align: left; padding: 20px; background: #f1f5f9; border-radius: 12px; margin: 15px 0; font-size: 1.1em; }
+        
+        .btn-opt { display: block; width: 100%; background: white; border: 2px solid #e2e8f0; padding: 12px; margin: 8px 0; border-radius: 10px; cursor: pointer; text-align: left; direction: ltr; font-weight: 500; }
+        .btn-opt:hover { border-color: var(--primary); background: #f0f7ff; }
+        .btn-opt.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .btn-opt.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        .score-screen { text-align: center; padding: 40px; }
+        .score-val { font-size: 4em; color: var(--primary); font-weight: bold; }
+        
+        .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .match-item { padding: 12px; border: 2px solid #cbd5e1; border-radius: 10px; cursor: pointer; background: white; text-align: center; }
+        .match-item.selected { border-color: var(--primary); background: #dbeafe; }
+        .match-item.matched { visibility: hidden; }
+
+        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-container">
+    <h1 style="text-align: center; color: var(--primary); margin-top:0;">English Test Prep</h1>
+    
+    <div class="menu" id="nav-menu">
+        <button onclick="startLevel('sorting')">מיון רבים</button>
+        <button onclick="startLevel('matching')">חיבור ביטויים</button>
+        <button onclick="startLevel('isare')">Is or Are?</button>
+        <button onclick="startLevel('vocab')">אוצר מילים</button>
+        <button onclick="startLevel('reading')">הבנת הנקרא</button>
+    </div>
+
+    <div id="game-zone">
+        <div id="sorting" class="game-section">
+            <div class="progress-bar"><div id="p-sorting" class="progress-fill"></div></div>
+            <h3 style="text-align:right;">איזה חוק מתאים למילה?</h3>
+            <div class="en-content" style="text-align:center; font-size: 2.5em; font-weight:bold;" id="sort-word">---</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="btn-opt" onclick="handleSort('s')" style="text-align:center;">Regular (+S)</button>
+                <button class="btn-opt" onclick="handleSort('es')" style="text-align:center;">Ends in CH/SH/X (+ES)</button>
+                <button class="btn-opt" onclick="handleSort('ies')" style="text-align:center;">Ends in Y (➔ IES)</button>
+                <button class="btn-opt" onclick="handleSort('irreg')" style="text-align:center;">Irregular (מיוחד)</button>
+            </div>
+            <div id="sort-msg" style="text-align:center; margin-top:15px; font-weight:bold; height:20px;"></div>
+        </div>
+
+        <div id="matching" class="game-section">
+            <h3 style="text-align:right;">התאימי בין הצדדים:</h3>
+            <div class="match-grid">
+                <div id="col-left"></div>
+                <div id="col-right"></div>
+            </div>
+        </div>
+
+        <div id="isare" class="game-section">
+            <div class="progress-bar"><div id="p-isare" class="progress-fill"></div></div>
+            <h3 style="text-align:right;">בחרי There is או There are:</h3>
+            <div class="en-content" id="isare-q" style="font-size: 1.4em;">---</div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-opt" onclick="handleIsAre('is')" style="text-align:center;">There is</button>
+                <button class="btn-opt" onclick="handleIsAre('are')" style="text-align:center;">There are</button>
+            </div>
+        </div>
+
+        <div id="vocab" class="game-section">
+            <div class="progress-bar"><div id="p-vocab" class="progress-fill"></div></div>
+            <h3 style="text-align:right;">מה התרגום הנכון?</h3>
+            <div class="en-content" id="vocab-q" style="text-align:center; font-size: 2em; font-weight:bold;">---</div>
+            <div id="vocab-opts"></div>
+        </div>
+
+        <div id="reading" class="game-section">
+            <h3 style="text-align:right;">The School Race</h3>
+            <div class="en-content" style="line-height:1.6; font-size:1em;">
+                Today is the big race at school. Many <b>children</b>, men, and women are there. 
+                It is very <b>important</b> to <b>practice</b> every day to be a <b>winner</b>. 
+                My friend Avi is in the race. He wants to win a gold <b>medal</b> and a <b>prize</b>. 
+                <b>There are</b> many parents and teachers watching. They are very <b>excited</b> and they make a lot of <b>noise</b>. 
+                Avi has a problem with his legs, but he moves fast. <b>There are</b> five birds in the trees and lots of cars on the road near the school. It is a special day!
+            </div>
+            <div id="read-q-zone"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DATA ---
+    const data = {
+        sorting: [
+            {s:"car", r:"s", p:"cars"}, {s:"bird", r:"s", p:"birds"}, {s:"table", r:"s", p:"tables"}, {s:"game", r:"s", p:"games"},
+            {s:"sandwich", r:"es", p:"sandwiches"}, {s:"box", r:"es", p:"boxes"}, {s:"lunch", r:"es", p:"lunches"}, {s:"dress", r:"es", p:"dresses"}, {s:"class", r:"es", p:"classes"},
+            {s:"baby", r:"ies", p:"babies"}, {s:"family", r:"ies", p:"families"}, {s:"hobby", r:"ies", p:"hobbies"}, {s:"story", r:"ies", p:"stories"},
+            {s:"child", r:"irreg", p:"children"}, {s:"man", r:"irreg", p:"men"}, {s:"woman", r:"irreg", p:"women"}, {s:"foot", r:"irreg", p:"feet"}, {s:"mouse", r:"irreg", p:"mice"}
+        ],
+        matching: [
+            {l:"win", r:"a medal"}, {l:"play", r:"basketball"}, {l:"build", r:"towns"}, {l:"eat", r:"pieces"},
+            {l:"fix", r:"a computer"}, {l:"find", r:"your pen"}, {l:"use", r:"a computer"}, {l:"move", r:"the pieces"}
+        ],
+        isare: [
+            {q:"_____ a new game.", a:"is"}, {q:"_____ lots of cars.", a:"are"}, {q:"_____ a problem with his legs.", a:"is"},
+            {q:"_____ many ways to move.", a:"are"}, {q:"_____ five birds in the tree.", a:"are"}, {q:"_____ two restaurants.", a:"are"},
+            {q:"_____ a note on the table.", a:"is"}, {q:"_____ a lot of customers.", a:"are"}
+        ],
+        vocab: [
+            {q:"winner", a:"מנצח", o:["מפסיד", "מנצח", "משחק", "פרס"]},
+            {q:"tomorrow", a:"מחר", o:["היום", "אתמול", "מחר", "שנה"]},
+            {q:"important", a:"חשוב", o:["חשוב", "מעניין", "קשה", "קל"]},
+            {q:"medal", a:"מדליה", o:["גביע", "מדליה", "תעודה", "מקום"]},
+            {q:"excited", a:"נרגש", o:["עצוב", "עייף", "נרגש", "חולה"]},
+            {q:"prize", a:"פרס", o:["כסף", "פרס", "מדליה", "מתנה"]},
+            {q:"noise", a:"רעש", o:["שקט", "רעש", "מוזיקה", "דיבור"]}
+        ],
+        reading: [
+            {q:"Where is the race?", a:"At the school", o:["At the park", "At the school", "On an island", "At a restaurant"]},
+            {q:"Who is in the race?", a:"Many children, men and women", o:["Only children", "Only Avi", "Many children, men and women", "Only teachers"]},
+            {q:"What is important to do every day?", a:"To practice", o:["To eat eggs", "To practice", "To fix a computer", "To sleep"]},
+            {q:"What does the winner get?", a:"A medal and a prize", o:["A sandwich", "A medal and a prize", "A new game", "A guitar"]},
+            {q:"How do the people feel?", a:"Excited", o:["Sad", "Excited", "Sick", "Poor"]}
+        ]
+    };
+
+    let state = { mode: '', list: [], idx: 0, score: 0, selected: null };
+
+    function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+
+    function startLevel(m) {
+        state = { mode: m, list: shuffle([...data[m]]), idx: 0, score: 0, selected: null };
+        document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(m).classList.add('active');
+        renderStep();
+    }
+
+    function renderStep() {
+        const item = state.list[state.idx];
+        const prog = (state.idx / state.list.length) * 100;
+        
+        if (state.mode === 'sorting') {
+            document.getElementById('p-sorting').style.width = prog + '%';
+            document.getElementById('sort-word').innerText = item.s;
+            document.getElementById('sort-msg').innerText = "";
+        }
+        else if (state.mode === 'isare') {
+            document.getElementById('p-isare').style.width = prog + '%';
+            document.getElementById('isare-q').innerText = item.q;
+        }
+        else if (state.mode === 'vocab') {
+            document.getElementById('p-vocab').style.width = prog + '%';
+            document.getElementById('vocab-q').innerText = item.q;
+            document.getElementById('vocab-opts').innerHTML = shuffle([...item.o]).map(o => 
+                `<button class="btn-opt" onclick="handleVocab('${o}')">${o}</button>`).join('');
+        }
+        else if (state.mode === 'matching') {
+            const left = shuffle([...state.list]);
+            const right = shuffle([...state.list]);
+            document.getElementById('col-left').innerHTML = left.map(i => `<div class="match-item" id="L-${i.l}" onclick="matchSelect('L','${i.l}')">${i.l}</div>`).join('');
+            document.getElementById('col-right').innerHTML = right.map(i => `<div class="match-item" id="R-${i.r}" onclick="matchSelect('R','${i.r}')">${i.r}</div>`).join('');
+        }
+        else if (state.mode === 'reading') {
+            document.getElementById('read-q-zone').innerHTML = state.list.map((q, i) => `
+                <div style="margin-top:20px; direction:ltr; text-align:left;">
+                    <b>${i+1}. ${q.q}</b>
+                    ${shuffle([...q.o]).map(o => `<button class="btn-opt" onclick="handleRead(this,'${o}','${q.a}')">${o}</button>`).join('')}
+                </div>
+            `).join('');
+        }
+    }
+
+    function handleSort(r) {
+        const item = state.list[state.idx];
+        const msg = document.getElementById('sort-msg');
+        if (r === item.r) {
+            state.score++;
+            msg.innerHTML = `<span style="color:var(--success)">Correct! ${item.s} ➔ ${item.p}</span>`;
+            next();
+        } else msg.innerHTML = `<span style="color:var(--error)">Try another rule...</span>`;
+    }
+
+    function handleIsAre(a) { if(a === state.list[state.idx].a) { state.score++; next(); } }
+    function handleVocab(o) { if(o === state.list[state.idx].a) { state.score++; next(); } }
+    
+    function handleRead(btn, o, a) {
+        if(o === a) { btn.classList.add('correct'); state.score++; }
+        else btn.classList.add('wrong');
+        btn.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
+        state.idx++; if(state.idx === state.list.length) setTimeout(showScore, 1000);
+    }
+
+    function matchSelect(side, val) {
+        const id = side + '-' + val;
+        const el = document.getElementById(id);
+        if (el.classList.contains('matched')) return;
+        
+        if (state.selected && state.selected.side !== side) {
+            const pair = side === 'L' ? data.matching.find(p => p.l === val && p.r === state.selected.val) : data.matching.find(p => p.r === val && p.l === state.selected.val);
+            if (pair) {
+                el.classList.add('matched');
+                document.getElementById(state.selected.id).classList.add('matched');
+                state.score++; state.idx++;
+                if (state.idx === state.list.length) showScore();
+            }
+            document.getElementById(state.selected.id).classList.remove('selected');
+            state.selected = null;
+        } else {
+            if (state.selected) document.getElementById(state.selected.id).classList.remove('selected');
+            el.classList.add('selected');
+            state.selected = { side, val, id };
+        }
+    }
+
+    function next() {
+        state.idx++;
+        if (state.idx < state.list.length) setTimeout(renderStep, 800);
+        else setTimeout(showScore, 800);
+    }
+
+    function showScore() {
+        const final = Math.round((state.score / state.list.length) * 100);
+        document.getElementById('game-zone').innerHTML = `
+            <div class="score-screen">
+                <h2>סיימת את החלק הזה!</h2>
+                <div class="score-val">${final}</div>
+                <p>ציון סופי</p>
+                <button onclick="location.reload()" style="background:var(--primary); color:white; border:none; padding:15px 30px; border-radius:10px; cursor:pointer;">חזרה לתפריט</button>
+            </div>`;
+    }
+</script>
+</body>
+</html>
