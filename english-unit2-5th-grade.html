@@ -3,241 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Mastery - Jump 2</title>
+    <title>English Fun - Jump 2</title>
     <style>
-        :root { --primary: #4a90e2; --success: #2ecc71; --error: #e74c3c; --bg: #f8fafc; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .menu { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; justify-content: center; }
-        .menu button { background: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 20px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .menu button:hover { transform: scale(1.05); }
+        :root { --p: #6c5ce7; --s: #00cec9; --w: #ff7675; --y: #fdcb6e; --g: #55efc4; --bg: #f0f3f7; }
+        body { font-family: 'Assistant', 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #2d3436; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 4px solid #fff; }
         
+        /* Menu & Progress */
+        .menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
+        .menu button { background: linear-gradient(135deg, var(--p), #a29bfe); color: white; border: none; padding: 15px; border-radius: 18px; cursor: pointer; font-weight: bold; font-size: 16px; box-shadow: 0 4px 0 #4834d4; transition: 0.1s; }
+        .menu button:active { transform: translateY(4px); box-shadow: none; }
+        .progress-bar { height: 12px; background: #dfe6e9; border-radius: 10px; margin-bottom: 20px; overflow: hidden; border: 2px solid #fff; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--s), var(--g)); width: 0%; transition: 0.4s; }
+
+        /* Game Areas */
         .game-section { display: none; }
-        .active { display: block; }
-        
-        .en-content { direction: ltr; text-align: left; padding: 20px; background: #f1f5f9; border-radius: 12px; margin: 15px 0; font-size: 1.1em; }
-        
-        .btn-opt { display: block; width: 100%; background: white; border: 2px solid #e2e8f0; padding: 12px; margin: 8px 0; border-radius: 10px; cursor: pointer; text-align: left; direction: ltr; font-weight: 500; }
-        .btn-opt:hover { border-color: var(--primary); background: #f0f7ff; }
-        .btn-opt.correct { background: var(--success) !important; color: white; border-color: var(--success); }
-        .btn-opt.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+        .active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .score-screen { text-align: center; padding: 40px; }
-        .score-val { font-size: 4em; color: var(--primary); font-weight: bold; }
-        
-        .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .match-item { padding: 12px; border: 2px solid #cbd5e1; border-radius: 10px; cursor: pointer; background: white; text-align: center; }
-        .match-item.selected { border-color: var(--primary); background: #dbeafe; }
-        .match-item.matched { visibility: hidden; }
+        .card { direction: ltr; background: #f9f9f9; padding: 30px; border-radius: 20px; text-align: center; font-size: 2.5em; font-weight: 800; color: var(--p); margin-bottom: 20px; border: 3px dashed #dfe6e9; position: relative; }
+        .speaker { position: absolute; top: 10px; left: 10px; font-size: 24px; cursor: pointer; background: none; border: none; }
 
-        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .opt-btn { background: white; border: 3px solid #eee; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 18px; }
+        .opt-btn:hover { border-color: var(--p); background: #f3f0ff; }
+        
+        /* Matching Game Corrected */
+        .match-container { display: flex; justify-content: space-between; gap: 20px; direction: ltr; }
+        .match-col { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .m-item { padding: 15px; border: 3px solid #eee; border-radius: 12px; background: white; text-align: center; font-weight: bold; cursor: pointer; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+        .m-item.selected { border-color: var(--p); background: #f3f0ff; transform: scale(1.02); }
+        .m-item.matched { visibility: hidden; pointer-events: none; }
+
+        .score-box { text-align: center; padding: 40px; }
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; border: 8px solid var(--g); display: flex; align-items: center; justify-content: center; font-size: 3em; margin: 20px auto; color: var(--p); font-weight: 900; }
     </style>
 </head>
 <body>
 
-<div class="container" id="main-container">
-    <h1 style="text-align: center; color: var(--primary); margin-top:0;">English Test Prep</h1>
+<div class="container">
+    <h1 style="text-align: center; color: var(--p); text-shadow: 2px 2px #f0f0f0;">English Adventure 🚀</h1>
     
-    <div class="menu" id="nav-menu">
-        <button onclick="startLevel('sorting')">מיון רבים</button>
-        <button onclick="startLevel('matching')">חיבור ביטויים</button>
-        <button onclick="startLevel('isare')">Is or Are?</button>
-        <button onclick="startLevel('vocab')">אוצר מילים</button>
-        <button onclick="startLevel('reading')">הבנת הנקרא</button>
+    <div class="menu" id="nav">
+        <button onclick="start('sorting')">ממיינים רבים 🧺</button>
+        <button onclick="start('matching')">מחברים זוגות 🔗</button>
+        <button onclick="start('isare')">Is or Are? ✌️</button>
+        <button onclick="start('vocab')">אוצר מילים 🔡</button>
+        <button onclick="start('reading')">הבנת הנקרא 📖</button>
     </div>
 
-    <div id="game-zone">
+    <div id="zone">
         <div id="sorting" class="game-section">
-            <div class="progress-bar"><div id="p-sorting" class="progress-fill"></div></div>
-            <h3 style="text-align:right;">איזה חוק מתאים למילה?</h3>
-            <div class="en-content" style="text-align:center; font-size: 2.5em; font-weight:bold;" id="sort-word">---</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="btn-opt" onclick="handleSort('s')" style="text-align:center;">Regular (+S)</button>
-                <button class="btn-opt" onclick="handleSort('es')" style="text-align:center;">Ends in CH/SH/X (+ES)</button>
-                <button class="btn-opt" onclick="handleSort('ies')" style="text-align:center;">Ends in Y (➔ IES)</button>
-                <button class="btn-opt" onclick="handleSort('irreg')" style="text-align:center;">Irregular (מיוחד)</button>
+            <div class="progress-bar"><div id="p-sort" class="progress-fill"></div></div>
+            <div class="card">
+                <button class="speaker" onclick="sayWord('sort-w')">🔊</button>
+                <span id="sort-w">---</span>
             </div>
-            <div id="sort-msg" style="text-align:center; margin-top:15px; font-weight:bold; height:20px;"></div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="goSort('s')">+S (Regular)</button>
+                <button class="opt-btn" onclick="goSort('es')">+ES (ch, x, s)</button>
+                <button class="opt-btn" onclick="goSort('ies')">Y ➔ IES</button>
+                <button class="opt-btn" onclick="goSort('irreg')">Irregular ✨</button>
+            </div>
         </div>
 
         <div id="matching" class="game-section">
-            <h3 style="text-align:right;">התאימי בין הצדדים:</h3>
-            <div class="match-grid">
-                <div id="col-left"></div>
-                <div id="col-right"></div>
+            <h3 style="text-align:center;">חברי בין הפועל לביטוי:</h3>
+            <div class="match-container">
+                <div id="col-L" class="match-col"></div>
+                <div id="col-R" class="match-col"></div>
             </div>
         </div>
 
         <div id="isare" class="game-section">
             <div class="progress-bar"><div id="p-isare" class="progress-fill"></div></div>
-            <h3 style="text-align:right;">בחרי There is או There are:</h3>
-            <div class="en-content" id="isare-q" style="font-size: 1.4em;">---</div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-opt" onclick="handleIsAre('is')" style="text-align:center;">There is</button>
-                <button class="btn-opt" onclick="handleIsAre('are')" style="text-align:center;">There are</button>
+            <div class="card" style="font-size: 1.5em; padding: 40px;" id="isare-q">---</div>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="goIsAre('is')">There is</button>
+                <button class="opt-btn" onclick="goIsAre('are')">There are</button>
             </div>
         </div>
 
         <div id="vocab" class="game-section">
             <div class="progress-bar"><div id="p-vocab" class="progress-fill"></div></div>
-            <h3 style="text-align:right;">מה התרגום הנכון?</h3>
-            <div class="en-content" id="vocab-q" style="text-align:center; font-size: 2em; font-weight:bold;">---</div>
-            <div id="vocab-opts"></div>
+            <div class="card">
+                <button class="speaker" onclick="sayWord('vocab-q')">🔊</button>
+                <span id="vocab-q">---</span>
+            </div>
+            <div id="vocab-opts" class="options-grid"></div>
         </div>
 
         <div id="reading" class="game-section">
-            <h3 style="text-align:right;">The School Race</h3>
-            <div class="en-content" style="line-height:1.6; font-size:1em;">
-                Today is the big race at school. Many <b>children</b>, men, and women are there. 
-                It is very <b>important</b> to <b>practice</b> every day to be a <b>winner</b>. 
-                My friend Avi is in the race. He wants to win a gold <b>medal</b> and a <b>prize</b>. 
-                <b>There are</b> many parents and teachers watching. They are very <b>excited</b> and they make a lot of <b>noise</b>. 
-                Avi has a problem with his legs, but he moves fast. <b>There are</b> five birds in the trees and lots of cars on the road near the school. It is a special day!
+            <div class="en-content" style="direction:ltr; text-align:left; padding:15px; background:#fff8e1; border-radius:15px; border:2px solid #ffe082; line-height:1.6; margin-bottom:20px;">
+                Today is the <b>big race</b> at school. Many <b>children</b>, men, and women are there. 
+                It is very <b>important</b> to <b>practice</b> to be a <b>winner</b>. 
+                Avi is in the race. He wants to win a gold <b>medal</b> and a <b>prize</b>. 
+                <b>There are</b> many parents and teachers watching. They make a lot of <b>noise</b>. 
+                <b>There are</b> five birds in the trees and many cars on the <b>road</b>. It is fun!
             </div>
-            <div id="read-q-zone"></div>
+            <div id="read-qs"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- DATA ---
-    const data = {
+    // DATA
+   // מאגר נתונים מורחב
+    const db = {
         sorting: [
-            {s:"car", r:"s", p:"cars"}, {s:"bird", r:"s", p:"birds"}, {s:"table", r:"s", p:"tables"}, {s:"game", r:"s", p:"games"},
-            {s:"sandwich", r:"es", p:"sandwiches"}, {s:"box", r:"es", p:"boxes"}, {s:"lunch", r:"es", p:"lunches"}, {s:"dress", r:"es", p:"dresses"}, {s:"class", r:"es", p:"classes"},
-            {s:"baby", r:"ies", p:"babies"}, {s:"family", r:"ies", p:"families"}, {s:"hobby", r:"ies", p:"hobbies"}, {s:"story", r:"ies", p:"stories"},
-            {s:"child", r:"irreg", p:"children"}, {s:"man", r:"irreg", p:"men"}, {s:"woman", r:"irreg", p:"women"}, {s:"foot", r:"irreg", p:"feet"}, {s:"mouse", r:"irreg", p:"mice"}
+            {s:"car", r:"s", p:"cars"}, {s:"sandwich", r:"es", p:"sandwiches"}, {s:"family", r:"ies", p:"families"}, 
+            {s:"child", r:"irreg", p:"children"}, {s:"man", r:"irreg", p:"men"}, {s:"box", r:"es", p:"boxes"}, 
+            {s:"hobby", r:"ies", p:"hobbies"}, {s:"bird", r:"s", p:"birds"}, {s:"foot", r:"irreg", p:"feet"},
+            {s:"woman", r:"irreg", p:"women"}, {s:"story", r:"ies", p:"stories"}, {s:"lunch", r:"es", p:"lunches"},
+            {s:"dress", r:"es", p:"dresses"}, {s:"class", r:"es", p:"classes"}, {s:"baby", r:"ies", p:"babies"}
         ],
         matching: [
-            {l:"win", r:"a medal"}, {l:"play", r:"basketball"}, {l:"build", r:"towns"}, {l:"eat", r:"pieces"},
-            {l:"fix", r:"a computer"}, {l:"find", r:"your pen"}, {l:"use", r:"a computer"}, {l:"move", r:"the pieces"}
+            {l:"win", r:"a medal"}, {l:"play", r:"basketball"}, {l:"build", r:"towns"}, 
+            {l:"eat", r:"pieces"}, {l:"fix", r:"a computer"}, {l:"use", r:"a computer"},
+            {l:"move", r:"the pieces"}, {l:"find", r:"your pen"}, {l:"build", r:"a house"},
+            {l:"fix", r:"a car"}, {l:"choose", r:"a game"}
         ],
         isare: [
-            {q:"_____ a new game.", a:"is"}, {q:"_____ lots of cars.", a:"are"}, {q:"_____ a problem with his legs.", a:"is"},
-            {q:"_____ many ways to move.", a:"are"}, {q:"_____ five birds in the tree.", a:"are"}, {q:"_____ two restaurants.", a:"are"},
-            {q:"_____ a note on the table.", a:"is"}, {q:"_____ a lot of customers.", a:"are"}
+            {q:"_____ a new game.", a:"is"}, {q:"_____ lots of cars.", a:"are"}, 
+            {q:"_____ many ways to move.", a:"are"}, {q:"_____ five birds.", a:"are"},
+            {q:"_____ a note for mom.", a:"is"}, {q:"_____ two restaurants.", a:"are"},
+            {q:"_____ a problem with his legs.", a:"is"}, {q:"_____ a lot of customers.", a:"are"}
         ],
         vocab: [
-            {q:"winner", a:"מנצח", o:["מפסיד", "מנצח", "משחק", "פרס"]},
-            {q:"tomorrow", a:"מחר", o:["היום", "אתמול", "מחר", "שנה"]},
-            {q:"important", a:"חשוב", o:["חשוב", "מעניין", "קשה", "קל"]},
-            {q:"medal", a:"מדליה", o:["גביע", "מדליה", "תעודה", "מקום"]},
-            {q:"excited", a:"נרגש", o:["עצוב", "עייף", "נרגש", "חולה"]},
-            {q:"prize", a:"פרס", o:["כסף", "פרס", "מדליה", "מתנה"]},
-            {q:"noise", a:"רעש", o:["שקט", "רעש", "מוזיקה", "דיבור"]}
+            {q:"winner", a:"מנצח", o:["מנצח","מפסיד","פרס","חשוב"]},
+            {q:"tomorrow", a:"מחר", o:["מחר","היום","אתמול","שנה"]},
+            {q:"important", a:"חשוב", o:["חשוב","קל","מעניין","נמוך"]},
+            {q:"medal", a:"מדליה", o:["מדליה","גביע","ניצחון","כסף"]},
+            {q:"noise", a:"רעש", o:["שקט","רעש","מוזיקה","דיבור"]},
+            {q:"excited", a:"נרגש", o:["נרגש","עצוב","עייף","כועס"]},
+            {q:"prize", a:"פרס", o:["פרס","מתנה","מדליה","כסף"]},
+            {q:"practice", a:"להתאמן", o:["להתאמן","לשחק","לנצח","לרוץ"]},
+            {q:"country", a:"מדינה", o:["מדינה","עיר","כפר","אי"]},
+            {q:"interesting", a:"מעניין", o:["מעניין","משעמם","חשוב","קשה"]},
+            {q:"choose", a:"לבחור", o:["לבחור","לקנות","לבנות","לתקן"]},
+            {q:"different", a:"שונה", o:["שונה","דומה","חדש","ישן"]},
+            {q:"together", a:"ביחד", o:["ביחד","לבד","מהר","לאט"]},
+            {q:"adult", a:"מבוגר", o:["מבוגר","ילד","תינוק","שחקן"]},
+            {q:"again", a:"שוב", o:["שוב","אולי","תמיד","אף פעם"]},
+            {q:"because", a:"בגלל", o:["בגלל","אבל","אז","למרות"]}
         ],
         reading: [
-            {q:"Where is the race?", a:"At the school", o:["At the park", "At the school", "On an island", "At a restaurant"]},
-            {q:"Who is in the race?", a:"Many children, men and women", o:["Only children", "Only Avi", "Many children, men and women", "Only teachers"]},
-            {q:"What is important to do every day?", a:"To practice", o:["To eat eggs", "To practice", "To fix a computer", "To sleep"]},
-            {q:"What does the winner get?", a:"A medal and a prize", o:["A sandwich", "A medal and a prize", "A new game", "A guitar"]},
-            {q:"How do the people feel?", a:"Excited", o:["Sad", "Excited", "Sick", "Poor"]}
+            {q:"Where is the race?", a:"At the school", o:["At the park","At the school","In a house","On the road"]},
+            {q:"Who is in the race?", a:"Children, men and women", o:["Only kids","Only Avi","Children, men and women","Only teachers"]},
+            {q:"What is important to do to be a winner?", a:"To practice every day", o:["To eat a sandwich","To practice every day","To sleep","To talk to Avi"]},
+            {q:"What does the winner get?", a:"A gold medal and a prize", o:["A new game","A gold medal and a prize","A sandwich","A guitar"]},
+            {q:"How do the parents and teachers feel?", a:"Excited", o:["Sad","Excited","Tired","Sick"]},
+            {q:"What is near the school?", a:"Lots of cars on the road", o:["A restaurant","Lots of cars on the road","A swimming pool","A big park"]}
         ]
     };
 
-    let state = { mode: '', list: [], idx: 0, score: 0, selected: null };
+    let st = { mode: '', list: [], idx: 0, score: 0, sel: null };
 
-    function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
-
-    function startLevel(m) {
-        state = { mode: m, list: shuffle([...data[m]]), idx: 0, score: 0, selected: null };
-        document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
-        document.getElementById(m).classList.add('active');
-        renderStep();
+    function sayWord(id) {
+        let txt = document.getElementById(id).innerText;
+        let msg = new SpeechSynthesisUtterance(txt);
+        msg.lang = 'en-US';
+        window.speechSynthesis.speak(msg);
     }
 
-    function renderStep() {
-        const item = state.list[state.idx];
-        const prog = (state.idx / state.list.length) * 100;
+    function start(m) {
+        st = { mode: m, list: [...db[m]].sort(()=>Math.random()-0.5), idx: 0, score: 0, sel: null };
+        document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(m).classList.add('active');
+        render();
+    }
+
+    function render() {
+        let item = st.list[st.idx];
+        let p = (st.idx / st.list.length) * 100;
         
-        if (state.mode === 'sorting') {
-            document.getElementById('p-sorting').style.width = prog + '%';
-            document.getElementById('sort-word').innerText = item.s;
-            document.getElementById('sort-msg').innerText = "";
-        }
-        else if (state.mode === 'isare') {
-            document.getElementById('p-isare').style.width = prog + '%';
+        if(st.mode==='sorting') {
+            document.getElementById('p-sort').style.width = p+'%';
+            document.getElementById('sort-w').innerText = item.s;
+        if(st.mode==='matching') {
+            const L = [...st.list].sort(()=>Math.random()-0.5);
+            const R = [...st.list].sort(()=>Math.random()-0.5);
+            // שימוש באינדקס המקור כדי להבטיח זיהוי ייחודי
+            document.getElementById('col-L').innerHTML = L.map((i, idx) => 
+                `<div class="m-item" id="L-${idx}" onclick="selM('L','${i.l}', ${idx})">${i.l}</div>`).join('');
+            document.getElementById('col-R').innerHTML = R.map((i, idx) => 
+                `<div class="m-item" id="R-${idx}" onclick="selM('R','${i.r}', ${idx})">${i.r}</div>`).join('');
+        } else if(st.mode==='isare') {
+            document.getElementById('p-isare').style.width = p+'%';
             document.getElementById('isare-q').innerText = item.q;
-        }
-        else if (state.mode === 'vocab') {
-            document.getElementById('p-vocab').style.width = prog + '%';
+        } else if(st.mode==='vocab') {
+            document.getElementById('p-vocab').style.width = p+'%';
             document.getElementById('vocab-q').innerText = item.q;
-            document.getElementById('vocab-opts').innerHTML = shuffle([...item.o]).map(o => 
-                `<button class="btn-opt" onclick="handleVocab('${o}')">${o}</button>`).join('');
-        }
-        else if (state.mode === 'matching') {
-            const left = shuffle([...state.list]);
-            const right = shuffle([...state.list]);
-            document.getElementById('col-left').innerHTML = left.map(i => `<div class="match-item" id="L-${i.l}" onclick="matchSelect('L','${i.l}')">${i.l}</div>`).join('');
-            document.getElementById('col-right').innerHTML = right.map(i => `<div class="match-item" id="R-${i.r}" onclick="matchSelect('R','${i.r}')">${i.r}</div>`).join('');
-        }
-        else if (state.mode === 'reading') {
-            document.getElementById('read-q-zone').innerHTML = state.list.map((q, i) => `
-                <div style="margin-top:20px; direction:ltr; text-align:left;">
-                    <b>${i+1}. ${q.q}</b>
-                    ${shuffle([...q.o]).map(o => `<button class="btn-opt" onclick="handleRead(this,'${o}','${q.a}')">${o}</button>`).join('')}
+            document.getElementById('vocab-opts').innerHTML = item.o.sort(()=>Math.random()-0.5).map(o => `<button class="opt-btn" onclick="goVocab('${o}')">${o}</button>`).join('');
+        } else if(st.mode==='reading') {
+            document.getElementById('read-qs').innerHTML = st.list.map((q,i) => `
+                <div style="direction:ltr; text-align:left; margin-top:15px;">
+                    <b>${i+1}. ${q.q}</b><br>
+                    ${q.options ? '' : q.o.map(o => `<button class="opt-btn" style="width:auto; margin-right:5px; font-size:14px;" onclick="goRead(this,'${o}','${q.a}')">${o}</button>`).join('')}
                 </div>
             `).join('');
         }
     }
 
-    function handleSort(r) {
-        const item = state.list[state.idx];
-        const msg = document.getElementById('sort-msg');
-        if (r === item.r) {
-            state.score++;
-            msg.innerHTML = `<span style="color:var(--success)">Correct! ${item.s} ➔ ${item.p}</span>`;
-            next();
-        } else msg.innerHTML = `<span style="color:var(--error)">Try another rule...</span>`;
+    function goSort(r) { 
+        if(r === st.list[st.idx].r) { st.score++; next(); } 
+        else { alert("Try again! The plural is: " + st.list[st.idx].p); next(); }
     }
-
-    function handleIsAre(a) { if(a === state.list[state.idx].a) { state.score++; next(); } }
-    function handleVocab(o) { if(o === state.list[state.idx].a) { state.score++; next(); } }
-    
-    function handleRead(btn, o, a) {
-        if(o === a) { btn.classList.add('correct'); state.score++; }
-        else btn.classList.add('wrong');
+    function goIsAre(a) { if(a === st.list[st.idx].a) st.score++; next(); }
+    function goVocab(o) { if(o === st.list[st.idx].a) st.score++; next(); }
+    function goRead(btn, o, a) {
+        if(o === a) { btn.style.background = "#55efc4"; st.score++; }
+        else btn.style.background = "#ff7675";
         btn.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
-        state.idx++; if(state.idx === state.list.length) setTimeout(showScore, 1000);
+        st.idx++; if(st.idx === st.list.length) setTimeout(finish, 1000);
     }
 
-    function matchSelect(side, val) {
-        const id = side + '-' + val;
+    // פונקציית הבחירה המעודכנת:
+    function selM(side, val, idx) {
+        const id = side + '-' + idx;
         const el = document.getElementById(id);
-        if (el.classList.contains('matched')) return;
         
-        if (state.selected && state.selected.side !== side) {
-            const pair = side === 'L' ? data.matching.find(p => p.l === val && p.r === state.selected.val) : data.matching.find(p => p.r === val && p.l === state.selected.val);
-            if (pair) {
-                el.classList.add('matched');
-                document.getElementById(state.selected.id).classList.add('matched');
-                state.score++; state.idx++;
-                if (state.idx === state.list.length) showScore();
+        if(st.sel && st.sel.side !== side) {
+            // בדיקה אם הערכים שבחרנו יוצרים זוג נכון לפי ה-db
+            const isMatch = side === 'L' ? 
+                db.matching.find(p => p.l === val && p.r === st.sel.val) : 
+                db.matching.find(p => p.r === val && p.l === st.sel.val);
+                
+            if(isMatch) {
+                el.classList.add('matched'); 
+                document.getElementById(st.sel.id).classList.add('matched');
+                st.score++; st.idx++; 
+                if(st.idx === st.list.length) finish();
             }
-            document.getElementById(state.selected.id).classList.remove('selected');
-            state.selected = null;
+            if (st.sel) document.getElementById(st.sel.id).classList.remove('selected');
+            st.sel = null;
         } else {
-            if (state.selected) document.getElementById(state.selected.id).classList.remove('selected');
-            el.classList.add('selected');
-            state.selected = { side, val, id };
+            if(st.sel) document.getElementById(st.sel.id).classList.remove('selected');
+            el.classList.add('selected'); 
+            st.sel = {side, val, id};
         }
     }
 
-    function next() {
-        state.idx++;
-        if (state.idx < state.list.length) setTimeout(renderStep, 800);
-        else setTimeout(showScore, 800);
-    }
-
-    function showScore() {
-        const final = Math.round((state.score / state.list.length) * 100);
-        document.getElementById('game-zone').innerHTML = `
-            <div class="score-screen">
-                <h2>סיימת את החלק הזה!</h2>
-                <div class="score-val">${final}</div>
-                <p>ציון סופי</p>
-                <button onclick="location.reload()" style="background:var(--primary); color:white; border:none; padding:15px 30px; border-radius:10px; cursor:pointer;">חזרה לתפריט</button>
+    function next() { st.idx++; if(st.idx < st.list.length) render(); else finish(); }
+    function finish() {
+        let f = Math.round((st.score/st.list.length)*100);
+        document.getElementById('zone').innerHTML = `
+            <div class="score-box">
+                <h2>WOW! סיימת! 🎉</h2>
+                <div class="score-circle">${f}</div>
+                <button class="opt-btn" onclick="location.reload()" style="background:var(--p); color:white; width:200px;">חזרה לתפריט</button>
             </div>`;
     }
 </script>
