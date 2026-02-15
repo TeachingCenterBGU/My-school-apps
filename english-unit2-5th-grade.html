@@ -9,29 +9,27 @@
         body { font-family: 'Assistant', 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #2d3436; }
         .container { max-width: 700px; margin: auto; background: white; padding: 25px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 4px solid #fff; }
         
-        /* Menu & Progress */
         .menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
         .menu button { background: linear-gradient(135deg, var(--p), #a29bfe); color: white; border: none; padding: 15px; border-radius: 18px; cursor: pointer; font-weight: bold; font-size: 16px; box-shadow: 0 4px 0 #4834d4; transition: 0.1s; }
         .menu button:active { transform: translateY(4px); box-shadow: none; }
+        
         .progress-bar { height: 12px; background: #dfe6e9; border-radius: 10px; margin-bottom: 20px; overflow: hidden; border: 2px solid #fff; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--s), var(--g)); width: 0%; transition: 0.4s; }
 
-        /* Game Areas */
         .game-section { display: none; }
         .active { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { direction: ltr; background: #f9f9f9; padding: 30px; border-radius: 20px; text-align: center; font-size: 2.5em; font-weight: 800; color: var(--p); margin-bottom: 20px; border: 3px dashed #dfe6e9; position: relative; }
+        .card { direction: ltr; background: #f9f9f9; padding: 30px; border-radius: 20px; text-align: center; font-size: 2.2em; font-weight: 800; color: var(--p); margin-bottom: 20px; border: 3px dashed #dfe6e9; position: relative; }
         .speaker { position: absolute; top: 10px; left: 10px; font-size: 24px; cursor: pointer; background: none; border: none; }
 
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .opt-btn { background: white; border: 3px solid #eee; padding: 15px; border-radius: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 18px; }
         .opt-btn:hover { border-color: var(--p); background: #f3f0ff; }
         
-        /* Matching Game Corrected */
         .match-container { display: flex; justify-content: space-between; gap: 20px; direction: ltr; }
         .match-col { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-        .m-item { padding: 15px; border: 3px solid #eee; border-radius: 12px; background: white; text-align: center; font-weight: bold; cursor: pointer; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+        .m-item { padding: 15px; border: 3px solid #eee; border-radius: 12px; background: white; text-align: center; font-weight: bold; cursor: pointer; min-height: 50px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .m-item.selected { border-color: var(--p); background: #f3f0ff; transform: scale(1.02); }
         .m-item.matched { visibility: hidden; pointer-events: none; }
 
@@ -94,7 +92,7 @@
         </div>
 
         <div id="reading" class="game-section">
-            <div class="en-content" style="direction:ltr; text-align:left; padding:15px; background:#fff8e1; border-radius:15px; border:2px solid #ffe082; line-height:1.6; margin-bottom:20px;">
+            <div style="direction:ltr; text-align:left; padding:15px; background:#fff8e1; border-radius:15px; border:2px solid #ffe082; line-height:1.6; margin-bottom:20px;">
                 Today is the <b>big race</b> at school. Many <b>children</b>, men, and women are there. 
                 It is very <b>important</b> to <b>practice</b> to be a <b>winner</b>. 
                 Avi is in the race. He wants to win a gold <b>medal</b> and a <b>prize</b>. 
@@ -107,8 +105,6 @@
 </div>
 
 <script>
-    // DATA
-   // מאגר נתונים מורחב
     const db = {
         sorting: [
             {s:"car", r:"s", p:"cars"}, {s:"sandwich", r:"es", p:"sandwiches"}, {s:"family", r:"ies", p:"families"}, 
@@ -180,14 +176,11 @@
         if(st.mode==='sorting') {
             document.getElementById('p-sort').style.width = p+'%';
             document.getElementById('sort-w').innerText = item.s;
-        if(st.mode==='matching') {
+        } else if(st.mode==='matching') {
             const L = [...st.list].sort(()=>Math.random()-0.5);
             const R = [...st.list].sort(()=>Math.random()-0.5);
-            // שימוש באינדקס המקור כדי להבטיח זיהוי ייחודי
-            document.getElementById('col-L').innerHTML = L.map((i, idx) => 
-                `<div class="m-item" id="L-${idx}" onclick="selM('L','${i.l}', ${idx})">${i.l}</div>`).join('');
-            document.getElementById('col-R').innerHTML = R.map((i, idx) => 
-                `<div class="m-item" id="R-${idx}" onclick="selM('R','${i.r}', ${idx})">${i.r}</div>`).join('');
+            document.getElementById('col-L').innerHTML = L.map((i, idx) => `<div class="m-item" id="L-${idx}" onclick="selM('L','${i.l}', ${idx})">${i.l}</div>`).join('');
+            document.getElementById('col-R').innerHTML = R.map((i, idx) => `<div class="m-item" id="R-${idx}" onclick="selM('R','${i.r}', ${idx})">${i.r}</div>`).join('');
         } else if(st.mode==='isare') {
             document.getElementById('p-isare').style.width = p+'%';
             document.getElementById('isare-q').innerText = item.q;
@@ -199,7 +192,7 @@
             document.getElementById('read-qs').innerHTML = st.list.map((q,i) => `
                 <div style="direction:ltr; text-align:left; margin-top:15px;">
                     <b>${i+1}. ${q.q}</b><br>
-                    ${q.options ? '' : q.o.map(o => `<button class="opt-btn" style="width:auto; margin-right:5px; font-size:14px;" onclick="goRead(this,'${o}','${q.a}')">${o}</button>`).join('')}
+                    ${q.o.map(o => `<button class="opt-btn" style="width:auto; margin-right:5px; font-size:14px;" onclick="goRead(this,'${o}','${q.a}')">${o}</button>`).join('')}
                 </div>
             `).join('');
         }
@@ -218,29 +211,20 @@
         st.idx++; if(st.idx === st.list.length) setTimeout(finish, 1000);
     }
 
-    // פונקציית הבחירה המעודכנת:
     function selM(side, val, idx) {
         const id = side + '-' + idx;
         const el = document.getElementById(id);
-        
         if(st.sel && st.sel.side !== side) {
-            // בדיקה אם הערכים שבחרנו יוצרים זוג נכון לפי ה-db
-            const isMatch = side === 'L' ? 
-                db.matching.find(p => p.l === val && p.r === st.sel.val) : 
-                db.matching.find(p => p.r === val && p.l === st.sel.val);
-                
+            const isMatch = side === 'L' ? db.matching.find(p => p.l === val && p.r === st.sel.val) : db.matching.find(p => p.r === val && p.l === st.sel.val);
             if(isMatch) {
-                el.classList.add('matched'); 
-                document.getElementById(st.sel.id).classList.add('matched');
-                st.score++; st.idx++; 
-                if(st.idx === st.list.length) finish();
+                el.classList.add('matched'); document.getElementById(st.sel.id).classList.add('matched');
+                st.score++; st.idx++; if(st.idx === st.list.length) finish();
             }
             if (st.sel) document.getElementById(st.sel.id).classList.remove('selected');
             st.sel = null;
         } else {
             if(st.sel) document.getElementById(st.sel.id).classList.remove('selected');
-            el.classList.add('selected'); 
-            st.sel = {side, val, id};
+            el.classList.add('selected'); st.sel = {side, val, id};
         }
     }
 
