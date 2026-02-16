@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>מחולל קוביות למנוע החדש 🎲</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f9ff; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h2 { color: #4f46e5; text-align: center; margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input, select { width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 1em; }
+        input:focus { border-color: #4f46e5; outline: none; }
+        button { background: #4f46e5; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 1.1em; font-weight: bold; margin-top: 10px; transition: 0.2s; }
+        button:hover { background: #4338ca; transform: translateY(-2px); }
+        
+        /* אזור הקוד */
+        .output-area { margin-top: 25px; position: relative; }
+        textarea { width: 100%; height: 180px; direction: ltr; font-family: monospace; padding: 15px; border: 2px solid #333; background: #1e293b; color: #a5f3fc; border-radius: 8px; }
+        .copy-hint { text-align: center; color: #64748b; font-size: 0.9em; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>מחולל למנוע החדש 🚀</h2>
+
+    <div class="form-group">
+        <label>מזהה האפליקציה (ID):</label>
+        <span style="font-size:0.85em; color:#666;">(חייב להיות זהה לשם קובץ ה-JSON בתיקיית data)</span>
+        <input type="text" id="appId" placeholder="למשל: english_unit2">
+    </div>
+
+    <div class="form-group">
+        <label>אייקון (אימוג'י):</label>
+        <input type="text" id="icon" value="🎓">
+    </div>
+
+    <div class="form-group">
+        <label>כותרת (נושא):</label>
+        <input type="text" id="title" placeholder="אנגלית: יחידה 2">
+    </div>
+
+    <div class="form-group">
+        <label>תיאור קצר:</label>
+        <input type="text" id="desc" placeholder="חזרה למבחן על יחיד ורבים">
+    </div>
+
+    <div class="form-group">
+        <label>סוג תאריך:</label>
+        <select id="dateType" onchange="toggleDateLabel()">
+            <option value="exam">📅 לקראת מבחן (תגית אדומה)</option>
+            <option value="new">✨ חדש באתר (תגית צהובה)</option>
+            <option value="none">ללא תאריך</option>
+        </select>
+    </div>
+
+    <div class="form-group" id="dateGroup">
+        <label id="dateLabel">תאריך המבחן:</label>
+        <input type="date" id="dateVal">
+    </div>
+
+    <button onclick="generateCode()">צור קוד להעתקה ✨</button>
+
+    <div class="output-area">
+        <label>הקוד להדבקה ב-index.html:</label>
+        <textarea id="output" onclick="this.select()"></textarea>
+        <div class="copy-hint">לחצי על הקוד כדי לסמן הכל, ואז העתיקי (Ctrl+C)</div>
+    </div>
+</div>
+
+<script>
+    // תאריך ברירת מחדל - היום
+    document.getElementById('dateVal').valueAsDate = new Date();
+
+    function toggleDateLabel() {
+        const type = document.getElementById('dateType').value;
+        const group = document.getElementById('dateGroup');
+        
+        if (type === 'none') {
+            group.style.display = 'none';
+        } else {
+            group.style.display = 'block';
+            document.getElementById('dateLabel').innerText = type === 'exam' ? 'תאריך המבחן:' : 'תאריך העלאה:';
+        }
+    }
+
+    function generateCode() {
+        const appId = document.getElementById('appId').value.trim();
+        const icon = document.getElementById('icon').value;
+        const title = document.getElementById('title').value;
+        const desc = document.getElementById('desc').value;
+        const dateType = document.getElementById('dateType').value;
+        const dateVal = document.getElementById('dateVal').value;
+
+        if (!appId) {
+            alert("חובה למלא מזהה אפליקציה!");
+            return;
+        }
+
+        let dateAttr = "";
+        if (dateType === 'exam') dateAttr = `data-exam-date="${dateVal}"`;
+        else if (dateType === 'new') dateAttr = `data-added="${dateVal}"`;
+
+        // כאן השינוי הגדול: הקישור הוא תמיד ל-play.html עם פרמטר ID
+        const code = `
+<div class="card" data-app-id="${appId}" ${dateAttr}>
+    <a class="card-main" href="play.html?id=${appId}">
+        <span class="icon">${icon}</span>
+        <span class="card-title">${title}</span>
+        <span class="card-desc">${desc}</span>
+    </a>
+    <div class="card-actions">
+        <button class="mark-btn partial" type="button">בוצע חלקית</button>
+        <button class="mark-btn done" type="button">סיימתי</button>
+    </div>
+</div>`;
+
+        document.getElementById('output').value = code.trim();
+    }
+</script>
+
+</body>
+</html>

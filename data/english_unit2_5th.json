@@ -1,0 +1,55 @@
+{
+  "id": "english_unit2_5th",
+  "title": "English Mastery - Unit 2",
+  "subject": "אנגלית",
+  "description": "חזרה למבחן: יחיד/רבים, Is/Are ואוצר מילים",
+  "examDate": "2026-02-19",
+  "activities": [
+    {
+      "name": "Plural Rules (יחיד לרבים)",
+      "type": "trivia",
+      "icon": "🧺",
+      "questions": [
+        { "q": "מה צורת הרבים של 'car'?", "opts": ["cars (+s)", "cares (+es)", "caries (+ies)"], "a": 0 },
+        { "q": "מה צורת הרבים של 'sandwich'?", "opts": ["sandwichs", "sandwiches (+es)", "sandwichies"], "a": 1 },
+        { "q": "מה צורת הרבים של 'family'?", "opts": ["familys", "familyes", "families (y -> ies)"], "a": 2 },
+        { "q": "מה צורת הרבים של 'child'?", "opts": ["childs", "children (irregular)", "childes"], "a": 1 },
+        { "q": "מה צורת הרבים של 'man'?", "opts": ["mans", "men (irregular)", "manes"], "a": 1 },
+        { "q": "מה צורת הרבים של 'box'?", "opts": ["boxs", "boxes (+es)", "boxies"], "a": 1 },
+        { "q": "מה צורת הרבים של 'hobby'?", "opts": ["hobbys", "hobbis", "hobbies (y -> ies)"], "a": 2 },
+        { "q": "מה צורת הרבים של 'foot'?", "opts": ["foots", "feet (irregular)", "feets"], "a": 1 },
+        { "q": "מה צורת הרבים של 'woman'?", "opts": ["womans", "women (irregular)", "womenses"], "a": 1 }
+      ]
+    },
+    {
+      "name": "Is or Are?",
+      "type": "cloze",
+      "icon": "✌️",
+      "text": "There {is} a new game. There {are} lots of cars on the road. There {are} many ways to move. Look! There {are} five birds in the sky. There {is} a note for mom on the table. There {are} two restaurants in this town.",
+      "bank": ["is", "are"]
+    },
+    {
+      "name": "Match the Pairs (התאמות)",
+      "type": "trivia",
+      "icon": "🔗",
+      "questions": [
+        { "q": "מה מתאים לפועל 'Win'?", "opts": ["a medal", "basketball", "a house"], "a": 0 },
+        { "q": "מה מתאים לפועל 'Play'?", "opts": ["towns", "basketball", "a computer"], "a": 1 },
+        { "q": "מה מתאים לפועל 'Build'?", "opts": ["towns / a house", "a medal", "your pen"], "a": 0 },
+        { "q": "מה מתאים לפועל 'Fix'?", "opts": ["a computer", "the pieces", "games"], "a": 0 },
+        { "q": "מה מתאים לפועל 'Find'?", "opts": ["your pen", "a house", "basketball"], "a": 0 }
+      ]
+    },
+    {
+      "name": "Reading Comprehension",
+      "type": "trivia",
+      "icon": "📖",
+      "questions": [
+        { "q": "Where is the race?", "opts": ["At the park", "At the school", "In a house"], "a": 1 },
+        { "q": "Who is in the race?", "opts": ["Only kids", "Children, men and women", "Only Avi"], "a": 1 },
+        { "q": "What does the winner get?", "opts": ["A sandwich", "Medal and prize", "A guitar"], "a": 1 },
+        { "q": "How do the people feel?", "opts": ["Sad", "Excited", "Tired"], "a": 1 }
+      ]
+    }
+  ]
+}

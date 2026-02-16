@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>לומדים בכיף</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Rubik', sans-serif; background-color: #f0f9ff; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* עיצובים ספציפיים לרכיבים */
+        .cloze-select { 
+            border: 2px solid #6366f1; color: #4338ca; padding: 4px 8px; 
+            border-radius: 6px; font-weight: bold; background: white; cursor: pointer;
+        }
+        .cloze-select.correct { background: #dcfce7; border-color: #22c55e; color: #15803d; pointer-events: none; }
+        .cloze-select.wrong { background: #fee2e2; border-color: #ef4444; }
+
+        .game-card { transition: all 0.2s; }
+        .game-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <header class="w-full max-w-3xl mb-6 flex justify-between items-center">
+        <button onclick="goHome()" class="bg-white text-gray-600 px-4 py-2 rounded-full shadow-sm hover:bg-gray-50 font-bold border">🏠 תפריט ראשי</button>
+        <div id="exam-badge" class="hidden bg-red-100 text-red-700 px-4 py-2 rounded-full font-bold border border-red-200 text-sm animate-pulse">
+            📅 המבחן בעוד <span id="days-left">0</span> ימים!
+        </div>
+    </header>
+
+    <main id="app-container" class="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-6 min-h-[500px] relative border-t-8 border-indigo-500">
+        
+        <div id="loading" class="text-center py-20 text-gray-500">
+            <div class="text-4xl animate-bounce mb-4">⏳</div>
+            טוען נתונים...
+        </div>
+
+        <div id="menu-view" class="hidden text-center fade-in">
+            <h1 id="app-title" class="text-3xl font-bold text-gray-800 mb-2"></h1>
+            <p id="app-subtitle" class="text-gray-500 mb-8 text-lg"></p>
+            
+            <div id="activities-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+        </div>
+
+        <div id="game-view" class="hidden fade-in">
+            <button onclick="showMenu()" class="mb-4 text-indigo-600 font-bold flex items-center hover:underline">
+                ⬅ חזרה לתפריט הפעילויות
+            </button>
+            <div id="game-content"></div>
+            <div id="feedback-area" class="mt-6 text-center text-xl font-bold h-8"></div>
+        </div>
+
+    </main>
+
+    <script>
+        let appData = null;
+
+        // --- אתחול וטעינה ---
+        window.onload = async () => {
+            const params = new URLSearchParams(window.location.search);
+            const contentId = params.get('id'); // play.html?id=bible_ch28
+
+            if (!contentId) {
+                alert("לא נמצא מזהה משחק. חוזר לדף הבית.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                // טעינת קובץ ה-JSON מהתיקייה data
+                const response = await fetch(`data/${contentId}.json`);
+                if (!response.ok) throw new Error("קובץ לא נמצא");
+                appData = await response.json();
+                initApp();
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `
+                    <div class="text-red-500 font-bold">שגיאה בטעינת המשחק 😕<br><span class="text-sm font-normal text-gray-400">${error.message}</span></div>
+                    <button onclick="goHome()" class="mt-4 bg-gray-200 px-4 py-2 rounded">חזור</button>
+                `;
+            }
+        };
+
+        function initApp() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('menu-view').classList.remove('hidden');
+            
+            // כותרות
+            document.getElementById('app-title').innerText = appData.title;
+            document.getElementById('app-subtitle').innerText = appData.description || "בחרי פעילות כדי להתחיל";
+            document.title = appData.title;
+
+            // תאריך מבחן
+            if (appData.examDate) {
+                const days = Math.ceil((new Date(appData.examDate) - new Date()) / (1000 * 60 * 60 * 24));
+                if (days >= 0 && days <= 14) {
+                    document.getElementById('exam-badge').classList.remove('hidden');
+                    document.getElementById('days-left').innerText = days === 0 ? "היום" : days;
+                }
+            }
+
+            // יצירת כפתורי תפריט
+            const grid = document.getElementById('activities-grid');
+            grid.innerHTML = appData.activities.map((act, index) => `
+                <button onclick="loadActivity(${index})" class="game-card bg-indigo-50 border-2 border-indigo-100 p-6 rounded-2xl text-right hover:bg-indigo-100 hover:border-indigo-300">
+                    <div class="text-3xl mb-2">${act.icon || '🎮'}</div>
+                    <div class="font-bold text-xl text-indigo-900">${act.name}</div>
+                    <div class="text-sm text-gray-500">${getActivityTypeHebrew(act.type)}</div>
+                </button>
+            `).join('');
+        }
+
+        function getActivityTypeHebrew(type) {
+            const types = { 'trivia': 'שאלות אמריקאיות', 'cloze': 'השלמת סיפור', 'order': 'סידור רצף', 'cards': 'משחק הזיכרון' };
+            return types[type] || 'פעילות';
+        }
+
+        function goHome() { window.location.href = 'index.html'; }
+        function showMenu() {
+            document.getElementById('game-view').classList.add('hidden');
+            document.getElementById('menu-view').classList.remove('hidden');
+            document.getElementById('feedback-area').innerText = "";
+        }
+
+        // --- מנוע המשחקים ---
+
+        function loadActivity(index) {
+            const activity = appData.activities[index];
+            const container = document.getElementById('game-content');
+            document.getElementById('menu-view').classList.add('hidden');
+            document.getElementById('game-view').classList.remove('hidden');
+            document.getElementById('feedback-area').innerText = "";
+            
+            container.innerHTML = `<h2 class="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2">${activity.name}</h2>`;
+
+            // ניתוב לסוג המשחק המתאים
+            if (activity.type === 'trivia') renderTrivia(activity, container);
+            else if (activity.type === 'cloze') renderCloze(activity, container);
+            else if (activity.type === 'order') renderOrder(activity, container);
+        }
+
+        // 1. מנוע טריוויה (אמריקאי)
+        function renderTrivia(data, container) {
+            let currentQ = 0;
+            let score = 0;
+            
+            function showQ() {
+                if (currentQ >= data.questions.length) {
+                    showWin(container, `ענית נכון על ${score} מתוך ${data.questions.length} שאלות!`);
+                    return;
+                }
+                const q = data.questions[currentQ];
+                // ערבוב תשובות לתצוגה בלבד
+                let optsWithIndex = q.opts.map((opt, i) => ({txt: opt, idx: i}));
+                optsWithIndex.sort(() => Math.random() - 0.5);
+
+                container.innerHTML = `
+                    <div class="mb-2 text-gray-400 text-sm">שאלה ${currentQ + 1} מתוך ${data.questions.length}</div>
+                    <h3 class="text-xl font-bold mb-6 leading-relaxed">${q.q}</h3>
+                    <div class="space-y-3">
+                        ${optsWithIndex.map(o => `
+                            <button onclick="checkTrivia(this, ${o.idx === q.a})" class="w-full text-right p-4 border-2 rounded-xl text-lg hover:bg-gray-50 transition">
+                                ${o.txt}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            window.checkTrivia = (btn, isCorrect) => {
+                if (isCorrect) {
+                    btn.className = "w-full text-right p-4 border-2 rounded-xl text-lg bg-green-100 border-green-500 text-green-800 font-bold";
+                    document.getElementById('feedback-area').innerText = "✅ מצוין!";
+                    document.getElementById('feedback-area').className = "mt-6 text-center text-xl font-bold h-8 text-green-600";
+                    score++;
+                    setTimeout(() => { 
+                        currentQ++; 
+                        document.getElementById('feedback-area').innerText = "";
+                        showQ(); 
+                    }, 1000);
+                } else {
+                    btn.className = "w-full text-right p-4 border-2 rounded-xl text-lg bg-red-100 border-red-500 text-red-800";
+                    document.getElementById('feedback-area').innerText = "❌ לא נכון, נסי שוב";
+                    document.getElementById('feedback-area').className = "mt-6 text-center text-xl font-bold h-8 text-red-500";
+                }
+            };
+            showQ();
+        }
+
+        // 2. מנוע השלמת משפטים (Cloze)
+        function renderCloze(data, container) {
+            const textParts = data.text.split(/\{([^}]+)\}/g); // מפרק לפי סוגריים מסולסלים {מילה}
+            let html = `<div class="bg-blue-50 p-6 rounded-xl text-lg leading-loose shadow-inner mb-6 text-right">`;
+            
+            // יצירת מחסן מילים (אם אין, יוצר אוטומטית מהתשובות הנכונות + מסיחים אם יש)
+            let wordBank = data.bank || [];
+            if(wordBank.length === 0) {
+                 // אוסף את המילים שבתוך הסוגריים
+                 textParts.forEach((part, i) => { if (i % 2 !== 0) wordBank.push(part); });
+                 wordBank.sort(() => Math.random() - 0.5);
+            }
+
+            let optionsHtml = `<option value="">בחרי...</option>` + wordBank.map(w => `<option value="${w}">${w}</option>`).join('');
+
+            textParts.forEach((part, i) => {
+                if (i % 2 === 0) {
+                    // טקסט רגיל
+                    html += part;
+                } else {
+                    // מילה להשלמה (מה שבתוך הסוגריים)
+                    html += `<select class="cloze-select mx-1" data-answer="${part}">${optionsHtml}</select>`;
+                }
+            });
+            html += `</div><button onclick="checkCloze()" class="bg-indigo-600 text-white px-8 py-2 rounded-full font-bold shadow-lg hover:bg-indigo-700 w-full md:w-auto">בדיקה</button>`;
+            
+            container.innerHTML = html;
+
+            window.checkCloze = () => {
+                let allCorrect = true;
+                document.querySelectorAll('.cloze-select').forEach(sel => {
+                    if (sel.value === sel.dataset.answer) {
+                        sel.classList.remove('wrong');
+                        sel.classList.add('correct');
+                    } else {
+                        sel.classList.add('wrong');
+                        allCorrect = false;
+                    }
+                });
+                
+                const fb = document.getElementById('feedback-area');
+                if (allCorrect) {
+                    fb.innerText = "כל הכבוד! הסיפור הושלם! 🎉";
+                    fb.className = "mt-6 text-center text-xl font-bold h-8 text-green-600";
+                    confetti();
+                } else {
+                    fb.innerText = "יש טעויות, נסי לתקן את האדומים...";
+                    fb.className = "mt-6 text-center text-xl font-bold h-8 text-red-500";
+                }
+            };
+        }
+
+        // 3. מנוע סידור רצף (Order)
+        function renderOrder(data, container) {
+            let items = [...data.items];
+            items.sort(() => Math.random() - 0.5);
+            let selection = [];
+
+            container.innerHTML = `
+                <p class="mb-4 text-gray-600">לחצי על המשפטים לפי הסדר הנכון:</p>
+                <div id="order-container" class="space-y-2">
+                    ${items.map((item, i) => `<div onclick="selectOrderItem(this, '${item}')" class="p-4 bg-white border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition select-none">${item}</div>`).join('')}
+                </div>
+                <div class="mt-6 flex gap-2 justify-center">
+                    <button onclick="resetOrder()" class="bg-gray-200 px-4 py-2 rounded-full">איפוס</button>
+                    <button onclick="checkOrder('${data.items.join('|')}')" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-bold">בדיקה</button>
+                </div>
+            `;
+
+            window.selectOrderItem = (el, txt) => {
+                if (el.classList.contains('bg-indigo-500')) return; // כבר נבחר
+                selection.push(txt);
+                el.classList.remove('bg-white', 'hover:bg-gray-50');
+                el.classList.add('bg-indigo-500', 'text-white', 'border-indigo-600');
+                
+                // הוספת מספר
+                const badge = document.createElement('span');
+                badge.className = "bg-white text-indigo-600 rounded-full w-6 h-6 inline-flex items-center justify-center font-bold text-sm ml-2 float-left";
+                badge.innerText = selection.length;
+                el.appendChild(badge);
+            };
+
+            window.resetOrder = () => { selection = []; loadActivity(appData.activities.indexOf(data)); }; // Reload current
+            
+            window.checkOrder = (correctStr) => {
+                const correctArr = correctStr.split('|');
+                const fb = document.getElementById('feedback-area');
+                
+                if (selection.length !== correctArr.length) {
+                    fb.innerText = "צריך לבחור את כל המשפטים...";
+                    fb.className = "mt-6 text-center text-xl font-bold h-8 text-orange-500";
+                    return;
+                }
+
+                let isCorrect = selection.every((val, index) => val === correctArr[index]);
+                if (isCorrect) {
+                    fb.innerText = "סדר מעולה! כל הכבוד! 🏆";
+                    fb.className = "mt-6 text-center text-xl font-bold h-8 text-green-600";
+                    confetti();
+                } else {
+                    fb.innerText = "הסדר לא נכון, נסי שוב (לחצי איפוס)";
+                    fb.className = "mt-6 text-center text-xl font-bold h-8 text-red-500";
+                }
+            };
+        }
+
+        function showWin(container, msg) {
+            container.innerHTML = `
+                <div class="text-center py-10">
+                    <div class="text-6xl mb-4">👑</div>
+                    <h2 class="text-2xl font-bold text-indigo-800 mb-6">${msg}</h2>
+                    <button onclick="showMenu()" class="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg">חזרה לתפריט</button>
+                </div>
+            `;
+            confetti();
+        }
+    </script>
+</body>
+</html>
