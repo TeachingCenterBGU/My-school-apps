@@ -10,15 +10,15 @@
       "type": "trivia",
       "icon": "🧺",
       "questions": [
-        { "q": "מה צורת הרבים של 'car'?", "opts": ["cars (+s)", "cares (+es)", "caries (+ies)"], "a": 0 },
-        { "q": "מה צורת הרבים של 'sandwich'?", "opts": ["sandwichs", "sandwiches (+es)", "sandwichies"], "a": 1 },
-        { "q": "מה צורת הרבים של 'family'?", "opts": ["familys", "familyes", "families (y -> ies)"], "a": 2 },
-        { "q": "מה צורת הרבים של 'child'?", "opts": ["childs", "children (irregular)", "childes"], "a": 1 },
-        { "q": "מה צורת הרבים של 'man'?", "opts": ["mans", "men (irregular)", "manes"], "a": 1 },
-        { "q": "מה צורת הרבים של 'box'?", "opts": ["boxs", "boxes (+es)", "boxies"], "a": 1 },
-        { "q": "מה צורת הרבים של 'hobby'?", "opts": ["hobbys", "hobbis", "hobbies (y -> ies)"], "a": 2 },
-        { "q": "מה צורת הרבים של 'foot'?", "opts": ["foots", "feet (irregular)", "feets"], "a": 1 },
-        { "q": "מה צורת הרבים של 'woman'?", "opts": ["womans", "women (irregular)", "womenses"], "a": 1 }
+        { "q": "What is the plural of 'car'?", "opts": ["cars", "cares", "caries"], "a": 0 },
+        { "q": "What is the plural of 'sandwich'?", "opts": ["sandwichs", "sandwiches", "sandwichies"], "a": 1 },
+        { "q": "What is the plural of 'family'?", "opts": ["familys", "familyes", "families"], "a": 2 },
+        { "q": "What is the plural of 'child'?", "opts": ["childs", "children", "childes"], "a": 1 },
+        { "q": "What is the plural of 'man'?", "opts": ["mans", "men", "manes"], "a": 1 },
+        { "q": "What is the plural of 'box'?", "opts": ["boxs", "boxes", "boxies"], "a": 1 },
+        { "q": "What is the plural of 'hobby'?", "opts": ["hobbys", "hobbis", "hobbies"], "a": 2 },
+        { "q": "What is the plural of 'foot'?", "opts": ["foots", "feet", "feets"], "a": 1 },
+        { "q": "What is the plural of 'woman'?", "opts": ["womans", "women", "womenses"], "a": 1 }
       ]
     },
     {
@@ -30,20 +30,21 @@
     },
     {
       "name": "Match the Pairs (התאמות)",
-      "type": "trivia",
+      "type": "matching_pairs",
       "icon": "🔗",
-      "questions": [
-        { "q": "מה מתאים לפועל 'Win'?", "opts": ["a medal", "basketball", "a house"], "a": 0 },
-        { "q": "מה מתאים לפועל 'Play'?", "opts": ["towns", "basketball", "a computer"], "a": 1 },
-        { "q": "מה מתאים לפועל 'Build'?", "opts": ["towns / a house", "a medal", "your pen"], "a": 0 },
-        { "q": "מה מתאים לפועל 'Fix'?", "opts": ["a computer", "the pieces", "games"], "a": 0 },
-        { "q": "מה מתאים לפועל 'Find'?", "opts": ["your pen", "a house", "basketball"], "a": 0 }
+      "pairs": [
+        { "left": "Win", "right": "a medal" },
+        { "left": "Play", "right": "basketball" },
+        { "left": "Build", "right": "a house" },
+        { "left": "Fix", "right": "a computer" },
+        { "left": "Find", "right": "your pen" }
       ]
     },
     {
       "name": "Reading Comprehension",
-      "type": "trivia",
+      "type": "reading",
       "icon": "📖",
+      "text": "Today is the big race at school. Many children, men, and women are there. It is important to practice to be a winner. Avi wants to win a gold medal and a prize. There are many parents watching. Avi has a problem with his legs, but he moves fast. There are five birds and many cars on the road. It is fun!",
       "questions": [
         { "q": "Where is the race?", "opts": ["At the park", "At the school", "In a house"], "a": 1 },
         { "q": "Who is in the race?", "opts": ["Only kids", "Children, men and women", "Only Avi"], "a": 1 },
