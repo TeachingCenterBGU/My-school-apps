@@ -35,6 +35,13 @@ const homeworkData = [
         "date": "11/02"
     },
     {
+        "id": "8227",
+        "grade": 3,
+        "subject": "חשבון",
+        "task": "לסיים עד עמ' 127",
+        "date": "16/02"
+    },
+    {
         "id": "8030",
         "grade": 3,
         "subject": "כתיבה",
@@ -103,6 +110,13 @@ const homeworkData = [
         "subject": "גיאומטריה",
         "task": "במחברת",
         "date": "12/02"
+    },
+    {
+        "id": "8248",
+        "grade": 5,
+        "subject": "מדעים",
+        "task": "294-295",
+        "date": "16/02"
     },
     {
         "id": "7795",
