@@ -19,17 +19,20 @@
         .game-card { transition: all 0.2s; }
         .game-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
 
-        /* סגנונות למשחק התאמה */
         .match-card { cursor: pointer; transition: all 0.2s; user-select: none; }
         .match-card.selected { background-color: #fbbf24; border-color: #d97706; transform: scale(1.05); }
         .match-card.matched { background-color: #dcfce7; border-color: #22c55e; opacity: 0; pointer-events: none; transform: scale(0.9); transition: opacity 0.5s, transform 0.5s; }
         .match-card.error { animation: shake 0.5s; background-color: #fee2e2; border-color: #ef4444; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        /* תמיכה בכיווניות */
+        [dir="ltr"] .text-right { text-align: left; }
+        [dir="ltr"] .border-l-4 { border-left: 0; border-right: 4px solid; } 
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4">
 
-    <header class="w-full max-w-3xl mb-6 flex justify-between items-center">
+    <header class="w-full max-w-3xl mb-6 flex justify-between items-center" dir="rtl">
         <button onclick="goHome()" class="bg-white text-gray-600 px-4 py-2 rounded-full shadow-sm hover:bg-gray-50 font-bold border">🏠 תפריט ראשי</button>
         <div id="exam-badge" class="hidden bg-red-100 text-red-700 px-4 py-2 rounded-full font-bold border border-red-200 text-sm animate-pulse">
             📅 המבחן בעוד <span id="days-left">0</span> ימים!
@@ -50,8 +53,10 @@
         </div>
 
         <div id="game-view" class="hidden fade-in">
-            <button onclick="showMenu()" class="mb-4 text-indigo-600 font-bold flex items-center hover:underline">⬅ חזרה לתפריט</button>
-            <div id="game-content"></div>
+            <button onclick="showMenu()" class="mb-4 text-indigo-600 font-bold flex items-center hover:underline" dir="rtl">⬅ חזרה לתפריט</button>
+            <div id="game-content-wrapper">
+                <div id="game-content"></div>
+            </div>
             <div id="feedback-area" class="mt-6 text-center text-xl font-bold h-8"></div>
         </div>
     </main>
@@ -70,7 +75,7 @@
                 appData = await response.json();
                 initApp();
             } catch (error) {
-                document.getElementById('loading').innerHTML = `<div class="text-red-500">שגיאה בטעינה: ${error.message}</div>`;
+                document.getElementById('loading').innerHTML = `<div class="text-red-500">שגיאה בטעינה: ${error.message}<br><small>אם את מריצה מקומית, ודאי שאת משתמשת ב-Live Server</small></div>`;
             }
         };
 
@@ -82,6 +87,10 @@
             document.getElementById('app-subtitle').innerText = appData.description || "";
             document.title = appData.title;
 
+            // עדכון כיוון הטקסט הכללי של האפליקציה אם הוגדר
+            const direction = appData.direction || 'rtl';
+            document.getElementById('game-content-wrapper').dir = direction;
+
             if (appData.examDate) {
                 const days = Math.ceil((new Date(appData.examDate) - new Date()) / (1000 * 60 * 60 * 24));
                 if (days >= 0 && days <= 14) {
@@ -92,7 +101,7 @@
 
             const grid = document.getElementById('activities-grid');
             grid.innerHTML = appData.activities.map((act, index) => `
-                <button onclick="loadActivity(${index})" class="game-card bg-indigo-50 border-2 border-indigo-100 p-6 rounded-2xl text-right hover:bg-indigo-100 hover:border-indigo-300">
+                <button onclick="loadActivity(${index})" class="game-card bg-indigo-50 border-2 border-indigo-100 p-6 rounded-2xl text-right hover:bg-indigo-100 hover:border-indigo-300" dir="rtl">
                     <div class="text-3xl mb-2">${act.icon || '🎮'}</div>
                     <div class="font-bold text-xl text-indigo-900">${act.name}</div>
                     <div class="text-sm text-gray-500">${getActivityTypeHebrew(act.type)}</div>
@@ -118,7 +127,9 @@
             document.getElementById('menu-view').classList.add('hidden');
             document.getElementById('game-view').classList.remove('hidden');
             document.getElementById('feedback-area').innerText = "";
-            container.innerHTML = `<h2 class="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2">${activity.name}</h2>`;
+            
+            // כותרת הפעילות תמיד מיושרת לימין כדי שיהיה ברור שזה תפריט
+            container.innerHTML = `<h2 class="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2" dir="auto">${activity.name}</h2>`;
 
             if (activity.type === 'trivia') renderTrivia(activity, container);
             else if (activity.type === 'cloze') renderCloze(activity, container);
@@ -127,9 +138,8 @@
             else if (activity.type === 'reading') renderReading(activity, container);
         }
 
-        // --- סוגי משחקים ---
+        // --- רכיבי המשחק ---
 
-        // 1. התאמת זוגות (Matching) - החדש!
         function renderMatching(data, container) {
             let pairs = data.pairs;
             let lefts = pairs.map((p, i) => ({ txt: p.left, id: i, side: 'L' })).sort(() => Math.random() - 0.5);
@@ -138,7 +148,8 @@
             let selected = null;
             let matchesFound = 0;
 
-            container.innerHTML = `
+            // הגריד יסתדר אוטומטית לפי ה-dir שהגדרנו ב-initApp
+            container.innerHTML += `
                 <div class="grid grid-cols-2 gap-8 mt-4">
                     <div class="space-y-3" id="col-left">${lefts.map(renderCard).join('')}</div>
                     <div class="space-y-3" id="col-right">${rights.map(renderCard).join('')}</div>
@@ -155,21 +166,18 @@
                 const el = document.getElementById(`${side}-${id}`);
                 if (el.classList.contains('matched')) return;
 
-                // ביטול בחירה אם לוחצים על אותו אחד
                 if (selected && selected.side === side && selected.id === id) {
                     el.classList.remove('selected');
                     selected = null;
                     return;
                 }
 
-                // בחירה ראשונה
                 if (!selected) {
                     selected = { side, id, el };
                     el.classList.add('selected');
                     return;
                 }
 
-                // בחירה מאותו צד (החלפה)
                 if (selected.side === side) {
                     selected.el.classList.remove('selected');
                     selected = { side, id, el };
@@ -177,23 +185,15 @@
                     return;
                 }
 
-                // בדיקת התאמה (צדדים שונים)
                 if (selected.id === id) {
-                    // התאמה!
                     el.classList.remove('selected');
                     selected.el.classList.remove('selected');
-                    
                     el.classList.add('matched');
                     selected.el.classList.add('matched');
-                    
                     matchesFound++;
                     selected = null;
-
-                    if (matchesFound === pairs.length) {
-                        showWin(document.getElementById('game-content'), "כל הכבוד! סיימת את כל ההתאמות!");
-                    }
+                    if (matchesFound === pairs.length) showWin(container, "כל הכבוד! סיימת את הכל!");
                 } else {
-                    // טעות
                     el.classList.add('error');
                     selected.el.classList.add('error');
                     setTimeout(() => {
@@ -205,18 +205,14 @@
             };
         }
 
-        // 2. הבנת הנקרא (Reading) - החדש!
         function renderReading(data, container) {
-            // אזור טקסט
-            let html = `
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8 rounded-r-lg shadow-sm text-lg leading-relaxed font-medium text-gray-800">
+            // הוספת הטקסט
+            container.innerHTML += `
+                <div class="bg-yellow-50 border-s-4 border-yellow-400 p-6 mb-8 rounded-e-lg shadow-sm text-lg leading-relaxed font-medium text-gray-800">
                     ${data.text}
                 </div>
                 <div id="reading-questions" class="space-y-8"></div>
             `;
-            
-            // שימוש בלוגיקה של הטריוויה אבל לכל השאלות יחד
-            container.innerHTML = html;
             
             const qContainer = document.getElementById('reading-questions');
             let score = 0;
@@ -231,7 +227,7 @@
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                         ${q.opts.map((opt, i) => `
-                            <button onclick="checkReading(this, ${idx}, ${i === q.a})" class="text-left p-3 border rounded-lg hover:bg-gray-50 transition q-btn-${idx}">
+                            <button onclick="checkReading(this, ${idx}, ${i === q.a})" class="text-start p-3 border rounded-lg hover:bg-gray-50 transition q-btn-${idx}">
                                 ${opt}
                             </button>
                         `).join('')}
@@ -242,10 +238,8 @@
             });
 
             window.checkReading = (btn, qIdx, isCorrect) => {
-                // נעל את השאלה הזו
                 const btns = document.querySelectorAll(`.q-btn-${qIdx}`);
                 btns.forEach(b => b.disabled = true);
-                
                 const fb = document.getElementById(`fb-${qIdx}`);
                 if (isCorrect) {
                     btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
@@ -258,10 +252,9 @@
                     fb.className = "mt-2 text-sm font-bold text-red-500";
                 }
                 answered++;
-                
                 if (answered === data.questions.length) {
                     document.getElementById('feedback-area').innerHTML = `
-                        <div class="text-2xl mt-4 text-indigo-800">ציון סופי: ${score}/${data.questions.length}</div>
+                        <div class="text-2xl mt-4 text-indigo-800">ציון: ${score}/${data.questions.length}</div>
                         <button onclick="showMenu()" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-full font-bold">סיום</button>
                     `;
                     if (score === data.questions.length) confetti();
@@ -269,14 +262,13 @@
             };
         }
 
-        // 3. טריוויה רגילה (ללא שינוי, רק העתקה לביטחון)
         function renderTrivia(data, container) {
             let currentQ = 0;
             let score = 0;
             
             function showQ() {
                 if (currentQ >= data.questions.length) {
-                    showWin(container, `ענית נכון על ${score} מתוך ${data.questions.length} שאלות!`);
+                    showWin(container, `ציון: ${score}/${data.questions.length}`);
                     return;
                 }
                 const q = data.questions[currentQ];
@@ -284,11 +276,12 @@
                 optsWithIndex.sort(() => Math.random() - 0.5);
 
                 container.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-indigo-700 border-b pb-2" dir="auto">${data.name}</h2>
                     <div class="mb-2 text-gray-400 text-sm">שאלה ${currentQ + 1} מתוך ${data.questions.length}</div>
-                    <h3 class="text-xl font-bold mb-6 leading-relaxed ltr" style="direction:ltr; text-align:left;">${q.q}</h3>
+                    <h3 class="text-xl font-bold mb-6 leading-relaxed">${q.q}</h3>
                     <div class="space-y-3">
                         ${optsWithIndex.map(o => `
-                            <button onclick="checkTrivia(this, ${o.idx === q.a})" class="w-full text-left p-4 border-2 rounded-xl text-lg hover:bg-gray-50 transition ltr" style="direction:ltr;">
+                            <button onclick="checkTrivia(this, ${o.idx === q.a})" class="w-full text-start p-4 border-2 rounded-xl text-lg hover:bg-gray-50 transition">
                                 ${o.txt}
                             </button>
                         `).join('')}
@@ -298,8 +291,8 @@
 
             window.checkTrivia = (btn, isCorrect) => {
                 if (isCorrect) {
-                    btn.className = "w-full text-left p-4 border-2 rounded-xl text-lg bg-green-100 border-green-500 text-green-800 font-bold ltr";
-                    document.getElementById('feedback-area').innerText = "✅ Excellent!";
+                    btn.className = "w-full text-start p-4 border-2 rounded-xl text-lg bg-green-100 border-green-500 text-green-800 font-bold";
+                    document.getElementById('feedback-area').innerText = "✅ יפה מאוד!";
                     document.getElementById('feedback-area').className = "mt-6 text-center text-xl font-bold h-8 text-green-600";
                     score++;
                     setTimeout(() => { 
@@ -308,70 +301,82 @@
                         showQ(); 
                     }, 1000);
                 } else {
-                    btn.className = "w-full text-left p-4 border-2 rounded-xl text-lg bg-red-100 border-red-500 text-red-800 ltr";
-                    document.getElementById('feedback-area').innerText = "❌ Try again";
+                    btn.className = "w-full text-start p-4 border-2 rounded-xl text-lg bg-red-100 border-red-500 text-red-800";
+                    document.getElementById('feedback-area').innerText = "❌ נסי שוב";
                     document.getElementById('feedback-area').className = "mt-6 text-center text-xl font-bold h-8 text-red-500";
                 }
             };
             showQ();
         }
 
-        // 4. השלמת משפטים (ללא שינוי)
         function renderCloze(data, container) {
             const textParts = data.text.split(/\{([^}]+)\}/g);
-            let html = `<div class="bg-blue-50 p-6 rounded-xl text-lg leading-loose shadow-inner mb-6 text-left ltr" style="direction:ltr;">`;
+            let html = `<div class="bg-blue-50 p-6 rounded-xl text-lg leading-loose shadow-inner mb-6">`;
             
             let wordBank = data.bank || [];
             if(wordBank.length === 0) {
                  textParts.forEach((part, i) => { if (i % 2 !== 0) wordBank.push(part); });
                  wordBank.sort(() => Math.random() - 0.5);
             }
-
-            let optionsHtml = `<option value="">Select...</option>` + wordBank.map(w => `<option value="${w}">${w}</option>`).join('');
+            let optionsHtml = `<option value="">?</option>` + wordBank.map(w => `<option value="${w}">${w}</option>`).join('');
 
             textParts.forEach((part, i) => {
-                if (i % 2 === 0) {
-                    html += part;
-                } else {
-                    html += `<select class="cloze-select mx-1" data-answer="${part}">${optionsHtml}</select>`;
-                }
+                if (i % 2 === 0) html += part;
+                else html += `<select class="cloze-select mx-1" data-answer="${part}">${optionsHtml}</select>`;
             });
-            html += `</div><button onclick="checkCloze()" class="bg-indigo-600 text-white px-8 py-2 rounded-full font-bold shadow-lg hover:bg-indigo-700 w-full md:w-auto">Check Answers</button>`;
+            html += `</div><button onclick="checkCloze()" class="bg-indigo-600 text-white px-8 py-2 rounded-full font-bold shadow-lg hover:bg-indigo-700 w-full md:w-auto">בדיקה</button>`;
             
-            container.innerHTML = html;
+            container.innerHTML += html;
 
             window.checkCloze = () => {
                 let allCorrect = true;
                 document.querySelectorAll('.cloze-select').forEach(sel => {
                     if (sel.value === sel.dataset.answer) {
-                        sel.classList.remove('wrong');
-                        sel.classList.add('correct');
+                        sel.classList.remove('wrong'); sel.classList.add('correct');
                     } else {
-                        sel.classList.add('wrong');
-                        allCorrect = false;
+                        sel.classList.add('wrong'); allCorrect = false;
                     }
                 });
-                
                 const fb = document.getElementById('feedback-area');
-                if (allCorrect) {
-                    fb.innerText = "Good Job! 🎉";
-                    fb.className = "mt-6 text-center text-xl font-bold h-8 text-green-600";
-                    confetti();
-                } else {
-                    fb.innerText = "Keep trying...";
-                    fb.className = "mt-6 text-center text-xl font-bold h-8 text-red-500";
-                }
+                if (allCorrect) { fb.innerText = "מעולה! 🎉"; fb.className = "mt-6 text-center text-xl font-bold h-8 text-green-600"; confetti(); } 
+                else { fb.innerText = "יש טעויות..."; fb.className = "mt-6 text-center text-xl font-bold h-8 text-red-500"; }
+            };
+        }
+
+        function renderOrder(data, container) {
+            let items = [...data.items];
+            items.sort(() => Math.random() - 0.5);
+            let selection = [];
+
+            container.innerHTML += `
+                <div id="order-container" class="space-y-2">
+                    ${items.map(item => `<div onclick="selectOrderItem(this, '${item}')" class="p-4 bg-white border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition select-none">${item}</div>`).join('')}
+                </div>
+                <div class="mt-6 flex gap-2 justify-center">
+                    <button onclick="loadActivity(${appData.activities.indexOf(data)})" class="bg-gray-200 px-4 py-2 rounded-full">איפוס</button>
+                    <button onclick="checkOrder('${data.items.join('|')}')" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-bold">בדיקה</button>
+                </div>
+            `;
+
+            window.selectOrderItem = (el, txt) => {
+                if (el.classList.contains('bg-indigo-500')) return;
+                selection.push(txt);
+                el.classList.remove('bg-white', 'hover:bg-gray-50');
+                el.classList.add('bg-indigo-500', 'text-white', 'border-indigo-600');
+            };
+
+            window.checkOrder = (correctStr) => {
+                const correctArr = correctStr.split('|');
+                const fb = document.getElementById('feedback-area');
+                if (selection.length !== correctArr.length) { fb.innerText = "חסר משפטים"; fb.className = "mt-6 text-center text-xl font-bold h-8 text-orange-500"; return; }
+                let isCorrect = selection.every((val, index) => val === correctArr[index]);
+                if (isCorrect) { fb.innerText = "סדר נכון! 🏆"; fb.className = "mt-6 text-center text-xl font-bold h-8 text-green-600"; confetti(); } 
+                else { fb.innerText = "טעות בסדר"; fb.className = "mt-6 text-center text-xl font-bold h-8 text-red-500"; }
             };
         }
 
         function showWin(container, msg) {
-            container.innerHTML = `
-                <div class="text-center py-10">
-                    <div class="text-6xl mb-4">👑</div>
-                    <h2 class="text-2xl font-bold text-indigo-800 mb-6">${msg}</h2>
-                    <button onclick="showMenu()" class="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg">חזרה לתפריט</button>
-                </div>
-            `;
+            container.innerHTML = `<div class="text-center py-10"><div class="text-6xl mb-4">👑</div><h2 class="text-2xl font-bold text-indigo-800 mb-6">${msg}</h2><button onclick="showMenu()" class="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg">לתפריט</button></div>`;
             confetti();
         }
     </script>

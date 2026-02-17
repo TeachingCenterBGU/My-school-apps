@@ -4,9 +4,10 @@
   "subject": "אנגלית",
   "description": "חזרה למבחן: יחיד/רבים, Is/Are ואוצר מילים",
   "examDate": "2026-02-19",
+  "direction": "ltr", 
   "activities": [
     {
-      "name": "Plural Rules (יחיד לרבים)",
+      "name": "Plural Rules",
       "type": "trivia",
       "icon": "🧺",
       "questions": [
@@ -29,7 +30,7 @@
       "bank": ["is", "are"]
     },
     {
-      "name": "Match the Pairs (התאמות)",
+      "name": "Match the Pairs",
       "type": "matching_pairs",
       "icon": "🔗",
       "pairs": [
