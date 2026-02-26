@@ -140,13 +140,6 @@ const homeworkData = [
         "date": "16/02"
     },
     {
-        "id": "8181",
-        "grade": 5,
-        "subject": "מתמטיקה",
-        "task": "81-83",
-        "date": "15/02"
-    },
-    {
         "id": "8344",
         "grade": 5,
         "subject": "מתמטיקה",
