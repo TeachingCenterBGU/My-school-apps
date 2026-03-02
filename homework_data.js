@@ -68,12 +68,5 @@ const homeworkData = [
         "subject": "אנגלית",
         "task": "w. b. p. 96",
         "date": "24/02"
-    },
-    {
-        "id": "8458",
-        "grade": 5,
-        "subject": "גיאומטריה",
-        "task": "36-41",
-        "date": "19/02"
     }
 ];
