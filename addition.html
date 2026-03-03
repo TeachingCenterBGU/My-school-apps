@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מגיני המספרים - חיבור</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        canvas { display: block; }
+
+        #hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+            pointer-events: none;
+            direction: ltr;
+            text-align: left;
+        }
+
+        #input-container {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+        }
+
+        input[type="number"] {
+            font-size: 2rem;
+            padding: 10px 20px;
+            width: 150px;
+            text-align: center;
+            border: 3px solid #4a90e2;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            border-radius: 50px;
+            outline: none;
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+            transition: border-color 0.2s;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 100;
+        }
+
+        h1 { font-size: 3rem; color: #4a90e2; margin-bottom: 10px; text-shadow: 0 0 20px #4a90e2; text-align: center;}
+        p { font-size: 1.2rem; margin-bottom: 20px; color: #ccc; }
+
+        .settings-group {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .settings-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f39c12;
+            margin-bottom: 15px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            border: 2px solid #4a90e2;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .option-btn.active {
+            background: #4a90e2;
+            color: white;
+            box-shadow: 0 0 15px #4a90e2;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+        .start-btn {
+            padding: 15px 50px;
+            font-size: 1.5rem;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            transition: transform 0.2s;
+            margin-top: 10px;
+            font-family: inherit;
+            font-weight: bold;
+        }
+        .start-btn:hover { transform: scale(1.1); }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="hud">
+        ❤️ <span id="livesVal">3</span><br>
+        🏆 <span id="scoreVal">0</span>
+    </div>
+
+    <div id="startScreen" class="overlay">
+        <h1>🚀 מגיני המספרים</h1>
+        
+        <div class="settings-group">
+            <div class="settings-title">באיזה טווח נשחק?</div>
+            <div class="btn-group">
+                <button class="option-btn active" id="btn-range-10" onclick="setRange(10)">עד 10</button>
+                <button class="option-btn" id="btn-range-20" onclick="setRange(20)">עד 20</button>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <div class="settings-title">באיזו רמה?</div>
+            <div class="btn-group">
+                <button class="option-btn active" id="btn-level-1" onclick="setLevel(1)">רמה 1 (לאט)</button>
+                <button class="option-btn" id="btn-level-2" onclick="setLevel(2)">רמה 2 (מהר)</button>
+                <button class="option-btn" id="btn-level-3" onclick="setLevel(3)">רמה 3 (כמה ביחד)</button>
+            </div>
+        </div>
+
+        <p style="margin-top: 10px; font-size: 1rem;">הקלידו את התשובה ולחצו ENTER כדי לירות!</p>
+        <button class="start-btn" onclick="startGame()">התחל משחק!</button>
+    </div>
+
+    <div id="gameOverScreen" class="overlay hidden">
+        <h1 style="color: #e74c3c; text-shadow: 0 0 20px #e74c3c;">המשחק נגמר!</h1>
+        <p>כל הכבוד! צברת: <span id="finalScore" style="font-weight:bold; font-size:1.5em; color:#f1c40f;">0</span> נקודות</p>
+        <button class="start-btn" onclick="showStartScreen()">שחקו שוב</button>
+    </div>
+
+    <div id="input-container">
+        <input type="number" id="answerInput" placeholder="?" autocomplete="off">
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const input = document.getElementById('answerInput');
+    const scoreVal = document.getElementById('scoreVal');
+    const livesVal = document.getElementById('livesVal');
+    const startScreen = document.getElementById('startScreen');
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const finalScore = document.getElementById('finalScore');
+
+    let gameActive = false;
+    let score = 0;
+    let lives = 3;
+    let meteors = [];
+    let particles = [];
+    
+    // הגדרות ברירת מחדל
+    let selectedRange = 10;
+    let selectedLevel = 1;
+
+    // פונקציות לעדכון בחירות מהכפתורים
+    function setRange(range) {
+        selectedRange = range;
+        document.getElementById('btn-range-10').classList.remove('active');
+        document.getElementById('btn-range-20').classList.remove('active');
+        document.getElementById(`btn-range-${range}`).classList.add('active');
+    }
+
+    function setLevel(level) {
+        selectedLevel = level;
+        document.getElementById('btn-level-1').classList.remove('active');
+        document.getElementById('btn-level-2').classList.remove('active');
+        document.getElementById('btn-level-3').classList.remove('active');
+        document.getElementById(`btn-level-${level}`).classList.add('active');
+    }
+
+    class Meteor {
+        constructor() {
+            this.radius = 45;
+            this.x = Math.random() * (canvas.width - 100) + 50;
+            this.y = -50;
+            
+            // קביעת מהירות לפי הרמה
+            if (selectedLevel === 1) {
+                this.speed = Math.random() * 0.3 + 0.3; // איטי
+            } else if (selectedLevel === 2) {
+                this.speed = Math.random() * 0.5 + 0.8; // מהיר
+            } else {
+                this.speed = Math.random() * 0.4 + 0.4; // בינוני (לרמה 3 שיש בה כמה מטאורים)
+            }
+            
+            // יצירת תרגיל חיבור חכם: הבטחה שהסכום לא יעבור את הטווח המבוקש
+            this.answer = Math.floor(Math.random() * (selectedRange + 1)); 
+            this.n1 = Math.floor(Math.random() * (this.answer + 1));
+            this.n2 = this.answer - this.n1;
+            this.text = `${this.n1} + ${this.n2}`;
+            
+            this.color = `hsl(${Math.random() * 360}, 70%, 50%)`;
+        }
+
+        update() {
+            this.y += this.speed;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 28px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.text, this.x, this.y);
+        }
+    }
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.vx = (Math.random() - 0.5) * 10;
+            this.vy = (Math.random() - 0.5) * 10;
+            this.life = 1.0;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= 0.02;
+        }
+        draw() {
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 5, 0, Math.PI*2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+        }
+    }
+
+    function startGame() {
+        score = 0;
+        lives = 3;
+        meteors = [];
+        particles = [];
+        gameActive = true;
+        
+        scoreVal.innerText = score;
+        livesVal.innerText = lives;
+        
+        startScreen.classList.add('hidden');
+        gameOverScreen.classList.add('hidden');
+        input.value = '';
+        
+        // פוקוס אוטומטי לתיבת הטקסט
+        setTimeout(() => input.focus(), 100);
+        
+        requestAnimationFrame(gameLoop);
+    }
+
+    function showStartScreen() {
+        gameOverScreen.classList.add('hidden');
+        startScreen.classList.remove('hidden');
+    }
+
+    function gameOver() {
+        gameActive = false;
+        finalScore.innerText = score;
+        gameOverScreen.classList.remove('hidden');
+        input.blur();
+    }
+
+    function gameLoop(timestamp) {
+        if (!gameActive) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (selectedLevel === 1 || selectedLevel === 2) {
+            // מטאור אחד בלבד על המסך
+            if (meteors.length === 0) {
+                meteors.push(new Meteor());
+            }
+        } else if (selectedLevel === 3) {
+            // כמה מטאורים
+            if (meteors.length === 0 || Math.random() < 0.008) { 
+                meteors.push(new Meteor());
+            }
+        }
+
+        for (let i = meteors.length - 1; i >= 0; i--) {
+            let m = meteors[i];
+            m.update();
+            m.draw();
+
+            if (m.y - m.radius > canvas.height) {
+                lives--;
+                livesVal.innerText = lives;
+                meteors.splice(i, 1);
+                
+                canvas.style.transform = 'translate(5px, 5px)';
+                setTimeout(()=> canvas.style.transform = 'none', 50);
+
+                if (lives <= 0) gameOver();
+            }
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.update();
+            p.draw();
+            if (p.life <= 0) particles.splice(i, 1);
+        }
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    function checkAnswer() {
+        const val = parseInt(input.value);
+        if (isNaN(val)) return;
+
+        let hitIndex = -1;
+        let maxY = -1;
+        
+        meteors.forEach((m, index) => {
+            if (m.answer === val) {
+                if (m.y > maxY) {
+                    maxY = m.y;
+                    hitIndex = index;
+                }
+            }
+        });
+
+        if (hitIndex !== -1) {
+            const m = meteors[hitIndex];
+            for(let k=0; k<20; k++) particles.push(new Particle(m.x, m.y, m.color));
+            
+            meteors.splice(hitIndex, 1);
+            score += 10;
+            scoreVal.innerText = score;
+            
+            input.value = '';
+            input.style.borderColor = '#2ecc71'; 
+            setTimeout(() => input.style.borderColor = '#4a90e2', 200);
+        } else {
+            input.value = ''; 
+            input.style.borderColor = '#e74c3c'; 
+            setTimeout(() => input.style.borderColor = '#4a90e2', 200);
+        }
+    }
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if(gameActive && e.target.tagName !== 'BUTTON') {
+            input.focus();
+        }
+    });
+
+</script>
+</body>
+</html>
