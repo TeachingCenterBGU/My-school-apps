@@ -7,6 +7,13 @@ const homeworkData = [
         "date": "08/03"
     },
     {
+        "id": "9091",
+        "grade": 3,
+        "subject": "חשבון",
+        "task": "דף עבודה",
+        "date": "09/03"
+    },
+    {
         "id": "8981",
         "grade": 3,
         "subject": "מדעים",
@@ -19,6 +26,13 @@ const homeworkData = [
         "subject": "שפה",
         "task": "עמ' 90-91-משימות 1-6",
         "date": "08/03"
+    },
+    {
+        "id": "9090",
+        "grade": 3,
+        "subject": "שפה",
+        "task": "משימות בקובץ שנשלח להורים",
+        "date": "09/03"
     },
     {
         "id": "9061",
