@@ -128,12 +128,6 @@
       line-height:1.5;
     }
 
-    .sound-note{
-      font-size:18px;
-      margin-top:8px;
-      color:#6b4f1d;
-    }
-
     .game-layout{
       display:grid;
       grid-template-columns:1.15fr 1fr;
@@ -320,11 +314,6 @@
       margin-top:10px;
     }
 
-    @media (max-width: 900px){
-      .game-layout{
-        grid-template-columns:1fr;
-      }
-    }
     .footer {
       text-align: center;
       padding: 20px;
@@ -332,12 +321,20 @@
       color: #888;
       margin-top: 40px;
       border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    @media (max-width: 900px){
+      .game-layout{
+        grid-template-columns:1fr;
       }
-    </style>
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>🎈 משחק מיון אותיות 🎈</h1>
+    <div class="subtitle" id="subtitle">בחרו אותיות כדי להתחיל</div>
+
     <div class="setup-box">
       <div class="setup-title">בחרו 3 אותיות</div>
       <div class="setup-row">
@@ -382,122 +379,30 @@
     </div>
   </div>
 
-  <footer class="footer">
-    נוצר באהבה על ידי אלינה גולדשטיין-לויטין ❤️
-  </footer>
-
   <script>
     const WORD_BANK = {
-      "א": [
-        { word: "אריה", emoji: "🦁", letter: "א" },
-        { word: "אוטו", emoji: "🚗", letter: "א" },
-        { word: "אבטיח", emoji: "🍉", letter: "א" }
-      ],
-      "ב": [
-        { word: "בננה", emoji: "🍌", letter: "ב" },
-        { word: "בית", emoji: "🏠", letter: "ב" },
-        { word: "בלון", emoji: "🎈", letter: "ב" }
-      ],
-      "ג": [
-        { word: "גזר", emoji: "🥕", letter: "ג" },
-        { word: "גמל", emoji: "🐪", letter: "ג" },
-        { word: "גלידה", emoji: "🍦", letter: "ג" }
-      ],
-      "ד": [
-        { word: "דג", emoji: "🐟", letter: "ד" },
-        { word: "דבורה", emoji: "🐝", letter: "ד" },
-        { word: "דגל", emoji: "🏳️", letter: "ד" }
-      ],
-      "ה": [
-        { word: "הר", emoji: "⛰️", letter: "ה" },
-        { word: "היפופוטם", emoji: "🦛", letter: "ה" },
-        { word: "הליקופטר", emoji: "🚁", letter: "ה" }
-      ],
-      "ו": [
-        { word: "ורד", emoji: "🌹", letter: "ו" },
-        { word: "וילון", emoji: "🪟", letter: "ו" },
-        { word: "וופל", emoji: "🧇", letter: "ו" }
-      ],
-      "ז": [
-        { word: "זברה", emoji: "🦓", letter: "ז" },
-        { word: "זית", emoji: "🫒", letter: "ז" },
-        { word: "זחל", emoji: "🐛", letter: "ז" }
-      ],
-      "ח": [
-        { word: "חתול", emoji: "🐱", letter: "ח" },
-        { word: "חלב", emoji: "🥛", letter: "ח" },
-        { word: "חלון", emoji: "🪟", letter: "ח" }
-      ],
-      "ט": [
-        { word: "טלה", emoji: "🐑", letter: "ט" },
-        { word: "טיל", emoji: "🚀", letter: "ט" },
-        { word: "טבעת", emoji: "💍", letter: "ט" }
-      ],
-      "י": [
-        { word: "יד", emoji: "✋", letter: "י" },
-        { word: "ים", emoji: "🌊", letter: "י" },
-        { word: "יונה", emoji: "🕊️", letter: "י" }
-      ],
-      "כ": [
-        { word: "כדור", emoji: "⚽", letter: "כ" },
-        { word: "כובע", emoji: "🧢", letter: "כ" },
-        { word: "כיסא", emoji: "🪑", letter: "כ" }
-      ],
-      "ל": [
-        { word: "לב", emoji: "❤️", letter: "ל" },
-        { word: "לימון", emoji: "🍋", letter: "ל" },
-        { word: "לחם", emoji: "🍞", letter: "ל" }
-      ],
-      "מ": [
-        { word: "מטרייה", emoji: "☂️", letter: "מ" },
-        { word: "מכונית", emoji: "🚙", letter: "מ" },
-        { word: "מלפפון", emoji: "🥒", letter: "מ" }
-      ],
-      "נ": [
-        { word: "נר", emoji: "🕯️", letter: "נ" },
-        { word: "נמר", emoji: "🐯", letter: "נ" },
-        { word: "נעל", emoji: "👟", letter: "נ" }
-      ],
-      "ס": [
-        { word: "סוס", emoji: "🐴", letter: "ס" },
-        { word: "ספר", emoji: "📘", letter: "ס" },
-        { word: "סירה", emoji: "⛵", letter: "ס" }
-      ],
-      "ע": [
-        { word: "עין", emoji: "👁️", letter: "ע" },
-        { word: "עוגה", emoji: "🎂", letter: "ע" },
-        { word: "עץ", emoji: "🌳", letter: "ע" }
-      ],
-      "פ": [
-        { word: "פרח", emoji: "🌸", letter: "פ" },
-        { word: "פיל", emoji: "🐘", letter: "פ" },
-        { word: "פטרייה", emoji: "🍄", letter: "פ" }
-      ],
-      "צ": [
-        { word: "צב", emoji: "🐢", letter: "צ" },
-        { word: "ציפור", emoji: "🐦", letter: "צ" },
-        { word: "צלחת", emoji: "🍽️", letter: "צ" }
-      ],
-      "ק": [
-        { word: "קוף", emoji: "🐒", letter: "ק" },
-        { word: "קערה", emoji: "🥣", letter: "ק" },
-        { word: "קשת", emoji: "🌈", letter: "ק" }
-      ],
-      "ר": [
-        { word: "רכבת", emoji: "🚂", letter: "ר" },
-        { word: "רימון", emoji: "🔴", letter: "ר" },
-        { word: "רגל", emoji: "🦵", letter: "ר" }
-      ],
-      "ש": [
-        { word: "שמש", emoji: "☀️", letter: "ש" },
-        { word: "שעון", emoji: "⏰", letter: "ש" },
-        { word: "שועל", emoji: "🦊", letter: "ש" }
-      ],
-      "ת": [
-        { word: "תות", emoji: "🍓", letter: "ת" },
-        { word: "תפוח", emoji: "🍎", letter: "ת" },
-        { word: "תיק", emoji: "🎒", letter: "ת" }
-      ]
+      "א": [{ word: "אריה", emoji: "🦁", letter: "א" }, { word: "אוטו", emoji: "🚗", letter: "א" }, { word: "אבטיח", emoji: "🍉", letter: "א" }],
+      "ב": [{ word: "בננה", emoji: "🍌", letter: "ב" }, { word: "בית", emoji: "🏠", letter: "ב" }, { word: "בלון", emoji: "🎈", letter: "ב" }],
+      "ג": [{ word: "גזר", emoji: "🥕", letter: "ג" }, { word: "גמל", emoji: "🐪", letter: "ג" }, { word: "גלידה", emoji: "🍦", letter: "ג" }],
+      "ד": [{ word: "דג", emoji: "🐟", letter: "ד" }, { word: "דבורה", emoji: "🐝", letter: "ד" }, { word: "דגל", emoji: "🏳️", letter: "ד" }],
+      "ה": [{ word: "הר", emoji: "⛰️", letter: "ה" }, { word: "היפופוטם", emoji: "🦛", letter: "ה" }, { word: "הליקופטר", emoji: "🚁", letter: "ה" }],
+      "ו": [{ word: "ורד", emoji: "🌹", letter: "ו" }, { word: "וילון", emoji: "🪟", letter: "ו" }, { word: "וופל", emoji: "🧇", letter: "ו" }],
+      "ז": [{ word: "זברה", emoji: "🦓", letter: "ז" }, { word: "זית", emoji: "🫒", letter: "ז" }, { word: "זחל", emoji: "🐛", letter: "ז" }],
+      "ח": [{ word: "חתול", emoji: "🐱", letter: "ח" }, { word: "חלב", emoji: "🥛", letter: "ח" }, { word: "חלון", emoji: "🪟", letter: "ח" }],
+      "ט": [{ word: "טלה", emoji: "🐑", letter: "ט" }, { word: "טיל", emoji: "🚀", letter: "ט" }, { word: "טבעת", emoji: "💍", letter: "ט" }],
+      "י": [{ word: "יד", emoji: "✋", letter: "י" }, { word: "ים", emoji: "🌊", letter: "י" }, { word: "יונה", emoji: "🕊️", letter: "י" }],
+      "כ": [{ word: "כדור", emoji: "⚽", letter: "כ" }, { word: "כובע", emoji: "🧢", letter: "כ" }, { word: "כיסא", emoji: "🪑", letter: "כ" }],
+      "ל": [{ word: "לב", emoji: "❤️", letter: "ל" }, { word: "לימון", emoji: "🍋", letter: "ל" }, { word: "לחם", emoji: "🍞", letter: "ל" }],
+      "מ": [{ word: "מטרייה", emoji: "☂️", letter: "מ" }, { word: "מכונית", emoji: "🚙", letter: "מ" }, { word: "מלפפון", emoji: "🥒", letter: "מ" }],
+      "נ": [{ word: "נר", emoji: "🕯️", letter: "נ" }, { word: "נמר", emoji: "🐯", letter: "נ" }, { word: "נעל", emoji: "👟", letter: "נ" }],
+      "ס": [{ word: "סוס", emoji: "🐴", letter: "ס" }, { word: "ספר", emoji: "📘", letter: "ס" }, { word: "סירה", emoji: "⛵", letter: "ס" }],
+      "ע": [{ word: "עין", emoji: "👁️", letter: "ע" }, { word: "עוגה", emoji: "🎂", letter: "ע" }, { word: "עץ", emoji: "🌳", letter: "ע" }],
+      "פ": [{ word: "פרח", emoji: "🌸", letter: "פ" }, { word: "פיל", emoji: "🐘", letter: "פ" }, { word: "פטרייה", emoji: "🍄", letter: "פ" }],
+      "צ": [{ word: "צב", emoji: "🐢", letter: "צ" }, { word: "ציפור", emoji: "🐦", letter: "צ" }, { word: "צלחת", emoji: "🍽️", letter: "צ" }],
+      "ק": [{ word: "קוף", emoji: "🐒", letter: "ק" }, { word: "קערה", emoji: "🥣", letter: "ק" }, { word: "קשת", emoji: "🌈", letter: "ק" }],
+      "ר": [{ word: "רכבת", emoji: "🚂", letter: "ר" }, { word: "רימון", emoji: "🔴", letter: "ר" }, { word: "רגל", emoji: "🦵", letter: "ר" }],
+      "ש": [{ word: "שמש", emoji: "☀️", letter: "ש" }, { word: "שעון", emoji: "⏰", letter: "ש" }, { word: "שועל", emoji: "🦊", letter: "ש" }],
+      "ת": [{ word: "תות", emoji: "🍓", letter: "ת" }, { word: "תפוח", emoji: "🍎", letter: "ת" }, { word: "תיק", emoji: "🎒", letter: "ת" }]
     };
 
     let currentLetters = [];
@@ -528,15 +433,11 @@
     }
 
     function speakWord(text) {
-      if (!("speechSynthesis" in window)) {
-        alert("הדפדפן לא תומך בהשמעת קול.");
-        return;
-      }
+      if (!("speechSynthesis" in window)) return;
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "he-IL";
       utterance.rate = 0.85;
-      utterance.pitch = 1.05;
       window.speechSynthesis.speak(utterance);
     }
 
@@ -546,14 +447,11 @@
     }
 
     function getChosenLetters() {
-      const letters = [
+      return [
         normalizeLetter(document.getElementById("letter1").value),
         normalizeLetter(document.getElementById("letter2").value),
         normalizeLetter(document.getElementById("letter3").value)
-      ];
-
-      const unique = [...new Set(letters)].filter(Boolean);
-      return unique;
+      ].filter(Boolean);
     }
 
     function buildDropzones() {
@@ -569,23 +467,14 @@
           </div>
           <div class="dropzone-body" id="zone-${letter}"></div>
         `;
-
-        zone.addEventListener("dragover", (e) => {
-          e.preventDefault();
-          zone.classList.add("active");
-        });
-
-        zone.addEventListener("dragleave", () => {
-          zone.classList.remove("active");
-        });
-
+        zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("active"); });
+        zone.addEventListener("dragleave", () => zone.classList.remove("active"));
         zone.addEventListener("drop", (e) => {
           e.preventDefault();
           zone.classList.remove("active");
           const cardId = e.dataTransfer.getData("text/plain");
           handleDropById(cardId, letter);
         });
-
         dropzonesEl.appendChild(zone);
       });
     }
@@ -596,12 +485,8 @@
         const btn = document.createElement("button");
         btn.className = "letter-action-btn";
         btn.textContent = letter;
-        btn.dataset.letter = letter;
         btn.addEventListener("click", () => {
-          if (selectedWordId === null) {
-            showMessage("קודם בחרו מילה", "error");
-            return;
-          }
+          if (selectedWordId === null) { showMessage("קודם בחרו מילה", "error"); return; }
           handleDropById(selectedWordId, letter);
         });
         letterActionsEl.appendChild(btn);
@@ -613,15 +498,7 @@
       card.className = "word-card";
       card.draggable = true;
       card.dataset.id = index;
-      card.dataset.word = item.word;
-      card.dataset.letter = item.letter;
-
-      card.innerHTML = `
-        <div class="emoji">${item.emoji}</div>
-        <div class="word-text">${item.word}</div>
-        <div class="tap-hint">לחץ לשמיעה</div>
-      `;
-
+      card.innerHTML = `<div class="emoji">${item.emoji}</div><div class="word-text">${item.word}</div><div class="tap-hint">לחץ לשמיעה</div>`;
       card.addEventListener("click", () => {
         speakWord(item.word);
         selectedWordId = index;
@@ -629,56 +506,28 @@
         document.querySelectorAll(".word-card").forEach(c => c.style.outline = "");
         card.style.outline = "5px solid #fbbf24";
       });
-
-      card.addEventListener("dragstart", (e) => {
-        e.dataTransfer.setData("text/plain", index);
-        card.classList.add("dragging");
-      });
-
-      card.addEventListener("dragend", () => {
-        card.classList.remove("dragging");
-      });
-
+      card.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/plain", index); card.classList.add("dragging"); });
+      card.addEventListener("dragend", () => card.classList.remove("dragging"));
       return card;
-    }
-
-    function renderCards() {
-      cardsContainer.innerHTML = "";
-      currentWords.forEach((item, index) => {
-        cardsContainer.appendChild(createCard(item, index));
-      });
-    }
-
-    function placeMiniCard(item, zoneLetter) {
-      const zone = document.getElementById(`zone-${zoneLetter}`);
-      const mini = document.createElement("div");
-      mini.className = "mini-card";
-      mini.textContent = `${item.emoji} ${item.word}`;
-      mini.addEventListener("click", () => speakWord(item.word));
-      zone.appendChild(mini);
-    }
-
-    function updateScore() {
-      scoreEl.textContent = score;
-      if (score === currentWords.length && currentWords.length > 0) {
-        showMessage("כל הכבוד! מיינת את כל המילים נכון! 🎉", "success");
-        speakWord("כל הכבוד");
-      }
     }
 
     function handleDropById(cardId, targetLetter) {
       const item = currentWords[cardId];
       const cardEl = document.querySelector(`.word-card[data-id="${cardId}"]`);
       if (!item || !cardEl) return;
-
       if (item.letter === targetLetter) {
-        placeMiniCard(item, targetLetter);
+        const zone = document.getElementById(`zone-${targetLetter}`);
+        const mini = document.createElement("div");
+        mini.className = "mini-card";
+        mini.textContent = `${item.emoji} ${item.word}`;
+        zone.appendChild(mini);
         cardEl.remove();
         score++;
         selectedWordId = null;
         selectedWordBox.textContent = "לא נבחרה מילה";
         showMessage("מצוין! תשובה נכונה 👏", "success");
-        updateScore();
+        scoreEl.textContent = score;
+        if (score === currentWords.length) { showMessage("כל הכבוד! סיימת הכל! 🎉", "success"); speakWord("כל הכבוד"); }
       } else {
         showMessage("נסה שוב 😊", "error");
       }
@@ -686,64 +535,42 @@
 
     function resetCurrentGame() {
       if (!currentLetters.length) return;
-      score = 0;
-      selectedWordId = null;
-      scoreEl.textContent = "0";
-      selectedWordBox.textContent = "לא נבחרה מילה";
-      showMessage("");
-      currentWords = shuffle(currentLetters.flatMap(letter => WORD_BANK[letter] || []));
+      score = 0; scoreEl.textContent = "0"; showMessage("");
+      currentWords = shuffle(currentLetters.flatMap(l => WORD_BANK[l] || []));
       totalEl.textContent = currentWords.length;
-
-      currentLetters.forEach(letter => {
-        const zone = document.getElementById(`zone-${letter}`);
-        if (zone) zone.innerHTML = "";
-      });
-
-      renderCards();
+      cardsContainer.innerHTML = "";
+      currentWords.forEach((item, index) => cardsContainer.appendChild(createCard(item, index)));
     }
 
     function generateGame() {
-      const chosen = getChosenLetters();
-
-      if (chosen.length !== 3) {
-        alert("נא לבחור 3 אותיות שונות.");
-        return;
-      }
-
-      const unsupported = chosen.filter(letter => !WORD_BANK[letter]);
-      if (unsupported.length) {
-        alert("אין עדיין מילים עבור האותיות: " + unsupported.join(" , "));
-        return;
-      }
-    }
-
-    function randomLetters() {
-      const allLetters = Object.keys(WORD_BANK);
-      const shuffled = shuffle(allLetters).slice(0, 3);
-      document.getElementById("letter1").value = shuffled[0];
-      document.getElementById("letter2").value = shuffled[1];
-      document.getElementById("letter3").value = shuffled[2];
-      generateGame();
+      const chosen = [...new Set(getChosenLetters())];
+      if (chosen.length !== 3) { alert("נא לבחור 3 אותיות שונות."); return; }
+      currentLetters = chosen;
+      subtitleEl.textContent = `מיינו לפי האותיות: ${currentLetters.join(" , ")}`;
+      buildDropzones();
+      buildMobileButtons();
+      resetCurrentGame();
     }
 
     document.getElementById("generateBtn").addEventListener("click", generateGame);
-    document.getElementById("randomBtn").addEventListener("click", randomLetters);
-    document.getElementById("resetBtn").addEventListener("click", resetCurrentGame);
-
-    document.getElementById("speakAllBtn").addEventListener("click", async () => {
-      for (const item of currentWords) {
-        speakWord(item.word);
-        await new Promise(resolve => setTimeout(resolve, 1400));
-      }
+    document.getElementById("randomBtn").addEventListener("click", () => {
+      const keys = Object.keys(WORD_BANK);
+      const rand = shuffle(keys).slice(0, 3);
+      document.getElementById("letter1").value = rand[0];
+      document.getElementById("letter2").value = rand[1];
+      document.getElementById("letter3").value = rand[2];
+      generateGame();
     });
-
-    ["letter1","letter2","letter3"].forEach(id => {
-      document.getElementById(id).addEventListener("input", (e) => {
-        e.target.value = normalizeLetter(e.target.value);
-      });
+    document.getElementById("resetBtn").addEventListener("click", resetCurrentGame);
+    document.getElementById("speakAllBtn").addEventListener("click", async () => {
+      for (const item of currentWords) { speakWord(item.word); await new Promise(r => setTimeout(r, 1500)); }
     });
 
     generateGame();
   </script>
+
+  <footer class="footer">
+    נוצר באהבה על ידי אלינה גולדשטיין-לויטין ❤️
+  </footer>
 </body>
 </html>
