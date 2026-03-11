@@ -325,13 +325,19 @@
         grid-template-columns:1fr;
       }
     }
-  </style>
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #888;
+      margin-top: 40px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      }
+    </style>
 </head>
 <body>
   <div class="container">
     <h1>🎈 משחק מיון אותיות 🎈</h1>
-    <div class="subtitle" id="subtitle">בחרו אותיות כדי להתחיל</div>
-
     <div class="setup-box">
       <div class="setup-title">בחרו 3 אותיות</div>
       <div class="setup-row">
@@ -375,6 +381,10 @@
       </section>
     </div>
   </div>
+
+  <footer class="footer">
+    נוצר באהבה על ידי אלינה גולדשטיין-לויטין ❤️
+  </footer>
 
   <script>
     const WORD_BANK = {
@@ -705,12 +715,6 @@
         alert("אין עדיין מילים עבור האותיות: " + unsupported.join(" , "));
         return;
       }
-
-      currentLetters = chosen;
-      subtitleEl.textContent = `גררו או לחצו על המילים ומיינו לפי האות הראשונה: ${currentLetters.join(" , ")}`;
-      buildDropzones();
-      buildMobileButtons();
-      resetCurrentGame();
     }
 
     function randomLetters() {
