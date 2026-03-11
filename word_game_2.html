@@ -12,8 +12,6 @@
       --ink:#3b2f2f;
       --accent:#f59e0b;
       --accent2:#10b981;
-      --accent3:#60a5fa;
-      --accent4:#a855f7;
       --danger:#ef4444;
       --shadow:0 10px 25px rgba(0,0,0,0.12);
       --radius:20px;
@@ -26,11 +24,10 @@
       font-family: Arial, sans-serif;
       background: linear-gradient(180deg,var(--bg1),var(--bg2));
       color:var(--ink);
-      min-height: 100vh;
     }
 
     .container{
-      max-width:1200px;
+      max-width:1250px;
       margin:0 auto;
       padding:20px;
     }
@@ -43,26 +40,47 @@
 
     .subtitle{
       text-align:center;
-      font-size:clamp(18px,2.5vw,24px);
+      font-size:clamp(18px,2.4vw,24px);
       margin-bottom:20px;
     }
 
-    .topbar{
+    .setup-box,
+    .words-panel,
+    .letters-panel{
+      background:rgba(255,255,255,0.75);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .setup-box{
+      margin-bottom:18px;
+    }
+
+    .setup-title{
+      font-size:28px;
+      text-align:center;
+      margin-bottom:12px;
+      font-weight:bold;
+    }
+
+    .setup-row{
       display:flex;
       gap:12px;
       justify-content:center;
       align-items:center;
       flex-wrap:wrap;
-      margin-bottom:20px;
+      margin-bottom:12px;
     }
 
-    .pill{
-      background:var(--card);
-      border-radius:999px;
-      padding:12px 18px;
-      box-shadow:var(--shadow);
-      font-size:20px;
-      font-weight:bold;
+    .letter-input{
+      width:80px;
+      height:68px;
+      font-size:38px;
+      text-align:center;
+      border-radius:16px;
+      border:2px solid #d1d5db;
+      background:white;
     }
 
     .btn{
@@ -75,11 +93,28 @@
       box-shadow:var(--shadow);
       background:var(--accent);
       color:white;
-      transition: transform 0.2s;
     }
 
     .btn:hover{
-      transform:scale(1.05);
+      transform:translateY(-1px);
+    }
+
+    .topbar{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+      margin:18px 0;
+    }
+
+    .pill{
+      background:var(--card);
+      border-radius:999px;
+      padding:12px 18px;
+      box-shadow:var(--shadow);
+      font-size:20px;
+      font-weight:bold;
     }
 
     .instructions{
@@ -89,21 +124,21 @@
       margin-bottom:18px;
       box-shadow:var(--shadow);
       text-align:center;
-      font-size:20px;
+      font-size:22px;
+      line-height:1.5;
+    }
+
+    .sound-note{
+      font-size:18px;
+      margin-top:8px;
+      color:#6b4f1d;
     }
 
     .game-layout{
       display:grid;
-      grid-template-columns: 1.15fr 1fr;
+      grid-template-columns:1.15fr 1fr;
       gap:20px;
       align-items:start;
-    }
-
-    .words-panel, .letters-panel{
-      background:rgba(255,255,255,0.7);
-      border-radius:var(--radius);
-      padding:18px;
-      box-shadow:var(--shadow);
     }
 
     .panel-title{
@@ -115,7 +150,7 @@
 
     .cards{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
       gap:16px;
     }
 
@@ -129,18 +164,37 @@
       user-select:none;
       border:4px solid transparent;
       transition:transform 0.15s ease, border-color 0.15s ease;
-      min-height:140px;
+      min-height:150px;
       display:flex;
       flex-direction:column;
       justify-content:center;
       align-items:center;
+      gap:8px;
     }
 
-    .word-card:hover{ transform:scale(1.03); border-color:#fde68a; }
-    .word-card.dragging{ opacity:0.5; }
+    .word-card:hover{
+      transform:scale(1.03);
+      border-color:#fde68a;
+    }
 
-    .emoji{ font-size:48px; }
-    .word-text{ font-size:28px; font-weight:bold; }
+    .word-card.dragging{
+      opacity:0.55;
+    }
+
+    .emoji{
+      font-size:54px;
+      line-height:1;
+    }
+
+    .word-text{
+      font-size:32px;
+      font-weight:bold;
+    }
+
+    .tap-hint{
+      font-size:15px;
+      color:#777;
+    }
 
     .dropzones{
       display:grid;
@@ -152,52 +206,57 @@
       background:var(--card);
       border-radius:22px;
       border:4px dashed #d1d5db;
-      min-height:140px;
+      min-height:170px;
       padding:14px;
       box-shadow:var(--shadow);
+      transition:background 0.15s ease, border-color 0.15s ease;
     }
 
-    .dropzone.active{ background:#f0fdf4; border-color:var(--accent2); }
+    .dropzone.active{
+      background:#f0fdf4;
+      border-color:var(--accent2);
+    }
 
     .dropzone-header{
       display:flex;
+      justify-content:center;
       align-items:center;
-      gap:12px;
-      font-size:28px;
+      gap:10px;
+      font-size:38px;
       font-weight:bold;
       margin-bottom:12px;
+      flex-wrap:wrap;
     }
 
     .letter-badge{
-      width:50px;
-      height:50px;
+      width:64px;
+      height:64px;
       border-radius:50%;
       display:inline-flex;
       justify-content:center;
       align-items:center;
       color:white;
-      font-size:28px;
+      font-size:38px;
+      font-weight:bold;
+      background:#f97316;
     }
-
-    /* צבעים משתנים לאותיות */
-    .badge-0 { background:#f97316; }
-    .badge-1 { background:#3b82f6; }
-    .badge-2 { background:#10b981; }
 
     .dropzone-body{
       display:flex;
       flex-wrap:wrap;
-      gap:8px;
-      min-height:50px;
+      gap:10px;
+      min-height:70px;
+      justify-content:center;
+      align-items:flex-start;
     }
 
     .mini-card{
       background:#fff7ed;
-      border-radius:12px;
-      padding:6px 10px;
-      font-size:20px;
+      border-radius:16px;
+      padding:8px 12px;
+      font-size:24px;
       font-weight:bold;
-      box-shadow:0 2px 5px rgba(0,0,0,0.1);
+      box-shadow:0 4px 10px rgba(0,0,0,0.08);
     }
 
     .mobile-buttons{
@@ -205,282 +264,482 @@
       background:rgba(255,255,255,0.8);
       border-radius:var(--radius);
       padding:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .mobile-buttons h3{
+      margin-top:0;
+      text-align:center;
+      font-size:26px;
+    }
+
+    .selected-word-box{
+      text-align:center;
+      min-height:60px;
+      font-size:30px;
+      font-weight:bold;
+      margin-bottom:14px;
+      color:#7c2d12;
     }
 
     .letter-actions{
       display:flex;
       justify-content:center;
       gap:12px;
+      flex-wrap:wrap;
     }
 
     .letter-action-btn{
-      flex:1;
-      max-width:100px;
-      height:60px;
-      font-size:28px;
+      min-width:88px;
+      min-height:68px;
+      font-size:34px;
       font-weight:bold;
       border:none;
-      border-radius:15px;
+      border-radius:18px;
       cursor:pointer;
       color:white;
+      box-shadow:var(--shadow);
+      background:#3b82f6;
     }
 
     .message{
       margin-top:18px;
       text-align:center;
-      font-size:24px;
+      font-size:28px;
       font-weight:bold;
-      min-height:35px;
+      min-height:40px;
     }
 
     .success{ color:#15803d; }
     .error{ color:var(--danger); }
 
+    .small-note{
+      text-align:center;
+      font-size:16px;
+      color:#666;
+      margin-top:10px;
+    }
+
     @media (max-width: 900px){
-      .game-layout{ grid-template-columns:1fr; }
+      .game-layout{
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎈 משחק המיון הגדול 🎈</h1>
-    <div class="subtitle" id="gameSubtitle">מיינו את המילים לפי האות הפותחת</div>
+    <h1>🎈 משחק מיון אותיות 🎈</h1>
+    <div class="subtitle" id="subtitle">בחרו אותיות כדי להתחיל</div>
+
+    <div class="setup-box">
+      <div class="setup-title">בחרו 3 אותיות</div>
+      <div class="setup-row">
+        <input id="letter1" class="letter-input" maxlength="1" value="ה" />
+        <input id="letter2" class="letter-input" maxlength="1" value="ו" />
+        <input id="letter3" class="letter-input" maxlength="1" value="ז" />
+      </div>
+      <div class="setup-row">
+        <button class="btn" id="generateBtn">צור משחק</button>
+        <button class="btn" id="randomBtn">אותיות אקראיות</button>
+      </div>
+      <div class="small-note">למשל: ה ו ז / ח כ ל / ק ג ע</div>
+    </div>
 
     <div class="topbar">
       <div class="pill">ניקוד: <span id="score">0</span> / <span id="total">0</span></div>
-      <button class="btn" id="resetBtn">הגרל סט אותיות חדש</button>
+      <button class="btn" id="resetBtn">ערבב מחדש</button>
+      <button class="btn" id="speakAllBtn">השמע את כל המילים</button>
     </div>
 
     <div class="instructions">
-      לחצו על כרטיס לשמיעה, וגררו לאות הנכונה (או השתמשו בכפתורי האותיות למטה).
+      לחצו על כרטיס כדי לשמוע את המילה. אחר כך גררו אותה לריבוע עם האות הנכונה, או תלחצו על האות הנכונה בתחתית הרשימה.
     </div>
 
     <div class="game-layout">
       <section class="words-panel">
-        <div class="panel-title">המילים שלנו</div>
+        <div class="panel-title">המילים</div>
         <div class="cards" id="cardsContainer"></div>
 
         <div class="mobile-buttons">
-          <div class="selected-word-box" id="selectedWordBox" style="text-align:center; font-size:24px; margin-bottom:10px; font-weight:bold;">בחרו מילה...</div>
-          <div class="letter-actions" id="mobileActionButtons"></div>
+          <h3>אותיות לבחירה</h3>
+          <div class="selected-word-box" id="selectedWordBox">לא נבחרה מילה</div>
+          <div class="letter-actions" id="letterActions"></div>
         </div>
       </section>
 
       <section class="letters-panel">
-        <div class="panel-title">לאן זה שייך?</div>
-        <div class="dropzones" id="dropzonesContainer"></div>
+        <div class="panel-title">המיון</div>
+        <div class="dropzones" id="dropzones"></div>
         <div class="message" id="message"></div>
       </section>
     </div>
   </div>
 
   <script>
-    // מאגר מילים ענק
-    const letterPool = {
-      "א": [{w:"אריה", e:"🦁"}, {w:"אגס", e:"🍐"}, {w:"אווירון", e:"✈️"}],
-      "ב": [{w:"בית", e:"🏠"}, {w:"בובה", e:"🪆"}, {w:"ביצה", e:"🥚"}],
-      "ג": [{w:"גלידה", e:"🍦"}, {w:"גמל", e:"🐫"}, {w:"גזר", e:"🥕"}],
-      "ד": [{w:"דג", e:"🐟"}, {w:"דוב", e:"🐻"}, {w:"דלת", e:"🚪"}],
-      "ה": [{w:"היפו", e:"🦛"}, {w:"הגה", e:"🎡"}, {w:"הר", e:"⛰️"}],
-      "ו": [{w:"ורד", e:"🌹"}, {w:"וו", e:"🪝"}, {w:"וילון", e:"🪟"}],
-      "ז": [{w:"זברה", e:"🦓"}, {w:"זית", e:"🫒"}, {w:"זבוב", e:"🪰"}],
-      "ח": [{w:"חתול", e:"🐱"}, {w:"חלב", e:"🥛"}, {w:"חלון", e:"🪟"}],
-      "ט": [{w:"טלפון", e:"📱"}, {w:"טווס", e:"🦚"}, {w:"טרקטור", e:"🚜"}],
-      "י": [{w:"ילד", e:"👦"}, {w:"יד", e:"✋"}, {w:"ירח", e:"🌙"}],
-      "כ": [{w:"כדור", e:"⚽"}, {w:"כובע", e:"🧢"}, {w:"כיסא", e:"🪑"}],
-      "ל": [{w:"לב", e:"❤️"}, {w:"לימון", e:"🍋"}, {w:"לחם", e:"🍞"}],
-      "מ": [{w:"מכונית", e:"🚗"}, {w:"מפתח", e:"🔑"}, {w:"מפה", e:"🗺️"}],
-      "נ": [{w:"נחש", e:"🐍"}, {w:"נר", e:"🕯️"}, {w:"נעל", e:"👟"}],
-      "ס": [{w:"סוס", e:"🐎"}, {w:"סירה", e:"⛵"}, {w:"ספר", e:"📚"}],
-      "ע": [{w:"עוגה", e:"🍰"}, {w:"עין", e:"👁️"}, {w:"עץ", e:"🌳"}],
-      "פ": [{w:"פרח", e:"🌸"}, {w:"פיל", e:"🐘"}, {w:"פסנתר", e:"🎹"}],
-      "צ": [{w:"צב", e:"🐢"}, {w:"ציפור", e:"🐦"}, {w:"צפרדע", e:"🐸"}],
-      "ק": [{w:"קוף", e:"🐒"}, {w:"קשת", e:"🌈"}, {w:"קומקום", e:"🫖"}],
-      "ר": [{w:"רכבת", e:"🚂"}, {w:"ראש", e:"👤"}, {w:"רימון", e:"🍎"}],
-      "ש": [{w:"שמש", e:"☀️"}, {w:"שעון", e:"⌚"}, {w:"שולחן", e:"🪑"}],
-      "ת": [{w:"תפוח", e:"🍎"}, {w:"תיק", e:"🎒"}, {w:"תרנגול", e:"🐓"}]
+    const WORD_BANK = {
+      "א": [
+        { word: "אריה", emoji: "🦁", letter: "א" },
+        { word: "אוטו", emoji: "🚗", letter: "א" },
+        { word: "אבטיח", emoji: "🍉", letter: "א" }
+      ],
+      "ב": [
+        { word: "בננה", emoji: "🍌", letter: "ב" },
+        { word: "בית", emoji: "🏠", letter: "ב" },
+        { word: "בלון", emoji: "🎈", letter: "ב" }
+      ],
+      "ג": [
+        { word: "גזר", emoji: "🥕", letter: "ג" },
+        { word: "גמל", emoji: "🐪", letter: "ג" },
+        { word: "גלידה", emoji: "🍦", letter: "ג" }
+      ],
+      "ד": [
+        { word: "דג", emoji: "🐟", letter: "ד" },
+        { word: "דבורה", emoji: "🐝", letter: "ד" },
+        { word: "דגל", emoji: "🏳️", letter: "ד" }
+      ],
+      "ה": [
+        { word: "הר", emoji: "⛰️", letter: "ה" },
+        { word: "היפופוטם", emoji: "🦛", letter: "ה" },
+        { word: "הליקופטר", emoji: "🚁", letter: "ה" }
+      ],
+      "ו": [
+        { word: "ורד", emoji: "🌹", letter: "ו" },
+        { word: "וילון", emoji: "🪟", letter: "ו" },
+        { word: "וופל", emoji: "🧇", letter: "ו" }
+      ],
+      "ז": [
+        { word: "זברה", emoji: "🦓", letter: "ז" },
+        { word: "זית", emoji: "🫒", letter: "ז" },
+        { word: "זחל", emoji: "🐛", letter: "ז" }
+      ],
+      "ח": [
+        { word: "חתול", emoji: "🐱", letter: "ח" },
+        { word: "חלב", emoji: "🥛", letter: "ח" },
+        { word: "חלון", emoji: "🪟", letter: "ח" }
+      ],
+      "ט": [
+        { word: "טלה", emoji: "🐑", letter: "ט" },
+        { word: "טיל", emoji: "🚀", letter: "ט" },
+        { word: "טבעת", emoji: "💍", letter: "ט" }
+      ],
+      "י": [
+        { word: "יד", emoji: "✋", letter: "י" },
+        { word: "ים", emoji: "🌊", letter: "י" },
+        { word: "יונה", emoji: "🕊️", letter: "י" }
+      ],
+      "כ": [
+        { word: "כדור", emoji: "⚽", letter: "כ" },
+        { word: "כובע", emoji: "🧢", letter: "כ" },
+        { word: "כיסא", emoji: "🪑", letter: "כ" }
+      ],
+      "ל": [
+        { word: "לב", emoji: "❤️", letter: "ל" },
+        { word: "לימון", emoji: "🍋", letter: "ל" },
+        { word: "לחם", emoji: "🍞", letter: "ל" }
+      ],
+      "מ": [
+        { word: "מטרייה", emoji: "☂️", letter: "מ" },
+        { word: "מכונית", emoji: "🚙", letter: "מ" },
+        { word: "מלפפון", emoji: "🥒", letter: "מ" }
+      ],
+      "נ": [
+        { word: "נר", emoji: "🕯️", letter: "נ" },
+        { word: "נמר", emoji: "🐯", letter: "נ" },
+        { word: "נעל", emoji: "👟", letter: "נ" }
+      ],
+      "ס": [
+        { word: "סוס", emoji: "🐴", letter: "ס" },
+        { word: "ספר", emoji: "📘", letter: "ס" },
+        { word: "סירה", emoji: "⛵", letter: "ס" }
+      ],
+      "ע": [
+        { word: "עין", emoji: "👁️", letter: "ע" },
+        { word: "עוגה", emoji: "🎂", letter: "ע" },
+        { word: "עץ", emoji: "🌳", letter: "ע" }
+      ],
+      "פ": [
+        { word: "פרח", emoji: "🌸", letter: "פ" },
+        { word: "פיל", emoji: "🐘", letter: "פ" },
+        { word: "פטרייה", emoji: "🍄", letter: "פ" }
+      ],
+      "צ": [
+        { word: "צב", emoji: "🐢", letter: "צ" },
+        { word: "ציפור", emoji: "🐦", letter: "צ" },
+        { word: "צלחת", emoji: "🍽️", letter: "צ" }
+      ],
+      "ק": [
+        { word: "קוף", emoji: "🐒", letter: "ק" },
+        { word: "קערה", emoji: "🥣", letter: "ק" },
+        { word: "קשת", emoji: "🌈", letter: "ק" }
+      ],
+      "ר": [
+        { word: "רכבת", emoji: "🚂", letter: "ר" },
+        { word: "רימון", emoji: "🔴", letter: "ר" },
+        { word: "רגל", emoji: "🦵", letter: "ר" }
+      ],
+      "ש": [
+        { word: "שמש", emoji: "☀️", letter: "ש" },
+        { word: "שעון", emoji: "⏰", letter: "ש" },
+        { word: "שועל", emoji: "🦊", letter: "ש" }
+      ],
+      "ת": [
+        { word: "תות", emoji: "🍓", letter: "ת" },
+        { word: "תפוח", emoji: "🍎", letter: "ת" },
+        { word: "תיק", emoji: "🎒", letter: "ת" }
+      ]
     };
 
-    let usedLetterSets = []; // מעקב אחרי מה שהיה בסשן
-    let currentWords = [];
     let currentLetters = [];
+    let currentWords = [];
     let score = 0;
     let selectedWordId = null;
 
     const cardsContainer = document.getElementById("cardsContainer");
-    const dropzonesContainer = document.getElementById("dropzonesContainer");
-    const mobileActionButtons = document.getElementById("mobileActionButtons");
     const scoreEl = document.getElementById("score");
     const totalEl = document.getElementById("total");
     const messageEl = document.getElementById("message");
     const selectedWordBox = document.getElementById("selectedWordBox");
+    const dropzonesEl = document.getElementById("dropzones");
+    const letterActionsEl = document.getElementById("letterActions");
+    const subtitleEl = document.getElementById("subtitle");
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function normalizeLetter(value) {
+      return (value || "").trim().charAt(0);
+    }
 
     function speakWord(text) {
-      if (!("speechSynthesis" in window)) return;
+      if (!("speechSynthesis" in window)) {
+        alert("הדפדפן לא תומך בהשמעת קול.");
+        return;
+      }
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "he-IL";
-      utterance.rate = 0.9;
+      utterance.rate = 0.85;
+      utterance.pitch = 1.05;
       window.speechSynthesis.speak(utterance);
     }
 
-    function getRandomLetters(count) {
-      let allKeys = Object.keys(letterPool);
-      // סינון אותיות שכבר השתמשנו בהן בסשן הנוכחי
-      let availableKeys = allKeys.filter(k => !usedLetterSets.includes(k));
-      
-      // אם נגמרו האותיות, מתחילים סבב חדש של זיכרון
-      if (availableKeys.length < count) {
-        usedLetterSets = [];
-        availableKeys = allKeys;
-      }
-
-      const shuffled = availableKeys.sort(() => 0.5 - Math.random());
-      const selected = shuffled.slice(0, count);
-      
-      // הוספה לרשימת המשומשים
-      usedLetterSets.push(...selected);
-      return selected;
+    function showMessage(text, type="") {
+      messageEl.textContent = text;
+      messageEl.className = "message " + type;
     }
 
-    function initGame() {
-      // איפוס נתונים
-      score = 0;
-      selectedWordId = null;
-      currentWords = [];
-      scoreEl.textContent = "0";
-      messageEl.textContent = "";
-      selectedWordBox.textContent = "בחרו מילה...";
-      
-      // בחירת אותיות
-      currentLetters = getRandomLetters(3);
-      document.getElementById("gameSubtitle").textContent = `מיינו לפי האותיות: ${currentLetters.join(" , ")}`;
+    function getChosenLetters() {
+      const letters = [
+        normalizeLetter(document.getElementById("letter1").value),
+        normalizeLetter(document.getElementById("letter2").value),
+        normalizeLetter(document.getElementById("letter3").value)
+      ];
 
-      // בניית רשימת מילים
+      const unique = [...new Set(letters)].filter(Boolean);
+      return unique;
+    }
+
+    function buildDropzones() {
+      dropzonesEl.innerHTML = "";
       currentLetters.forEach(letter => {
-        letterPool[letter].forEach(item => {
-          currentWords.push({ ...item, letter: letter });
-        });
-      });
-
-      // ערבוב מילים
-      currentWords = currentWords.sort(() => 0.5 - Math.random());
-      totalEl.textContent = currentWords.length;
-
-      renderUI();
-    }
-
-    function renderUI() {
-      // 1. יצירת כרטיסי מילים
-      cardsContainer.innerHTML = "";
-      currentWords.forEach((item, index) => {
-        const card = document.createElement("div");
-        card.className = "word-card";
-        card.draggable = true;
-        card.innerHTML = `
-          <div class="emoji">${item.e}</div>
-          <div class="word-text">${item.w}</div>
-        `;
-        
-        card.onclick = () => {
-          speakWord(item.w);
-          selectedWordId = index;
-          selectedWordBox.textContent = `נבחרה: ${item.w}`;
-          document.querySelectorAll(".word-card").forEach(c => c.style.outline = "");
-          card.style.outline = "5px solid var(--accent)";
-        };
-
-        card.ondragstart = (e) => {
-          e.dataTransfer.setData("text", index);
-          card.classList.add("dragging");
-        };
-        card.ondragend = () => card.classList.remove("dragging");
-        
-        cardsContainer.appendChild(card);
-      });
-
-      // 2. יצירת אזורי גרירה וכפתורי מובייל
-      dropzonesContainer.innerHTML = "";
-      mobileActionButtons.innerHTML = "";
-
-      currentLetters.forEach((letter, idx) => {
-        // אזור גרירה
-        const dz = document.createElement("div");
-        dz.className = "dropzone";
-        dz.dataset.letter = letter;
-        dz.innerHTML = `
+        const zone = document.createElement("div");
+        zone.className = "dropzone";
+        zone.dataset.letter = letter;
+        zone.innerHTML = `
           <div class="dropzone-header">
-            <span class="letter-badge badge-${idx}">${letter}</span>
-            <span>מילים ב-${letter}</span>
+            <span class="letter-badge">${letter}</span>
+            <span>מילים שמתחילות ב-${letter}</span>
           </div>
           <div class="dropzone-body" id="zone-${letter}"></div>
         `;
 
-        dz.ondragover = (e) => { e.preventDefault(); dz.classList.add("active"); };
-        dz.ondragleave = () => dz.classList.remove("active");
-        dz.ondrop = (e) => {
+        zone.addEventListener("dragover", (e) => {
           e.preventDefault();
-          dz.classList.remove("active");
-          const id = e.dataTransfer.getData("text");
-          handleMatch(id, letter);
-        };
-        dropzonesContainer.appendChild(dz);
+          zone.classList.add("active");
+        });
 
-        // כפתור מובייל
-        const btn = document.createElement("button");
-        btn.className = `letter-action-btn badge-${idx}`;
-        btn.textContent = letter;
-        btn.onclick = () => {
-          if (selectedWordId === null) {
-            messageEl.textContent = "קודם תבחרו מילה מלמעלה!";
-            messageEl.className = "message error";
-            return;
-          }
-          handleMatch(selectedWordId, letter);
-        };
-        mobileActionButtons.appendChild(btn);
+        zone.addEventListener("dragleave", () => {
+          zone.classList.remove("active");
+        });
+
+        zone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          zone.classList.remove("active");
+          const cardId = e.dataTransfer.getData("text/plain");
+          handleDropById(cardId, letter);
+        });
+
+        dropzonesEl.appendChild(zone);
       });
     }
 
-    function handleMatch(wordId, targetLetter) {
-      const item = currentWords[wordId];
-      if (!item) return;
-
-      if (item.letter === targetLetter) {
-        // הצלחה
-        const zone = document.getElementById(`zone-${targetLetter}`);
-        const mini = document.createElement("div");
-        mini.className = "mini-card";
-        mini.textContent = `${item.e} ${item.w}`;
-        zone.appendChild(mini);
-
-        // הסרת הכרטיס המקורי
-        const cardEls = document.querySelectorAll(".word-card");
-        cardEls.forEach(c => {
-            if(c.querySelector(".word-text").textContent === item.w) c.style.display = "none";
+    function buildMobileButtons() {
+      letterActionsEl.innerHTML = "";
+      currentLetters.forEach(letter => {
+        const btn = document.createElement("button");
+        btn.className = "letter-action-btn";
+        btn.textContent = letter;
+        btn.dataset.letter = letter;
+        btn.addEventListener("click", () => {
+          if (selectedWordId === null) {
+            showMessage("קודם בחרו מילה", "error");
+            return;
+          }
+          handleDropById(selectedWordId, letter);
         });
+        letterActionsEl.appendChild(btn);
+      });
+    }
 
-        score++;
-        scoreEl.textContent = score;
-        messageEl.textContent = "כל הכבוד! נכון מאוד 🌟";
-        messageEl.className = "message success";
-        selectedWordId = null;
-        selectedWordBox.textContent = "בחרו מילה...";
-        
-        if (score === currentWords.length) {
-          messageEl.textContent = "ניצחתם! איזה אלופים! 🎉";
-          speakWord("כל הכבוד, סיימתם את כל המילים");
-        }
-      } else {
-        messageEl.textContent = "אופס, נסו אות אחרת... 😊";
-        messageEl.className = "message error";
+    function createCard(item, index) {
+      const card = document.createElement("div");
+      card.className = "word-card";
+      card.draggable = true;
+      card.dataset.id = index;
+      card.dataset.word = item.word;
+      card.dataset.letter = item.letter;
+
+      card.innerHTML = `
+        <div class="emoji">${item.emoji}</div>
+        <div class="word-text">${item.word}</div>
+        <div class="tap-hint">לחץ לשמיעה</div>
+      `;
+
+      card.addEventListener("click", () => {
+        speakWord(item.word);
+        selectedWordId = index;
+        selectedWordBox.textContent = `נבחרה מילה: ${item.word}`;
+        document.querySelectorAll(".word-card").forEach(c => c.style.outline = "");
+        card.style.outline = "5px solid #fbbf24";
+      });
+
+      card.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text/plain", index);
+        card.classList.add("dragging");
+      });
+
+      card.addEventListener("dragend", () => {
+        card.classList.remove("dragging");
+      });
+
+      return card;
+    }
+
+    function renderCards() {
+      cardsContainer.innerHTML = "";
+      currentWords.forEach((item, index) => {
+        cardsContainer.appendChild(createCard(item, index));
+      });
+    }
+
+    function placeMiniCard(item, zoneLetter) {
+      const zone = document.getElementById(`zone-${zoneLetter}`);
+      const mini = document.createElement("div");
+      mini.className = "mini-card";
+      mini.textContent = `${item.emoji} ${item.word}`;
+      mini.addEventListener("click", () => speakWord(item.word));
+      zone.appendChild(mini);
+    }
+
+    function updateScore() {
+      scoreEl.textContent = score;
+      if (score === currentWords.length && currentWords.length > 0) {
+        showMessage("כל הכבוד! מיינת את כל המילים נכון! 🎉", "success");
+        speakWord("כל הכבוד");
       }
     }
 
-    document.getElementById("resetBtn").onclick = initGame;
+    function handleDropById(cardId, targetLetter) {
+      const item = currentWords[cardId];
+      const cardEl = document.querySelector(`.word-card[data-id="${cardId}"]`);
+      if (!item || !cardEl) return;
 
-    // התחלה ראשונה
-    initGame();
+      if (item.letter === targetLetter) {
+        placeMiniCard(item, targetLetter);
+        cardEl.remove();
+        score++;
+        selectedWordId = null;
+        selectedWordBox.textContent = "לא נבחרה מילה";
+        showMessage("מצוין! תשובה נכונה 👏", "success");
+        updateScore();
+      } else {
+        showMessage("נסה שוב 😊", "error");
+      }
+    }
+
+    function resetCurrentGame() {
+      if (!currentLetters.length) return;
+      score = 0;
+      selectedWordId = null;
+      scoreEl.textContent = "0";
+      selectedWordBox.textContent = "לא נבחרה מילה";
+      showMessage("");
+      currentWords = shuffle(currentLetters.flatMap(letter => WORD_BANK[letter] || []));
+      totalEl.textContent = currentWords.length;
+
+      currentLetters.forEach(letter => {
+        const zone = document.getElementById(`zone-${letter}`);
+        if (zone) zone.innerHTML = "";
+      });
+
+      renderCards();
+    }
+
+    function generateGame() {
+      const chosen = getChosenLetters();
+
+      if (chosen.length !== 3) {
+        alert("נא לבחור 3 אותיות שונות.");
+        return;
+      }
+
+      const unsupported = chosen.filter(letter => !WORD_BANK[letter]);
+      if (unsupported.length) {
+        alert("אין עדיין מילים עבור האותיות: " + unsupported.join(" , "));
+        return;
+      }
+
+      currentLetters = chosen;
+      subtitleEl.textContent = `גררו או לחצו על המילים ומיינו לפי האות הראשונה: ${currentLetters.join(" , ")}`;
+      buildDropzones();
+      buildMobileButtons();
+      resetCurrentGame();
+    }
+
+    function randomLetters() {
+      const allLetters = Object.keys(WORD_BANK);
+      const shuffled = shuffle(allLetters).slice(0, 3);
+      document.getElementById("letter1").value = shuffled[0];
+      document.getElementById("letter2").value = shuffled[1];
+      document.getElementById("letter3").value = shuffled[2];
+      generateGame();
+    }
+
+    document.getElementById("generateBtn").addEventListener("click", generateGame);
+    document.getElementById("randomBtn").addEventListener("click", randomLetters);
+    document.getElementById("resetBtn").addEventListener("click", resetCurrentGame);
+
+    document.getElementById("speakAllBtn").addEventListener("click", async () => {
+      for (const item of currentWords) {
+        speakWord(item.word);
+        await new Promise(resolve => setTimeout(resolve, 1400));
+      }
+    });
+
+    ["letter1","letter2","letter3"].forEach(id => {
+      document.getElementById(id).addEventListener("input", (e) => {
+        e.target.value = normalizeLetter(e.target.value);
+      });
+    });
+
+    generateGame();
   </script>
 </body>
 </html>
