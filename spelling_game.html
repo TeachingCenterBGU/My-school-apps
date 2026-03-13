@@ -15,8 +15,8 @@
       --accent3:#3b82f6;
       --danger:#ef4444;
       --muted:#6b7280;
-      --shadow:0 16px 36px rgba(0,0,0,0.14);
-      --radius:24px;
+      --shadow:0 8px 24px rgba(0,0,0,0.08);
+      --radius:20px;
     }
 
     *{ box-sizing:border-box; }
@@ -30,20 +30,20 @@
     }
 
     .wrap{
-      max-width:1320px;
+      max-width:960px;
       margin:0 auto;
       padding:20px;
     }
 
     h1{
       text-align:center;
-      font-size:clamp(30px,4vw,52px);
+      font-size:clamp(26px,3.5vw,42px);
       margin:8px 0;
     }
 
     .subtitle{
       text-align:center;
-      font-size:clamp(18px,2.2vw,24px);
+      font-size:clamp(16px,2vw,20px);
       margin-bottom:18px;
       line-height:1.6;
     }
@@ -59,8 +59,8 @@
     .pill{
       background:white;
       border-radius:999px;
-      padding:12px 18px;
-      font-size:20px;
+      padding:10px 16px;
+      font-size:16px;
       font-weight:bold;
       box-shadow:var(--shadow);
     }
@@ -68,8 +68,8 @@
     .btn{
       border:none;
       border-radius:999px;
-      padding:12px 18px;
-      font-size:18px;
+      padding:10px 16px;
+      font-size:16px;
       font-weight:bold;
       cursor:pointer;
       color:white;
@@ -84,7 +84,7 @@
       background:var(--panel);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:22px;
+      padding:20px;
       margin-bottom:18px;
     }
 
@@ -97,17 +97,17 @@
     }
 
     .setup label{
-      font-size:20px;
+      font-size:16px;
       font-weight:bold;
     }
 
     .setup select,
     .setup input{
-      width:170px;
-      height:54px;
-      font-size:22px;
+      width:180px; /* קצת יותר רחב לטקסט הארוך */
+      height:44px;
+      font-size:16px;
       text-align:center;
-      border-radius:14px;
+      border-radius:12px;
       border:2px solid #d1d5db;
       background:white;
     }
@@ -124,31 +124,31 @@
       display:flex;
       align-items:center;
       gap:8px;
-      font-size:18px;
+      font-size:16px;
       font-weight:bold;
       background:#fff;
       border-radius:999px;
-      padding:10px 14px;
+      padding:8px 12px;
       box-shadow:var(--shadow);
     }
 
     .toggle input{
-      width:22px;
-      height:22px;
+      width:18px;
+      height:18px;
     }
 
     .layout{
       display:grid;
-      grid-template-columns:1.05fr 0.95fr;
+      grid-template-columns:1fr 1fr;
       gap:20px;
       align-items:start;
     }
 
     .prompt-box{
       background:linear-gradient(180deg,#fef3c7,#fde68a);
-      border-radius:26px;
-      padding:24px 18px;
-      min-height:220px;
+      border-radius:20px;
+      padding:20px 18px;
+      min-height:200px;
       display:flex;
       flex-direction:column;
       justify-content:center;
@@ -159,16 +159,16 @@
     }
 
     .prompt-label{
-      font-size:28px;
+      font-size:24px;
       font-weight:bold;
       color:#7c2d12;
     }
 
     .image-card{
-      width:min(320px,90%);
-      min-height:170px;
+      width:min(280px,90%);
+      min-height:150px;
       background:white;
-      border-radius:24px;
+      border-radius:20px;
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -176,7 +176,7 @@
       gap:10px;
       box-shadow:var(--shadow);
       cursor:pointer;
-      padding:18px;
+      padding:16px;
       border:3px solid #fde68a;
       transition:transform 0.15s ease;
     }
@@ -186,33 +186,56 @@
     }
 
     .image-emoji{
-      font-size:76px;
+      font-size:64px;
       line-height:1;
+    }
+    
+    /* עיצוב לתצוגת הטקסט של הפעלים */
+    .text-prompt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .verb-main {
+      font-size: 38px;
+      font-weight: bold;
+      color: #1e3a8a;
+      line-height: 1.1;
+    }
+    
+    .verb-sub {
+      font-size: 18px;
+      color: #475569;
+      font-weight: bold;
     }
 
     .image-label{
-      font-size:22px;
+      font-size:18px;
       color:#64748b;
       font-weight:bold;
+      margin-top: 5px;
     }
 
     .spoken-text{
-      font-size:30px;
+      font-size:24px;
       font-weight:bold;
-      min-height:42px;
+      min-height:34px;
     }
 
     .word-length{
-      font-size:20px;
+      font-size:16px;
       color:#64748b;
       font-weight:bold;
     }
 
     .message{
-      min-height:42px;
-      margin-top:18px;
+      min-height:34px;
+      margin-top:16px;
       text-align:center;
-      font-size:30px;
+      font-size:24px;
       font-weight:bold;
     }
 
@@ -221,13 +244,13 @@
 
     .helper-title{
       text-align:center;
-      font-size:30px;
+      font-size:24px;
       font-weight:bold;
-      margin:0 0 14px;
+      margin:0 0 12px;
     }
 
     .helper-text{
-      font-size:22px;
+      font-size:18px;
       text-align:center;
       line-height:1.6;
       margin-bottom:16px;
@@ -235,7 +258,7 @@
 
     .difficulty-pill{
       text-align:center;
-      font-size:24px;
+      font-size:20px;
       font-weight:bold;
       color:#1d4ed8;
       margin-bottom:14px;
@@ -252,23 +275,23 @@
     .slots{
       display:flex;
       justify-content:center;
-      gap:10px;
+      gap:8px;
       flex-wrap:wrap;
       direction:rtl;
-      min-height:90px;
+      min-height:80px;
       margin-bottom:16px;
     }
 
     .slot{
-      width:72px;
-      height:82px;
-      border-radius:18px;
+      width:56px;
+      height:66px;
+      border-radius:14px;
       background:#f8fafc;
-      border:4px dashed #cbd5e1;
+      border:3px dashed #cbd5e1;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:42px;
+      font-size:34px;
       font-weight:bold;
       color:#1d4ed8;
       box-shadow:inset 0 0 0 2px rgba(255,255,255,0.45);
@@ -283,21 +306,21 @@
     .letter-bank{
       display:flex;
       justify-content:center;
-      gap:10px;
+      gap:8px;
       flex-wrap:wrap;
       direction:rtl;
-      min-height:100px;
+      min-height:80px;
     }
 
     .letter-tile{
-      min-width:64px;
-      height:72px;
-      padding:0 14px;
+      min-width:50px;
+      height:60px;
+      padding:0 12px;
       border:none;
-      border-radius:18px;
+      border-radius:14px;
       background:white;
       box-shadow:var(--shadow);
-      font-size:38px;
+      font-size:30px;
       font-weight:bold;
       color:#111827;
       cursor:grab;
@@ -315,7 +338,7 @@
     .bank-note{
       text-align:center;
       color:var(--muted);
-      font-size:18px;
+      font-size:14px;
       margin-top:12px;
       line-height:1.6;
     }
@@ -323,23 +346,23 @@
     .typed-word{
       display:flex;
       justify-content:center;
-      gap:10px;
+      gap:8px;
       flex-wrap:wrap;
       direction:rtl;
-      min-height:86px;
+      min-height:76px;
       margin-bottom:16px;
     }
 
     .typed-letter{
-      width:72px;
-      height:82px;
-      border-radius:18px;
+      width:56px;
+      height:66px;
+      border-radius:14px;
       background:#f8fafc;
-      border:4px dashed #cbd5e1;
+      border:3px dashed #cbd5e1;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:42px;
+      font-size:34px;
       font-weight:bold;
       color:#1d4ed8;
     }
@@ -352,31 +375,31 @@
 
     .keyboard-note{
       text-align:center;
-      font-size:22px;
-      line-height:1.7;
+      font-size:16px;
+      line-height:1.6;
       color:#475569;
       background:#fff;
-      border-radius:18px;
-      padding:18px;
+      border-radius:14px;
+      padding:16px;
       box-shadow:var(--shadow);
     }
 
     .hint-box{
       margin-top:16px;
       background:#eff6ff;
-      border:3px solid #93c5fd;
-      border-radius:18px;
-      padding:14px;
+      border:2px solid #93c5fd;
+      border-radius:14px;
+      padding:12px;
       text-align:center;
-      font-size:22px;
+      font-size:18px;
       font-weight:bold;
-      min-height:64px;
+      min-height:54px;
       line-height:1.5;
     }
 
     .progress{
       margin-top:20px;
-      height:22px;
+      height:16px;
       background:#e5e7eb;
       border-radius:999px;
       overflow:hidden;
@@ -391,14 +414,14 @@
 
     .stars{
       text-align:center;
-      font-size:42px;
-      min-height:56px;
-      margin-top:18px;
+      font-size:36px;
+      min-height:48px;
+      margin-top:16px;
     }
 
     .small-note{
       text-align:center;
-      font-size:18px;
+      font-size:14px;
       color:var(--muted);
       margin-top:16px;
       line-height:1.6;
@@ -416,43 +439,52 @@
       z-index:999;
     }
 
+    .credit-footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      color: #9ca3af;
+      font-size: 15px;
+    }
+
     @keyframes floatUp{
       0%{ opacity:1; transform:translate(-50%, -50%) scale(0.7); }
       100%{ opacity:0; transform:translate(-50%, -120%) scale(1.3); }
     }
 
-    @media (max-width:980px){
+    @media (max-width:850px){
       .layout{
         grid-template-columns:1fr;
       }
 
       .slot,.typed-letter{
-        width:62px;
-        height:74px;
-        font-size:36px;
+        width:48px;
+        height:56px;
+        font-size:28px;
       }
 
       .letter-tile{
-        min-width:58px;
-        height:66px;
-        font-size:34px;
+        min-width:44px;
+        height:52px;
+        font-size:26px;
       }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>✍️ משחק איות בעברית</h1>
+    <h1>✍️ משחק איות ופעלים</h1>
     <div class="subtitle">
-      לוחצים על התמונה כדי לשמוע את המילה, ואז מרכיבים או כותבים אותה.
+      לוחצים על התמונה (או המילה) כדי לשמוע אותה, ואז מרכיבים או כותבים אותה.
     </div>
 
     <div class="topbar">
       <div class="pill">נקודות: <span id="score">0</span></div>
       <div class="pill">שלב: <span id="round">1</span> / <span id="maxRounds">10</span></div>
       <div class="pill">רצף: <span id="streak">0</span></div>
-      <button class="btn" id="startBtn">התחל</button>
-      <button class="btn secondary" id="restartBtn">התחל מחדש</button>
+      <button class="btn" id="startBtn">התחל משחק</button>
+      <button class="btn secondary" id="restartBtn">איפוס והתחלה מחדש</button>
       <button class="btn secondary" id="sayAgainBtn">השמע שוב</button>
     </div>
 
@@ -468,20 +500,19 @@
         <label for="roundsNum">שלבים</label>
         <input id="roundsNum" type="number" min="1" max="50" value="10">
 
-        <label for="lengthSelect">טווח אורך מילים</label>
-        <select id="lengthSelect">
-          <option value="all">מעורב</option>
-          <option value="upto3">עד 3 אותיות</option>
-          <option value="upto4">עד 4 אותיות</option>
-          <option value="upto5">עד 5 אותיות</option>
-          <option value="upto6">עד 6 אותיות</option>
+        <label for="categorySelect">נושא התרגול</label>
+        <select id="categorySelect">
+          <option value="all">הכל מעורב</option>
+          <option value="general">מילים כלליות (חיות, חפצים)</option>
+          <option value="infinitive">שמות פועל</option>
+          <option value="conjugated">פעלים (גוף וזמן)</option>
         </select>
       </div>
 
       <div class="toggle-row">
         <label class="toggle">
           <input type="checkbox" id="showWordHint">
-          להראות את המילה כרמז
+          להראות את המילה כרמז (לתצוגה בלבד)
         </label>
       </div>
     </div>
@@ -489,10 +520,16 @@
     <div class="layout">
       <div class="panel">
         <div class="prompt-box">
-          <div class="prompt-label">מה כתוב בתמונה?</div>
+          <div class="prompt-label" id="mainPromptLabel">מה כתוב בתמונה?</div>
 
           <div class="image-card" id="imageCard">
-            <div class="image-emoji" id="imageEmoji">☁️</div>
+            <div id="emojiDisplay" class="image-emoji">☁️</div>
+            
+            <div id="textDisplay" class="text-prompt hide">
+                <div class="verb-main" id="verbMain">לְשַׂחֵק</div>
+                <div class="verb-sub" id="verbSub">(עבר, אנחנו)</div>
+            </div>
+
             <div class="image-label">לחצו כדי לשמוע</div>
           </div>
 
@@ -500,7 +537,7 @@
           <div class="word-length" id="wordLength">אורך המילה: 3</div>
         </div>
 
-        <div class="message" id="message">לחצו על "התחל"</div>
+        <div class="message" id="message">אפשר להתחיל לשחק!</div>
       </div>
 
       <div class="panel">
@@ -531,7 +568,7 @@
         </div>
 
         <div class="hint-box" id="hintBox">
-          לחצו על התמונה כדי לשמוע את המילה.
+          לחצו למעלה כדי לשמוע את המילה.
         </div>
 
         <div class="progress">
@@ -547,28 +584,199 @@
         </div>
       </div>
     </div>
+
+    <div class="credit-footer">
+      נבנה באהבה על ידי אלינה גולדשטיין-לויטין
+    </div>
   </div>
 
   <script>
+    // מאגר מילים מורחב ומחולק לקטגוריות (types)
     const WORDS = [
-      { word: "ענן", emoji: "☁️" },
-      { word: "דג", emoji: "🐟" },
-      { word: "ים", emoji: "🌊" },
-      { word: "פרח", emoji: "🌸" },
-      { word: "סוס", emoji: "🐴" },
-      { word: "ירח", emoji: "🌙" },
-      { word: "אריה", emoji: "🦁" },
-      { word: "בננה", emoji: "🍌" },
-      { word: "גזר", emoji: "🥕" },
-      { word: "לימון", emoji: "🍋" },
-      { word: "כוכב", emoji: "⭐" },
-      { word: "חלון", emoji: "🪟" },
-      { word: "מטריה", emoji: "☂️" },
-      { word: "תפוח", emoji: "🍎" },
-      { word: "צפרדע", emoji: "🐸" },
-      { word: "רימון", emoji: "🔴" },
-      { word: "עוגיה", emoji: "🍪" },
-      { word: "מטוס", emoji: "✈️" }
+      // === מילים כלליות ===
+{ word: "ענן", emoji: "☁️", type: "general" },
+      { word: "דג", emoji: "🐟", type: "general" },
+      { word: "ים", emoji: "🌊", type: "general" },
+      { word: "פרח", emoji: "🌸", type: "general" },
+      { word: "סוס", emoji: "🐴", type: "general" },
+      { word: "ירח", emoji: "🌙", type: "general" },
+      { word: "אריה", emoji: "🦁", type: "general" },
+      { word: "בננה", emoji: "🍌", type: "general" },
+      { word: "גזר", emoji: "🥕", type: "general" },
+      { word: "לימון", emoji: "🍋", type: "general" },
+      { word: "כוכב", emoji: "⭐", type: "general" },
+      { word: "חלון", emoji: "🪟", type: "general" },
+      { word: "מטריה", emoji: "☂️", type: "general" },
+      { word: "תפוח", emoji: "🍎", type: "general" },
+      { word: "צפרדע", emoji: "🐸", type: "general" },
+      { word: "רימון", emoji: "🔴", type: "general" },
+      { word: "עוגיה", emoji: "🍪", type: "general" },
+      { word: "מטוס", emoji: "✈️", type: "general" },
+      { word: "כלב", emoji: "🐶", type: "general" },
+      { word: "חתול", emoji: "🐱", type: "general" },
+      { word: "שמש", emoji: "☀️", type: "general" },
+      { word: "עץ", emoji: "🌳", type: "general" },
+      { word: "בית", emoji: "🏠", type: "general" },
+      { word: "כדור", emoji: "⚽", type: "general" },
+      { word: "ספר", emoji: "📚", type: "general" },
+      { word: "פיל", emoji: "🐘", type: "general" },
+      { word: "דוב", emoji: "🐻", type: "general" },
+      { word: "פרפר", emoji: "🦋", type: "general" },
+      { word: "בלון", emoji: "🎈", type: "general" },
+      { word: "מתנה", emoji: "🎁", type: "general" },
+      { word: "ציפור", emoji: "🐦", type: "general" },
+      { word: "פרה", emoji: "🐮", type: "general" },
+      { word: "אוטו", emoji: "🚗", type: "general" },
+      { word: "רכבת", emoji: "🚂", type: "general" },
+      { word: "דלת", emoji: "🚪", type: "general" },
+      { word: "שעון", emoji: "⌚", type: "general" },
+      { word: "פיצה", emoji: "🍕", type: "general" },
+      { word: "גלידה", emoji: "🍦", type: "general" },
+      { word: "עוגה", emoji: "🎂", type: "general" },
+      { word: "חזיר", emoji: "🐷", type: "general" },
+      { word: "קוף", emoji: "🐒", type: "general" },
+      { word: "נחש", emoji: "🐍", type: "general" },
+      { word: "עכבר", emoji: "🐭", type: "general" },
+      { word: "ארנב", emoji: "🐰", type: "general" },
+      { word: "צב", emoji: "🐢", type: "general" },
+      { word: "כריש", emoji: "🦈", type: "general" },
+      { word: "תמנון", emoji: "🐙", type: "general" },
+      { word: "דבורה", emoji: "🐝", type: "general" },
+      { word: "נמלה", emoji: "🐜", type: "general" },
+      { word: "עכביש", emoji: "🕷️", type: "general" },
+      { word: "פלפל", emoji: "🫑", type: "general" },
+      { word: "בצל", emoji: "🧅", type: "general" },
+      { word: "עגבניה", emoji: "🍅", type: "general" },
+      { word: "אבטיח", emoji: "🍉", type: "general" },
+      { word: "ענבים", emoji: "🍇", type: "general" },
+      { word: "תות", emoji: "🍓", type: "general" },
+      { word: "הר", emoji: "⛰️", type: "general" },
+      { word: "אש", emoji: "🔥", type: "general" },
+      { word: "מיטה", emoji: "🛏️", type: "general" },
+      { word: "מחשב", emoji: "💻", type: "general" },
+      { word: "טלפון", emoji: "📱", type: "general" },
+      { word: "מצלמה", emoji: "📷", type: "general" },
+      { word: "מפתח", emoji: "🔑", type: "general" },
+      { word: "מספריים", emoji: "✂️", type: "general" },
+      { word: "משקפיים", emoji: "👓", type: "general" },
+      { word: "כובע", emoji: "🧢", type: "general" },
+      { word: "נעל", emoji: "👞", type: "general" },
+      { word: "חולצה", emoji: "👕", type: "general" },
+      { word: "מכנסיים", emoji: "👖", type: "general" },
+      { word: "שמלה", emoji: "👗", type: "general" },
+
+      // === שמות פועל ===
+{ word: "לרוץ", emoji: "🏃", type: "infinitive" },
+      { word: "לישון", emoji: "😴", type: "infinitive" },
+      { word: "לשחות", emoji: "🏊", type: "infinitive" },
+      { word: "לאכול", emoji: "🍽️", type: "infinitive" },
+      { word: "לשחק", emoji: "🕹️", type: "infinitive" },
+      { word: "לשיר", emoji: "🎤", type: "infinitive" },
+      { word: "לקפוץ", emoji: "🦘", type: "infinitive" },
+      { word: "לרקוד", emoji: "💃", type: "infinitive" },
+      { word: "לצחוק", emoji: "😂", type: "infinitive" },
+      { word: "לקרוא", emoji: "📖", type: "infinitive" },
+      { word: "ללכת", emoji: "🚶", type: "infinitive" },
+      { word: "לעמוד", emoji: "🧍", type: "infinitive" },
+      { word: "לבשל", emoji: "🍳", type: "infinitive" },
+      { word: "לכתוב", emoji: "✍️", type: "infinitive" },
+      { word: "לצייר", emoji: "🎨", type: "infinitive" },
+      { word: "לראות", emoji: "👀", type: "infinitive" },
+      { word: "לשמוע", emoji: "👂", type: "infinitive" },
+      { word: "להריח", emoji: "👃", type: "infinitive" },
+      { word: "לגעת", emoji: "✋", type: "infinitive" },
+      { word: "לדבר", emoji: "🗣️", type: "infinitive" },
+      { word: "לבכות", emoji: "😢", type: "infinitive" },
+      { word: "לחייך", emoji: "😊", type: "infinitive" },
+      { word: "לכעוס", emoji: "😠", type: "infinitive" },
+      { word: "לאהוב", emoji: "❤️", type: "infinitive" },
+      { word: "לתת", emoji: "🎁", type: "infinitive" },
+      { word: "לנקות", emoji: "🧹", type: "infinitive" },
+      { word: "להתקלח", emoji: "🚿", type: "infinitive" },
+      { word: "לנסוע", emoji: "🚗", type: "infinitive" },
+      { word: "לטוס", emoji: "✈️", type: "infinitive" },
+      { word: "לרכב", emoji: "🚲", type: "infinitive" },
+      { word: "לטפס", emoji: "🧗", type: "infinitive" },
+      { word: "להחליק", emoji: "⛸️", type: "infinitive" },
+      { word: "לגלוש", emoji: "🏄", type: "infinitive" },
+
+      // === פעלים בנטיות (גוף וזמן) ===
+// לשחק
+      { word: "שיחקתי", promptText: "לְשַׂחֵק", subPrompt: "(זמן עבר, אני)", spoken: "לשחק, בזמן עבר, אני", type: "conjugated" },
+      { word: "שיחקנו", promptText: "לְשַׂחֵק", subPrompt: "(זמן עבר, אנחנו)", spoken: "לשחק, בזמן עבר, אנחנו", type: "conjugated" },
+      { word: "נשחק", promptText: "לְשַׂחֵק", subPrompt: "(זמן עתיד, אנחנו)", spoken: "לשחק, בזמן עתיד, אנחנו", type: "conjugated" },
+      { word: "תשחקו", promptText: "לְשַׂחֵק", subPrompt: "(זמן עתיד, אתם/אתן)", spoken: "לשחק, בזמן עתיד, אתם", type: "conjugated" },
+      { word: "משחקים", promptText: "לְשַׂחֵק", subPrompt: "(זמן הווה, הם/אנחנו)", spoken: "לשחק, בזמן הווה, רבים", type: "conjugated" },
+      // לאכול
+      { word: "אכלנו", promptText: "לֶאֱכוֹל", subPrompt: "(זמן עבר, אנחנו)", spoken: "לאכול, בזמן עבר, אנחנו", type: "conjugated" },
+      { word: "יאכלו", promptText: "לֶאֱכוֹל", subPrompt: "(זמן עתיד, הם/הן)", spoken: "לאכול, בזמן עתיד, הם", type: "conjugated" },
+      { word: "אוכלת", promptText: "לֶאֱכוֹל", subPrompt: "(זמן הווה, היא)", spoken: "לאכול, בזמן הווה, היא", type: "conjugated" },
+      { word: "תאכלי", promptText: "לֶאֱכוֹל", subPrompt: "(זמן עתיד, את)", spoken: "לאכול, בזמן עתיד, את", type: "conjugated" },
+      // לקרוא
+      { word: "קורא", promptText: "לִקְרוֹא", subPrompt: "(זמן הווה, הוא/אני)", spoken: "לקרוא, בזמן הווה, יחיד", type: "conjugated" },
+      { word: "קראתם", promptText: "לִקְרוֹא", subPrompt: "(זמן עבר, אתם)", spoken: "לקרוא, בזמן עבר, אתם", type: "conjugated" },
+      { word: "אקרא", promptText: "לִקְרוֹא", subPrompt: "(זמן עתיד, אני)", spoken: "לקרוא, בזמן עתיד, אני", type: "conjugated" },
+      { word: "תקראו", promptText: "לִקְרוֹא", subPrompt: "(זמן עתיד, אתם/אתן)", spoken: "לקרוא, בזמן עתיד, אתם", type: "conjugated" },
+      // לכתוב
+      { word: "יכתבו", promptText: "לִכְתּוֹב", subPrompt: "(זמן עתיד, הם/הן)", spoken: "לכתוב, בזמן עתיד, הם", type: "conjugated" },
+      { word: "כותבות", promptText: "לִכְתּוֹב", subPrompt: "(זמן הווה, הן/אנחנו)", spoken: "לכתוב, בזמן הווה, רבות", type: "conjugated" },
+      { word: "כתבת", promptText: "לִכְתּוֹב", subPrompt: "(זמן עבר, את/אתה)", spoken: "לכתוב, בזמן עבר, את", type: "conjugated" },
+      { word: "נכתוב", promptText: "לִכְתּוֹב", subPrompt: "(זמן עתיד, אנחנו)", spoken: "לכתוב, בזמן עתיד, אנחנו", type: "conjugated" },
+      // לרוץ
+      { word: "רצנו", promptText: "לָרוּץ", subPrompt: "(זמן עבר, אנחנו)", spoken: "לרוץ, בזמן עבר, אנחנו", type: "conjugated" },
+      { word: "ירוצו", promptText: "לָרוּץ", subPrompt: "(זמן עתיד, הם/הן)", spoken: "לרוץ, בזמן עתיד, הם", type: "conjugated" },
+      { word: "רצה", promptText: "לָרוּץ", subPrompt: "(זמן הווה, היא)", spoken: "לרוץ, בזמן הווה, היא", type: "conjugated" },
+      { word: "ארוץ", promptText: "לָרוּץ", subPrompt: "(זמן עתיד, אני)", spoken: "לרוץ, בזמן עתיד, אני", type: "conjugated" },
+      // לשיר
+      { word: "שרתי", promptText: "לָשִׁיר", subPrompt: "(זמן עבר, אני)", spoken: "לשיר, בזמן עבר, אני", type: "conjugated" },
+      { word: "נשיר", promptText: "לָשִׁיר", subPrompt: "(זמן עתיד, אנחנו)", spoken: "לשיר, בזמן עתיד, אנחנו", type: "conjugated" },
+      { word: "שרים", promptText: "לָשִׁיר", subPrompt: "(זמן הווה, רבים)", spoken: "לשיר, בזמן הווה, רבים", type: "conjugated" },
+      { word: "ישירו", promptText: "לָשִׁיר", subPrompt: "(זמן עתיד, הם/הן)", spoken: "לשיר, בזמן עתיד, הם", type: "conjugated" },
+      // לנסוע
+      { word: "נסעו", promptText: "לִנְסוֹעַ", subPrompt: "(זמן עבר, הם/הן)", spoken: "לנסוע, בזמן עבר, הם", type: "conjugated" },
+      { word: "אסע", promptText: "לִנְסוֹעַ", subPrompt: "(זמן עתיד, אני)", spoken: "לנסוע, בזמן עתיד, אני", type: "conjugated" },
+      { word: "נוסעת", promptText: "לִנְסוֹעַ", subPrompt: "(זמן הווה, היא)", spoken: "לנסוע, בזמן הווה, היא", type: "conjugated" },
+      { word: "ניסע", promptText: "לִנְסוֹעַ", subPrompt: "(זמן עתיד, אנחנו)", spoken: "לנסוע, בזמן עתיד, אנחנו", type: "conjugated" },
+      // לצייר
+      { word: "תצייר", promptText: "לְצַיֵּר", subPrompt: "(זמן עתיד, אתה/היא)", spoken: "לצייר, בזמן עתיד, אתה או היא", type: "conjugated" },
+      { word: "ציירנו", promptText: "לְצַיֵּר", subPrompt: "(זמן עבר, אנחנו)", spoken: "לצייר, בזמן עבר, אנחנו", type: "conjugated" },
+      { word: "מציירים", promptText: "לְצַיֵּר", subPrompt: "(זמן הווה, רבים)", spoken: "לצייר, בזמן הווה, רבים", type: "conjugated" },
+      { word: "ציירתי", promptText: "לְצַיֵּר", subPrompt: "(זמן עבר, אני)", spoken: "לצייר, בזמן עבר, אני", type: "conjugated" },
+      // ללמוד
+      { word: "למדתן", promptText: "לִלְמוֹד", subPrompt: "(זמן עבר, אתן)", spoken: "ללמוד, בזמן עבר, אתן", type: "conjugated" },
+      { word: "ילמדו", promptText: "לִלְמוֹד", subPrompt: "(זמן עתיד, הם/הן)", spoken: "ללמוד, בזמן עתיד, הם", type: "conjugated" },
+      { word: "לומד", promptText: "לִלְמוֹד", subPrompt: "(זמן הווה, הוא)", spoken: "ללמוד, בזמן הווה, הוא", type: "conjugated" },
+      { word: "נלמד", promptText: "לִלְמוֹד", subPrompt: "(זמן עתיד, אנחנו)", spoken: "ללמוד, בזמן עתיד, אנחנו", type: "conjugated" },
+      // לרקוד
+      { word: "נרקוד", promptText: "לִרְקוֹד", subPrompt: "(זמן עתיד, אנחנו)", spoken: "לרקוד, בזמן עתיד, אנחנו", type: "conjugated" },
+      { word: "רקדתם", promptText: "לִרְקוֹד", subPrompt: "(זמן עבר, אתם)", spoken: "לרקוד, בזמן עבר, אתם", type: "conjugated" },
+      { word: "רוקדות", promptText: "לִרְקוֹד", subPrompt: "(זמן הווה, הן/אתן)", spoken: "לרקוד, בזמן הווה, רבות", type: "conjugated" },
+      { word: "ארקוד", promptText: "לִרְקוֹד", subPrompt: "(זמן עתיד, אני)", spoken: "לרקוד, בזמן עתיד, אני", type: "conjugated" },
+      // לשמוע
+      { word: "שמעתי", promptText: "לִשְׁמוֹעַ", subPrompt: "(זמן עבר, אני)", spoken: "לשמוע, בזמן עבר, אני", type: "conjugated" },
+      { word: "תשמעו", promptText: "לִשְׁמוֹעַ", subPrompt: "(זמן עתיד, אתם/אתן)", spoken: "לשמוע, בזמן עתיד, אתם", type: "conjugated" },
+      { word: "שומעת", promptText: "לִשְׁמוֹעַ", subPrompt: "(זמן הווה, היא)", spoken: "לשמוע, בזמן הווה, היא", type: "conjugated" },
+      { word: "שמענו", promptText: "לִשְׁמוֹעַ", subPrompt: "(זמן עבר, אנחנו)", spoken: "לשמוע, בזמן עבר, אנחנו", type: "conjugated" },
+      // לראות
+      { word: "ראינו", promptText: "לִרְאוֹת", subPrompt: "(זמן עבר, אנחנו)", spoken: "לראות, בזמן עבר, אנחנו", type: "conjugated" },
+      { word: "יראו", promptText: "לִרְאוֹת", subPrompt: "(זמן עתיד, הם/הן)", spoken: "לראות, בזמן עתיד, הם", type: "conjugated" },
+      { word: "רואה", promptText: "לִרְאוֹת", subPrompt: "(זמן הווה, הוא/היא/אני)", spoken: "לראות, בזמן הווה, יחיד", type: "conjugated" },
+      { word: "אראה", promptText: "לִרְאוֹת", subPrompt: "(זמן עתיד, אני)", spoken: "לראות, בזמן עתיד, אני", type: "conjugated" },
+      // לבוא
+      { word: "באנו", promptText: "לָבוֹא", subPrompt: "(זמן עבר, אנחנו)", spoken: "לבוא, בזמן עבר, אנחנו", type: "conjugated" },
+      { word: "תבואי", promptText: "לָבוֹא", subPrompt: "(זמן עתיד, את)", spoken: "לבוא, בזמן עתיד, את", type: "conjugated" },
+      { word: "באים", promptText: "לָבוֹא", subPrompt: "(זמן הווה, רבים)", spoken: "לבוא, בזמן הווה, רבים", type: "conjugated" },
+      { word: "אבוא", promptText: "לָבוֹא", subPrompt: "(זמן עתיד, אני)", spoken: "לבוא, בזמן עתיד, אני", type: "conjugated" },
+      // לשתות
+      { word: "שתינו", promptText: "לִשְׁתּוֹת", subPrompt: "(זמן עבר, אנחנו)", spoken: "לשתות, בזמן עבר, אנחנו", type: "conjugated" },
+      { word: "ישתה", promptText: "לִשְׁתּוֹת", subPrompt: "(זמן עתיד, הוא)", spoken: "לשתות, בזמן עתיד, הוא", type: "conjugated" },
+      { word: "שותות", promptText: "לִשְׁתּוֹת", subPrompt: "(זמן הווה, רבות)", spoken: "לשתות, בזמן הווה, רבות", type: "conjugated" },
+      { word: "אשתה", promptText: "לִשְׁתּוֹת", subPrompt: "(זמן עתיד, אני)", spoken: "לשתות, בזמן עתיד, אני", type: "conjugated" },
+      // לקפוץ
+      { word: "קפצתי", promptText: "לִקְפּוֹץ", subPrompt: "(זמן עבר, אני)", spoken: "לקפוץ, בזמן עבר, אני", type: "conjugated" },
+      { word: "תקפצו", promptText: "לִקְפּוֹץ", subPrompt: "(זמן עתיד, אתם/אתן)", spoken: "לקפוץ, בזמן עתיד, אתם", type: "conjugated" },
+      { word: "קופצת", promptText: "לִקְפּוֹץ", subPrompt: "(זמן הווה, היא)", spoken: "לקפוץ, בזמן הווה, היא", type: "conjugated" },
+      { word: "יקפצו", promptText: "לִקְפּוֹץ", subPrompt: "(זמן עתיד, הם/הן)", spoken: "לקפוץ, בזמן עתיד, הם", type: "conjugated" }
     ];
 
     const EXTRA_LETTERS = ["א","ב","ג","ד","ה","ו","ז","ח","ט","י","כ","ל","מ","נ","ס","ע","פ","צ","ק","ר","ש","ת"];
@@ -586,11 +794,16 @@
 
     const difficultySelect = document.getElementById("difficultySelect");
     const roundsNumEl = document.getElementById("roundsNum");
-    const lengthSelect = document.getElementById("lengthSelect");
+    const categorySelect = document.getElementById("categorySelect");
     const showWordHintEl = document.getElementById("showWordHint");
 
     const imageCard = document.getElementById("imageCard");
-    const imageEmoji = document.getElementById("imageEmoji");
+    const imageEmoji = document.getElementById("emojiDisplay");
+    const textDisplay = document.getElementById("textDisplay");
+    const verbMain = document.getElementById("verbMain");
+    const verbSub = document.getElementById("verbSub");
+    const mainPromptLabel = document.getElementById("mainPromptLabel");
+    
     const spokenTextEl = document.getElementById("spokenText");
     const wordLengthEl = document.getElementById("wordLength");
     const messageEl = document.getElementById("message");
@@ -610,13 +823,15 @@
     let streak = 0;
     let round = 1;
     let totalRounds = 10;
-    let started = false;
+    let started = false; 
     let locked = false;
     let currentWord = null;
     let selectedTile = null;
     let currentSlots = [];
     let typedLetters = [];
     let bankTiles = [];
+    
+    let usedWords = [];
 
     function normalizeChar(ch) {
       return FINAL_MAP[ch] || ch;
@@ -677,21 +892,26 @@
     }
 
     function getFilteredWords() {
-      const mode = lengthSelect.value;
-      let list = [...WORDS];
-
-      if (mode === "upto3") list = list.filter(item => [...item.word].length <= 3);
-      else if (mode === "upto4") list = list.filter(item => [...item.word].length <= 4);
-      else if (mode === "upto5") list = list.filter(item => [...item.word].length <= 5);
-      else if (mode === "upto6") list = list.filter(item => [...item.word].length <= 6);
-
-      return list;
+      const mode = categorySelect.value;
+      if (mode === "all") return [...WORDS];
+      return WORDS.filter(item => item.type === mode);
     }
 
     function pickWord() {
       let list = getFilteredWords();
-      if (list.length === 0) list = [...WORDS];
-      return list[Math.floor(Math.random() * list.length)];
+      if (list.length === 0) list = [...WORDS]; // פולבק במקרה של שגיאה
+
+      let available = list.filter(item => !usedWords.includes(item.word));
+
+      if (available.length === 0) {
+        usedWords = [];
+        available = list;
+      }
+
+      const chosen = available[Math.floor(Math.random() * available.length)];
+      usedWords.push(chosen.word);
+      
+      return chosen;
     }
 
     function updateDifficultyText() {
@@ -709,15 +929,29 @@
     }
 
     function getWordHintText() {
-      if (!currentWord) return "לחצו על התמונה כדי לשמוע את המילה.";
+      if (!currentWord) return "לחצו למעלה כדי לשמוע את המילה.";
       return showWordHintEl.checked
         ? `רמז: המילה היא ${currentWord.word}`
-        : "לחצו על התמונה כדי לשמוע את המילה.";
+        : "לחצו על המסגרת למעלה כדי לשמוע את ההנחיה.";
     }
 
     function setWord(wordObj) {
       currentWord = wordObj;
-      imageEmoji.textContent = wordObj.emoji;
+      
+      // החלפת התצוגה בהתאם לסוג המילה
+      if(wordObj.type === "conjugated") {
+          imageEmoji.classList.add("hide");
+          textDisplay.classList.remove("hide");
+          verbMain.textContent = wordObj.promptText;
+          verbSub.textContent = wordObj.subPrompt;
+          mainPromptLabel.textContent = "איך כותבים את זה?";
+      } else {
+          imageEmoji.classList.remove("hide");
+          textDisplay.classList.add("hide");
+          imageEmoji.textContent = wordObj.emoji;
+          mainPromptLabel.textContent = "מה כתוב בתמונה?";
+      }
+
       spokenTextEl.textContent = "—";
       wordLengthEl.textContent = `אורך המילה: ${[...wordObj.word].length}`;
       hintBoxEl.textContent = getWordHintText();
@@ -929,8 +1163,8 @@
         updateHud();
         showMessage("אופס, נסה שוב", "bad");
         hintBoxEl.textContent = showWordHintEl.checked
-          ? `זו לא תחילת המילה. רמז: ${currentWord.word}`
-          : "זו לא תחילת המילה. אפשר למחוק ולנסות שוב.";
+          ? `התחלה שגויה. רמז: ${currentWord.word}`
+          : "התחלה שגויה. אפשר למחוק ולנסות שוב.";
         setTimeout(() => {
           typedLetters = [];
           renderTypedWord();
@@ -968,7 +1202,7 @@
       locked = false;
       setWord(pickWord());
       updateHud();
-      showMessage("לחצו על התמונה, הקשיבו, ואז אייתו את המילה", "");
+      showMessage("הקשיבו להנחיה ואז הרכיבו את המילה", "");
     }
 
     function startGame() {
@@ -983,6 +1217,7 @@
       streak = 0;
       round = 1;
       locked = false;
+      usedWords = []; // איפוס הזיכרון
       updateHud();
       nextRound();
     }
@@ -1006,7 +1241,9 @@
 
     function replayCurrent() {
       if (!currentWord) return;
-      speakHebrew(currentWord.word);
+      // אם זו הטיה, מקריאים את ה-spoken שיצרנו, אחרת מקריאים את המילה עצמה
+      const textToSpeak = currentWord.spoken || currentWord.word;
+      speakHebrew(textToSpeak);
     }
 
     startBtn.addEventListener("click", startGame);
@@ -1016,8 +1253,8 @@
 
     imageCard.addEventListener("click", () => {
       if (!currentWord) return;
-      speakHebrew(currentWord.word);
-      spokenTextEl.textContent = "🔊 הושמעה המילה";
+      replayCurrent();
+      spokenTextEl.textContent = "🔊 הושמעה ההנחיה";
       hintBoxEl.textContent = getWordHintText();
     });
 
@@ -1029,6 +1266,14 @@
         bankTiles = [];
         renderMode();
       }
+    });
+
+    categorySelect.addEventListener("change", () => {
+        // בעת שינוי קטגוריה נאפס את רשימת המילים ונביא מילה חדשה
+        usedWords = [];
+        if(started && !locked) {
+            setWord(pickWord());
+        }
     });
 
     showWordHintEl.addEventListener("change", () => {
@@ -1065,9 +1310,14 @@
       progressFillEl.style.width = progress + "%";
     }, 150);
 
+    /* הפעלה ראשונית */
+    started = true;
+    usedWords = [];
     updateHud();
     updateDifficultyText();
-    currentWord = { word: "ענן", emoji: "☁️" };
+    
+    // בוחרים מילה ראשונה
+    currentWord = pickWord();
     setWord(currentWord);
   </script>
 </body>
