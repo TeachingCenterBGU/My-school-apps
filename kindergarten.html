@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-W58S98V8J0');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>גן חובה - כאן לומדות ולומדים</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <header class="main-header" style="padding: 15px; margin-bottom: 25px;">
+        <h1 style="font-size: 1.8em;">כאן לומדות ולומדים בכיף 🎓</h1>
+    </header>
+
+    <main class="grades-container">
+        <section class="grade-col kindergarten">
+            <div class="grade-header">
+                <h2 class="grade-title">גן חובה 🍊</h2>
+                <a href="index.html" class="back-btn">🏠 חזרה לראשי</a>
+            </div>
+
+            <div class="homework-box">
+                <h3 style="margin:0 0 10px 0; font-size:1.1em;">📝 המשימות שלי:</h3>
+                
+                <div class="homework-item">
+                    <div class="homework-info" style="width: 100%;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <span class="homework-subject">חשבון</span>
+                        </div>
+                        <div>
+                            <a href="https://www.matific.com/il/he/login-page/" target="_blank" style="text-decoration:none; color:#2c3e50; font-weight:bold;">
+                                🎮 כניסה למטיפיק (לחצי כאן)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="homework-item">
+                    <div class="homework-info" style="width: 100%;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <span class="homework-subject">חוברת עבודה</span>
+                        </div>
+                        <div style="color:#555;">לסיים 4 עמודים בחוברת</div>
+                    </div>
+                    <button class="hw-done-btn" onclick="this.parentElement.style.opacity='0.5'; alert('כל הכבוד! אלופה! 🌟')" title="סיימתי!">✓</button>
+                </div>
+            </div>
+
+            <details class="subject-box" open>
+                <summary class="subject-title">🔤 אותיות ומילים</summary>
+                
+                <div class="card" data-app-id="wordgame2" data-added="2026-03-11">
+                    <a class="card-main" href="word_game_2.html">
+                        <span class="icon">🦉</span>
+                        <span class="card-title">אות פותחת</span>
+                        <span class="card-desc">אילו מילים מתחילות באילו אותיות?</span>
+                    </a>
+                </div>
+
+                <div class="apps-grid">                    
+                    <div class="card">
+                        <a class="card-main" href="memory.html">
+                            <span class="icon">🧠</span>
+                            <span class="card-title">משחק הזיכרון</span>
+                            <span class="card-desc">מתחילים בקטן וגדלים!</span>
+                        </a>
+                    </div>
+
+                    <div class="card">
+                        <a class="card-main" href="memory-initial.html">
+                            <span class="icon">🧠</span>
+                            <span class="card-title">התאמת צליל לאות - זכרון</span>
+                            <span class="card-desc">התאימו בין האות לתמונה שמתחילה באותו הצליל</span>
+                        </a>
+                    </div>
+
+                    <div class="card">
+                        <a class="card-main" href="start_with.html">
+                            <span class="icon">🍎</span>
+                            <span class="card-title">מה מתחיל ב...?</span>
+                            <span class="card-desc">זיהוי אות פותחת לפי תמונה וצליל</span>
+                        </a>
+                    </div>
+
+                    <div class="card">
+                        <a class="card-main" href="addition.html">
+                            <span class="icon">🔢</span>
+                            <span class="card-title">מגני המספרים!</span>
+                            <span class="card-desc">משחק חיבור וחיסור</span>
+                        </a>
+                    </div>
+                </div>
+            </details>
+        </section>
+    </main>
+    
+    <footer>
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px auto; max-width: 200px;">
+        נבנה באהבה ללמידה ע"י ענבל צרפתי-ברעד &copy; 2025
+    </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="homework_data.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-W58S98V8J0');
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כאן לומדות ולומדים בכיף - עמוד ראשי</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* תוספת עיצוב קטנה וספציפית לעמוד הפתיחה כדי להגדיל את כפתורי הניווט */
+        .entrance-nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 40px;
+            min-height: 40vh; /* מרווח נושם מתחת לכפתורים */
+        }
+        
+        .entrance-btn {
+            width: 100%;
+            max-width: 300px; /* רוחב אחיד לכולם */
+            text-align: center;
+            padding: 15px 20px;
+            font-size: 1.3em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="main-header">
+        <h1>כאן לומדות ולומדים בכיף 🎓</h1>
+        <p>תרגול, משחקים ודפי עבודה</p>
+        <p class="subtitle" style="font-size: 1.1em; margin-top: 15px;">בחרו את הכיתה שלכן כדי להתחיל:</p>
+    </header>
+
+    <main class="entrance-nav">
+        <a href="kindergarten.html" class="tab-btn entrance-btn" style="--grade-color: #fb8c00;">גן חובה 🍊</a>
+        <a href="grade-3.html" class="tab-btn entrance-btn" style="--grade-color: #ec407a;">כיתה ג' 🍬</a>
+        <a href="grade-5.html" class="tab-btn entrance-btn" style="--grade-color: #5c6bc0;">כיתה ה' 🦋</a>
+    </main>
+
+    <footer>
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px auto; max-width: 200px;">
+        נבנה באהבה ללמידה ע"י ענבל צרפתי-ברעד &copy; 2025
+    </footer>
+</div>
+
+</body>
+</html>
