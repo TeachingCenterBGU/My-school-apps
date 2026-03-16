@@ -234,7 +234,6 @@
       font-size:38px;
       font-weight:bold;
       background:#f97316;
-      text-transform: uppercase;
     }
 
     .dropzone-body{
@@ -302,7 +301,6 @@
       color:white;
       box-shadow:var(--shadow);
       background:#3b82f6;
-      text-transform: uppercase;
     }
 
     .message{
@@ -477,9 +475,9 @@
         zone.className = "dropzone";
         zone.dataset.letter = letter;
         zone.innerHTML = `
-          <div class="dropzone-header">
-            <span class="letter-badge">${letter}</span>
-            <span>Starts with ${letter.toUpperCase()}</span>
+            <div class="dropzone-header">
+            <span class="letter-badge">${letter.toUpperCase()}${letter.toLowerCase()}</span>
+            <span>Starts with ${letter.toUpperCase()}${letter.toLowerCase()}</span>
           </div>
           <div class="dropzone-body" id="zone-${letter}"></div>
         `;
@@ -500,7 +498,7 @@
       currentLetters.forEach(letter => {
         const btn = document.createElement("button");
         btn.className = "letter-action-btn";
-        btn.textContent = letter;
+        btn.textContent = letter.toUpperCase() + letter.toLowerCase();
         btn.addEventListener("click", () => {
           if (selectedWordId === null) { showMessage("קודם בחרו מילה", "error"); return; }
           handleDropById(selectedWordId, letter);
@@ -565,8 +563,7 @@
       const chosen = [...new Set(getChosenLetters())];
       if (chosen.length !== 3) { alert("נא לבחור 3 אותיות שונות באנגלית."); return; }
       currentLetters = chosen;
-      subtitleEl.textContent = `מיינו לפי האותיות: ${currentLetters.map(l => l.toUpperCase()).join(" , ")}`;
-      buildDropzones();
+      subtitleEl.textContent = `מיינו לפי האותיות: ${currentLetters.map(l => l.toUpperCase() + l.toLowerCase()).join(" , ")}`;      buildDropzones();
       buildMobileButtons();
       resetCurrentGame();
     }
