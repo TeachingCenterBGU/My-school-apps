@@ -1,6 +1,6 @@
 // ==============================================
 // firebase-homework.js
-// שמירת שיעורי בית ב-Firebase, לפי ילדה
+// שמירת שיעורי בית ב-Firebase, לפי כיתה (= לפי ילדה)
 // ==============================================
 
 const firebaseConfig = {
@@ -32,58 +32,10 @@ const analytics = getAnalytics(app);
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- זיהוי הילדה ---
-
-function getCurrentUser() {
-    return localStorage.getItem("hw_user");
-}
-
-function setCurrentUser(name) {
-    localStorage.setItem("hw_user", name);
-}
-
-function askForUser() {
-    const overlay = document.createElement("div");
-    overlay.id = "user-select-overlay";
-    overlay.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5); display: flex; align-items: center;
-        justify-content: center; z-index: 9999;
-    `;
-
-    overlay.innerHTML = `
-        <div style="background: white; border-radius: 16px; padding: 30px; text-align: center; max-width: 300px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2);">
-            <h2 style="margin: 0 0 20px 0; font-size: 1.3em;">מי את? 👋</h2>
-            <button class="user-pick-btn" onclick="pickUser('child1')" style="
-                display: block; width: 100%; padding: 12px; margin: 8px 0;
-                font-size: 1.1em; border: 2px solid #ec407a; border-radius: 10px;
-                background: #fce4ec; cursor: pointer; font-weight: bold;
-            ">🍬 הילדה של כיתה ג'</button>
-            <button class="user-pick-btn" onclick="pickUser('child2')" style="
-                display: block; width: 100%; padding: 12px; margin: 8px 0;
-                font-size: 1.1em; border: 2px solid #5c6bc0; border-radius: 10px;
-                background: #e8eaf6; cursor: pointer; font-weight: bold;
-            ">🦋 הילדה של כיתה ה'</button>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-}
-
-window.pickUser = function(name) {
-    setCurrentUser(name);
-    const overlay = document.getElementById("user-select-overlay");
-    if (overlay) overlay.remove();
-    renderHomework(3, 'hw-container-3');
-    renderHomework(5, 'hw-container-5');
-};
-
 // --- פונקציות Firebase ---
 
-function saveTaskDone(taskId, taskInfo) {
-    const user = getCurrentUser();
-    if (!user) return;
-
+function saveTaskDone(grade, taskId, taskInfo) {
+    const user = "grade" + grade;
     const now = new Date();
     const timestamp = now.toISOString();
     const displayDate = now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
@@ -99,10 +51,8 @@ function saveTaskDone(taskId, taskInfo) {
     });
 }
 
-async function getAllDoneIds() {
-    const user = getCurrentUser();
-    if (!user) return new Set();
-
+async function getDoneIds(grade) {
+    const user = "grade" + grade;
     const snapshot = await db.ref('done/' + user).once('value');
     const data = snapshot.val();
     return data ? new Set(Object.keys(data)) : new Set();
@@ -114,13 +64,10 @@ async function renderHomework(grade, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const user = getCurrentUser();
-    if (!user) return;
-
     container.innerHTML = '<p style="text-align:center; color:#888;">⏳ טוען שיעורי בית...</p>';
 
     const tasks = (typeof homeworkData !== 'undefined') ? homeworkData : [];
-    const doneIds = await getAllDoneIds();
+    const doneIds = await getDoneIds(grade);
 
     const pendingTasks = tasks.filter(t => t.grade === grade && !doneIds.has(t.id));
 
@@ -134,7 +81,7 @@ async function renderHomework(grade, containerId) {
     pendingTasks.forEach(task => {
         const dateHtml = task.date ? `<span class="hw-date">${task.date}</span>` : '';
         html += `
-            <div class="homework-item" id="task-${task.id}">
+            <div class="homework-item" id="task-${task.id}" data-grade="${task.grade}">
                 <div class="homework-info" style="width: 100%;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                         <span class="homework-subject">${task.subject}</span>
@@ -143,7 +90,7 @@ async function renderHomework(grade, containerId) {
                     <div style="color:#555; line-height:1.4;">${task.task}</div>
                 </div>
                 <button class="hw-done-btn"
-                        onclick="markHomeworkDone('${task.id}')"
+                        onclick="markHomeworkDone('${task.id}', ${task.grade})"
                         title="סיימתי!">✓</button>
             </div>
         `;
@@ -153,7 +100,7 @@ async function renderHomework(grade, containerId) {
 
 // --- סימון משימה ---
 
-window.markHomeworkDone = function(id) {
+window.markHomeworkDone = function(id, grade) {
     if (typeof confetti !== 'undefined') {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
@@ -161,7 +108,7 @@ window.markHomeworkDone = function(id) {
     const tasks = (typeof homeworkData !== 'undefined') ? homeworkData : [];
     const taskInfo = tasks.find(t => t.id === id) || {};
 
-    saveTaskDone(id, taskInfo);
+    saveTaskDone(grade, id, taskInfo);
 
     const taskItem = document.getElementById("task-" + id);
     if (taskItem) {
@@ -181,11 +128,6 @@ window.markHomeworkDone = function(id) {
 
 // --- הפעלה ---
 document.addEventListener('DOMContentLoaded', () => {
-    const user = getCurrentUser();
-    if (!user) {
-        askForUser();
-    } else {
-        renderHomework(3, 'hw-container-3');
-        renderHomework(5, 'hw-container-5');
-    }
+    renderHomework(3, 'hw-container-3');
+    renderHomework(5, 'hw-container-5');
 });
