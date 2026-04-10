@@ -1,7 +1,7 @@
 // ==============================================
 // firebase-homework.js
 // שמירת שיעורי בית ב-Firebase, עם זיהוי לפי שם
-// בכל כניסה שואלים מי נכנס/ת
+// זוכרים את השם לשעה, אחרי זה שואלים שוב
 // ==============================================
 
 const firebaseConfig = {
@@ -17,9 +17,38 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- משתנה גלובלי לשם הנוכחי ---
+// --- הגדרות ---
+const SESSION_DURATION_MS = 60 * 60 * 1000; // שעה אחת
+
+// --- זיהוי לפי שם עם טיימר ---
+
 let currentUser = null;
 let currentDisplayName = null;
+
+function getSavedUser() {
+    const saved = localStorage.getItem("hw_session");
+    if (!saved) return null;
+
+    try {
+        const session = JSON.parse(saved);
+        const elapsed = Date.now() - session.timestamp;
+        if (elapsed > SESSION_DURATION_MS) {
+            localStorage.removeItem("hw_session");
+            return null; // עברה שעה — שואלים שוב
+        }
+        return session;
+    } catch (e) {
+        return null;
+    }
+}
+
+function saveSession(safeId, displayName) {
+    localStorage.setItem("hw_session", JSON.stringify({
+        id: safeId,
+        name: displayName,
+        timestamp: Date.now()
+    }));
+}
 
 // --- מסך כניסה ---
 
@@ -74,8 +103,10 @@ window.submitUserName = function() {
         return;
     }
 
-    currentUser = name.replace(/\s+/g, "_");
+    const safeId = name.replace(/\s+/g, "_");
+    currentUser = safeId;
     currentDisplayName = name;
+    saveSession(safeId, name);
 
     const overlay = document.getElementById("user-select-overlay");
     if (overlay) overlay.remove();
@@ -90,9 +121,14 @@ function showUserBadge() {
     badge.style.cssText = `
         position: fixed; top: 10px; left: 10px; background: #5c6bc0; color: white;
         padding: 6px 14px; border-radius: 20px; font-size: 0.85em; z-index: 999;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15); direction: rtl;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; direction: rtl;
     `;
+    badge.title = "לחצי להחלפת משתמש";
     badge.textContent = "👤 " + currentDisplayName;
+    badge.addEventListener("click", () => {
+        localStorage.removeItem("hw_session");
+        location.reload();
+    });
     document.body.appendChild(badge);
 }
 
@@ -200,7 +236,15 @@ function initHomework() {
     renderHomework(5, 'hw-container-5');
 }
 
-// תמיד שואלים מי נכנס/ת
 document.addEventListener('DOMContentLoaded', () => {
-    showLoginScreen();
+    const saved = getSavedUser();
+    if (saved) {
+        currentUser = saved.id;
+        currentDisplayName = saved.name;
+        // מחדשים את הטיימר בכל כניסה
+        saveSession(saved.id, saved.name);
+        initHomework();
+    } else {
+        showLoginScreen();
+    }
 });
