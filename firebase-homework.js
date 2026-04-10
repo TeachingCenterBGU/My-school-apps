@@ -1,6 +1,7 @@
 // ==============================================
 // firebase-homework.js
 // שמירת שיעורי בית ב-Firebase, עם זיהוי לפי שם
+// בכל כניסה שואלים מי נכנס/ת
 // ==============================================
 
 const firebaseConfig = {
@@ -16,15 +17,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- זיהוי לפי שם ---
+// --- משתנה גלובלי לשם הנוכחי ---
+let currentUser = null;
+let currentDisplayName = null;
 
-function getCurrentUser() {
-    return localStorage.getItem("hw_user");
-}
-
-function setCurrentUser(name) {
-    localStorage.setItem("hw_user", name);
-}
+// --- מסך כניסה ---
 
 function showLoginScreen() {
     const overlay = document.createElement("div");
@@ -55,7 +52,6 @@ function showLoginScreen() {
 
     document.body.appendChild(overlay);
 
-    // אפשר גם ללחוץ Enter
     setTimeout(() => {
         const input = document.getElementById("hw-name-input");
         if (input) {
@@ -78,10 +74,8 @@ window.submitUserName = function() {
         return;
     }
 
-    // שומרים שם נקי (בלי רווחים, lowercase לזיהוי) + שם תצוגה
-    const safeId = name.replace(/\s+/g, "_");
-    setCurrentUser(safeId);
-    localStorage.setItem("hw_display_name", name);
+    currentUser = name.replace(/\s+/g, "_");
+    currentDisplayName = name;
 
     const overlay = document.getElementById("user-select-overlay");
     if (overlay) overlay.remove();
@@ -90,51 +84,42 @@ window.submitUserName = function() {
 };
 
 function showUserBadge() {
-    const displayName = localStorage.getItem("hw_display_name") || getCurrentUser();
-    if (!displayName) return;
+    if (!currentDisplayName) return;
 
     const badge = document.createElement("div");
     badge.style.cssText = `
         position: fixed; top: 10px; left: 10px; background: #5c6bc0; color: white;
         padding: 6px 14px; border-radius: 20px; font-size: 0.85em; z-index: 999;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; direction: rtl;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15); direction: rtl;
     `;
-    badge.title = "לחצי להחלפת שם";
-    badge.textContent = "👤 " + displayName;
-    badge.addEventListener("click", () => {
-        localStorage.removeItem("hw_user");
-        localStorage.removeItem("hw_display_name");
-        location.reload();
-    });
+    badge.textContent = "👤 " + currentDisplayName;
     document.body.appendChild(badge);
 }
 
 // --- פונקציות Firebase ---
 
 function saveTaskDone(taskId, taskInfo) {
-    const user = getCurrentUser();
-    if (!user) return;
+    if (!currentUser) return;
 
     const now = new Date();
     const displayDate = now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
 
-    db.ref('done/' + user + '/' + taskId).set(true);
+    db.ref('done/' + currentUser + '/' + taskId).set(true);
 
-    db.ref('log/' + user + '/' + taskId).set({
+    db.ref('log/' + currentUser + '/' + taskId).set({
         completedAt: now.toISOString(),
         completedAtDisplay: displayDate,
         subject: taskInfo.subject || '',
         task: taskInfo.task || '',
         grade: taskInfo.grade || '',
-        userName: localStorage.getItem("hw_display_name") || user
+        userName: currentDisplayName
     });
 }
 
 async function getDoneIds() {
-    const user = getCurrentUser();
-    if (!user) return new Set();
+    if (!currentUser) return new Set();
 
-    const snapshot = await db.ref('done/' + user).once('value');
+    const snapshot = await db.ref('done/' + currentUser).once('value');
     const data = snapshot.val();
     return data ? new Set(Object.keys(data)) : new Set();
 }
@@ -215,11 +200,7 @@ function initHomework() {
     renderHomework(5, 'hw-container-5');
 }
 
+// תמיד שואלים מי נכנס/ת
 document.addEventListener('DOMContentLoaded', () => {
-    const user = getCurrentUser();
-    if (!user) {
-        showLoginScreen();
-    } else {
-        initHomework();
-    }
+    showLoginScreen();
 });
