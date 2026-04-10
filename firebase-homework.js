@@ -1,40 +1,96 @@
 // ==============================================
 // firebase-homework.js
-// מחליף את localStorage בשמירה ל-Firebase
+// שמירת שיעורי בית ב-Firebase, לפי ילדה
 // ==============================================
-
-// --- אתחול Firebase ---
-// (ה-SDK נטען מה-HTML לפני הקובץ הזה)
 
 const firebaseConfig = {
     // ⬇️ ענבל: החליפי את הערכים האלה בערכים מה-Firebase Console שלך
-    apiKey: "AIzaSyAi0YrEfLEr7GK2VRjJ9FOuhz4066_7T5M",
-    authDomain: "homework-barad.firebaseapp.com",
-    databaseURL: "https://homework-barad-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "homework-barad",
-    storageBucket: "homework-barad.firebasestorage.app",
-    messagingSenderId: "324035760311",
-    appId: "1:324035760311:web:2b9793e3924cc2840a3d32",
-    measurementId: "G-HHGQZ2WX3Q"
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAi0YrEfLEr7GK2VRjJ9FOuhz4066_7T5M",
+  authDomain: "homework-barad.firebaseapp.com",
+  databaseURL: "https://homework-barad-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "homework-barad",
+  storageBucket: "homework-barad.firebasestorage.app",
+  messagingSenderId: "324035760311",
+  appId: "1:324035760311:web:2b9793e3924cc2840a3d32",
+  measurementId: "G-HHGQZ2WX3Q"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- פונקציות עזר ---
+// --- זיהוי הילדה ---
 
-// שומרת שמשימה הושלמה (עם תאריך וזמן)
+function getCurrentUser() {
+    return localStorage.getItem("hw_user");
+}
+
+function setCurrentUser(name) {
+    localStorage.setItem("hw_user", name);
+}
+
+function askForUser() {
+    const overlay = document.createElement("div");
+    overlay.id = "user-select-overlay";
+    overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); display: flex; align-items: center;
+        justify-content: center; z-index: 9999;
+    `;
+
+    overlay.innerHTML = `
+        <div style="background: white; border-radius: 16px; padding: 30px; text-align: center; max-width: 300px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2);">
+            <h2 style="margin: 0 0 20px 0; font-size: 1.3em;">מי את? 👋</h2>
+            <button class="user-pick-btn" onclick="pickUser('child1')" style="
+                display: block; width: 100%; padding: 12px; margin: 8px 0;
+                font-size: 1.1em; border: 2px solid #ec407a; border-radius: 10px;
+                background: #fce4ec; cursor: pointer; font-weight: bold;
+            ">🍬 הילדה של כיתה ג'</button>
+            <button class="user-pick-btn" onclick="pickUser('child2')" style="
+                display: block; width: 100%; padding: 12px; margin: 8px 0;
+                font-size: 1.1em; border: 2px solid #5c6bc0; border-radius: 10px;
+                background: #e8eaf6; cursor: pointer; font-weight: bold;
+            ">🦋 הילדה של כיתה ה'</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+}
+
+window.pickUser = function(name) {
+    setCurrentUser(name);
+    const overlay = document.getElementById("user-select-overlay");
+    if (overlay) overlay.remove();
+    renderHomework(3, 'hw-container-3');
+    renderHomework(5, 'hw-container-5');
+};
+
+// --- פונקציות Firebase ---
+
 function saveTaskDone(taskId, taskInfo) {
+    const user = getCurrentUser();
+    if (!user) return;
+
     const now = new Date();
     const timestamp = now.toISOString();
     const displayDate = now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
-    
-    // שומרים בשני מקומות:
-    // 1. רשימת "בוצע" (לבדיקה מהירה)
-    db.ref('done/' + taskId).set(true);
-    
-    // 2. לוג מלא (היסטוריה)
-    db.ref('log/' + taskId).set({
+
+    db.ref('done/' + user + '/' + taskId).set(true);
+
+    db.ref('log/' + user + '/' + taskId).set({
         completedAt: timestamp,
         completedAtDisplay: displayDate,
         subject: taskInfo.subject || '',
@@ -43,26 +99,24 @@ function saveTaskDone(taskId, taskInfo) {
     });
 }
 
-// בודקת אם משימה כבר בוצעה
-async function isTaskDone(taskId) {
-    const snapshot = await db.ref('done/' + taskId).once('value');
-    return snapshot.val() === true;
-}
-
-// מושכת את כל המשימות שבוצעו (set של IDs)
 async function getAllDoneIds() {
-    const snapshot = await db.ref('done').once('value');
+    const user = getCurrentUser();
+    if (!user) return new Set();
+
+    const snapshot = await db.ref('done/' + user).once('value');
     const data = snapshot.val();
     return data ? new Set(Object.keys(data)) : new Set();
 }
 
-// --- רינדור שיעורי בית (מחליף את renderHomework הישן) ---
+// --- רינדור שיעורי בית ---
 
 async function renderHomework(grade, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // טוענים loading
+    const user = getCurrentUser();
+    if (!user) return;
+
     container.innerHTML = '<p style="text-align:center; color:#888;">⏳ טוען שיעורי בית...</p>';
 
     const tasks = (typeof homeworkData !== 'undefined') ? homeworkData : [];
@@ -88,8 +142,8 @@ async function renderHomework(grade, containerId) {
                     </div>
                     <div style="color:#555; line-height:1.4;">${task.task}</div>
                 </div>
-                <button class="hw-done-btn" 
-                        onclick="markHomeworkDone('${task.id}')" 
+                <button class="hw-done-btn"
+                        onclick="markHomeworkDone('${task.id}')"
                         title="סיימתי!">✓</button>
             </div>
         `;
@@ -97,22 +151,18 @@ async function renderHomework(grade, containerId) {
     container.innerHTML = html;
 }
 
-// --- סימון משימה כ"בוצעה" (מחליף את markHomeworkDone הישן) ---
+// --- סימון משימה ---
 
 window.markHomeworkDone = function(id) {
-    // 1. קונפטי
     if (typeof confetti !== 'undefined') {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
 
-    // 2. מוצאים את פרטי המשימה ללוג
     const tasks = (typeof homeworkData !== 'undefined') ? homeworkData : [];
     const taskInfo = tasks.find(t => t.id === id) || {};
 
-    // 3. שומרים ב-Firebase (במקום localStorage)
     saveTaskDone(id, taskInfo);
 
-    // 4. אנימציית העלמות
     const taskItem = document.getElementById("task-" + id);
     if (taskItem) {
         taskItem.style.transition = "all 0.5s ease";
@@ -129,8 +179,13 @@ window.markHomeworkDone = function(id) {
     }
 };
 
-// --- הפעלה אוטומטית ---
+// --- הפעלה ---
 document.addEventListener('DOMContentLoaded', () => {
-    renderHomework(3, 'hw-container-3');
-    renderHomework(5, 'hw-container-5');
+    const user = getCurrentUser();
+    if (!user) {
+        askForUser();
+    } else {
+        renderHomework(3, 'hw-container-3');
+        renderHomework(5, 'hw-container-5');
+    }
 });
