@@ -6,15 +6,16 @@ const homeworkData = [
         "task": "עמודים 137-145",
         "date": "10/04"
     },
-        {
+
+    {
         "id": "pesach2",
         "grade": 3,
         "subject": "חשבון",
-        "task": "דף עבודה - חיבור בתחום ההרכבה",
+        "task": "דף עבודה - חיבור ארוך",
         "date": "10/04"
-    }
+    },
 
-            {
+    {
         "id": "pesach3",
         "grade": 3,
         "subject": "חשבון",
