@@ -16,6 +16,8 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const appCheck = firebase.appCheck();
+appCheck.activate('6Lc3ybEsAAAAAJpdWESSOGNXCqW764S9qIpsbc0k', true);
 
 // --- הגדרות ---
 const SESSION_DURATION_MS = 60 * 60 * 1000; // שעה אחת
