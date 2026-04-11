@@ -171,7 +171,11 @@ async function renderHomework(grade, containerId) {
 
     container.innerHTML = '<p style="text-align:center; color:#888;">⏳ טוען שיעורי בית...</p>';
 
-    const tasks = (typeof homeworkData !== 'undefined') ? homeworkData : [];
+    const auto = (typeof homeworkData !== 'undefined') ? homeworkData : [];
+    const manual = (typeof manualTasks !== 'undefined') ? manualTasks : [];
+    const tasks = auto.concat(manual);
+
+
     const doneIds = await getDoneIds();
 
     const pendingTasks = tasks.filter(t => t.grade === grade && !doneIds.has(t.id));
@@ -210,7 +214,9 @@ window.markHomeworkDone = function(id) {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
 
-    const tasks = (typeof homeworkData !== 'undefined') ? homeworkData : [];
+    const auto = (typeof homeworkData !== 'undefined') ? homeworkData : [];
+    const manual = (typeof manualTasks !== 'undefined') ? manualTasks : [];
+    const tasks = auto.concat(manual);
     const taskInfo = tasks.find(t => t.id === id) || {};
 
     saveTaskDone(id, taskInfo);

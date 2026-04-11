@@ -92,6 +92,9 @@ def update_homework():
 
     # --- שלב 3: משיכת שיעורים וסינון ---
     all_tasks = []
+    lookback_days = 30
+    cutoff_date = datetime.now() - timedelta(days=lookback_days)
+    cutoff_date = cutoff_date.replace(hour=0, minute=0, second=0, microsecond=0)
 
     for child in children:
         name = child['privateName']
@@ -121,6 +124,9 @@ def update_homework():
                     task_date_str = hw.get('lessonDate')
                     if task_date_str:
                         task_date = parse_date(task_date_str)
+
+                        if task_date < cutoff_date:
+                            continue
                         
                     
                     # 2. המרה למבנה שלנו
