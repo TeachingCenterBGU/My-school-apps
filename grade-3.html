@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+    <link rel="manifest" href="manifest.json">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -255,4 +256,9 @@
 <script src="homework_manual.js"></script>
 <script src="firebase-homework.js"></script>
 </body>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+</script>
 </html>

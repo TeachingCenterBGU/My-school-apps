@@ -1,0 +1,23 @@
+{
+    "name": "כאן לומדות ולומדים בכיף",
+    "short_name": "לומדים בכיף",
+    "description": "תרגול, משחקים ודפי עבודה",
+    "start_url": "/My-school-apps/index.html"
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#5c6bc0",
+    "dir": "rtl",
+    "lang": "he",
+    "icons": [
+        {
+            "src": "icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
