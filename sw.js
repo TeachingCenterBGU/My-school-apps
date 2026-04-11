@@ -1,14 +1,14 @@
 const CACHE_NAME = 'homework-v1';
 const URLS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/grade-3.html',
-    '/grade-5.html',
-    '/kindergarten.html',
-    '/homework_data.js',
-    '/homework_manual.js',
-    '/firebase-homework.js'
+    '/My-school-apps/',
+    '/My-school-apps/index.html',
+    '/My-school-apps/style.css',
+    '/My-school-apps/grade-3.html',
+    '/My-school-apps/grade-5.html',
+    '/My-school-apps/kindergarten.html',
+    '/My-school-apps/homework_data.js',
+    '/My-school-apps/homework_manual.js',
+    '/My-school-apps/firebase-homework.js'
 ];
 
 // התקנה — שומרים את הקבצים הבסיסיים בקאש
