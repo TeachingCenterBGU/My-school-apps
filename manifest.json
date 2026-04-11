@@ -3,6 +3,7 @@
     "short_name": "לומדים בכיף",
     "description": "תרגול, משחקים ודפי עבודה",
     "start_url": "/My-school-apps/index.html",
+    "scope": "/My-school-apps/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#5c6bc0",
