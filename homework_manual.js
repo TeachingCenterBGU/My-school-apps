@@ -70,6 +70,14 @@ const manualTasks = [
         "date": "10/04"
     },
 
+    {
+        "id": "pesach10",
+        "grade": 3,
+        "subject": "חשבון",
+        "task": "להשלים בחוברת עמודים - 71,145,146",
+        "date": "10/04"
+    },
+
 {
         "id": "p1",
         "grade": 5,
