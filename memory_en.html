@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>English Memory Game - Auto Voice</title>
+    <title>ABC Match - Big & Small Letters</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -125,6 +125,14 @@
             transform: rotateY(180deg);
             font-size: 3.5em;
             font-weight: bold;
+            flex-direction: column;
+        }
+
+        .case-label {
+            font-size: 0.28em;
+            font-weight: normal;
+            color: #999;
+            margin-top: 2px;
         }
 
         .back-btn {
@@ -169,7 +177,7 @@
 <body>
 
     <div class="top-bar">
-        <h1>ABC Match! 🎊</h1>
+        <h1>Aa Bb Match! 🎊</h1>
         <button id="sound-toggle" class="sound-on">🔊</button>
     </div>
 
@@ -189,7 +197,7 @@
     </div>
 
     <br>
-    <a href="index.html" class="back-btn">Back to Home</a>
+    <a href="grade-3.html" class="back-btn">Back to Home</a>
 
     <script>
         const allLetters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
@@ -203,17 +211,12 @@
         let totalPairs = 0;
         let isSoundOn = true; 
 
-        // פונקציית הקראה אוטומטית
         function playLetterSound(letter) {
             if (!isSoundOn) return;
-            
-            // יצירת אובייקט הקראה
-            const utterance = new SpeechSynthesisUtterance(letter);
-            utterance.lang = 'en-US'; // הגדרה לאנגלית אמריקאית
-            utterance.rate = 0.9;      // מהירות מעט איטית יותר כדי שיהיה ברור
-            utterance.pitch = 1.1;     // טון מעט גבוה (ידידותי יותר לילדים)
-            
-            // עצירת הקראות קודמות כדי שלא ייווצר "תור" של צלילים
+            const utterance = new SpeechSynthesisUtterance(letter.toUpperCase());
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.1;
             window.speechSynthesis.cancel();
             window.speechSynthesis.speak(utterance);
         }
@@ -238,6 +241,7 @@
             hasFlippedCard = false;
             lockBoard = false;
 
+            // Pick letters for this round
             let selectedLetters = [];
             if (numCards === 52) {
                 selectedLetters = [...allLetters];
@@ -252,14 +256,22 @@
             }
 
             totalPairs = selectedLetters.length;
+
+            // Assign a color per letter
             const letterColors = {};
             selectedLetters.forEach(letter => {
                 letterColors[letter] = colors[Math.floor(Math.random() * colors.length)];
             });
 
-            const deck = [...selectedLetters, ...selectedLetters];
+            // Build deck: one UPPERCASE card + one lowercase card per letter
+            const deck = [];
+            selectedLetters.forEach(letter => {
+                deck.push({ display: letter.toUpperCase(), letter: letter, isUpper: true });
+                deck.push({ display: letter.toLowerCase(), letter: letter, isUpper: false });
+            });
             deck.sort(() => 0.5 - Math.random());
 
+            // Grid layout
             let columns = 4;
             let maxWidth = '1000px';
             if (numCards === 4) { columns = 2; maxWidth = '400px'; }
@@ -276,17 +288,27 @@
             board.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
             board.style.maxWidth = maxWidth;
 
-            deck.forEach(letter => {
+            deck.forEach(item => {
                 const card = document.createElement('div');
                 card.classList.add('card');
-                card.dataset.letter = letter;
+                // Store the base letter (always uppercase) for matching logic
+                card.dataset.letter = item.letter.toUpperCase();
+                // Store whether this card is the upper or lower version
+                card.dataset.case = item.isUpper ? 'upper' : 'lower';
+
                 const frontFace = document.createElement('div');
                 frontFace.classList.add('front');
+
                 const backFace = document.createElement('div');
                 backFace.classList.add('back');
-                backFace.textContent = letter;
-                backFace.style.color = letterColors[letter];
-                backFace.style.borderColor = letterColors[letter];
+                backFace.style.color = letterColors[item.letter];
+                backFace.style.borderColor = letterColors[item.letter];
+
+                // Letter display
+                const letterSpan = document.createElement('span');
+                letterSpan.textContent = item.display;
+                backFace.appendChild(letterSpan);
+
                 card.appendChild(frontFace);
                 card.appendChild(backFace);
                 card.addEventListener('click', flipCard);
@@ -314,7 +336,11 @@
         }
 
         function checkForMatch() {
-            if (firstCard.dataset.letter === secondCard.dataset.letter) {
+            // Match = same letter BUT different case (one upper, one lower)
+            const sameLetter = firstCard.dataset.letter === secondCard.dataset.letter;
+            const differentCase = firstCard.dataset.case !== secondCard.dataset.case;
+
+            if (sameLetter && differentCase) {
                 firstCard.classList.add('matched');
                 secondCard.classList.add('matched');
                 matchedCount++;

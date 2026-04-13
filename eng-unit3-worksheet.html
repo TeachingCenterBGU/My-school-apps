@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>מבחן באנגלית כיתה ג' - Unit 3 Animals</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Varela+Round&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #4caf50;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        h1 { margin: 0; color: #4caf50; font-size: 2.2em; }
+        .sub-title { color: #666; font-size: 1.2em; margin-top: 5px; }
+
+        .name-box {
+            font-size: 1.4em;
+            margin-bottom: 25px;
+            font-family: 'Varela Round', sans-serif;
+        }
+        .line { border-bottom: 1px solid black; display: inline-block; width: 250px; }
+
+        .section { margin-bottom: 28px; page-break-inside: avoid; }
+        
+        .section-header {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 12px;
+            border-right: 5px solid #4caf50;
+        }
+
+        .instruction { font-size: 1em; margin-bottom: 12px; color: #555; }
+
+        /* Part 1: Letters */
+        .letters-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 1.6em;
+            font-family: 'Varela Round', sans-serif;
+            direction: ltr;
+        }
+        .letter-pair {
+            border: 2px solid #ddd;
+            padding: 8px 12px;
+            border-radius: 10px;
+            width: 70px;
+            text-align: center;
+        }
+        .missing { color: #ccc; border-bottom: 2px dashed #999; display: inline-block; width: 30px; }
+
+        /* Sound grid */
+        .sound-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .sound-item {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .sound-icon { font-size: 2.8em; margin-bottom: 5px; }
+        .sound-options { 
+            font-family: 'Varela Round', sans-serif; 
+            font-size: 1.2em; 
+            letter-spacing: 5px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .sound-word {
+            font-family: 'Varela Round', sans-serif;
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        /* Match */
+        .match-box {
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 10px;
+            background: #fff;
+        }
+        .match-container {
+            display: flex;
+            justify-content: space-between;
+            direction: ltr;
+            font-size: 1.3em;
+            padding: 0 40px;
+        }
+        .col { display: flex; flex-direction: column; gap: 15px; }
+        .match-item { height: 40px; display: flex; align-items: center; }
+        .match-icon { font-size: 2em; }
+        .dot { 
+            width: 10px; height: 10px; 
+            background: #bbb; border-radius: 50%; 
+            display: inline-block; margin: 0 15px; 
+        }
+
+        /* Write word */
+        .write-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            direction: ltr;
+        }
+        .write-item {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .write-icon { font-size: 2.8em; margin-bottom: 5px; }
+        .write-line { 
+            border-bottom: 2px dashed #999; 
+            display: block; 
+            height: 30px; 
+            margin: 5px auto 0;
+            width: 90%;
+            font-family: 'Varela Round', sans-serif;
+            font-size: 1.1em;
+        }
+        .write-hint {
+            font-family: 'Varela Round', sans-serif;
+            font-size: 0.75em;
+            color: #bbb;
+            letter-spacing: 3px;
+            margin-top: 3px;
+        }
+
+        /* a/an */
+        .aan-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            direction: ltr;
+            font-family: 'Varela Round', sans-serif;
+            font-size: 1.3em;
+        }
+        .aan-item {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .aan-blank {
+            border-bottom: 2px dashed #999;
+            display: inline-block;
+            width: 50px;
+            text-align: center;
+        }
+
+        /* Reading */
+        .reading-box {
+            border: 2px dashed #ff9800;
+            padding: 15px;
+            border-radius: 15px;
+            background-color: #fff3e0;
+            font-size: 1.3em;
+            direction: ltr;
+            line-height: 2em;
+            font-family: 'Varela Round', sans-serif;
+        }
+        .bank { font-size: 0.8em; color: #666; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        .blank-line { border-bottom: 2px solid black; width: 100px; display: inline-block; }
+
+        /* Sentence writing */
+        .sentence-grid {
+            direction: ltr;
+            font-family: 'Varela Round', sans-serif;
+            font-size: 1.2em;
+        }
+        .sentence-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px 15px;
+        }
+        .sentence-icon { font-size: 2em; }
+        .sentence-line {
+            border-bottom: 2px dashed #999;
+            flex: 1;
+            height: 28px;
+        }
+        .sentence-label { font-size: 0.9em; color: #888; }
+
+        @media print {
+            body { padding: 0; }
+            .section { page-break-inside: avoid; }
+            h1 { font-size: 1.8em; }
+        }
+
+        .section.sound-section {
+            clear: both;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🐾 English Practice Test - Unit 3 🐾</h1>
+        <div class="sub-title">הכנה למבחן באנגלית - כיתה ג' - בעלי חיים</div>
+    </div>
+
+    <div class="name-box" dir="ltr">
+        Name: <span class="line"></span> &nbsp;&nbsp; Date: <span class="line" style="width:150px;"></span>
+    </div>
+
+    <!-- Section 1: Letters -->
+    <div class="section">
+        <div class="section-header">1. Write the Small Letter (כתבי את האות הקטנה)</div>
+        <div class="instruction">כתבי את האות הקטנה המתאימה:</div>
+        <div class="letters-grid">
+            <div class="letter-pair">A <span class="missing"></span></div>
+            <div class="letter-pair">F <span class="missing"></span></div>
+            <div class="letter-pair">G <span class="missing"></span></div>
+            <div class="letter-pair">H <span class="missing"></span></div>
+            <div class="letter-pair">L <span class="missing"></span></div>
+            <div class="letter-pair">P <span class="missing"></span></div>
+            <div class="letter-pair">I <span class="missing"></span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">2. Write the Big Letter (כתבי את האות הגדולה)</div>
+        <div class="instruction">כתבי את האות הגדולה המתאימה:</div>
+        <div class="letters-grid">
+            <div class="letter-pair"><span class="missing"></span> b</div>
+            <div class="letter-pair"><span class="missing"></span> c</div>
+            <div class="letter-pair"><span class="missing"></span> e</div>
+            <div class="letter-pair"><span class="missing"></span> m</div>
+            <div class="letter-pair"><span class="missing"></span> s</div>
+            <div class="letter-pair"><span class="missing"></span> t</div>
+        </div>
+    </div>
+
+    <!-- Section 2: Beginning Sound -->
+    <div class="section sound-section">
+        <div class="section-header">3. Beginning Sound (צליל פותח)</div>
+        <div class="instruction">מהי האות הראשונה של המילה? הקיפ/י בעיגול:</div>
+        <div class="sound-grid">
+            <div class="sound-item">
+                <div class="sound-icon">🐕</div>
+                <div class="sound-word">dog</div>
+                <div class="sound-options">D / B / G</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🦁</div>
+                <div class="sound-word">lion</div>
+                <div class="sound-options">L / I / M</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🐔</div>
+                <div class="sound-word">hen</div>
+                <div class="sound-options">H / E / N</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🎁</div>
+                <div class="sound-word">gift</div>
+                <div class="sound-options">G / J / F</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🍕</div>
+                <div class="sound-word">pizza</div>
+                <div class="sound-options">P / B / T</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🦆</div>
+                <div class="sound-word">duck</div>
+                <div class="sound-options">B / D / P</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🎸</div>
+                <div class="sound-word">guitar</div>
+                <div class="sound-options">G / C / T</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🍋</div>
+                <div class="sound-word">lemon</div>
+                <div class="sound-options">M / L / E</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Ending Sound -->
+    <div class="section sound-section">
+        <div class="section-header">4. Ending Sound (צליל סוגר)</div>
+        <div class="instruction">מהי האות האחרונה של המילה? הקיפ/י בעיגול:</div>
+        <div class="sound-grid">
+            <div class="sound-item">
+                <div class="sound-icon">🐕</div>
+                <div class="sound-word">dog</div>
+                <div class="sound-options">G / D / B</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🐔</div>
+                <div class="sound-word">hen</div>
+                <div class="sound-options">N / M / E</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🎩</div>
+                <div class="sound-word">hat</div>
+                <div class="sound-options">T / D / S</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🥛</div>
+                <div class="sound-word">milk</div>
+                <div class="sound-options">K / G / C</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🍞</div>
+                <div class="sound-word">bread</div>
+                <div class="sound-options">D / T / B</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🥊</div>
+                <div class="sound-word">hit</div>
+                <div class="sound-options">T / S / D</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🏡</div>
+                <div class="sound-word">farm</div>
+                <div class="sound-options">M / N / L</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🐾</div>
+                <div class="sound-word">pet</div>
+                <div class="sound-options">T / P / D</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 4: Middle Sound -->
+    <div class="section sound-section">
+        <div class="section-header">5. Middle Sound (צליל התנועה באמצע)</div>
+        <div class="instruction">מהי התנועה (vowel) באמצע המילה? הקיפ/י בעיגול:</div>
+        <div class="sound-grid">
+            <div class="sound-item">
+                <div class="sound-icon">🎩</div>
+                <div class="sound-word">hat</div>
+                <div class="sound-options">A / E / I</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🐔</div>
+                <div class="sound-word">hen</div>
+                <div class="sound-options">E / A / I</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🥊</div>
+                <div class="sound-word">hit</div>
+                <div class="sound-options">I / E / A</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🐕</div>
+                <div class="sound-word">dog</div>
+                <div class="sound-options">O / A / E</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🧶</div>
+                <div class="sound-word">net</div>
+                <div class="sound-options">E / A / I</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🐈</div>
+                <div class="sound-word">fat</div>
+                <div class="sound-options">A / E / O</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">📋</div>
+                <div class="sound-word">list</div>
+                <div class="sound-options">I / E / A</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🥛</div>
+                <div class="sound-word">milk</div>
+                <div class="sound-options">I / A / E</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 5: Match -->
+    <div class="section">
+        <div class="section-header">6. Match (מתחי קו)</div>
+        <div class="instruction">מתחי קו בין המילה לציור המתאים:</div>
+        
+        <div class="match-box">
+            <div class="match-container">
+                <div class="col">
+                    <div class="match-item">1. gorilla <span class="dot"></span></div>
+                    <div class="match-item">2. kangaroo <span class="dot"></span></div>
+                    <div class="match-item">3. duck <span class="dot"></span></div>
+                    <div class="match-item">4. kitchen <span class="dot"></span></div>
+                    <div class="match-item">5. lion <span class="dot"></span></div>
+                    <div class="match-item">6. igloo <span class="dot"></span></div>
+                    <div class="match-item">7. guitar <span class="dot"></span></div>
+                </div>
+                
+                <div class="col">
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🦁</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🦆</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🎸</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🦍</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🏠❄️</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🦘</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🍳</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Write the word -->
+    <div class="section">
+        <div class="section-header">7. Write the Word (כתבי את המילה)</div>
+        <div class="instruction">הסתכלי על הציור וכתבי את המילה באנגלית:</div>
+        <div class="write-grid">
+            <div class="write-item">
+                <div class="write-icon">🐕</div>
+                <div class="write-line"></div>
+                <div class="write-hint">d _ _</div>
+            </div>
+            <div class="write-item">
+                <div class="write-icon">🐔</div>
+                <div class="write-line"></div>
+                <div class="write-hint">h _ _</div>
+            </div>
+            <div class="write-item">
+                <div class="write-icon">🎩</div>
+                <div class="write-line"></div>
+                <div class="write-hint">h _ _</div>
+            </div>
+            <div class="write-item">
+                <div class="write-icon">🦁</div>
+                <div class="write-line"></div>
+                <div class="write-hint">l _ _ _</div>
+            </div>
+            <div class="write-item">
+                <div class="write-icon">🍕</div>
+                <div class="write-line"></div>
+                <div class="write-hint">p _ _ _ _</div>
+            </div>
+            <div class="write-item">
+                <div class="write-icon">🏡</div>
+                <div class="write-line"></div>
+                <div class="write-hint">f _ _ _</div>
+            </div>
+            <div class="write-item">
+                <div class="write-icon">🦆</div>
+                <div class="write-line"></div>
+                <div class="write-hint">d _ _ _</div>
+            </div>
+            <div class="write-item">
+                <div class="write-icon">🥛</div>
+                <div class="write-line"></div>
+                <div class="write-hint">m _ _ _</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 7: a or an -->
+    <div class="section">
+        <div class="section-header">8. a / an (כתבי a או an)</div>
+        <div class="instruction">?a או an - מה מתאים לפני המילה</div>
+        <div class="aan-grid">
+            <div class="aan-item"><span class="aan-blank"></span> dog 🐕</div>
+            <div class="aan-item"><span class="aan-blank"></span> igloo 🏠❄️</div>
+            <div class="aan-item"><span class="aan-blank"></span> hen 🐔</div>
+            <div class="aan-item"><span class="aan-blank"></span> elephant 🐘</div>
+            <div class="aan-item"><span class="aan-blank"></span> farm 🏡</div>
+            <div class="aan-item"><span class="aan-blank"></span> add ➕</div>
+            <div class="aan-item"><span class="aan-blank"></span> gorilla 🦍</div>
+            <div class="aan-item"><span class="aan-blank"></span> internet 🌐</div>
+        </div>
+    </div>
+
+    <!-- Section 8: Reading -->
+    <div class="section">
+        <div class="section-header">9. Reading (קריאה והשלמה)</div>
+        <div class="instruction">השלימי את המילה החסרה מבנק המילים:</div>
+        
+        <div class="reading-box">
+            <div class="bank"><strong>Word Bank:</strong> dog &nbsp;|&nbsp; hen &nbsp;|&nbsp; like &nbsp;|&nbsp; don't like &nbsp;|&nbsp; fast &nbsp;|&nbsp; fat</div>
+            
+            1. I have a <span class="blank-line"></span> . It can run. <br>
+            2. The <span class="blank-line"></span> has eggs. <br>
+            3. The gorilla is big and <span class="blank-line"></span> . <br>
+            4. The lion is <span class="blank-line"></span> . <br>
+            5. Do you like kangaroos? Yes! I <span class="blank-line"></span> kangaroos. <br>
+            6. Do you like snakes? No! I <span class="blank-line"></span> snakes.
+        </div>
+    </div>
+
+    <!-- Section 9: Write a sentence -->
+    <div class="section">
+        <div class="section-header">10. Write (כתבי משפט)</div>
+        <div class="instruction">הסתכלי על הציור וכתבי משפט עם I like / I don't like:</div>
+        <div class="sentence-grid">
+            <div class="sentence-row">
+                <span class="sentence-icon">🐕</span>
+                <div class="sentence-line"></div>
+            </div>
+            <div class="sentence-row">
+                <span class="sentence-icon">🐍</span>
+                <div class="sentence-line"></div>
+            </div>
+            <div class="sentence-row">
+                <span class="sentence-icon">🦘</span>
+                <div class="sentence-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 25px; font-size: 2em;">
+        Good Luck! 🐾🌟
+    </div>
+
+</body>
+</html>
