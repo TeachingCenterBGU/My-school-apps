@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מדעים ה' - עולם המתכות (גרסה מתוקנת V3)</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #e67e22;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --bg: #f4f6f7;
+            --table-header: #2980b9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title { font-size: 1.5rem; font-weight: bold; }
+        
+        .home-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .home-btn:hover { background: rgba(255,255,255,0.4); }
+
+        /* CONTENT AREA */
+        .content-area {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        /* MENU GRID */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .menu-card {
+            background: white;
+            border: 2px solid #eef2f7;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.2);
+        }
+
+        .menu-icon { font-size: 3.5rem; margin-bottom: 15px; }
+        .menu-title { font-size: 1.3rem; font-weight: bold; color: var(--dark); margin-bottom: 10px;}
+        .menu-desc { color: #7f8c8d; font-size: 0.95rem; }
+
+        /* --- TABLE STYLES (DROPDOWN FIX) --- */
+        .properties-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;
+        }
+        .properties-table th, .properties-table td {
+            border: 1px solid #bdc3c7;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .properties-table th {
+            background-color: var(--table-header);
+            color: white;
+            font-weight: bold;
+        }
+        .properties-table th:first-child { background-color: var(--dark); width: 20%; }
+
+        /* Dropdown Styling */
+        .table-select {
+            width: 90%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+            outline: none;
+            text-align: center;
+        }
+
+        .table-select:focus { border-color: var(--primary); }
+
+        .table-select.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+            pointer-events: none; /* Lock correct answers */
+            font-weight: bold;
+        }
+        .table-select.wrong {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        /* QUIZ STYLES */
+        .hidden { display: none; }
+        .question-box {
+            background: white; border: 1px solid #eee; padding: 25px;
+            margin-bottom: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .q-text { font-size: 1.25rem; font-weight: bold; margin-bottom: 20px; color: var(--dark); }
+        .options-grid { display: grid; gap: 15px; }
+        
+        .option-btn {
+            background: white; border: 2px solid #eef2f7; padding: 15px;
+            border-radius: 10px; text-align: right; cursor: pointer; transition: 0.2s; font-size: 1.1rem;
+        }
+        .option-btn:hover { border-color: var(--primary); background: #f4faff; }
+        
+        .option-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .option-btn.wrong { background: #f8d7da; border-color: var(--danger); color: #721c24; opacity: 0.7; }
+        
+        .feedback {
+            margin-top: 20px; padding: 15px; border-radius: 8px;
+            display: none; border-right: 5px solid transparent; font-weight: bold;
+        }
+        .feedback.correct-fb { background: #d4edda; color: #155724; border-color: var(--success); }
+        .feedback.wrong-fb { background: #f8d7da; color: #721c24; border-color: var(--danger); }
+
+        .next-btn {
+            background: var(--primary); color: white; border: none; padding: 12px 30px;
+            border-radius: 25px; font-size: 1.1rem; cursor: pointer; margin-top: 20px; display: inline-block;
+        }
+
+        /* ORDERING QUESTION */
+        .order-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .order-item {
+            background: white; border: 2px solid #bdc3c7; padding: 15px;
+            border-radius: 10px; cursor: pointer; text-align: center; font-weight: bold; transition: 0.2s;
+        }
+        .order-item.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .order-item.correct-order { background: var(--success); color: white; border-color: var(--success); cursor: default; }
+
+
+        /* LAB STYLES */
+        .exp-intro {
+            background: #f8f9fa; border: 1px solid #e9ecef; padding: 25px;
+            border-radius: 15px; margin-bottom: 30px;
+        }
+        .exp-title { color: var(--primary); margin-top: 0; border-bottom: 2px solid #dfe6e9; padding-bottom: 15px; }
+        
+        .progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-title">🧪 מדעים ה' - עולם המתכות</div>
+        <button class="home-btn" onclick="showMenu()">תפריט ראשי</button>
+    </header>
+
+    <div id="menu" class="content-area">
+        <h2 style="text-align: center;">בחר את נושא התרגול:</h2>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="startTableMode()">
+                <span class="menu-icon">📋</span>
+                <div class="menu-title">1. טבלת תכונות המתכות</div>
+                <div class="menu-desc">מילוי טבלה אינטראקטיבית על ברזל, נחושת, אלומיניום ובדיל.</div>
+            </div>
+            <div class="menu-card" onclick="startQuizMode('basics')">
+                <span class="menu-icon">💡</span>
+                <div class="menu-title">2. ידע: תכונות ושימושים</div>
+                <div class="menu-desc">12 שאלות על מוליכות, ברק, צליל, והתאמה למוצרים.</div>
+            </div>
+            <div class="menu-card" onclick="startQuizMode('process')">
+                <span class="menu-icon">🏭</span>
+                <div class="menu-title">3. ידע: הפקה, עיבוד וסביבה</div>
+                <div class="menu-desc">12 שאלות על כרייה, תהליך ההיתוך, ריקוע מול ערגול ואיכות הסביבה.</div>
+            </div>
+            <div class="menu-card" onclick="startLabMode()">
+                <span class="menu-icon">🔬</span>
+                <div class="menu-title">4. המעבדה: חקר וניסויים</div>
+                <div class="menu-desc">ניתוח ניסויים מדעיים והסקת מסקנות (הכל בעמוד אחד).</div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="https://www.classe.world/teacher/#!/he/session/88030/playLesson/637779/#taskstart" target="_blank" style="color: var(--primary); font-weight: bold; text-decoration: none; font-size: 1.1rem;">📖 לספר הדיגיטלי (עמודים 42-82) >></a>
+        </div>
+    </div>
+
+    <div id="table-interface" class="content-area hidden">
+        <h2>מלאי את הטבלה: בחרי את התשובה הנכונה מהרשימה</h2>
+        <p>ברגע שתבחרי תשובה נכונה, היא תסומן בירוק.</p>
+        <table class="properties-table">
+            <thead>
+                <tr>
+                    <th>תכונה / מתכת</th>
+                    <th>ברזל</th>
+                    <th>נחושת</th>
+                    <th>אלומיניום</th>
+                    <th>בדיל</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                </tbody>
+        </table>
+        <div id="table-completion-msg" class="feedback" style="text-align:center; font-size:1.2em;"></div>
+        <button class="next-btn" onclick="showMenu()" style="display:block; margin: 20px auto;">חזרה לתפריט</button>
+    </div>
+
+    <div id="quiz-interface" class="content-area hidden">
+        <div class="progress-bar"><div id="quiz-bar" class="progress-fill"></div></div>
+        <div id="quiz-progress" style="text-align: left; color: #777; margin-bottom: 15px; font-weight: bold;"></div>
+        <div id="quiz-container"></div>
+    </div>
+
+    <div id="lab-interface" class="content-area hidden">
+        <h2 id="lab-title-main" style="text-align: center; color: var(--dark);"></h2>
+        <div id="lab-content-container"></div>
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="next-btn" onclick="showMenu()">סיום ניסוי וחזרה לתפריט</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- DATA PART 1: PROPERTIES TABLE ---
+    const tableData = [
+        { 
+            prop: "משיכה למגנט", 
+            options: ["נמשך (מגנטי)", "לא נמשך"], 
+            correct: ["נמשך (מגנטי)", "לא נמשך", "לא נמשך", "לא נמשך"] 
+        },
+        { 
+            prop: "צבע אופייני", 
+            options: ["אדמדם/כתום", "כסוף/אפור", "צהוב/זהב", "שקוף"], 
+            correct: ["כסוף/אפור", "אדמדם/כתום", "כסוף/אפור", "כסוף/אפור"] 
+        },
+        { 
+            prop: "מצב צבירה (בחדר)", 
+            options: ["מוצק", "נוזל", "גז"], 
+            correct: ["מוצק", "מוצק", "מוצק", "מוצק"] 
+        },
+        { 
+            prop: "נטייה להחליד", 
+            options: ["גבוהה (מתפורר)", "בינונית (ירוקת)", "נמוכה (שכבת מגן)", "נמוכה מאוד"], 
+            correct: ["גבוהה (מתפורר)", "בינונית (ירוקת)", "נמוכה (שכבת מגן)", "נמוכה מאוד"] 
+        },
+        { 
+            prop: "משקל (צפיפות)", 
+            options: ["קל מאוד", "בינוני/כבד", "כבד מאוד"], 
+            correct: ["בינוני/כבד", "בינוני/כבד", "קל מאוד", "בינוני/כבד"] 
+        },
+        { 
+            prop: "מוליכות חשמלית", 
+            options: ["מצוינת", "טובה", "גרועה (מבודד)"], 
+            correct: ["טובה", "מצוינת", "טובה", "טובה"] 
+        }
+    ];
+
+    // --- DATA PART 2: BASICS QUIZ (12 Questions) ---
+    const poolBasics = [
+        { q: "מהי תכונה משותפת ל*כל* המתכות (ולא רק לחלקן)?", options: ["מוליכות חשמלית וחום", "משיכה למגנט", "צבע אדום", "מצב צבירה נוזל"], a: 0, info: "כל המתכות מוליכות חום וחשמל. מגנטיות, למשל, ייחודית רק לברזל ולמספר מתכות נוספות." },
+        { q: "כיצד נבדיל בין 'מתכת' ל'עפרת מתכת' (סלע) לפי המראה?", options: ["לעפרה יש ברק חזק יותר", "למתכת מעובדת יש ברק מתכתי, העפרה לרוב חסרת ברק", "שתיהן מבריקות אותו דבר", "מתכות הן תמיד שקופות"], a: 1, info: "העפרה היא סלע שנראה כמו אבן רגילה. הברק מתגלה רק אחרי שמפיקים את המתכת ומלטשים אותה." },
+        { q: "מהו ההבדל בצליל בין גוש מתכת לגוש אבן?", options: ["לאבן יש צליל 'חד'", "למתכת יש צליל 'חד' ומתמשך (Ring), לאבן צליל עמום", "אין הבדל בצליל", "מתכות לא משמיעות צליל"], a: 1, info: "אחת התכונות לזיהוי מתכת היא הצליל החד והמתמשך כשהיא מקבלת מכה." },
+        { q: "איזו מתכת נמשכת למגנט?", options: ["אלומיניום", "ברזל", "נחושת", "זהב"], a: 1, info: "הברזל הוא המתכת המגנטית העיקרית מבין אלו שלמדנו." },
+        { q: "מהי 'משיכות' (Ductility)?", options: ["היכולת להפוך לחוטים דקים", "היכולת להישבר לרסיסים", "היכולת להפוך לנוזל", "היכולת להחליד"], a: 0, info: "משיכות היא התכונה שמאפשרת לנו למתוח את המתכת לחוטים ארוכים (כמו חוטי חשמל)." },
+        { q: "מדוע ידיות של סירים עשויות מפלסטיק או עץ?", options: ["כי אלו חומרים מוליכי חום", "כי אלו חומרים מבודדי חום, וכך לא נחטוף כוויה", "כי הם יפים יותר", "כי מתכת היא חלשה מדי"], a: 1, info: "גוף הסיר מוליך חום כדי לבשל, הידית מבודדת חום כדי להגן על הידיים." },
+        { q: "איזו מתכת הכי מתאימה לייצור חוטי חשמל ומדוע?", options: ["ברזל - כי הוא חזק", "נחושת - כי היא מוליכה מצוינת וגמישה", "בדיל - כי הוא נמס מהר", "כסף - כי הוא זול"], a: 1, info: "הנחושת היא המוליך הטוב ביותר מבין המתכות הנפוצות, והיא גם גמישה מאוד." },
+        { q: "איזו תכונה ייחודית לאלומיניום הופכת אותו למתאים לבניית מטוסים?", options: ["מגנטיות", "צבע אפור", "משקל קל (צפיפות נמוכה) וחוזק", "מוליכות חום גרועה"], a: 2, info: "כלי טיס חייבים להיות קלים ככל האפשר כדי להמריא, אך עדיין חזקים." },
+        { q: "מה קורה לרוב המתכות כשמכים עליהן בפטיש?", options: ["הן נשברות לרסיסים (כמו זכוכית)", "הן מתמעכות ומשנות צורה (ניתנות לריקוע)", "הן הופכות למים", "הן נעלמות"], a: 1, info: "בניגוד לאבן או זכוכית שנשברות, מתכת היא חומר פלסטי שמשנה צורה במכה." },
+        { q: "מהי טמפרטורת ההיתוך?", options: ["הטמפרטורה שבה המתכת קופאת", "הטמפרטורה שבה המוצק הופך לנוזל", "הטמפרטורה בחדר ביום חם", "הטמפרטורה שבה המתכת מחלידה"], a: 1, info: "נקודת ההיתוך היא הטמפרטורה שבה החומר משנה מצב צבירה ממוצק לנוזל." },
+        { q: "באיזה מצב צבירה נמצאת הכספית בטמפרטורת החדר?", options: ["מוצק", "נוזל", "גז", "אבקה"], a: 1, info: "כספית היא המתכת היחידה שמופיעה כנוזל בטמפרטורת החדר." },
+        { q: "מהו בדיל ולמה הוא משמש?", options: ["מתכת קשה מאוד לבניית טנקים", "מתכת רכה עם נקודת היתוך נמוכה, משמשת להלחמה", "סוג של פלסטיק", "מתכת יקרה לתכשיטים"], a: 1, info: "בגלל שהוא ניתך בחום נמוך יחסית (קל להמיס אותו), משתמשים בו כדי להלחים ולחבר מתכות אחרות." }
+    ];
+
+    // --- DATA PART 3: PROCESS & ENV QUIZ (12 Questions + Ordering) ---
+    const poolProcess = [
+        {
+            type: 'order',
+            q: "סדרי את שלבי הפקת המתכת (תהליך הצריפה) לפי הסדר הנכון:",
+            items: ["כריית העפרה מהאדמה", "טחינה וערבוב העפרה עם חומרים", "חימום בתנור היתוך לטמפרטורה עצומה", "הפרדת המתכת הנוזלית מהסיגים (הפסולת)", "יציקה לתבניות והתמצקות"],
+            info: "זהו סדר הפעולות: קודם מוציאים מהאדמה, מעבדים, מתיכים בחום גבוה, מפרידים את הפסולת ויוצקים למוצר."
+        },
+        { q: "מהו ההבדל בין שיטת ה'ריקוע' לשיטת ה'ערגול'?", options: ["אין הבדל", "ריקוע הוא הכאה בפטיש, ערגול הוא מעיכה ושיטוח בין גלילים", "ערגול הוא חימום, ריקוע הוא קירור", "ריקוע הוא יציקה לתבנית"], a: 1, info: "ערגול (כמו עם מערוך) משמש במפעלים לייצור לוחות ופחים דקים וארוכים." },
+        { q: "מהו 'מכרה פתוח' (מחצבה)?", options: ["מכרה שנמצא עמוק מתחת לאדמה", "מכרה על פני השטח שנראה כמו בור ענק", "מכרה שנמצא בתוך מערה", "מקום שמוכרים בו מתכות"], a: 1, info: "במכרה פתוח חוצבים את הסלע החשוף על פני הקרקע. זה יוצר בורות גדולים בנוף." },
+        { q: "כדי להפיק 1 קילוגרם של נחושת, כמה קילוגרם של סלעים צריך לחצוב בערך?", options: ["1 קילוגרם", "10 קילוגרם", "222 קילוגרם", "מיליון קילוגרם"], a: 2, info: "כמות הפסולת היא עצומה. צריך לחצוב מעל 200 קילו סלע רק כדי להוציא קילו אחד של נחושת." },
+        { q: "אילו מוצרים נהוג לייצר בשיטת ה'יציקה'?", options: ["פחיות שתייה ונייר כסף", "מוצרים בעלי צורה מורכבת כמו ברזים, מנועים ופסלים", "חוטי חשמל", "לוחות ישרים"], a: 1, info: "יציקה מאפשרת למתכת הנוזלית להיכנס לכל החריצים של התבנית ולקבל צורה מורכבת ומדויקת." },
+        { q: "מהם 'סיגים'?", options: ["העובדים במפעל", "חומרי הפסולת שנפרדים מהמתכת בתנור ההיתוך וצפים למעלה", "סוג של מתכת יקרה", "התבניות של היציקה"], a: 1, info: "הסיגים הם 'הלכלוך' והסלעים המיותרים שנפרדים מהמתכת הנקייה בזמן ההיתוך." },
+        { q: "כיצד הכרייה משפיעה על איכות האוויר?", options: ["היא מנקה את האוויר", "היא יוצרת אבק רב שעלול לגרום לבעיות נשימה", "היא גורמת לריח טוב של פרחים", "אין לה השפעה"], a: 1, info: "הפיצוצים והחציבה מעלים ענני אבק שמזיקים לנשימה של האדם והחיות בסביבה." },
+        { q: "מהו מכרה תת-קרקעי?", options: ["בור פתוח לשמיים", "מכרה בעומק האדמה, שהכרייה נעשית מתוך מנהרות", "מכרה שנמצא מתחת למים", "מכרה שכבר נסגר"], a: 1, info: "כשעורק המתכת נמצא עמוק באדמה, חופרים מנהרות כדי להגיע אליו מבלי להרוס את כל פני השטח." },
+        { q: "מהי 'סגסוגת' (מסג)?", options: ["מתכת טהורה", "תערובת של מתכת עם מתכת אחרת (או חומר אחר) לשיפור תכונות", "שם של הר געש", "פסולת בניין"], a: 1, info: "למשל: ברונזה היא סגסוגת של נחושת ובדיל. פלדת אל-חלד היא סגסוגת של ברזל וכרום." },
+        { q: "מהו תפקיד ה'מפוח' בתנור ההיתוך?", options: ["כדי לקרר את העובדים", "להזרים אוויר (חמצן) שמגביר את האש והחום", "כדי להעיף את האבק", "כדי לכבות את האש"], a: 1, info: "כדי להגיע לטמפרטורות של אלפי מעלות ולהתיך סלעים, האש חייבת לקבל המון חמצן בעזרת המפוח." },
+        { q: "כיצד משפיעה הכרייה על מקורות המים?", options: ["היא לא משפיעה", "פסולת וחומרים רעילים עלולים לחלחל ולזהם את מי התהום", "היא הופכת את המים למתוקים", "היא יוצרת מעיינות חדשים"], a: 1, info: "הגשם שוטף את ערימות הפסולת והרעלים מחלחלים לאדמה ומגיעים למי השתייה שלנו." },
+        { q: "מהו הפתרון הסביבתי הטוב ביותר לצמצום הנזקים של הפקת מתכות?", options: ["לחצוב יותר מהר", "לזרוק הכל לפח", "מיחזור מתכות - שימוש חוזר במתכת קיימת במקום כרייה חדשה", "לצבוע את המכרות בירוק"], a: 2, info: "מיחזור חוסך את הצורך להרוס את הטבע בכרייה חדשה, וחוסך המון אנרגיה." },
+        { q: "בתהליך היציקה, מתי המתכת מקבלת את צורתה הסופית?", options: ["כשהיא נוזלית בתוך התנור", "כשהיא מתקררת ומתמצקת בתוך התבנית", "כשהיא נחצבת מהאדמה", "לפני החימום"], a: 1, info: "המתכת הנוזלית מקבלת את צורת התבנית, וכשהיא מתקררת ומתמצקת הצורה נשמרת." }
+    ];
+
+    // --- EXPERIMENTS (Lab Mode) ---
+    const experiments = [
+        {
+            id: 'heat_cond',
+            title: 'ניסוי 1: מירוץ החום',
+            intro: `
+                <h3>תיאור הניסוי</h3>
+                <p>בדקנו איזו מתכת מוליכה חום הכי מהר. לקחנו 3 מוטות: <strong>נחושת, ברזל וזכוכית</strong>.</p>
+                <ul>
+                    <li>על קצה כל מוט הדבקנו חרוז עם שעווה.</li>
+                    <li>את הקצה השני טבלנו במים רותחים.</li>
+                </ul>
+                <table style="width:100%; border-collapse:collapse; margin:15px 0;">
+                    <tr style="background:#2c3e50; color:white;"><th>המוט</th><th>זמן נפילת החרוז</th></tr>
+                    <tr><td style="border:1px solid #ddd; padding:8px;">נחושת</td><td style="border:1px solid #ddd; padding:8px;">20 שניות (הכי מהר)</td></tr>
+                    <tr><td style="border:1px solid #ddd; padding:8px;">ברזל</td><td style="border:1px solid #ddd; padding:8px;">55 שניות</td></tr>
+                    <tr><td style="border:1px solid #ddd; padding:8px;">זכוכית</td><td style="border:1px solid #ddd; padding:8px;">לא נפל כלל</td></tr>
+                </table>
+            `,
+            questions: [
+                { q: "מה הייתה מטרת הניסוי?", options: ["לבדוק דבקים", "להשוות הולכת חום", "לבדוק טמפרטורת מים"], a: 1, info: "המטרה היא לראות באיזה חומר החום עובר מהר יותר." },
+                { q: "מדוע החרוז נפל?", options: ["הדבק נרטב", "החום זרם במוט, המיס את השעווה והחרוז נפל", "הזכוכית נשברה"], a: 1, info: "החום עבר מהמים הרותחים, לאורך המוט, עד שהגיע לשעווה והמיס אותה." },
+                { q: "מה המסקנה לגבי נחושת מול ברזל?", options: ["ברזל מוליך טוב יותר", "נחושת מוליכה חום טוב יותר", "אותו דבר"], a: 1, info: "החרוז בנחושת נפל בזמן הקצר ביותר, מה שמעיד על הולכת חום מצוינת." },
+                { q: "למה החרוז בזכוכית לא נפל?", options: ["זכוכית היא מבודדת חום", "הזכוכית הייתה קרה", "החרוז היה כבד"], a: 0, info: "הזכוכית אינה מתכת והיא מוליכה חום בצורה גרועה מאוד (מבודדת), ולכן החום לא הגיע לשעווה." }
+            ]
+        },
+        {
+            id: 'lead_graph',
+            title: 'ניסוי 2: גרף חימום עופרת',
+            intro: `
+                <h3>תיאור הניסוי</h3>
+                <p>חיממנו גוש עופרת בתוך כלי ומדדנו טמפרטורה. הגרף מראה את השינוי.</p>
+                <div style="width:100%; max-width:400px; height:200px; margin:10px auto; border:1px solid #ccc; position:relative; background:white;">
+                     <svg width="100%" height="100%" viewBox="0 0 400 200" style="position:absolute; bottom:0;">
+                        <line x1="40" y1="180" x2="380" y2="180" stroke="black" stroke-width="2" />
+                        <line x1="40" y1="180" x2="40" y2="20" stroke="black" stroke-width="2" />
+                        <text x="350" y="195" font-size="12">זמן</text>
+                        <text x="10" y="100" transform="rotate(-90, 10, 100)" font-size="12">טמפ'</text>
+                        <polyline points="40,170 120,80 220,80 300,20" fill="none" stroke="blue" stroke-width="3" />
+                        <text x="5" y="85" font-size="11" font-weight="bold">327°C</text>
+                        <text x="160" y="70" font-size="12" fill="red" font-weight="bold">התכה</text>
+                    </svg>
+                </div>
+            `,
+            questions: [
+                { q: "מה מצב הצבירה בהתחלה (לפני 327 מעלות)?", options: ["נוזל", "מוצק", "גז"], a: 1, info: "התחלנו עם גוש מתכת מוצק." },
+                { q: "מה קורה בקו הישר (327 מעלות)?", options: ["התנור כבה", "שינוי מצב צבירה (התכה)", "העופרת מתקררת"], a: 1, info: "כשיש קו ישר בגרף חימום, זה אומר שהחומר משנה מצב צבירה. האנרגיה מושקעת בשינוי ולא בחימום." },
+                { q: "מה מצב הצבירה בסוף (אחרי הקו הישר)?", options: ["נוזל", "מוצק", "גז"], a: 0, info: "אחרי שההתכה מסתיימת, העופרת כולה נוזלית." },
+                { q: "מהי נקודת ההיתוך של העופרת לפי הגרף?", options: ["100 מעלות", "327 מעלות", "0 מעלות"], a: 1, info: "זו הטמפרטורה שבה הגרף נעצר והופך לקו ישר." }
+            ]
+        },
+        {
+            id: 'circuit',
+            title: 'ניסוי 3: מעגל חשמלי',
+            intro: `
+                <h3>תיאור הניסוי</h3>
+                <p>שמנו חפצים שונים בתוך מעגל חשמלי (במקום חתיכת חוט חסרה) כדי לראות אם הנורה תדלק.</p>
+                <ul>
+                    <li><strong>נדלק:</strong> מסמר ברזל, רדיד אלומיניום, חוט נחושת.</li>
+                    <li><strong>לא נדלק:</strong> כפית פלסטיק, מחק גומי, חוט צמר.</li>
+                </ul>
+            `,
+            questions: [
+                { q: "מה המסקנה העיקרית?", options: ["מתכות מוליכות חשמל, פלסטיק וגומי מבודדים", "הכל מוליך חשמל", "רק ברזל מוליך"], a: 0, info: "הנורה דלקה רק כששמנו מתכות." },
+                { q: "למה משמש ציפוי הפלסטיק בחוטי חשמל?", options: ["ליופי", "לבידוד ובטיחות", "לחיזוק"], a: 1, info: "הפלסטיק הוא מבודד, וכך הוא מגן עלינו מפני התחשמלות." },
+                { q: "אם נשים טבעת זהב, הנורה תדלק?", options: ["כן", "לא"], a: 0, info: "כן, זהב הוא מתכת והוא מוליך חשמל מצוין." },
+                { q: "למה כפית הפלסטיק לא הדליקה את הנורה?", options: ["היא שבורה", "פלסטיק הוא חומר מבודד (עוצר את הזרם)", "הפלסטיק היה קר"], a: 1, info: "חומר מבודד לא מאפשר לזרם החשמלי לעבור דרכו." }
+            ]
+        }
+    ];
+
+
+    // --- LOGIC FUNCTIONS ---
+
+    let currentPool = [];
+    let currentIndex = 0;
+    let currentLabIndex = 0;
+    let orderSelection = [];
+
+    function showMenu() {
+        document.querySelectorAll('.content-area').forEach(d => d.classList.add('hidden'));
+        document.getElementById('menu').classList.remove('hidden');
+    }
+
+    /* TABLE MODE LOGIC */
+    function startTableMode() {
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('table-interface').classList.remove('hidden');
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+        document.getElementById('table-completion-msg').style.display = 'none';
+
+        tableData.forEach((rowObj, rIdx) => {
+            let tr = document.createElement('tr');
+            
+            let th = document.createElement('td');
+            th.innerHTML = `<strong>${rowObj.prop}</strong>`;
+            th.style.backgroundColor = "#f2f2f2";
+            tr.appendChild(th);
+
+            for (let mIdx = 0; mIdx < 4; mIdx++) {
+                let td = document.createElement('td');
+                
+                let select = document.createElement('select');
+                select.className = 'table-select';
+                select.dataset.row = rIdx;
+                select.dataset.metal = mIdx;
+                
+                let defOpt = document.createElement('option');
+                defOpt.text = "בחרי...";
+                defOpt.value = "";
+                select.add(defOpt);
+
+                rowObj.options.forEach(optVal => {
+                    let opt = document.createElement('option');
+                    opt.text = optVal;
+                    opt.value = optVal;
+                    select.add(opt);
+                });
+
+                select.onchange = function() { checkTableCell(this, rowObj.correct[mIdx]); };
+
+                td.appendChild(select);
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        });
+    }
+
+    function checkTableCell(selectEl, correctVal) {
+        if (selectEl.value === correctVal) {
+            selectEl.classList.remove('wrong');
+            selectEl.classList.add('correct');
+            checkTableComplete();
+        } else {
+            selectEl.classList.remove('correct');
+            selectEl.classList.add('wrong');
+        }
+    }
+
+    function checkTableComplete() {
+        const total = document.querySelectorAll('.table-select').length;
+        const correct = document.querySelectorAll('.table-select.correct').length;
+        if (total === correct) {
+            const msg = document.getElementById('table-completion-msg');
+            msg.innerText = "כל הכבוד! השלמת את כל הטבלה בהצלחה! 🏆";
+            msg.style.display = 'block';
+            msg.className = "feedback correct-fb";
+        }
+    }
+
+    /* QUIZ MODE LOGIC */
+    function startQuizMode(mode) {
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('quiz-interface').classList.remove('hidden');
+        
+        currentPool = (mode === 'basics') ? [...poolBasics] : [...poolProcess];
+        
+        let orderQs = currentPool.filter(q => q.type === 'order');
+        let regQs = currentPool.filter(q => q.type !== 'order');
+        
+        for (let i = regQs.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [regQs[i], regQs[j]] = [regQs[j], regQs[i]];
+        }
+        currentPool = [...orderQs, ...regQs];
+
+        currentIndex = 0;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentIndex >= currentPool.length) {
+             alert("סיימת את כל השאלות בחלק זה! כל הכבוד!");
+             showMenu();
+             return;
+        }
+
+        const pct = ((currentIndex) / currentPool.length) * 100;
+        document.getElementById('quiz-bar').style.width = pct + "%";
+        document.getElementById('quiz-progress').innerText = `שאלה ${currentIndex + 1} מתוך ${currentPool.length}`;
+
+        const q = currentPool[currentIndex];
+        const container = document.getElementById('quiz-container');
+        
+        if (q.type === 'order') {
+            renderOrderQuestion(q, container);
+        } else {
+            renderRegularQuestion(q, container);
+        }
+    }
+
+    function renderRegularQuestion(q, container) {
+        let html = `<div class="question-box"><div class="q-text">${q.q}</div><div class="options-grid">`;
+        q.options.forEach((opt, i) => html += `<div class="option-btn" onclick="checkRegAnswer(this, ${i})">${opt}</div>`);
+        html += `</div><div id="feedback-quiz" class="feedback"></div><button id="next-quiz-btn" class="next-btn" style="display:none;" onclick="nextQuestion()">לשאלה הבאה</button></div>`;
+        container.innerHTML = html;
+    }
+
+    function checkRegAnswer(btn, idx) {
+        if (document.getElementById('next-quiz-btn').style.display === 'inline-block') return;
+        const q = currentPool[currentIndex];
+        const feedback = document.getElementById('feedback-quiz');
+        
+        // Highlight correct answer anyway
+        document.querySelectorAll('.option-btn')[q.a].classList.add('correct');
+        
+        if (idx === q.a) {
+            // Correct Answer logic
+            feedback.innerHTML = '✅ נכון! ' + q.info;
+            feedback.className = "feedback correct-fb";
+        } else {
+            // Wrong Answer logic
+            btn.classList.add('wrong');
+            feedback.innerHTML = '❌ לא מדויק. ' + q.info;
+            feedback.className = "feedback wrong-fb";
+        }
+        feedback.style.display = 'block';
+        document.getElementById('next-quiz-btn').style.display = 'inline-block';
+    }
+
+    function renderOrderQuestion(q, container) {
+        orderSelection = [];
+        let shuffledItems = [...q.items].sort(() => Math.random() - 0.5);
+        let html = `<div class="question-box"><div class="q-text">${q.q}</div><div class="order-container" id="order-items-box">`;
+        shuffledItems.forEach((item, i) => html += `<div class="order-item" id="ord-${i}" onclick="selectOrderItem(this, '${item}')">${item}</div>`);
+        html += `</div><div id="feedback-order" class="feedback"></div><button id="check-order-btn" class="next-btn" style="margin-top:20px;" onclick="checkOrderAnswer()">בדוק סדר</button><button id="next-quiz-btn" class="next-btn" style="display:none;" onclick="nextQuestion()">לשאלה הבאה</button></div>`;
+        container.innerHTML = html;
+    }
+
+    function selectOrderItem(btn, itemStr) {
+        if (document.getElementById('next-quiz-btn').style.display === 'inline-block') return;
+        
+        if (btn.classList.contains('selected')) {
+             return; 
+        } 
+        
+        btn.classList.add('selected');
+        orderSelection.push(itemStr);
+        btn.innerHTML = `<strong>${orderSelection.length}.</strong> ${itemStr}`;
+    }
+
+    function checkOrderAnswer() {
+        const q = currentPool[currentIndex];
+        const feedback = document.getElementById('feedback-order');
+        const correctOrder = q.items;
+        
+        if (orderSelection.length !== correctOrder.length) {
+             feedback.innerHTML = '❌ אנא בחרי את כל השלבים לפני הבדיקה.'; 
+             feedback.className = "feedback wrong-fb";
+             feedback.style.display = 'block';
+             return;
+        }
+
+        let isCorrect = orderSelection.every((val, index) => val === correctOrder[index]);
+        
+        if (isCorrect) {
+            feedback.innerHTML = '✅ ' + q.info;
+            feedback.className = "feedback correct-fb";
+            document.querySelectorAll('.order-item').forEach(b => b.classList.add('correct-order'));
+        } else {
+            feedback.innerHTML = '❌ הסדר לא נכון. נסי שוב! (הבחירה התאפסה)';
+            feedback.className = "feedback wrong-fb";
+             
+             // Reset selection for retry
+             orderSelection = [];
+             document.querySelectorAll('.order-item').forEach(b => {
+                 b.classList.remove('selected');
+                 let text = b.innerText; 
+                 if (text.includes('.')) text = text.split('. ')[1];
+                 b.innerText = text;
+             });
+             feedback.style.display = 'block';
+             return; 
+        }
+        feedback.style.display = 'block';
+        document.getElementById('check-order-btn').style.display = 'none';
+        document.getElementById('next-quiz-btn').style.display = 'inline-block';
+    }
+
+    function nextQuestion() { currentIndex++; loadQuestion(); }
+
+    /* LAB LOGIC */
+    function startLabMode() {
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('lab-interface').classList.remove('hidden');
+        currentLabIndex = 0;
+        loadExperiment();
+    }
+
+    function loadExperiment() {
+        if (currentLabIndex >= experiments.length) {
+            alert("סיימת את כל הניסויים במעבדה! כל הכבוד!");
+            showMenu();
+            return;
+        }
+        const exp = experiments[currentLabIndex];
+        document.getElementById('lab-title-main').innerText = exp.title;
+        
+        let html = `<div class="exp-intro">${exp.intro}</div><div class="lab-questions-container">`;
+        exp.questions.forEach((q, qIdx) => {
+            html += `<div class="question-box" id="lab-q-${qIdx}"><div class="q-text">${qIdx+1}. ${q.q}</div><div class="options-grid">`;
+            q.options.forEach((opt, oIdx) => {
+                html += `<div class="option-btn" onclick="checkLabAnswer(this, ${qIdx}, ${oIdx}, ${q.a})">${opt}</div>`;
+            });
+            html += `</div><div id="lab-feed-${qIdx}" class="feedback"></div></div>`;
+        });
+        html += `</div>`;
+        document.getElementById('lab-content-container').innerHTML = html;
+        
+        const mainBtn = document.querySelector('#lab-interface .next-btn');
+        if (currentLabIndex < experiments.length - 1) {
+             mainBtn.innerText = "לניסוי הבא >>";
+             mainBtn.onclick = nextExperiment;
+        } else {
+             mainBtn.innerText = "סיום המעבדה וחזרה לתפריט";
+             mainBtn.onclick = showMenu;
+        }
+    }
+
+    function checkLabAnswer(btn, qIdx, oIdx, correctIdx) {
+        const feedback = document.getElementById(`lab-feed-${qIdx}`);
+        if (feedback.style.display === 'block') return; 
+
+        const exp = experiments[currentLabIndex];
+        const qInfo = exp.questions[qIdx].info;
+        const btns = document.querySelectorAll(`#lab-q-${qIdx} .option-btn`);
+        
+        btns[correctIdx].classList.add('correct');
+        if (oIdx === correctIdx) {
+            feedback.innerHTML = '✅ נכון! ' + qInfo;
+            feedback.className = "feedback correct-fb";
+        } else {
+            btn.classList.add('wrong');
+            feedback.innerHTML = '❌ לא מדויק. ' + qInfo;
+            feedback.className = "feedback wrong-fb";
+        }
+        feedback.style.display = 'block';
+    }
+
+    function nextExperiment() { currentLabIndex++; loadExperiment(); }
+
+</script>
+
+</body>
+</html>

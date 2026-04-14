@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -204,7 +204,7 @@
     </div>
 
     <br>
-    <a href="index.html" class="back-btn">חזרה למסך הראשי</a>
+    <a href="../../index.html" class="back-btn">חזרה למסך הראשי</a>
 
     <audio id="success-sound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
 
@@ -248,7 +248,7 @@
 
         function playCardSound(filename) {
             if (!isSoundOn || !filename) return;
-            const audio = new Audio('letters/' + filename);
+            const audio = new Audio('../../letters/' + filename);
             audio.play().catch(e => console.log("Audio play error:", e));
         }
 
@@ -432,3 +432,4 @@
     </script>
 </body>
 </html>
+

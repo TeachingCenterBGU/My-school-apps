@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מסדרים את המילים - משחק לכיתה ג'</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --success-color: #2ecc71;
+            --bg-color: #f0f8ff;
+            --item-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .instructions {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #666;
+            background-color: #e8f4fd;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .level-indicator {
+            font-weight: bold;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .word-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .word-item {
+            background: var(--item-bg);
+            border: 2px solid #ddd;
+            margin-bottom: 8px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2em;
+            transition: transform 0.2s;
+        }
+
+        .word-item:hover {
+            border-color: var(--primary-color);
+            background-color: #fafafa;
+        }
+
+        .controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        button.move-btn {
+            background-color: #eee;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            transition: background 0.2s;
+        }
+
+        button.move-btn:hover {
+            background-color: #ddd;
+        }
+
+        .action-area {
+            margin-top: 30px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
+
+        .check-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2em;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #357abd;
+            transition: transform 0.1s;
+        }
+
+        .check-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .next-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2em;
+            border-radius: 25px;
+            cursor: pointer;
+            display: none; /* Hidden by default */
+            margin: 0 auto;
+        }
+
+        #feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.3em;
+            min-height: 1.5em;
+        }
+
+        .correct { color: var(--success-color); }
+        .incorrect { color: #e74c3c; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>מסדרים את המילים במילון 📚</h1>
+    <div class="level-indicator">משימה <span id="currentLevelDisplay">1</span> מתוך 3</div>
+    
+    <div class="instructions" id="instructionText">
+        סדרו את המילים לפי סדר האלפבית בעזרת החיצים.
+    </div>
+
+    <ul class="word-list" id="wordList">
+        </ul>
+
+    <div class="action-area">
+        <div id="feedback"></div>
+        <br>
+        <button class="check-btn" onclick="checkOrder()">בדיקה</button>
+        <button class="next-btn" onclick="nextLevel()">עבור למשימה הבאה ⬅</button>
+    </div>
+</div>
+
+<script>
+    // הגדרת המשימות והמילים
+    const levels = [
+        {
+            instruction: "משימה 1: סדרו את המילים לפי סדר האותיות (א'–ת')",
+            words: ["שולחן", "ארון", "בלון", "כדור", "דלת", "פרח", "חלון", "ילד", "נעל", "גמל"]
+        },
+        {
+            instruction: "משימה 2: כל המילים מתחילות ב-מ'. סדרו לפי האות השנייה",
+            words: ["מטוס", "מגדל", "מספריים", "מעיל", "מבחינה", "מלך", "מחשב", "מזלג", "מכונית", "מים"]
+        },
+        {
+            instruction: "משימה 3: מילים באותיות ח', ס', ר'. סדרו לפי האלפבית",
+            words: ["ספר", "רכבת", "חבר", "סוס", "ראש", "חלב", "רחוב", "סולם", "חלום", "רימון"]
+        }
+    ];
+
+    let currentLevel = 0;
+    let currentWords = [];
+
+    // אתחול המשחק בטעינת הדף
+    window.onload = function() {
+        loadLevel(currentLevel);
+    };
+
+    function loadLevel(levelIndex) {
+        // איפוס ממשק
+        document.getElementById('feedback').innerText = "";
+        document.querySelector('.check-btn').style.display = 'inline-block';
+        document.querySelector('.next-btn').style.display = 'none';
+        
+        // עדכון טקסטים
+        document.getElementById('currentLevelDisplay').innerText = levelIndex + 1;
+        document.getElementById('instructionText').innerText = levels[levelIndex].instruction;
+
+        // העתקת המילים כדי לא לשנות את המערך המקורי ושימור הסדר ההתחלתי (לא ממוין)
+        currentWords = [...levels[levelIndex].words]; 
+        
+        renderList();
+    }
+
+    function renderList() {
+        const listContainer = document.getElementById('wordList');
+        listContainer.innerHTML = '';
+
+        currentWords.forEach((word, index) => {
+            const li = document.createElement('li');
+            li.className = 'word-item';
+            
+            // יצירת כפתורי החיצים
+            let buttonsHtml = '<div class="controls">';
+            if (index > 0) {
+                buttonsHtml += `<button class="move-btn" onclick="moveItem(${index}, -1)">▲</button>`;
+            } else {
+                buttonsHtml += `<button class="move-btn" style="visibility:hidden">▲</button>`;
+            }
+            
+            if (index < currentWords.length - 1) {
+                buttonsHtml += `<button class="move-btn" onclick="moveItem(${index}, 1)">▼</button>`;
+            } else {
+                buttonsHtml += `<button class="move-btn" style="visibility:hidden">▼</button>`;
+            }
+            buttonsHtml += '</div>';
+
+            li.innerHTML = `<span>${word}</span> ${buttonsHtml}`;
+            listContainer.appendChild(li);
+        });
+    }
+
+    // פונקציה להזזת פריט ברשימה
+    function moveItem(index, direction) {
+        // החלפה בין האיבר הנוכחי לאיבר שאליו זזים
+        const temp = currentWords[index];
+        currentWords[index] = currentWords[index + direction];
+        currentWords[index + direction] = temp;
+        
+        renderList();
+        document.getElementById('feedback').innerText = ""; // איפוס משוב כשמשנים משהו
+    }
+
+    function checkOrder() {
+        // יצירת עותק ממוין של המילים הנוכחיות כדי להשוות למה שיש במסך
+        // שימוש ב-localeCompare למיון עברי תקני
+        const sortedCorrectly = [...currentWords].sort((a, b) => a.localeCompare(b, 'he'));
+        
+        // השוואה בין הסדר הנוכחי לסדר הממוין
+        let isCorrect = true;
+        for (let i = 0; i < currentWords.length; i++) {
+            if (currentWords[i] !== sortedCorrectly[i]) {
+                isCorrect = false;
+                break;
+            }
+        }
+
+        const feedbackEl = document.getElementById('feedback');
+        if (isCorrect) {
+            feedbackEl.innerHTML = "🎉 כל הכבוד! הצלחתם לסדר את המילים!";
+            feedbackEl.className = "correct";
+            document.querySelector('.check-btn').style.display = 'none';
+            
+            // בדיקה אם יש עוד שלבים
+            if (currentLevel < levels.length - 1) {
+                document.querySelector('.next-btn').style.display = 'inline-block';
+            } else {
+                feedbackEl.innerHTML += "<br>סיימתם את כל המשימות בהצטיינות! 🏆";
+            }
+        } else {
+            feedbackEl.innerText = "עדיין לא... נסו לבדוק שוב את הסדר 🧐";
+            feedbackEl.className = "incorrect";
+        }
+    }
+
+    function nextLevel() {
+        currentLevel++;
+        loadLevel(currentLevel);
+    }
+</script>
+
+</body>
+</html>

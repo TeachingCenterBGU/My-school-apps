@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>מבחן באנגלית כיתה ג' - מורחב</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Varela+Round&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #3f51b5;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        h1 { margin: 0; color: #3f51b5; font-size: 2.2em; }
+        .sub-title { color: #666; font-size: 1.2em; margin-top: 5px; }
+
+        .name-box {
+            font-size: 1.4em;
+            margin-bottom: 30px;
+            font-family: 'Varela Round', sans-serif;
+        }
+        .line { border-bottom: 1px solid black; display: inline-block; width: 250px; }
+
+        /* General Section Styles */
+        .section { margin-bottom: 30px; page-break-inside: avoid; }
+        
+        .section-header {
+            background-color: #e8eaf6;
+            color: #303f9f;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            border-right: 5px solid #3f51b5;
+        }
+
+        .instruction { font-size: 1em; margin-bottom: 15px; color: #555; }
+
+        /* Part 1: Letters */
+        .letters-grid {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.6em;
+            font-family: 'Varela Round', sans-serif;
+            direction: ltr;
+        }
+        .letter-pair {
+            border: 2px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 10px;
+            width: 80px;
+            text-align: center;
+        }
+        .missing { color: #ccc; border-bottom: 2px dashed #999; display: inline-block; width: 30px; }
+
+        /* Part 2: Beginning Sound (Images Only) */
+        .sound-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 in a row */
+            gap: 15px;
+            margin-bottom: 20px; /* Added spacing between grids */
+        }
+        .sound-item {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .sound-icon { font-size: 3em; margin-bottom: 5px; }
+        .sound-options { 
+            font-family: 'Varela Round', sans-serif; 
+            font-size: 1.2em; 
+            letter-spacing: 5px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* Part 3: Match (English to Icon) */
+        .match-box{
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px 10px;
+            background: #fff;
+        }
+        @media print{
+            .match-box{ page-break-inside: avoid; }
+        }
+
+        .match-container {
+            display: flex;
+            justify-content: space-between;
+            direction: ltr;
+            font-size: 1.3em;
+            padding: 0 40px;
+        }
+        .col { display: flex; flex-direction: column; gap: 15px; }
+        .match-item { height: 40px; display: flex; align-items: center; }
+        .match-icon { font-size: 2em; }
+        .dot { 
+            width: 10px; height: 10px; 
+            background: #bbb; border-radius: 50%; 
+            display: inline-block; margin: 0 15px; 
+        }
+
+        /* Part 4: Colors */
+        .colors-row {
+            display: flex;
+            justify-content: space-around;
+            direction: ltr;
+            margin-top: 10px;
+        }
+        .color-task {
+            text-align: center;
+            border: 2px dashed #aaa;
+            padding: 10px;
+            border-radius: 10px;
+            width: 120px;
+        }
+        .shape-to-color { font-size: 3em; color: white; -webkit-text-stroke: 2px black; } /* Outline shape */
+        .color-word { font-weight: bold; font-size: 1.2em; display: block; margin-top: 5px; }
+
+        /* Part 5: Odd One Out */
+        .odd-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 2em;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 50px;
+            justify-content: center;
+            direction: ltr;
+        }
+        .odd-label { font-size: 0.5em; margin-right: 10px; color: #999; }
+
+        /* Part 6: Reading Box */
+        .reading-box {
+            border: 2px dashed #ff9800;
+            padding: 15px;
+            border-radius: 15px;
+            background-color: #fff3e0;
+            font-size: 1.4em;
+            direction: ltr;
+            line-height: 1.8em;
+        }
+        .bank { font-size: 0.8em; color: #666; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        .blank-line { border-bottom: 2px solid black; width: 80px; display: inline-block; }
+
+        @media print {
+            body { padding: 0; }
+            .section { page-break-inside: avoid; }
+            h1 { font-size: 1.8em; }
+        }
+    
+        /* --- FIX: keep sound sections in order --- */
+        .section.sound-section{
+            clear: both;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>English Practice Test 🌟</h1>
+        <div class="sub-title">הכנה למבחן באנגלית - כיתה ג'</div>
+    </div>
+
+    <div class="name-box" dir="ltr">
+        Name: <span class="line"></span>
+    </div>
+
+    <div class="section">
+        <div class="section-header">1. Write the Small Letter (כתבי את האות הקטנה)</div>
+        <div class="instruction">השלימי את האות הקטנה המתאימה (למשל: A -> a):</div>
+        <div class="letters-grid">
+            <div class="letter-pair">C <span class="missing"></span></div>
+            <div class="letter-pair">B <span class="missing"></span></div>
+            <div class="letter-pair">T <span class="missing"></span></div>
+            <div class="letter-pair">S <span class="missing"></span></div>
+            <div class="letter-pair">E <span class="missing"></span></div>
+        </div>
+    </div>
+
+    <div class="section sound-section">
+        <div class="section-header">2. Sound (צליל פותח)</div>
+        
+        <div class="instruction">מהי האות הראשונה של המילה בציור? הקיפי בעיגול:</div>
+        <div class="sound-grid">
+            <div class="sound-item">
+                <div class="sound-icon">🐈</div>
+                <div class="sound-options">C / K / S</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🚌</div>
+                <div class="sound-options">B / D / P</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🐍</div>
+                <div class="sound-options">S / C / Z</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🥚</div>
+                <div class="sound-options">E / A / I</div>
+            </div>
+        </div>
+
+        <div class="instruction">מהי האות האחרונה של המילה בציור? הקיפי בעיגול:</div>
+        <div class="sound-grid">
+            <div class="sound-item">
+                <div class="sound-icon">🐈</div>
+                <div class="sound-options">T / D / P</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🚌</div>
+                <div class="sound-options">S / C / Z</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🎒</div>
+                <div class="sound-options">G / D / B</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🥚</div>
+                <div class="sound-options">G / K / J</div>
+            </div>
+        </div>
+
+        <div class="instruction">מהי התנועה (הצליל) באמצע המילה? הקיפי בעיגול:</div>
+        <div class="sound-grid">
+            <div class="sound-item">
+                <div class="sound-icon">🐈</div>
+                <div class="sound-options">A / E / I</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🖊️</div>
+                <div class="sound-options">E / A / I</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🎒</div>
+                <div class="sound-options">I / E / A</div>
+            </div>
+            <div class="sound-item">
+                <div class="sound-icon">🥚</div>
+                <div class="sound-options">E / A / O</div>
+            </div>
+        </div>
+    </div> <div class="section">
+        <div class="section-header">3. Match (מתחי קו)</div>
+        <div class="instruction">מתחי קו בין המילה לציור המתאים:</div>
+        
+        <div class="match-box">
+            <div class="match-container">
+                <div class="col">
+                    <div class="match-item">1. Paper <span class="dot"></span></div>
+                    <div class="match-item">2. Book <span class="dot"></span></div>
+                    <div class="match-item">3. Scissors <span class="dot"></span></div>
+                    <div class="match-item">4. ask <span class="dot"></span></div>
+                    <div class="match-item">5. Snake <span class="dot"></span></div>
+                    <div class="match-item">6. elephant <span class="dot"></span></div>
+                    <div class="match-item">7. Bag <span class="dot"></span></div>
+                </div>
+                
+                <div class="col">
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🐍</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">❓</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">📄</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🎒</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">🐘</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">📕</span></div>
+                    <div class="match-item"><span class="dot"></span> <span class="match-icon">✂️</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">4. Colors (צבעים)</div>
+        <div class="instruction">קראי את המילה וצבעי את הצורה בצבע הנכון:</div>
+        <div class="colors-row">
+            <div class="color-task">
+                <div class="shape-to-color">♥</div>
+                <span class="color-word">Red</span>
+            </div>
+            <div class="color-task">
+                <div class="shape-to-color">★</div>
+                <span class="color-word">Green</span>
+            </div>
+            <div class="color-task">
+                <div class="shape-to-color">●</div>
+                <span class="color-word">Orange</span>
+            </div>
+            <div class="color-task">
+                <div class="shape-to-color">✿</div>
+                <span class="color-word">Pink</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">5. Odd One Out (צלילים - יוצא דופן)</div>
+        <div class="instruction">הקיפי את הציור שמתחיל ב<strong>צליל אחר</strong>:</div>
+        
+        <div class="odd-row">
+            <span class="odd-label">1</span>
+            <span class="odd-icon">🚌</span> <span class="odd-icon">🍎</span> <span class="odd-icon">📕</span> <span class="odd-icon">🍌</span> 
+        </div>
+
+        <div class="odd-row">
+            <span class="odd-label">2</span>
+            <span class="odd-icon">🖊️</span> <span class="odd-icon">✏️</span> <span class="odd-icon">📄</span> <span class="odd-icon">✂️</span> 
+        </div>
+
+        <div class="odd-row">
+            <span class="odd-label">3</span>
+            <span class="odd-icon">🐜</span> <span class="odd-icon">🐊</span> <span class="odd-icon">🐘</span> <span class="odd-icon">🍎</span> 
+        </div>
+
+        <div class="odd-row">
+            <span class="odd-label">4</span>
+            <span class="odd-icon">🐈</span> <span class="odd-icon">🤡</span> <span class="odd-icon">🦇</span> <span class="odd-icon">🎂</span> 
+        </div>
+
+        <div class="odd-row">
+            <span class="odd-label">5</span>
+            <span class="odd-icon">🐍</span> <span class="odd-icon">⭐</span> <span class="odd-icon">✂️</span> <span class="odd-icon">🖊️</span> 
+        </div>
+    
+        <div class="odd-row">
+            <span class="odd-label">6</span>
+            <span class="odd-icon">🐘</span> <span class="odd-icon">🐜</span> <span class="odd-icon">🎒</span> <span class="odd-icon">🍌</span>
+        </div>
+
+        <div class="odd-row">
+            <span class="odd-label">7</span>
+            <span class="odd-icon">📏</span> <span class="odd-icon">✂️</span> <span class="odd-icon">🧴</span> <span class="odd-icon">🐍</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">6. Reading (קריאה)</div>
+        <div class="instruction">השלימי את המילה החסרה:</div>
+        
+        <div class="reading-box">
+            <div class="bank"><strong>Word Bank:</strong> cat | sat | I see</div>
+            
+            1. The <span class="blank-line"></span> is fat. <br><br>
+            2. The cat <span class="blank-line"></span> on the mat. <br><br>
+            3. <span class="blank-line"></span> a red bag.
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px; font-size: 2em;">
+        Good Luck! 🌟
+    </div>
+
+</body>
+</html>

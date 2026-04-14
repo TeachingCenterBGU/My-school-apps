@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ABC Match - Big & Small Letters</title>
+    <title>משחק הזיכרון - אותיות</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f4f8;
+            background-color: #e0f7fa;
             text-align: center;
             margin: 0;
             padding: 10px;
             user-select: none;
         }
 
+        /* סרגל עליון */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -22,12 +23,13 @@
             margin: 0 auto 10px;
         }
 
-        h1 { color: #1a237e; margin: 0; font-size: 1.8em; }
+        h1 { color: #006064; margin: 0; font-size: 1.8em; }
 
+        /* כפתור רמקול */
         #sound-toggle {
             background: white;
-            border: 2px solid #3f51b5;
-            color: #3f51b5;
+            border: 2px solid #00acc1;
+            color: #00838f;
             font-size: 1.5em;
             width: 45px;
             height: 45px;
@@ -38,9 +40,10 @@
             align-items: center; justify-content: center;
         }
         #sound-toggle.sound-on {
-            background: #3f51b5; color: white;
+            background: #00acc1; color: white;
         }
 
+        /* כפתורי רמות */
         .levels {
             display: flex;
             flex-wrap: wrap;
@@ -51,8 +54,8 @@
 
         .level-btn {
             background: white;
-            border: 2px solid #3f51b5;
-            color: #1a237e;
+            border: 2px solid #00acc1;
+            color: #00838f;
             padding: 8px 15px;
             border-radius: 20px;
             font-size: 1rem;
@@ -61,19 +64,22 @@
         }
 
         .level-btn.active {
-            background: #3f51b5;
+            background: #00acc1;
             color: white;
             font-weight: bold;
             transform: scale(1.05);
         }
 
+        /* לוח המשחק */
         .game-board {
             display: grid;
-            gap: 15px;
+            gap: 15px; /* קצת רווח יותר בין הקלפים */
             margin: 0 auto;
             perspective: 1000px;
+            /* הרוחב ייקבע עכשיו דינאמית ב-JS */
         }
 
+        /* הקלף */
         .card {
             background-color: white;
             border-radius: 15px;
@@ -85,8 +91,11 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        .card.flipped { transform: rotateY(180deg); }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
 
+        /* קלפים תואמים */
         .card.matched {
             transform: rotateY(180deg);
             cursor: default;
@@ -101,6 +110,7 @@
             100% { transform: rotateY(180deg) scale(1); }
         }
 
+        /* הצדדים */
         .front, .back {
             position: absolute;
             width: 100%;
@@ -113,11 +123,11 @@
         }
 
         .front {
-            background: linear-gradient(135deg, #7986cb, #3f51b5);
-            font-size: 3em;
+            background: linear-gradient(135deg, #4dd0e1, #00acc1);
+            font-size: 3em; /* גודל סימן שאלה */
             color: white;
         }
-        .front::after { content: "?"; }
+        .front::after { content: "❓"; }
 
         .back {
             background-color: #fff;
@@ -125,21 +135,13 @@
             transform: rotateY(180deg);
             font-size: 3.5em;
             font-weight: bold;
-            flex-direction: column;
-        }
-
-        .case-label {
-            font-size: 0.28em;
-            font-weight: normal;
-            color: #999;
-            margin-top: 2px;
         }
 
         .back-btn {
             display: inline-block;
             margin-top: 30px;
             padding: 10px 20px;
-            background: #f44336;
+            background: #ff7043;
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -172,38 +174,79 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             animation: bounce 2s infinite;
         }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <h1>Aa Bb Match! 🎊</h1>
-        <button id="sound-toggle" class="sound-on">🔊</button>
+        <button id="sound-toggle" class="sound-on" title="הפעל/השתק הקראה">🔊</button>
+        <h1>משחק אותיות 🎉</h1>
     </div>
 
     <div class="levels">
-        <button class="level-btn" onclick="startGame(4)">4 Cards</button>
-        <button class="level-btn" onclick="startGame(8)">8 Cards</button>
-        <button class="level-btn" onclick="startGame(16)">16 Cards</button>
-        <button class="level-btn" onclick="startGame(20)">20 Cards</button>
-        <button class="level-btn" onclick="startGame(52)">Full ABC</button>
+        <button class="level-btn" onclick="startGame(4)">4 קלפים</button>
+        <button class="level-btn" onclick="startGame(8)">8 קלפים</button>
+        <button class="level-btn" onclick="startGame(16)">16 קלפים</button>
+        <button class="level-btn" onclick="startGame(20)">20 קלפים</button>
+        <button class="level-btn" onclick="startGame(99)">כל האותיות</button>
     </div>
 
     <div class="game-board" id="board"></div>
 
     <div id="celebration">
-        Amazing Job! 🏆<br>
-        <button class="next-level-btn" onclick="startNextLevel()">Next Level! ➡️</button>
+        כל הכבוד! אלופה! 🏆<br>
+        <button class="next-level-btn" onclick="startNextLevel()">לשלב הבא! ➡️</button>
     </div>
 
     <br>
-    <a href="grade-3.html" class="back-btn">Back to Home</a>
+    <a href="../../index.html" class="back-btn">חזרה למסך הראשי</a>
+
+    <audio id="success-sound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
 
     <script>
-        const allLetters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-        const colors = ['#d32f2f', '#1976d2', '#388e3c', '#fbc02d', '#8e24aa', '#e64a19', '#00796b', '#607d8b'];
-        const levelsOrder = [4, 8, 16, 20, 52];
+        const allLetters = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת','ם','ן','ץ','ף','ך'];
+        const colors = ['#d32f2f', '#1976d2', '#388e3c', '#fbc02d', '#8e24aa', '#e64a19', '#5d4037', '#00796b', '#f57c00'];
+
+        const levelsOrder = [4, 8, 16, 20, 99];
         let currentLevelIndex = 0; 
+
+        // מיפוי שמות הקבצים
+        const letterFiles = {
+            'א': 'Aleph1.mp3',
+            'ב': 'beit.mp3',
+            'ג': 'gimel_1.mp3',
+            'ד': 'dalet_1.mp3',
+            'ה': 'hei_1.mp3',
+            'ו': 'vav_1.mp3',
+            'ז': 'zain_1.mp3',
+            'ח': 'chet_1.mp3',
+            'ט': 'tet.mp3',
+            'י': 'yud.mp3',
+            'כ': 'chaf_1.mp3',
+            'ל': 'lamed.mp3',
+            'מ': 'mem_1.mp3',
+            'נ': 'nun.mp3',
+            'ס': 'samech.mp3',
+            'ע': 'ain.mp3',
+            'פ': 'peh_1.mp3',
+            'צ': 'tzadik_1.mp3',
+            'ק': 'kuf.mp3',
+            'ר': 'reish.mp3',
+            'ש': 'shin.mp3',
+            'ת': 'taf_1.mp3',
+            'ם': 'mem sofit.mp3',
+            'ן': 'nun sofit.mp3',
+            'ץ': 'tzadik sofit_1.mp3',
+            'ף': 'peh sofit.mp3',
+            'ך': 'chaf sofit_1.mp3'
+        };
+
         let hasFlippedCard = false;
         let lockBoard = false;
         let firstCard, secondCard;
@@ -213,12 +256,11 @@
 
         function playLetterSound(letter) {
             if (!isSoundOn) return;
-            const utterance = new SpeechSynthesisUtterance(letter.toUpperCase());
-            utterance.lang = 'en-US';
-            utterance.rate = 0.9;
-            utterance.pitch = 1.1;
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(utterance);
+            const filename = letterFiles[letter];
+            if (filename) {
+                const audio = new Audio('../../letters/' + filename);
+                audio.play().catch(e => console.log("Audio play error:", e));
+            }
         }
 
         const soundToggleBtn = document.getElementById('sound-toggle');
@@ -230,8 +272,9 @@
 
         function startGame(numCards) {
             currentLevelIndex = levelsOrder.indexOf(numCards);
+            
             document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = Array.from(document.querySelectorAll('.level-btn')).find(b => b.textContent.includes(numCards) || (numCards===52 && b.textContent.includes("Full")));
+            const activeBtn = Array.from(document.querySelectorAll('.level-btn')).find(b => b.textContent.includes(numCards) || (numCards===99 && b.textContent.includes("כל")));
             if(activeBtn) activeBtn.classList.add('active');
 
             const board = document.getElementById('board');
@@ -241,9 +284,8 @@
             hasFlippedCard = false;
             lockBoard = false;
 
-            // Pick letters for this round
             let selectedLetters = [];
-            if (numCards === 52) {
+            if (numCards === 99) {
                 selectedLetters = [...allLetters];
             } else {
                 let tempLetters = [...allLetters];
@@ -257,72 +299,95 @@
 
             totalPairs = selectedLetters.length;
 
-            // Assign a color per letter
             const letterColors = {};
             selectedLetters.forEach(letter => {
-                letterColors[letter] = colors[Math.floor(Math.random() * colors.length)];
+                if (!letterColors[letter]) {
+                    letterColors[letter] = colors[Math.floor(Math.random() * colors.length)];
+                }
             });
 
-            // Build deck: one UPPERCASE card + one lowercase card per letter
-            const deck = [];
-            selectedLetters.forEach(letter => {
-                deck.push({ display: letter.toUpperCase(), letter: letter, isUpper: true });
-                deck.push({ display: letter.toLowerCase(), letter: letter, isUpper: false });
-            });
+            const deck = [...selectedLetters, ...selectedLetters];
             deck.sort(() => 0.5 - Math.random());
 
-            // Grid layout
+            // --- לוגיקה מעודכנת לגודל הלוח והטורים ---
             let columns = 4;
-            let maxWidth = '1000px';
-            if (numCards === 4) { columns = 2; maxWidth = '400px'; }
-            if (numCards === 8) { columns = 4; maxWidth = '600px'; }
-            if (numCards === 16) { columns = 4; maxWidth = '700px'; }
-            if (numCards === 20) { columns = 5; maxWidth = '850px'; }
-            if (numCards === 52) { columns = 7; maxWidth = '1100px'; }
+            let maxWidth = '1000px'; // ברירת מחדל
 
-            if (window.innerWidth < 600) {
-                 maxWidth = '100%';
-                 columns = numCards > 8 ? 4 : 2;
+            // 4 קלפים: 2 טורים, רוחב לוח קטן (כדי שהקלפים לא יהיו ענקיים)
+            if (numCards === 4) { 
+                columns = 2; 
+                maxWidth = '400px'; 
+            }
+            // 8 קלפים: 4 טורים, רוחב בינוני
+            if (numCards === 8) { 
+                columns = 4; 
+                maxWidth = '700px'; 
+            }
+            // 16 קלפים: 4 טורים, רוחב בינוני+
+            if (numCards === 16) { 
+                columns = 4; 
+                maxWidth = '700px'; 
+            }
+            // 20 קלפים: 5 טורים
+            if (numCards === 20) { 
+                columns = 5; 
+                maxWidth = '850px'; 
+            }
+            // כל האותיות: 9 טורים, רוחב מקסימלי
+            if (numCards === 99) { 
+                columns = 9; 
+                maxWidth = '1200px'; 
             }
 
+            // התאמה לנייד
+            if (window.innerWidth < 600) {
+                 maxWidth = '100%'; // בנייד תמיד תפוס הכל
+                 if (numCards > 8) columns = 4;
+                 if (numCards > 20) columns = 4; 
+            }
+
+            // החלת השינויים
             board.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
             board.style.maxWidth = maxWidth;
 
-            deck.forEach(item => {
+            deck.forEach(letter => {
                 const card = document.createElement('div');
                 card.classList.add('card');
-                // Store the base letter (always uppercase) for matching logic
-                card.dataset.letter = item.letter.toUpperCase();
-                // Store whether this card is the upper or lower version
-                card.dataset.case = item.isUpper ? 'upper' : 'lower';
-
+                card.dataset.letter = letter;
+                
                 const frontFace = document.createElement('div');
                 frontFace.classList.add('front');
 
                 const backFace = document.createElement('div');
                 backFace.classList.add('back');
-                backFace.style.color = letterColors[item.letter];
-                backFace.style.borderColor = letterColors[item.letter];
-
-                // Letter display
-                const letterSpan = document.createElement('span');
-                letterSpan.textContent = item.display;
-                backFace.appendChild(letterSpan);
+                backFace.textContent = letter;
+                
+                const color = letterColors[letter];
+                backFace.style.color = color;
+                backFace.style.borderColor = color;
 
                 card.appendChild(frontFace);
                 card.appendChild(backFace);
+
                 card.addEventListener('click', flipCard);
                 board.appendChild(card);
             });
         }
 
         function startNextLevel() {
-            currentLevelIndex = (currentLevelIndex + 1) % levelsOrder.length;
-            startGame(levelsOrder[currentLevelIndex]);
+            if (currentLevelIndex < levelsOrder.length - 1) {
+                currentLevelIndex++;
+                startGame(levelsOrder[currentLevelIndex]);
+            } else {
+                currentLevelIndex = 0;
+                startGame(levelsOrder[0]);
+            }
         }
 
         function flipCard() {
-            if (lockBoard || this === firstCard) return;
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
             this.classList.add('flipped');
             playLetterSound(this.dataset.letter);
 
@@ -331,31 +396,48 @@
                 firstCard = this;
                 return;
             }
+
             secondCard = this;
             checkForMatch();
         }
 
         function checkForMatch() {
-            // Match = same letter BUT different case (one upper, one lower)
-            const sameLetter = firstCard.dataset.letter === secondCard.dataset.letter;
-            const differentCase = firstCard.dataset.case !== secondCard.dataset.case;
+            let isMatch = firstCard.dataset.letter === secondCard.dataset.letter;
 
-            if (sameLetter && differentCase) {
-                firstCard.classList.add('matched');
-                secondCard.classList.add('matched');
-                matchedCount++;
-                if (matchedCount === totalPairs) {
-                    setTimeout(() => document.getElementById('celebration').style.display = 'block', 800);
-                }
-                resetBoard();
+            if (isMatch) {
+                disableCards();
             } else {
-                lockBoard = true;
-                setTimeout(() => {
-                    firstCard.classList.remove('flipped');
-                    secondCard.classList.remove('flipped');
-                    resetBoard();
-                }, 1000);
+                unflipCards();
             }
+        }
+
+        function disableCards() {
+            if (isSoundOn) {
+                setTimeout(() => {
+                     document.getElementById('success-sound').play();
+                }, 400);
+            }
+
+            firstCard.classList.add('matched');
+            secondCard.classList.add('matched');
+            
+            matchedCount++;
+            if (matchedCount === totalPairs) {
+                setTimeout(() => {
+                    document.getElementById('celebration').style.display = 'block';
+                }, 800);
+            }
+
+            resetBoard();
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                resetBoard();
+            }, 1200);
         }
 
         function resetBoard() {
@@ -367,3 +449,4 @@
     </script>
 </body>
 </html>
+

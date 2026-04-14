@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מרתון גיאומטריה כיתה ה'</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+
+        button {
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+
+        button:hover { opacity: 0.9; transform: scale(1.02); }
+        button.secondary { background: #95a5a6; }
+
+        .game-box { display: none; margin-top: 25px; border: 2px solid #ecf0f1; padding: 25px; border-radius: 15px; background: #fff; }
+        .active { display: block; }
+
+        .options-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        
+        .feedback { margin-top: 20px; font-size: 1.2em; font-weight: bold; min-height: 1.5em; }
+        .explanation { font-size: 0.95em; color: #444; background: #e8f4fd; padding: 15px; margin-top: 15px; border-radius: 8px; display: none; border-right: 5px solid var(--accent); text-align: right; }
+        
+        .progress-bar { font-size: 0.85em; color: #7f8c8d; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1 style="color: var(--primary);">📐 מרתון גיאומטריה: כיתה ה'</h1>
+    <p>30+ שאלות מאתגרות לקראת המבחן.</p>
+
+    <div class="modes">
+        <button onclick="initGame('logic')">משפחת המרובעים</button>
+        <button onclick="initGame('triangles')">מיון משולשים</button>
+        <button onclick="initGame('calc')">חישובי זוויות</button>
+        <button class="secondary" onclick="location.reload()">איפוס וחזרה</button>
+    </div>
+
+    <div id="game-area" class="game-box">
+        <div class="progress-bar">שאלה <span id="q-count">0</span> מתוך <span id="q-total">0</span></div>
+        <div id="q-text" style="font-size: 1.3em; margin-bottom: 20px; line-height: 1.4;"></div>
+        <div id="options" class="options-container"></div>
+        <div id="feedback" class="feedback"></div>
+        <div id="explanation" class="explanation"></div>
+        <button id="next-btn" style="margin-top:20px; background:var(--success); display:none;" onclick="renderQuestion()">לשאלה הבאה</button>
+    </div>
+</div>
+
+<script>
+    const allQuestions = {
+        logic: [
+            { q: "האם כל מלבן הוא גם מקבילית?", a: "כן", alt: ["לא"], exp: "נכון! מקבילית היא מרובע עם שני זוגות של צלעות מקבילות. למלבן יש שני זוגות כאלו, לכן הוא סוג של מקבילית." },
+            { q: "מי מהבאים הוא מרובע שיש לו שני זוגות של צלעות סמוכות שוות?", a: "דלתון", alt: ["טרפז", "מקבילית", "מלבן"], exp: "דלתון מוגדר על ידי שתי צלעות סמוכות שוות ועוד שתי צלעות סמוכות שוות." },
+            { q: "האם כל מעוין הוא ריבוע?", a: "לא", alt: ["כן"], exp: "לא. מעוין צריך שגם הזוויות שלו יהיו ישרות כדי להפוך לריבוע." },
+            { q: "מרובע שבו רק זוג אחד של צלעות מקבילות נקרא:", a: "טרפז", alt: ["מקבילית", "מעוין", "מלבן"] },
+            { q: "האם ריבוע הוא סוג של דלתון?", a: "כן", alt: ["לא"], exp: "כן! בדלתון יש שני זוגות של צלעות סמוכות שוות. בריבוע כל הצלעות שוות, ולכן התנאי מתקיים." },
+            { q: "איזו צורה היא גם מלבן וגם מעוין בו-זמנית?", a: "ריבוע", alt: ["מקבילית", "דלתון", "טרפז שווה שוקיים"] },
+            { q: "באיזו צורה כל הזוויות תמיד ישרות וכל הצלעות תמיד שוות?", a: "ריבוע", alt: ["מלבן", "מעוין", "מקבילית"] },
+            { q: "האם במקבילית הזוויות הנגדיות תמיד שוות?", a: "כן", alt: ["לא"], exp: "זוהי אחת התכונות החשובות של המקבילית." },
+            { q: "טרפז שיש לו שתי שוקיים שוות נקרא:", a: "טרפז שווה שוקיים", alt: ["טרפז ישר זווית", "מקבילית", "מעוין"] },
+            { q: "האם כל ריבוע הוא מלבן?", a: "כן", alt: ["לא"], exp: "נכון. מלבן הוא מרובע עם 4 זוויות ישרות. לריבוע יש 4 זוויות ישרות, לכן הוא מלבן (מיוחד)." },
+            { q: "מה הופך מקבילית למלבן?", a: "אם מוסיפים לה זוויות ישרות", alt: ["אם מוסיפים לה צלעות שוות", "אם היא הופכת לטרפז", "היא כבר מלבן"] }
+        ],
+        triangles: [
+            { q: "משולש שבו הזוויות הן 90°, 45°, 45° הוא:", a: "ישר זווית ושווה שוקיים", alt: ["חד זווית ושווה שוקיים", "קהה זווית ושווה צלעות", "ישר זווית ושונה צלעות"] },
+            { q: "במשולש שווה צלעות, כל הזוויות הן תמיד:", a: "60 מעלות", alt: ["90 מעלות", "45 מעלות", "70 מעלות"] },
+            { q: "האם קיים משולש שהוא גם ישר זווית וגם קהה זווית?", a: "לא", alt: ["כן"], exp: "לא, סכום הזוויות הוא 180. אם יש 90 ועוד זווית מעל 90, כבר עברנו את ה-180." },
+            { q: "איך נקרא למשולש שבו כל הצלעות באורך שונה?", a: "שונה צלעות", alt: ["שווה שוקיים", "שווה צלעות", "ישר זווית"] },
+            { q: "משולש עם זוויות 120°, 30°, 30° הוא:", a: "קהה זווית ושווה שוקיים", alt: ["חד זווית ושווה שוקיים", "ישר זווית ושווה שוקיים", "קהה זווית ושונה צלעות"] },
+            { q: "האם משולש שווה שוקיים יכול להיות גם ישר זווית?", a: "כן", alt: ["לא"], exp: "כן, למשל משולש עם זוויות 90, 45, 45." },
+            { q: "משולש שבו הזוויות הן 70°, 70°, 40° הוא:", a: "חד זווית ושווה שוקיים", alt: ["קהה זווית ושווה שוקיים", "חד זווית ושונה צלעות", "שווה צלעות"] },
+            { q: "במשולש שווה צלעות, האם כל הזוויות שוות?", a: "כן", alt: ["לא"], exp: "נכון, כל זווית היא בדיוק 60 מעלות." },
+            { q: "האם קיים משולש שווה צלעות שהוא גם שונה צלעות?", a: "לא", alt: ["כן"] },
+            { q: "משולש עם זוויות 80°, 60°, 40° הוא:", a: "חד זווית ושונה צלעות", alt: ["קהה זווית ושונה צלעות", "ישר זווית ושונה צלעות", "חד זווית ושווה שוקיים"] }
+        ],
+        calc: [
+            { q: "במשולש שווה שוקיים, זווית הראש היא 100 מעלות. מה גודל כל זווית בסיס?", a: "40 מעלות", alt: ["80 מעלות", "50 מעלות", "40 ו-60 מעלות"], exp: "180-100=80. 80 לחלק ל-2 זה 40." },
+            { q: "סכום הזוויות בכל מרובע (ריבוע, טרפז, דלתון...) הוא:", a: "360 מעלות", alt: ["180 מעלות", "90 מעלות", "400 מעלות"] },
+            { q: "במשולש, שתי זוויות הן 30° ו-60°. מה גודל הזווית השלישית?", a: "90 מעלות", alt: ["100 מעלות", "80 מעלות", "70 מעלות"] },
+            { q: "במשולש שווה שוקיים, זווית בסיס אחת היא 70 מעלות. מה גודל זווית הראש?", a: "40 מעלות", alt: ["70 מעלות", "110 מעלות", "50 מעלות"], exp: "זוויות הבסיס שוות (70+70=140). 180-140=40." },
+            { q: "במשולש ישר זווית, אחת הזוויות היא 25 מעלות. מה גודל הזווית החדה השנייה?", a: "65 מעלות", alt: ["55 מעלות", "90 מעלות", "75 מעלות"] },
+            { q: "סכום שתי זוויות במשולש הוא 110 מעלות. מה גודל הזווית השלישית?", a: "70 מעלות", alt: ["110 מעלות", "80 מעלות", "90 מעלות"] },
+            { q: "במשולש שווה צלעות, מה סכום כל שלוש הזוויות?", a: "180 מעלות", alt: ["360 מעלות", "60 מעלות", "100 מעלות"] },
+            { q: "במלבן, מה סכום שתי זוויות סמוכות?", a: "180 מעלות", alt: ["90 מעלות", "360 מעלות", "270 מעלות"] },
+            { q: "במשולש שווה שוקיים, זווית הראש היא 20 מעלות. מה גודל כל זווית בסיס?", a: "80 מעלות", alt: ["160 מעלות", "100 מעלות", "90 מעלות"] },
+            { q: "זווית אחת במשולש היא 120 מעלות. מה יכול להיות סכום שתי הזוויות האחרות?", a: "60 מעלות", alt: ["120 מעלות", "180 מעלות", "90 מעלות"] }
+        ]
+    };
+
+    let currentDeck = [];
+    let qIndex = 0;
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function initGame(cat) {
+        currentDeck = shuffle([...allQuestions[cat]]);
+        qIndex = 0;
+        document.getElementById('game-area').classList.add('active');
+        document.getElementById('q-total').textContent = currentDeck.length;
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        if (qIndex >= currentDeck.length) {
+            document.getElementById('game-area').innerHTML = "<h2>כל הכבוד! סיימת את כל החפיסה! 🏆</h2><p>את מוכנה למבחן!</p><button onclick='location.reload()'>חזרה לתפריט</button>";
+            return;
+        }
+
+        const qData = currentDeck[qIndex];
+        document.getElementById('q-count').textContent = qIndex + 1;
+        document.getElementById('q-text').textContent = qData.q;
+        document.getElementById('feedback').textContent = '';
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        const optsDiv = document.getElementById('options');
+        optsDiv.innerHTML = '';
+
+        const allOpts = shuffle([qData.a, ...qData.alt]);
+        allOpts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.textContent = opt;
+            btn.style.background = "#ecf0f1";
+            btn.style.color = "#2c3e50";
+            btn.onclick = () => check(opt, qData.a, qData.exp);
+            optsDiv.appendChild(btn);
+        });
+    }
+
+    function check(selected, correct, exp) {
+        const feedback = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        
+        if (selected === correct) {
+            feedback.textContent = "נכון מאוד! ✨";
+            feedback.style.color = "var(--success)";
+            if (exp) {
+                const expDiv = document.getElementById('explanation');
+                expDiv.textContent = exp;
+                expDiv.style.display = 'block';
+            }
+            nextBtn.style.display = 'inline-block';
+            qIndex++;
+        } else {
+            feedback.textContent = "לא בדיוק, נסי שוב...";
+            feedback.style.color = "var(--error)";
+        }
+    }
+</script>
+
+</body>
+
+</html>
