@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 חזרה לעבודה מסכמת - כיתה ג׳</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #4361ee;
+            --primary-light: #7b8ff5;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --warning: #ffd166;
+            --bg: #0f0e17;
+            --card: #1a1932;
+            --card-hover: #232247;
+            --text: #fffffe;
+            --text-dim: #a7a9be;
+            --accent: #ff8906;
+        }
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(67,97,238,0.15), transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(255,137,6,0.1), transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            text-align: center;
+            padding: 24px 0 16px;
+        }
+        .app-header h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .app-header p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-bar-container {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            height: 12px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+        .score-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+        .score-display .score-num {
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        /* ===== MENU ===== */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .menu-card {
+            background: var(--card);
+            border: 2px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 20px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 60%, rgba(255,255,255,0.03));
+            pointer-events: none;
+        }
+        .menu-card:hover, .menu-card:active {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(67,97,238,0.2);
+        }
+        .menu-card .emoji {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .menu-card .label {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .menu-card .sublabel {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+        .menu-card .badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--success);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* ===== EXERCISE AREA ===== */
+        .exercise-area {
+            display: none;
+        }
+        .exercise-area.active {
+            display: block;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            font-family: 'Rubik', sans-serif;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { border-color: var(--primary); }
+
+        .exercise-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 24px;
+            border: 2px solid rgba(255,255,255,0.06);
+            margin-bottom: 16px;
+        }
+        .exercise-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+        .exercise-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+        .question-num {
+            font-size: 0.8rem;
+            color: var(--primary-light);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        /* ===== MATH DISPLAY ===== */
+        .math-problem {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
+            direction: ltr;
+            letter-spacing: 2px;
+        }
+        .math-problem .operator {
+            color: var(--accent);
+            margin: 0 6px;
+        }
+        .math-problem .equals {
+            color: var(--primary-light);
+        }
+
+        /* ===== INPUT ===== */
+        .answer-input {
+            display: block;
+            width: 160px;
+            margin: 16px auto;
+            padding: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Rubik', sans-serif;
+            text-align: center;
+            background: rgba(255,255,255,0.06);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+            direction: ltr;
+        }
+        .answer-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 16px rgba(67,97,238,0.3);
+        }
+        .answer-input.correct {
+            border-color: var(--success);
+            box-shadow: 0 0 16px rgba(6,214,160,0.3);
+        }
+        .answer-input.wrong {
+            border-color: var(--danger);
+            box-shadow: 0 0 16px rgba(239,71,111,0.3);
+        }
+        .small-input {
+            width: 80px;
+            font-size: 1.2rem;
+            padding: 8px;
+            display: inline-block;
+            margin: 4px;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 200px;
+            margin: 16px auto 0;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Rubik', sans-serif;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67,97,238,0.4);
+        }
+        .submit-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            text-align: center;
+            margin-top: 14px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            min-height: 30px;
+        }
+        .feedback.correct { color: var(--success); }
+        .feedback.wrong { color: var(--danger); }
+
+        .next-btn {
+            display: none;
+            width: 200px;
+            margin: 12px auto 0;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Rubik', sans-serif;
+            background: var(--success);
+            color: #000;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .next-btn:hover { transform: translateY(-2px); }
+
+        /* ===== DISTRIBUTION LAYOUT ===== */
+        .distrib-layout {
+            direction: ltr;
+            text-align: center;
+            margin: 16px 0;
+        }
+        .distrib-row {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .distrib-row .op { color: var(--accent); }
+        .distrib-row .eq { color: var(--primary-light); }
+
+        /* ===== COMPARISON BUTTONS ===== */
+        .compare-btns {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .compare-btn {
+            width: 70px;
+            height: 56px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: var(--card);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            color: var(--text);
+            cursor: pointer;
+            font-family: 'Rubik', sans-serif;
+            transition: all 0.2s;
+        }
+        .compare-btn:hover, .compare-btn.selected {
+            border-color: var(--primary);
+            background: rgba(67,97,238,0.2);
+        }
+        .compare-btn.correct-choice {
+            border-color: var(--success);
+            background: rgba(6,214,160,0.2);
+        }
+        .compare-btn.wrong-choice {
+            border-color: var(--danger);
+            background: rgba(239,71,111,0.2);
+        }
+
+        /* ===== SEQUENCE ===== */
+        .sequence-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            direction: ltr;
+            margin: 16px 0;
+        }
+        .seq-num {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            min-width: 50px;
+            text-align: center;
+        }
+        .seq-comma {
+            color: var(--text-dim);
+        }
+
+        /* ===== WORD PROBLEM ===== */
+        .word-problem-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            background: rgba(255,255,255,0.04);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            text-align: right;
+        }
+
+        /* ===== PLACE VALUE TABLE ===== */
+        .place-value-table {
+            margin: 16px auto;
+            border-collapse: collapse;
+            direction: rtl;
+        }
+        .place-value-table th, .place-value-table td {
+            border: 2px solid rgba(255,255,255,0.15);
+            padding: 8px 14px;
+            text-align: center;
+            font-size: 1rem;
+        }
+        .place-value-table th {
+            background: rgba(67,97,238,0.2);
+            font-size: 0.85rem;
+            color: var(--primary-light);
+            text-align: right;
+            padding: 8px 16px;
+            min-width: 80px;
+        }
+        .place-value-table input {
+            width: 40px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            color: var(--text);
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            font-family: 'Rubik', sans-serif;
+            outline: none;
+        }
+        .place-value-table input:focus {
+            border-bottom-color: var(--primary);
+        }
+
+        /* ===== SUMMARY SCREEN ===== */
+        .summary-screen {
+            text-align: center;
+            padding: 30px 0;
+        }
+        .summary-screen .big-emoji {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+        .summary-screen h2 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+        .summary-screen .score-text {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+        .summary-screen .score-text span {
+            color: var(--success);
+            font-weight: 900;
+            font-size: 1.5rem;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-in { animation: popIn 0.3s ease-out; }
+
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .shake { animation: shake 0.3s ease; }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* mobile fixes */
+        @media (max-width: 500px) {
+            .math-problem { font-size: 1.4rem; }
+            .menu-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .menu-card { padding: 14px 10px; }
+            .menu-card .emoji { font-size: 1.8rem; }
+            .menu-card .label { font-size: 0.85rem; }
+            .distrib-row { font-size: 1.1rem; }
+            .seq-num { font-size: 0.95rem; min-width: 40px; }
+            .small-input { width: 65px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="app-header">
+        <h1>🎯 חזרה לעבודה מסכמת</h1>
+        <p>כיתה ג׳ — כפל, מבנה עשרוני, חיבור וחיסור</p>
+    </div>
+
+    <!-- MENU -->
+    <div id="menu">
+        <div class="score-display">
+            <span>סה״כ: <span class="score-num" id="totalScore">0</span> / <span id="totalQuestions">0</span></span>
+            <span id="starDisplay">⭐ 0</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="totalProgress" style="width:0%"></div>
+        </div>
+        <div class="menu-grid">
+            <div class="menu-card" onclick="startExercise('addition')">
+                <span class="emoji">➕</span>
+                <div class="label">חיבור וחיסור</div>
+                <div class="sublabel">במאונך עד 10,000</div>
+                <div class="badge" id="badge-addition" style="display:none"></div>
+            </div>
+            <div class="menu-card" onclick="startExercise('distrib')">
+                <span class="emoji">✖️</span>
+                <div class="label">כפל בפילוג</div>
+                <div class="sublabel">חוק הפילוג</div>
+                <div class="badge" id="badge-distrib" style="display:none"></div>
+            </div>
+            <div class="menu-card" onclick="startExercise('sequence')">
+                <span class="emoji">🔢</span>
+                <div class="label">סדרות מספרים</div>
+                <div class="sublabel">השלימו את הסדרה</div>
+                <div class="badge" id="badge-sequence" style="display:none"></div>
+            </div>
+            <div class="menu-card" onclick="startExercise('placevalue')">
+                <span class="emoji">📊</span>
+                <div class="label">מבנה עשרוני</div>
+                <div class="sublabel">טבלת ערך מקום</div>
+                <div class="badge" id="badge-placevalue" style="display:none"></div>
+            </div>
+            <div class="menu-card" onclick="startExercise('compare')">
+                <span class="emoji">⚖️</span>
+                <div class="label">השוואת מספרים</div>
+                <div class="sublabel">גדול, קטן או שווה</div>
+                <div class="badge" id="badge-compare" style="display:none"></div>
+            </div>
+            <div class="menu-card" onclick="startExercise('wordproblem')">
+                <span class="emoji">📝</span>
+                <div class="label">בעיות מילוליות</div>
+                <div class="sublabel">כפל וחילוק</div>
+                <div class="badge" id="badge-wordproblem" style="display:none"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXERCISE AREA -->
+    <div id="exerciseArea" class="exercise-area">
+        <button class="back-btn" onclick="goBack()">→ חזרה לתפריט</button>
+        <div class="exercise-card">
+            <div class="exercise-title" id="exTitle"></div>
+            <div class="exercise-subtitle" id="exSubtitle"></div>
+            <div class="question-num" id="qNum"></div>
+            <div id="questionContent"></div>
+            <div class="feedback" id="feedback"></div>
+            <button class="submit-btn" id="submitBtn" onclick="checkAnswer()">בדיקה ✓</button>
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()">הבא ←</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== STATE =====
+let currentCategory = '';
+let currentQ = 0;
+let questions = [];
+let categoryScores = { addition: 0, distrib: 0, sequence: 0, placevalue: 0, compare: 0, wordproblem: 0 };
+let categoryTotals = { addition: 0, distrib: 0, sequence: 0, placevalue: 0, compare: 0, wordproblem: 0 };
+let totalCorrect = 0;
+let totalAnswered = 0;
+let stars = 0;
+
+// ===== GENERATORS =====
+
+function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateAdditionQuestions() {
+    const qs = [];
+    for (let i = 0; i < 8; i++) {
+        if (i < 4) {
+            // addition
+            const a = randInt(200, 5000);
+            const b = randInt(100, 4999 - Math.min(a, 4999));
+            const sum = a + b;
+            if (sum > 9999) continue;
+            qs.push({ a, b, op: '+', answer: sum });
+        } else {
+            // subtraction
+            const a = randInt(1000, 9000);
+            const b = randInt(100, a - 100);
+            qs.push({ a, b, op: '-', answer: a - b });
+        }
+    }
+    return qs;
+}
+
+function generateDistribQuestions() {
+    const pairs = [];
+    const usedPairs = new Set();
+    while (pairs.length < 6) {
+        const multiplier = randInt(2, 9);
+        const tens = randInt(1, 9) * 10;
+        const ones = randInt(1, 9);
+        const num = tens + ones;
+        const key = `${multiplier}x${num}`;
+        if (usedPairs.has(key)) continue;
+        usedPairs.add(key);
+        pairs.push({
+            multiplier,
+            num,
+            tens,
+            ones,
+            partA: multiplier * tens,
+            partB: multiplier * ones,
+            answer: multiplier * num
+        });
+    }
+    return pairs;
+}
+
+function generateSequenceQuestions() {
+    const qs = [];
+    const steps = [5, 10, 25, 50, 100, 500];
+    for (let i = 0; i < 5; i++) {
+        const step = steps[randInt(0, steps.length - 1)];
+        const start = randInt(1000, 7000);
+        const rounded = Math.round(start / step) * step;
+        const sequence = [];
+        for (let j = 0; j < 8; j++) {
+            sequence.push(rounded + j * step);
+        }
+        // Hide 3 random positions (not first two)
+        const hidePositions = [];
+        const available = [2, 3, 4, 5, 6, 7];
+        while (hidePositions.length < 3) {
+            const idx = randInt(0, available.length - 1);
+            hidePositions.push(available.splice(idx, 1)[0]);
+        }
+        qs.push({ sequence, hidePositions: hidePositions.sort(), step });
+    }
+    return qs;
+}
+
+function generatePlaceValueQuestions() {
+    const qs = [];
+    for (let i = 0; i < 5; i++) {
+        const num = randInt(1000, 9999);
+        const thousands = Math.floor(num / 1000);
+        const hundreds = Math.floor((num % 1000) / 100);
+        const tens = Math.floor((num % 100) / 10);
+        const ones = num % 10;
+        qs.push({ num, thousands, hundreds, tens, ones });
+    }
+    return qs;
+}
+
+function generateCompareQuestions() {
+    const qs = [];
+    for (let i = 0; i < 6; i++) {
+        let a, b;
+        const type = randInt(0, 3);
+        if (type === 0) {
+            // simple compare
+            a = randInt(1000, 9999);
+            b = randInt(1000, 9999);
+        } else if (type === 1) {
+            // close numbers
+            a = randInt(1000, 9000);
+            b = a + randInt(-20, 20);
+            if (b < 1000) b = a + 15;
+        } else if (type === 2) {
+            // expression vs number
+            const x = randInt(100, 4000);
+            const y = randInt(100, 4000);
+            a = x + y;
+            b = randInt(1000, 9999);
+            qs.push({ left: `${x.toLocaleString()} + ${y.toLocaleString()}`, right: b.toLocaleString(), leftVal: a, rightVal: b, answer: a > b ? '>' : a < b ? '<' : '=' });
+            continue;
+        } else {
+            // equal
+            a = randInt(1000, 9999);
+            b = a;
+        }
+        qs.push({ left: a.toLocaleString(), right: b.toLocaleString(), leftVal: a, rightVal: b, answer: a > b ? '>' : a < b ? '<' : '=' });
+    }
+    return qs;
+}
+
+function generateWordProblems() {
+    const templates = [
+        () => {
+            const pricePerItem = randInt(3, 9);
+            const qty = randInt(10, 50);
+            const tens = Math.floor(qty / 10) * 10;
+            const ones = qty % 10 || randInt(1, 9);
+            const actualQty = tens + ones;
+            return {
+                text: `בחנות צעצועים, מחיר כל צעצוע הוא ${pricePerItem} ש״ח.\nרוני קנה ${actualQty} צעצועים.\nכמה שילם רוני בסך הכל?`,
+                answer: pricePerItem * actualQty,
+                hint: `${pricePerItem} × ${actualQty} = ?`
+            };
+        },
+        () => {
+            const totalItems = randInt(20, 80);
+            const groups = [3, 4, 5, 6][randInt(0, 3)];
+            const actual = Math.floor(totalItems / groups) * groups;
+            return {
+                text: `למורה יש ${actual} מחברות.\nהיא מחלקת אותן שווה בשווה ל-${groups} קבוצות.\nכמה מחברות בכל קבוצה?`,
+                answer: actual / groups,
+                hint: `${actual} ÷ ${groups} = ?`
+            };
+        },
+        () => {
+            const perBox = randInt(4, 8);
+            const boxes = randInt(10, 30);
+            const tens = Math.floor(boxes / 10) * 10;
+            const ones = boxes % 10 || randInt(1, 9);
+            const actualBoxes = tens + ones;
+            return {
+                text: `בכל קופסה יש ${perBox} עוגיות.\nבמאפייה יש ${actualBoxes} קופסאות.\nכמה עוגיות יש בסך הכל?`,
+                answer: perBox * actualBoxes,
+                hint: `${perBox} × ${actualBoxes} = ?`
+            };
+        },
+        () => {
+            const kids = [3, 4, 5, 6, 7][randInt(0, 4)];
+            const candiesPerKid = randInt(10, 25);
+            const total = kids * candiesPerKid;
+            return {
+                text: `אמא חילקה ${total} סוכריות שווה בשווה בין ${kids} ילדים.\nכמה סוכריות קיבל כל ילד?`,
+                answer: candiesPerKid,
+                hint: `${total} ÷ ${kids} = ?`
+            };
+        },
+        () => {
+            const price = randInt(3, 8);
+            const qty = randInt(12, 45);
+            const tens = Math.floor(qty / 10) * 10;
+            const ones = qty % 10 || randInt(1, 9);
+            const actualQty = tens + ones;
+            return {
+                text: `כל עט עולה ${price} ש״ח.\nכמה עטים אפשר לקנות ב-${price * actualQty} ש״ח?`,
+                answer: actualQty,
+                hint: `${price * actualQty} ÷ ${price} = ?`
+            };
+        },
+        () => {
+            const rows = randInt(3, 7);
+            const perRow = randInt(10, 30);
+            const tens = Math.floor(perRow / 10) * 10;
+            const ones = perRow % 10 || randInt(1, 9);
+            const actualPerRow = tens + ones;
+            return {
+                text: `באולם ישיבה יש ${rows} שורות.\nבכל שורה יש ${actualPerRow} כיסאות.\nכמה כיסאות יש באולם?`,
+                answer: rows * actualPerRow,
+                hint: `${rows} × ${actualPerRow} = ?`
+            };
+        }
+    ];
+    const qs = [];
+    const shuffled = templates.sort(() => Math.random() - 0.5);
+    for (let i = 0; i < Math.min(5, shuffled.length); i++) {
+        qs.push(shuffled[i]());
+    }
+    return qs;
+}
+
+// ===== EXERCISE FLOW =====
+
+function startExercise(category) {
+    currentCategory = category;
+    currentQ = 0;
+
+    switch (category) {
+        case 'addition': questions = generateAdditionQuestions(); break;
+        case 'distrib': questions = generateDistribQuestions(); break;
+        case 'sequence': questions = generateSequenceQuestions(); break;
+        case 'placevalue': questions = generatePlaceValueQuestions(); break;
+        case 'compare': questions = generateCompareQuestions(); break;
+        case 'wordproblem': questions = generateWordProblems(); break;
+    }
+
+    categoryScores[category] = 0;
+    categoryTotals[category] = questions.length;
+
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('exerciseArea').classList.add('active');
+    showQuestion();
+}
+
+function goBack() {
+    document.getElementById('exerciseArea').classList.remove('active');
+    document.getElementById('menu').style.display = 'block';
+    updateMenuBadges();
+}
+
+function showQuestion() {
+    if (currentQ >= questions.length) {
+        showSummary();
+        return;
+    }
+
+    const q = questions[currentQ];
+    const content = document.getElementById('questionContent');
+    const feedback = document.getElementById('feedback');
+    const submitBtn = document.getElementById('submitBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    feedback.textContent = '';
+    feedback.className = 'feedback';
+    submitBtn.style.display = 'block';
+    submitBtn.disabled = false;
+    nextBtn.style.display = 'none';
+
+    document.getElementById('qNum').textContent = `שאלה ${currentQ + 1} מתוך ${questions.length}`;
+
+    switch (currentCategory) {
+        case 'addition':
+            document.getElementById('exTitle').textContent = '➕ חיבור וחיסור במאונך';
+            document.getElementById('exSubtitle').textContent = 'פתרו את התרגיל';
+            content.innerHTML = `
+                <div class="math-problem pop-in">
+                    ${q.a.toLocaleString()} <span class="operator">${q.op}</span> ${q.b.toLocaleString()} <span class="equals">=</span> ?
+                </div>
+                <input type="number" class="answer-input" id="mainAnswer" inputmode="numeric" autofocus>
+            `;
+            setTimeout(() => document.getElementById('mainAnswer')?.focus(), 100);
+            break;
+
+        case 'distrib':
+            document.getElementById('exTitle').textContent = '✖️ כפל בפילוג';
+            document.getElementById('exSubtitle').textContent = 'פרקו לעשרות ויחידות ופתרו';
+            content.innerHTML = `
+                <div class="distrib-layout pop-in">
+                    <div class="distrib-row" style="font-size:1.5rem; margin-bottom:16px;">
+                        ${q.multiplier} <span class="op">×</span> ${q.num} <span class="eq">=</span> ?
+                    </div>
+                    <div class="distrib-row">
+                        ${q.multiplier} <span class="op">×</span> 
+                        <input type="number" class="answer-input small-input" id="dTens" inputmode="numeric" placeholder="עש׳"> 
+                        <span class="op">+</span> ${q.multiplier} <span class="op">×</span> 
+                        <input type="number" class="answer-input small-input" id="dOnes" inputmode="numeric" placeholder="יח׳">
+                    </div>
+                    <div class="distrib-row" style="margin-top:8px;">
+                        <span class="eq">=</span>
+                        <input type="number" class="answer-input small-input" id="dPartA" inputmode="numeric"> 
+                        <span class="op">+</span>
+                        <input type="number" class="answer-input small-input" id="dPartB" inputmode="numeric">
+                    </div>
+                    <div class="distrib-row" style="margin-top:8px;">
+                        <span class="eq">=</span>
+                        <input type="number" class="answer-input" id="dFinal" inputmode="numeric" style="width:130px;">
+                    </div>
+                </div>
+            `;
+            setTimeout(() => document.getElementById('dTens')?.focus(), 100);
+            break;
+
+        case 'sequence':
+            document.getElementById('exTitle').textContent = '🔢 השלימו את הסדרה';
+            document.getElementById('exSubtitle').textContent = `מצאו את החוק והשלימו`;
+            let seqHTML = '<div class="sequence-row pop-in">';
+            q.sequence.forEach((num, idx) => {
+                if (q.hidePositions.includes(idx)) {
+                    seqHTML += `<input type="number" class="answer-input small-input seq-input" data-idx="${idx}" data-answer="${num}" inputmode="numeric">`;
+                } else {
+                    seqHTML += `<span class="seq-num">${num.toLocaleString()}</span>`;
+                }
+                if (idx < q.sequence.length - 1) seqHTML += '<span class="seq-comma">,</span>';
+            });
+            seqHTML += '</div>';
+            content.innerHTML = seqHTML;
+            setTimeout(() => content.querySelector('.seq-input')?.focus(), 100);
+            break;
+
+        case 'placevalue':
+            document.getElementById('exTitle').textContent = '📊 מבנה עשרוני';
+            document.getElementById('exSubtitle').textContent = 'רשמו את הספרות במקום הנכון';
+            content.innerHTML = `
+                <div class="math-problem pop-in" style="font-size:2rem; margin-bottom:20px;">${q.num.toLocaleString()}</div>
+                <table class="place-value-table pop-in">
+                    <tr><th>אלפים</th><td><input type="number" class="pv-input" id="pvTh" data-answer="${q.thousands}" inputmode="numeric"></td></tr>
+                    <tr><th>מאות</th><td><input type="number" class="pv-input" id="pvH" data-answer="${q.hundreds}" inputmode="numeric"></td></tr>
+                    <tr><th>עשרות</th><td><input type="number" class="pv-input" id="pvT" data-answer="${q.tens}" inputmode="numeric"></td></tr>
+                    <tr><th>יחידות</th><td><input type="number" class="pv-input" id="pvO" data-answer="${q.ones}" inputmode="numeric"></td></tr>
+                </table>
+            `;
+            setTimeout(() => document.getElementById('pvTh')?.focus(), 100);
+            break;
+
+        case 'compare':
+            document.getElementById('exTitle').textContent = '⚖️ השוואת מספרים';
+            document.getElementById('exSubtitle').textContent = 'בחרו: גדול, קטן או שווה';
+            content.innerHTML = `
+                <div class="math-problem pop-in">
+                    ${q.left} <span class="equals" style="font-size:1.2rem;">⬜</span> ${q.right}
+                </div>
+                <div class="compare-btns pop-in">
+                    <button class="compare-btn" onclick="selectCompare(this, '>')">&gt;</button>
+                    <button class="compare-btn" onclick="selectCompare(this, '=')">=</button>
+                    <button class="compare-btn" onclick="selectCompare(this, '<')">&lt;</button>
+                </div>
+                <input type="hidden" id="compareAnswer" value="">
+            `;
+            break;
+
+        case 'wordproblem':
+            document.getElementById('exTitle').textContent = '📝 בעיות מילוליות';
+            document.getElementById('exSubtitle').textContent = 'קראו ופתרו';
+            content.innerHTML = `
+                <div class="word-problem-text pop-in">${q.text.replace(/\n/g, '<br>')}</div>
+                <div style="text-align:center; color: var(--text-dim); font-size:0.85rem; margin-bottom:8px;">רמז: ${q.hint}</div>
+                <input type="number" class="answer-input" id="mainAnswer" inputmode="numeric">
+            `;
+            setTimeout(() => document.getElementById('mainAnswer')?.focus(), 100);
+            break;
+    }
+
+    // Enter key handler
+    content.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+    });
+}
+
+function selectCompare(btn, value) {
+    document.querySelectorAll('.compare-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('compareAnswer').value = value;
+}
+
+function checkAnswer() {
+    const q = questions[currentQ];
+    let isCorrect = false;
+    const submitBtn = document.getElementById('submitBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const feedback = document.getElementById('feedback');
+
+    switch (currentCategory) {
+        case 'addition':
+        case 'wordproblem': {
+            const val = parseInt(document.getElementById('mainAnswer').value);
+            const expected = currentCategory === 'addition' ? q.answer : q.answer;
+            isCorrect = val === expected;
+            const inp = document.getElementById('mainAnswer');
+            inp.classList.add(isCorrect ? 'correct' : 'wrong');
+            if (!isCorrect) {
+                inp.classList.add('shake');
+                feedback.textContent = `התשובה הנכונה: ${expected.toLocaleString()}`;
+                feedback.className = 'feedback wrong';
+            }
+            break;
+        }
+
+        case 'distrib': {
+            const dTens = parseInt(document.getElementById('dTens').value);
+            const dOnes = parseInt(document.getElementById('dOnes').value);
+            const dPartA = parseInt(document.getElementById('dPartA').value);
+            const dPartB = parseInt(document.getElementById('dPartB').value);
+            const dFinal = parseInt(document.getElementById('dFinal').value);
+
+            const tensOk = dTens === q.tens;
+            const onesOk = dOnes === q.ones;
+            const partAOk = dPartA === q.partA;
+            const partBOk = dPartB === q.partB;
+            const finalOk = dFinal === q.answer;
+
+            isCorrect = tensOk && onesOk && partAOk && partBOk && finalOk;
+
+            ['dTens', 'dOnes', 'dPartA', 'dPartB', 'dFinal'].forEach(id => {
+                const el = document.getElementById(id);
+                const expectedVals = { dTens: q.tens, dOnes: q.ones, dPartA: q.partA, dPartB: q.partB, dFinal: q.answer };
+                el.classList.add(parseInt(el.value) === expectedVals[id] ? 'correct' : 'wrong');
+            });
+
+            if (!isCorrect) {
+                feedback.innerHTML = `${q.multiplier}×${q.tens} + ${q.multiplier}×${q.ones} = ${q.partA}+${q.partB} = ${q.answer}`;
+                feedback.className = 'feedback wrong';
+            }
+            break;
+        }
+
+        case 'sequence': {
+            const inputs = document.querySelectorAll('.seq-input');
+            isCorrect = true;
+            inputs.forEach(inp => {
+                const val = parseInt(inp.value);
+                const expected = parseInt(inp.dataset.answer);
+                if (val === expected) {
+                    inp.classList.add('correct');
+                } else {
+                    inp.classList.add('wrong');
+                    isCorrect = false;
+                }
+            });
+            if (!isCorrect) {
+                feedback.textContent = `הדילוג בסדרה: ${q.step}`;
+                feedback.className = 'feedback wrong';
+            }
+            break;
+        }
+
+        case 'placevalue': {
+            const inputs = document.querySelectorAll('.pv-input');
+            isCorrect = true;
+            inputs.forEach(inp => {
+                const val = parseInt(inp.value);
+                const expected = parseInt(inp.dataset.answer);
+                if (val === expected) {
+                    inp.style.color = 'var(--success)';
+                    inp.style.borderBottomColor = 'var(--success)';
+                } else {
+                    inp.style.color = 'var(--danger)';
+                    inp.style.borderBottomColor = 'var(--danger)';
+                    isCorrect = false;
+                }
+            });
+            if (!isCorrect) {
+                feedback.textContent = `${q.num} = ${q.thousands} אלפים, ${q.hundreds} מאות, ${q.tens} עשרות, ${q.ones} יחידות`;
+                feedback.className = 'feedback wrong';
+            }
+            break;
+        }
+
+        case 'compare': {
+            const val = document.getElementById('compareAnswer').value;
+            if (!val) {
+                feedback.textContent = 'בחרו תשובה!';
+                feedback.className = 'feedback wrong';
+                return;
+            }
+            isCorrect = val === q.answer;
+            document.querySelectorAll('.compare-btn').forEach(btn => {
+                if (btn.textContent.trim() === q.answer || (btn.textContent.trim() === '>' && q.answer === '>') || (btn.textContent.trim() === '<' && q.answer === '<') || (btn.textContent.trim() === '=' && q.answer === '=')) {
+                    btn.classList.add('correct-choice');
+                }
+                if (btn.classList.contains('selected') && !isCorrect) {
+                    btn.classList.add('wrong-choice');
+                }
+            });
+            if (!isCorrect) {
+                feedback.textContent = `${q.leftVal.toLocaleString()} ${q.answer} ${q.rightVal.toLocaleString()}`;
+                feedback.className = 'feedback wrong';
+            }
+            break;
+        }
+    }
+
+    if (isCorrect) {
+        feedback.textContent = ['מצוין! 🎉', 'כל הכבוד! ⭐', 'נכון! 💪', 'מדהים! 🌟'][randInt(0, 3)];
+        feedback.className = 'feedback correct';
+        categoryScores[currentCategory]++;
+        totalCorrect++;
+        stars++;
+    }
+
+    totalAnswered++;
+    submitBtn.style.display = 'none';
+    nextBtn.style.display = 'block';
+
+    // Disable inputs
+    document.querySelectorAll('#questionContent input').forEach(i => i.disabled = true);
+    document.querySelectorAll('.compare-btn').forEach(b => b.disabled = true);
+
+    updateTotalDisplay();
+
+    if (isCorrect) spawnMiniConfetti();
+}
+
+function nextQuestion() {
+    currentQ++;
+    showQuestion();
+}
+
+function showSummary() {
+    const score = categoryScores[currentCategory];
+    const total = questions.length;
+    const pct = Math.round((score / total) * 100);
+    const emoji = pct === 100 ? '🏆' : pct >= 80 ? '🌟' : pct >= 60 ? '👍' : '💪';
+    const msg = pct === 100 ? 'מושלם!' : pct >= 80 ? 'עבודה מצוינת!' : pct >= 60 ? 'כל הכבוד!' : 'נמשיך להתאמן!';
+
+    const content = document.getElementById('questionContent');
+    document.getElementById('qNum').textContent = '';
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('exTitle').textContent = '';
+    document.getElementById('exSubtitle').textContent = '';
+
+    content.innerHTML = `
+        <div class="summary-screen pop-in">
+            <div class="big-emoji">${emoji}</div>
+            <h2>${msg}</h2>
+            <div class="score-text"><span>${score}</span> / ${total}</div>
+            <button class="submit-btn" onclick="startExercise('${currentCategory}')" style="margin-bottom:10px;">🔄 נסו שוב</button>
+            <button class="next-btn" onclick="goBack()" style="display:block;">→ חזרה לתפריט</button>
+        </div>
+    `;
+
+    if (pct >= 80) spawnConfetti();
+}
+
+// ===== UI UPDATES =====
+
+function updateTotalDisplay() {
+    document.getElementById('totalScore').textContent = totalCorrect;
+    document.getElementById('totalQuestions').textContent = totalAnswered;
+    document.getElementById('starDisplay').textContent = `⭐ ${stars}`;
+    const pct = totalAnswered > 0 ? (totalCorrect / totalAnswered) * 100 : 0;
+    document.getElementById('totalProgress').style.width = pct + '%';
+}
+
+function updateMenuBadges() {
+    Object.keys(categoryScores).forEach(cat => {
+        const badge = document.getElementById(`badge-${cat}`);
+        if (categoryTotals[cat] > 0) {
+            badge.style.display = 'block';
+            badge.textContent = `${categoryScores[cat]}/${categoryTotals[cat]}`;
+        }
+    });
+}
+
+// ===== CONFETTI =====
+
+function spawnMiniConfetti() {
+    const colors = ['#06d6a0', '#ffd166', '#ef476f', '#4361ee', '#ff8906'];
+    for (let i = 0; i < 12; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = (30 + Math.random() * 40) + '%';
+        el.style.top = '-10px';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        el.style.width = (6 + Math.random() * 6) + 'px';
+        el.style.height = (6 + Math.random() * 6) + 'px';
+        el.style.animation = `confetti-fall ${1.5 + Math.random()}s ease-out forwards`;
+        el.style.animationDelay = (Math.random() * 0.3) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+    }
+}
+
+function spawnConfetti() {
+    const colors = ['#06d6a0', '#ffd166', '#ef476f', '#4361ee', '#ff8906', '#e84393'];
+    for (let i = 0; i < 40; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = Math.random() * 100 + '%';
+        el.style.top = '-20px';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        el.style.width = (8 + Math.random() * 8) + 'px';
+        el.style.height = (8 + Math.random() * 8) + 'px';
+        el.style.animation = `confetti-fall ${2 + Math.random() * 2}s ease-out forwards`;
+        el.style.animationDelay = (Math.random() * 0.8) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 5000);
+    }
+}
+</script>
+</body>
+</html>

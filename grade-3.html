@@ -10,9 +10,70 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>כיתה ג' - ראש פתוח</title>
+    <title>כיתה ג' - כאן לומדות ולומדים</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        .exam-alert {
+            background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+            border: 2px solid #e53935;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin: 0 14px 16px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .exam-alert-icon { font-size: 2em; flex-shrink: 0; }
+        .exam-alert-text { flex: 1; }
+        .exam-alert-title { font-weight: bold; color: #c62828; font-size: 1.1em; }
+        .exam-alert-date {
+            display: inline-block;
+            background: #e53935;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .exam-alert-desc { color: #555; font-size: 0.9em; margin-top: 4px; }
+
+        .card.for-exam {
+            border: 2px solid #e53935;
+            background: #fff8f8;
+        }
+        .card.for-exam:hover {
+            border-color: #c62828;
+            box-shadow: 0 10px 18px rgba(229,57,53,0.12);
+        }
+        .card.for-exam .card-title { color: #c62828; }
+        .card.for-exam .exam-tag {
+            display: inline-block;
+            background: #e53935;
+            color: white;
+            font-size: 0.65em;
+            padding: 2px 7px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .card.worksheet.for-exam {
+            border: 2px solid #1976d2;
+            border-top: 4px solid #1976d2;
+            background: #f0f6ff;
+        }
+        .card.worksheet.for-exam:hover {
+            border-color: #1565c0;
+            box-shadow: 0 10px 18px rgba(25,118,210,0.12);
+        }
+        .card.worksheet.for-exam .card-title { color: #1565c0; }
+        .card.worksheet.for-exam .exam-tag { background: #1976d2; }
+
+        .section-divider { padding: 0 14px; margin-bottom: 12px; }
+        .section-divider-line { border: 0; border-top: 1px dashed #ddd; margin: 0; }
+        .section-divider-label { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 6px; }
+
         .card-actions { display: none !important; }
     </style>
 </head>
@@ -21,7 +82,7 @@
 
 <div class="container">
     <header class="main-header" style="padding: 15px; margin-bottom: 25px;">
-        <h1 style="font-size: 1.8em;">ראש פתוח 🎓</h1>
+        <h1 style="font-size: 1.8em;">כאן לומדות ולומדים בכיף 🎓</h1>
     </header>
 
     <main class="grades-container">
@@ -36,50 +97,63 @@
             </div>
 
             <!-- ===== אנגלית ===== -->
-            <details class="subject-box" 
-                data-exam-date="2026-04-20"
-                data-exam-title="מבחן Unit 3 - בעלי חיים 🐾"
-                data-exam-desc="אותיות גדולות וקטנות · צלילים בתחילה/אמצע/סוף · קריאה וכתיבה של מילים">
+            <details class="subject-box" open>
                 <summary class="subject-title">
                     🗣️ אנגלית
+                    <span class="subject-badge exam">📅 מבחן 20.4</span>
                 </summary>
+                
+                <div class="exam-alert">
+                    <span class="exam-alert-icon">📝</span>
+                    <div class="exam-alert-text">
+                        <div class="exam-alert-title">
+                            <span class="exam-alert-date">יום ב׳ 20.4</span>
+                            מבחן Unit 3 - בעלי חיים 🐾
+                        </div>
+                        <div class="exam-alert-desc">אותיות גדולות וקטנות · צלילים בתחילה/אמצע/סוף · קריאה וכתיבה של מילים</div>
+                    </div>
+                </div>
 
-                <!-- כרטיסים למבחן -->
                 <div class="apps-grid">
-                    <div class="card" data-for-exam>
+                    <div class="card for-exam">
                         <a class="card-main" href="https://claude.ai/public/artifacts/5b690863-d0d3-41da-805d-b4ad3748e36b" target="_blank">
+                            <span class="exam-tag">למבחן</span>
                             <span class="icon">🌿</span>
                             <span class="card-title">גן האותיות - מהמורה</span>
                             <span class="card-desc">התאמת אותיות, צלילים, a/an</span>
                         </a>
                     </div>
 
-                    <div class="card" data-for-exam>
+                    <div class="card for-exam">
                         <a class="card-main" href="https://ea-games-web-production-f9e97a026853.herokuapp.com/4" target="_blank">
+                            <span class="exam-tag">למבחן</span>
                             <span class="icon">🕹️</span>
                             <span class="card-title">משחק תרגול - מהמורה</span>
                             <span class="card-desc">קישור לאתר חיצוני</span>
                         </a>
                     </div>
 
-                    <div class="card worksheet" data-for-exam>
-                        <a class="card-main" href="apps/english/eng-unit3-worksheet.html">
+                    <div class="card worksheet for-exam">
+                        <a class="card-main" href="eng-unit3-worksheet.html">
+                            <span class="exam-tag">למבחן</span>
                             <span class="icon">📄</span>
                             <span class="card-title">Unit 3 - דף עבודה</span>
                             <span class="card-desc">תרגול כתיבה להדפסה</span>
                         </a>
                     </div>
 
-                    <div class="card" data-for-exam>
-                        <a class="card-main" href="apps/english/word_game_en.html">
+                    <div class="card for-exam">
+                        <a class="card-main" href="word_game_en.html">
+                            <span class="exam-tag">למבחן</span>
                             <span class="icon">🦉</span>
                             <span class="card-title">אות פותחת</span>
                             <span class="card-desc">אילו מילים מתחילות באילו אותיות?</span>
                         </a>
                     </div>
 
-                    <div class="card" data-for-exam>
-                        <a class="card-main" href="apps/english/memory_en.html">
+                    <div class="card for-exam">
+                        <a class="card-main" href="memory_en.html">
+                            <span class="exam-tag">למבחן</span>
                             <span class="icon">🔡</span>
                             <span class="card-title">משחק הזכרון</span>
                             <span class="card-desc">הכרות עם האותיות באנגלית</span>
@@ -87,10 +161,14 @@
                     </div>
                 </div>
 
-                <!-- תרגולים נוספים (לא למבחן) -->
+                <div class="section-divider">
+                    <hr class="section-divider-line">
+                    <div class="section-divider-label">תרגולים נוספים</div>
+                </div>
+
                 <div class="apps-grid">
                     <div class="card" data-app-id="english-unit2">
-                        <a class="card-main" href="apps/english/english-unit2.html">
+                        <a class="card-main" href="english-unit2.html">
                             <span class="icon">🏫</span>
                             <span class="card-title">אנגלית - Unit 2</span>
                             <span class="card-desc">תרגול אוצר מילים</span>
@@ -98,7 +176,7 @@
                     </div>
 
                     <div class="card worksheet" data-app-id="english-unit2-worksheet">
-                        <a class="card-main" href="apps/english/eng-unit2-worksheet.html">
+                        <a class="card-main" href="eng-unit2-worksheet.html">
                             <span class="icon">📝</span>
                             <span class="card-title">Unit 2 - דף עבודה</span>
                             <span class="card-desc">להדפסה ולמילוי בכתב</span>
@@ -106,7 +184,7 @@
                     </div>
                     
                     <div class="card" data-app-id="english">
-                        <a class="card-main" href="apps/english/english.html">
+                        <a class="card-main" href="english.html">
                             <span class="icon">🔡</span>
                             <span class="card-title">אנגלית בסיסית</span>
                             <span class="card-desc">אותיות Aa, Bb, Dd...</span>
@@ -120,21 +198,21 @@
                 <summary class="subject-title">🔢 שפה</summary>
                 <div class="apps-grid">
                     <div class="card" data-app-id="milim">
-                        <a class="card-main" href="apps/hebrew/milim.html">
+                        <a class="card-main" href="milim.html">
                             <span class="icon">📚</span>
                             <span class="card-title">סדר במילון</span>
                             <span class="card-desc">סידור מילים לפי א'-ב'</span>
                         </a>
                     </div>
                     <div class="card" data-app-id="grammer">
-                        <a class="card-main" href="apps/hebrew/grammer.html">
+                        <a class="card-main" href="grammer.html">
                             <span class="icon">⌨️</span>
                             <span class="card-title">משחק השגיאות</span>
                             <span class="card-desc">תיקון שגיאות כתיב</span>
                         </a>
                     </div>
                     <div class="card" data-app-id="spelling">
-                        <a class="card-main" href="apps/hebrew/spelling_game.html">
+                        <a class="card-main" href="spelling_game.html">
                             <span class="icon">⌨️</span>
                             <span class="card-title">כיף לאיית</span>
                             <span class="card-desc"></span>
@@ -148,7 +226,7 @@
                 <summary class="subject-title">📜 תורה</summary>
                 <div class="apps-grid">
                     <div class="card" data-app-id="genesis282931">
-                        <a class="card-main" href="apps/bible/genesis_28_29_31.html">
+                        <a class="card-main" href="genesis_28_29_31.html">
                             <span class="icon">🪜</span>
                             <span class="card-title">ספר בראשית כח כט לא</span>
                             <span class="card-desc">סולם יעקב, הפגישה עם לבן, רחל ולאה</span>
@@ -162,7 +240,7 @@
                 <summary class="subject-title">⚗️ מדעים</summary>
                 <div class="apps-grid">
                     <div class="card" data-app-id="Materials_fix">
-                        <a class="card-main" href="apps/science/Materials_fix.html">
+                        <a class="card-main" href="Materials_fix.html">
                             <span class="icon">🧪</span>
                             <span class="card-title">חומרים</span>
                             <span class="card-desc">תכונות חומרים ושימושיהם</span>
@@ -172,32 +250,72 @@
             </details>
 
             <!-- ===== חשבון ===== -->
-            <details class="subject-box">
-                <summary class="subject-title">📐 חשבון והנדסה</summary>
+            <details class="subject-box" open>
+                <summary class="subject-title">
+                    📐 חשבון והנדסה
+                    <span class="subject-badge exam">📅 מבחן 26.4</span>
+                </summary>
+                
+                <div class="exam-alert">
+                    <span class="exam-alert-icon">📝</span>
+                    <div class="exam-alert-text">
+                        <div class="exam-alert-title">
+                            <span class="exam-alert-date">יום א׳ 26.4</span>
+                            עבודה מסכמת — חשבון
+                        </div>
+                        <div class="exam-alert-desc">כפל ופילוג · מבנה עשרוני · חיבור וחיסור עם המרה בתחום הרבבה · בעיות מילוליות</div>
+                    </div>
+                </div>
+
                 <div class="apps-grid">
-                    <div class="card" data-app-id="distributive_law">
-                        <a class="card-main" href="apps/math/distributive_law.html">
+                    <div class="card for-exam" data-app-id="distributive_law">
+                        <a class="card-main" href="distributive_law.html">
+                            <span class="exam-tag">למבחן</span>
                             <span class="icon">🧙‍♂️</span>
                             <span class="card-title">קוסם הכפל</span>
                             <span class="card-desc">חוק הפילוג - פירוק כפל לחתיכות</span>
                         </a>
                     </div>
+                    <div class="card for-exam" data-app-id="distributive_practice">
+                        <a class="card-main" href="distributive_practice.html">
+                            <span class="exam-tag">למבחן</span>
+                            <span class="icon">🎯</span>
+                            <span class="card-title">חזרה מקיפה למבחן</span>
+                            <span class="card-desc">6 קטגוריות: פילוג, סדרות, מבנה עשרוני, השוואה, חיבור וחיסור, בעיות מילוליות</span>
+                        </a>
+                    </div>
+                    <div class="card worksheet for-exam">
+                        <a class="card-main" href="distributive-worksheet.pdf" target="_blank">
+                            <span class="exam-tag">למבחן</span>
+                            <span class="icon">📄</span>
+                            <span class="card-title">דף עבודה להדפסה</span>
+                            <span class="card-desc">3 עמודים: תרגילים במאונך, פילוג, סדרות, ערך מקום, השוואה ובעיות מילוליות</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="section-divider">
+                    <hr class="section-divider-line">
+                    <div class="section-divider-label">תרגולים נוספים</div>
+                </div>
+
+                <div class="apps-grid">
                     <div class="card" data-app-id="math_story">
-                        <a class="card-main" href="apps/math/math_game.html">
+                        <a class="card-main" href="math_game.html">
                             <span class="icon">🦄</span>
                             <span class="card-title">בעיות מילוליות</span>
                             <span class="card-desc">אלופת הכפל: תרגול שאלות סיפור</span>
                         </a>
                     </div>
                     <div class="card" data-app-id="multiplication">
-                        <a class="card-main" href="apps/math/multiplication1.html">
+                        <a class="card-main" href="multiplication1.html">
                             <span class="icon">✖️</span>
                             <span class="card-title">משחק לוח הכפל</span>
                             <span class="card-desc">תרגול לוח הכפל בצורה משחקית</span>
                         </a>
                     </div>
                     <div class="card" data-app-id="calc8">
-                        <a class="card-main" href="apps/math/calc8.html">
+                        <a class="card-main" href="calc8.html">
                             <span class="icon">✖️</span>
                             <span class="card-title">לוח הכפל</span>
                             <span class="card-desc">חזרה על כפולות לפי מספרים</span>
@@ -220,7 +338,6 @@
 </div>
 
 <script src="remember-name.js"></script>
-<script src="exam-manager.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check-compat.js"></script>
