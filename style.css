@@ -437,6 +437,88 @@ details[open] > summary.subject-title::after {
 .grade-col.kindergarten h2.grade-title { background: #fb8c00; box-shadow: 0 4px 10px rgba(251, 140, 0, 0.3); }
 .grade-col.kindergarten .homework-box { border-color: #fb8c00; background: #fff3e0; }
 
+/* --- משימה שהושלמה (מחיקה רכה) --- */
+.homework-item.hw-done {
+    opacity: 0.5;
+    border-right-color: #a5d6a7;
+    background: #f5f5f5;
+    position: relative;
+}
+
+.homework-item.hw-done .hw-done-text {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.homework-item.hw-done .homework-subject {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.hw-done-icon {
+    font-size: 1.2em;
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+
+.hw-completed-section {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px dashed #ddd;
+}
+
+.hw-completed-title {
+    margin: 0 0 8px 0;
+    font-size: 0.9em;
+    color: #888;
+    font-weight: normal;
+}
+
+/* --- כוכבי הצלחה באפליקציות --- */
+.app-score-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 2;
+    background: rgba(255,255,255,0.9);
+    padding: 2px 6px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    line-height: 1;
+}
+
+.star-rating {
+    display: inline-flex;
+    gap: 1px;
+    direction: ltr;
+}
+
+.star-rating .star.empty {
+    color: #ddd;
+    font-style: normal;
+}
+
+.star-rating .star.filled {
+    font-size: 0.95em;
+}
+
+/* כרטיסייה שבוצעה — גבול ירוק עדין */
+.card.app-completed {
+    border-color: #a5d6a7;
+}
+
+.card.app-completed::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(200, 230, 201, 0.1);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
 /* --- Footer --- */
 footer {
     text-align: center;
