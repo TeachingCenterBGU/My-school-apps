@@ -472,6 +472,30 @@ details[open] > summary.subject-title::after {
     font-size: 0.9em;
     color: #888;
     font-weight: normal;
+    cursor: pointer;
+    padding: 8px 4px;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.05);
+}
+
+.hw-completed-title::-webkit-details-marker {
+    display: none;
+}
+
+.hw-completed-title::after {
+    content: "▾";
+    font-size: 0.85em;
+    color: #aaa;
+    margin-right: auto;
+    margin-left: 4px;
+    transition: transform 0.2s;
+}
+
+details.hw-completed-section[open] > .hw-completed-title::after {
+    transform: rotate(180deg);
 }
 
 /* --- כוכבי הצלחה באפליקציות --- */
