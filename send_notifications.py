@@ -133,8 +133,8 @@ def send_notification(token, title, body):
             notification=messaging.WebpushNotification(
                 title=title,
                 body=body,
-                icon='/My-school-apps/icon192.png',
-                badge='/My-school-apps/icon192.png',
+                icon='https://inbalbar.github.io/My-school-apps/icon192.png',
+                badge='https://inbalbar.github.io/My-school-apps/icon192.png',
                 tag='homework-reminder',
                 renotify=True,
             ),

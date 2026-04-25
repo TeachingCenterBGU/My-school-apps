@@ -1,6 +1,6 @@
 {
-    "name": "כאן לומדות ולומדים בכיף",
-    "short_name": "לומדים בכיף",
+    "name": "ראש פתוח — תרגול, משחקים ודפי עבודה",
+    "short_name": "ראש פתוח",
     "description": "תרגול, משחקים ודפי עבודה",
     "start_url": "/My-school-apps/index.html",
     "scope": "/My-school-apps/",
@@ -11,12 +11,12 @@
     "lang": "he",
     "icons": [
         {
-            "src": "icon-192.png",
+            "src": "icon192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "icon-512.png",
+            "src": "icon512.png",
             "sizes": "512x512",
             "type": "image/png"
         }
