@@ -525,8 +525,8 @@ async function renderHomework(grade, containerId) {
     }
 
     if (completedTasks.length > 0) {
-        html += '<div class="hw-completed-section">';
-        html += '<h4 class="hw-completed-title">✅ הושלמו:</h4>';
+        html += '<details class="hw-completed-section">';
+        html += '<summary class="hw-completed-title">✅ הושלמו (' + completedTasks.length + ')</summary>';
         completedTasks.forEach(task => {
             const dateHtml = task.completedDisplay 
                 ? `<span class="hw-date">הושלם ${task.completedDisplay}</span>` 
@@ -544,7 +544,7 @@ async function renderHomework(grade, containerId) {
                 </div>
             `;
         });
-        html += '</div>';
+        html += '</details>';
     }
 
     container.innerHTML = html;
