@@ -2,7 +2,6 @@
 // firebase-homework.js
 // שמירת שיעורי בית ב-Firebase
 // אימות משתמש באמצעות Google/Gmail
-// רישום כיתה אישי — כל ילדה רואה רק את המשימות שלה
 // מחיקה רכה: משימות נמחקות אחרי שבוע
 // ==============================================
 
@@ -27,23 +26,13 @@ if (firebase.appCheck) {
 }
 
 // --- הגדרות ---
-const SOFT_DELETE_DAYS = 7;
+const SOFT_DELETE_DAYS = 7; // מספר ימים עד למחיקה מוחלטת
 
 // --- זיהוי משתמש ---
 let currentUser = null;       // Firebase UID
 let currentDisplayName = null;
 let currentEmail = null;
-let currentUserGrade = null;  // הכיתה הרשומה של המשתמש
 let isGuest = false;
-
-// --- זיהוי עמוד נוכחי ---
-function detectPageGrade() {
-    const path = window.location.pathname;
-    if (path.includes('grade-3')) return 3;
-    if (path.includes('grade-5')) return 5;
-    if (path.includes('kindergarten')) return 0;
-    return null;
-}
 
 // --- מצב אורח ---
 
@@ -52,7 +41,6 @@ window.continueAsGuest = function() {
     currentUser = null;
     currentDisplayName = "אורח/ת";
     currentEmail = null;
-    currentUserGrade = null;
 
     const overlay = document.getElementById("user-select-overlay");
     if (overlay) overlay.remove();
@@ -62,7 +50,10 @@ window.continueAsGuest = function() {
         box.style.display = 'none';
     });
 
+    // הצגת badge אורח
     showGuestBadge();
+
+    // טעינת כוכבים לא רלוונטית לאורח, אבל אפשר להציג את הכרטיסיות
 };
 
 function showGuestBadge() {
@@ -81,6 +72,7 @@ function showGuestBadge() {
     badge.innerHTML = `<span style="font-size: 0.9em;">👀</span> אורח/ת`;
     badge.addEventListener("click", () => {
         isGuest = false;
+        // הצגת קוביות שיעורי בית מחדש
         document.querySelectorAll('.homework-box').forEach(box => {
             box.style.display = '';
         });
@@ -145,6 +137,7 @@ window.signInWithGoogle = async function() {
 
     try {
         const result = await auth.signInWithPopup(googleProvider);
+        // ההצלחה תטופל ב-onAuthStateChanged
     } catch (error) {
         console.error("Login error:", error);
         if (errorEl) {
@@ -165,170 +158,12 @@ window.signInWithGoogle = async function() {
     }
 };
 
-// ==============================================
-// בחירת כיתה — מוצג רק פעם אחת אחרי ההתחברות
-// ==============================================
-
-function showGradeSelection() {
-    return new Promise((resolve) => {
-        const overlay = document.createElement("div");
-        overlay.id = "grade-select-overlay";
-        overlay.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: flex; align-items: center;
-            justify-content: center; z-index: 9998;
-        `;
-
-        overlay.innerHTML = `
-            <div style="background: white; border-radius: 20px; padding: 30px 25px; text-align: center; max-width: 340px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2); direction: rtl;">
-                <div style="font-size: 2.5em; margin-bottom: 8px;">🎒</div>
-                <h2 style="margin: 0 0 6px 0; font-size: 1.3em; color: #333;">שלום ${currentDisplayName}!</h2>
-                <p style="margin: 0 0 22px 0; color: #666; font-size: 0.95em;">באיזו כיתה את/ה?</p>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <button onclick="selectGrade(3)" class="grade-select-btn" style="
-                        padding: 14px; font-size: 1.15em; border: 2px solid #ec407a;
-                        border-radius: 14px; background: #fce4ec; color: #c2185b;
-                        cursor: pointer; font-family: inherit; font-weight: bold;
-                        transition: all 0.2s;
-                    ">כיתה ג' 🍬</button>
-                    <button onclick="selectGrade(5)" class="grade-select-btn" style="
-                        padding: 14px; font-size: 1.15em; border: 2px solid #5c6bc0;
-                        border-radius: 14px; background: #e8eaf6; color: #3949ab;
-                        cursor: pointer; font-family: inherit; font-weight: bold;
-                        transition: all 0.2s;
-                    ">כיתה ה' 🦋</button>
-                </div>
-                <p style="margin: 18px 0 0 0; color: #aaa; font-size: 0.8em;">
-                    אפשר לשנות אחר כך דרך הלחיצה על השם
-                </p>
-            </div>
-        `;
-
-        document.body.appendChild(overlay);
-
-        // שמירת ה-resolve כדי לקרוא לו כשבוחרים כיתה
-        window._gradeSelectResolve = resolve;
-    });
-}
-
-window.selectGrade = async function(grade) {
-    if (!currentUser) return;
-
-    // שמירה ב-Firebase
-    await db.ref('users/' + currentUser + '/grade').set(grade);
-    currentUserGrade = grade;
-
-    // שמירה גם ב-localStorage כגיבוי מהיר
-    try { localStorage.setItem('userGrade_' + currentUser, grade); } catch(e) {}
-
-    // הסרת המסך
-    const overlay = document.getElementById("grade-select-overlay");
-    if (overlay) overlay.remove();
-
-    // המשך אתחול
-    if (window._gradeSelectResolve) {
-        window._gradeSelectResolve(grade);
-        window._gradeSelectResolve = null;
-    }
-};
-
-// --- קריאת כיתת המשתמש מ-Firebase ---
-async function loadUserGrade() {
-    if (!currentUser) return null;
-
-    // ניסיון מהיר מ-localStorage
-    try {
-        const cached = localStorage.getItem('userGrade_' + currentUser);
-        if (cached) {
-            currentUserGrade = parseInt(cached);
-        }
-    } catch(e) {}
-
-    // קריאה מ-Firebase (מקור אמת)
-    try {
-        const snapshot = await db.ref('users/' + currentUser + '/grade').once('value');
-        const grade = snapshot.val();
-        if (grade) {
-            currentUserGrade = grade;
-            try { localStorage.setItem('userGrade_' + currentUser, grade); } catch(e) {}
-            return grade;
-        }
-    } catch(e) {
-        console.error("Error loading user grade:", e);
-    }
-
-    return currentUserGrade; // יכול להיות null
-}
-
-// --- שינוי כיתה (מתוך badge המשתמש) ---
-async function changeGrade() {
-    const overlay = document.createElement("div");
-    overlay.id = "grade-change-overlay";
-    overlay.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5); display: flex; align-items: center;
-        justify-content: center; z-index: 9998;
-    `;
-
-    const gradeNames = { 3: "ג'", 5: "ה'" };
-    const currentGradeName = gradeNames[currentUserGrade] || "?";
-
-    overlay.innerHTML = `
-        <div style="background: white; border-radius: 16px; padding: 25px; text-align: center; max-width: 300px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2); direction: rtl;">
-            <h3 style="margin: 0 0 6px 0;">🔄 שינוי כיתה</h3>
-            <p style="color: #666; font-size: 0.9em; margin: 0 0 18px 0;">
-                עכשיו רשומה לכיתה ${currentGradeName}
-            </p>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="doChangeGrade(3)" style="
-                    padding: 10px 20px; border: 2px solid #ec407a; border-radius: 12px;
-                    background: ${currentUserGrade === 3 ? '#ec407a' : '#fce4ec'};
-                    color: ${currentUserGrade === 3 ? 'white' : '#c2185b'};
-                    cursor: pointer; font-family: inherit; font-weight: bold; font-size: 1em;
-                ">ג' 🍬</button>
-                <button onclick="doChangeGrade(5)" style="
-                    padding: 10px 20px; border: 2px solid #5c6bc0; border-radius: 12px;
-                    background: ${currentUserGrade === 5 ? '#5c6bc0' : '#e8eaf6'};
-                    color: ${currentUserGrade === 5 ? 'white' : '#3949ab'};
-                    cursor: pointer; font-family: inherit; font-weight: bold; font-size: 1em;
-                ">ה' 🦋</button>
-            </div>
-            <button onclick="document.getElementById('grade-change-overlay').remove()" style="
-                margin-top: 14px; border: none; background: none; color: #999;
-                cursor: pointer; font-size: 0.9em; font-family: inherit;
-            ">ביטול</button>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-}
-
-window.doChangeGrade = async function(grade) {
-    if (!currentUser) return;
-
-    await db.ref('users/' + currentUser + '/grade').set(grade);
-    currentUserGrade = grade;
-    try { localStorage.setItem('userGrade_' + currentUser, grade); } catch(e) {}
-
-    const overlay = document.getElementById("grade-change-overlay");
-    if (overlay) overlay.remove();
-
-    // רענון הצגת שיעורי בית
-    renderHomeworkForUser();
-    // עדכון badge
-    showUserBadge();
-};
-
-// --- Badge משתמש (עם כיתה + אפשרות שינוי) ---
-
 function showUserBadge() {
     if (!currentDisplayName) return;
 
+    // הסרת badge קודם אם קיים
     const existing = document.getElementById("user-badge");
     if (existing) existing.remove();
-
-    const gradeNames = { 3: "ג'", 5: "ה'" };
-    const gradeLabel = currentUserGrade ? ` · כיתה ${gradeNames[currentUserGrade] || currentUserGrade}` : '';
 
     const badge = document.createElement("div");
     badge.id = "user-badge";
@@ -338,63 +173,16 @@ function showUserBadge() {
         box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; direction: rtl;
         display: flex; align-items: center; gap: 6px;
     `;
-    badge.title = "לחצי לאפשרויות";
-    badge.innerHTML = `<span style="font-size: 0.9em;">👤</span> ${currentDisplayName}${gradeLabel}`;
-    
-    badge.addEventListener("click", () => {
-        showUserMenu();
+    badge.title = "לחצי להתנתקות";
+    badge.innerHTML = `<span style="font-size: 0.9em;">👤</span> ${currentDisplayName}`;
+    badge.addEventListener("click", async () => {
+        if (confirm("להתנתק?")) {
+            await auth.signOut();
+            location.reload();
+        }
     });
     document.body.appendChild(badge);
 }
-
-function showUserMenu() {
-    // תפריט קטן עם אפשרויות
-    const existing = document.getElementById("user-menu-popup");
-    if (existing) { existing.remove(); return; }
-
-    const menu = document.createElement("div");
-    menu.id = "user-menu-popup";
-    menu.style.cssText = `
-        position: fixed; top: 45px; left: 10px; background: white; color: #333;
-        border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        z-index: 1000; direction: rtl; overflow: hidden;
-        border: 1px solid #eee; min-width: 160px;
-    `;
-
-    menu.innerHTML = `
-        <button onclick="changeGrade(); document.getElementById('user-menu-popup').remove();" style="
-            display: block; width: 100%; padding: 12px 16px; border: none;
-            background: white; text-align: right; cursor: pointer; font-family: inherit;
-            font-size: 0.95em; border-bottom: 1px solid #f0f0f0;
-        ">🔄 שינוי כיתה</button>
-        <button onclick="doLogout()" style="
-            display: block; width: 100%; padding: 12px 16px; border: none;
-            background: white; text-align: right; cursor: pointer; font-family: inherit;
-            font-size: 0.95em; color: #e53935;
-        ">🚪 התנתקות</button>
-    `;
-
-    document.body.appendChild(menu);
-
-    // סגירה בלחיצה מחוץ לתפריט
-    setTimeout(() => {
-        document.addEventListener("click", function closeMenu(e) {
-            if (!menu.contains(e.target)) {
-                menu.remove();
-                document.removeEventListener("click", closeMenu);
-            }
-        });
-    }, 100);
-}
-
-window.doLogout = async function() {
-    const menu = document.getElementById("user-menu-popup");
-    if (menu) menu.remove();
-    if (confirm("להתנתק?")) {
-        await auth.signOut();
-        location.reload();
-    }
-};
 
 // --- פונקציות Firebase ---
 
@@ -404,10 +192,21 @@ function saveTaskDone(taskId, taskInfo) {
     const now = new Date();
     const displayDate = now.toLocaleDateString('he-IL') + ' ' + now.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
 
-    db.ref('done/' + currentUser + '/' + taskId).set({
+    const doneEntry = {
         completedAt: now.toISOString(),
         completedAtDisplay: displayDate
-    });
+    };
+
+    // שמירה מקומית כגיבוי (תמיד עובד)
+    try {
+        const localDone = JSON.parse(localStorage.getItem('hw_done_' + currentUser) || '{}');
+        localDone[taskId] = doneEntry;
+        localStorage.setItem('hw_done_' + currentUser, JSON.stringify(localDone));
+    } catch (e) { /* localStorage not available */ }
+
+    // שמירה ב-Firebase
+    db.ref('done/' + currentUser + '/' + taskId).set(doneEntry)
+        .catch(err => console.error("Firebase save failed:", err));
 
     db.ref('log/' + currentUser + '/' + taskId).set({
         completedAt: now.toISOString(),
@@ -417,14 +216,36 @@ function saveTaskDone(taskId, taskInfo) {
         grade: taskInfo.grade || '',
         userName: currentDisplayName,
         userEmail: currentEmail
-    });
+    }).catch(err => console.error("Firebase log failed:", err));
 }
 
 async function getDoneData() {
     if (!currentUser) return {};
 
-    const snapshot = await db.ref('done/' + currentUser).once('value');
-    return snapshot.val() || {};
+    // קריאה מ-localStorage (גיבוי מקומי)
+    let localDone = {};
+    try {
+        localDone = JSON.parse(localStorage.getItem('hw_done_' + currentUser) || '{}');
+    } catch (e) { /* ignore */ }
+
+    // קריאה מ-Firebase
+    let firebaseDone = {};
+    try {
+        const snapshot = await db.ref('done/' + currentUser).once('value');
+        firebaseDone = snapshot.val() || {};
+    } catch (err) {
+        console.error("Firebase read failed:", err);
+    }
+
+    // מיזוג: Firebase גובר על localStorage (אם שניהם קיימים)
+    const merged = { ...localDone, ...firebaseDone };
+
+    // סנכרון localStorage עם התוצאה הממוזגת
+    try {
+        localStorage.setItem('hw_done_' + currentUser, JSON.stringify(merged));
+    } catch (e) { /* ignore */ }
+
+    return merged;
 }
 
 function isExpired(completedAt) {
@@ -435,15 +256,35 @@ function isExpired(completedAt) {
     return diffDays >= SOFT_DELETE_DAYS;
 }
 
+// --- ניקוי משימות ישנות מ-Firebase ו-localStorage ---
 async function cleanupExpiredTasks() {
     if (!currentUser) return;
     const doneData = await getDoneData();
     
+    let localDone = {};
+    try {
+        localDone = JSON.parse(localStorage.getItem('hw_done_' + currentUser) || '{}');
+    } catch (e) { /* ignore */ }
+
+    let localChanged = false;
+
     for (const [taskId, info] of Object.entries(doneData)) {
         const completedAt = typeof info === 'object' ? info.completedAt : null;
+        // תאימות לאחור: אם הערך הוא true (פורמט ישן), לא מוחקים
         if (completedAt && isExpired(completedAt)) {
-            db.ref('done/' + currentUser + '/' + taskId).remove();
+            db.ref('done/' + currentUser + '/' + taskId).remove()
+                .catch(err => console.error("Firebase cleanup failed:", err));
+            if (localDone[taskId]) {
+                delete localDone[taskId];
+                localChanged = true;
+            }
         }
+    }
+
+    if (localChanged) {
+        try {
+            localStorage.setItem('hw_done_' + currentUser, JSON.stringify(localDone));
+        } catch (e) { /* ignore */ }
     }
 }
 
@@ -453,24 +294,6 @@ async function renderHomework(grade, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // אם המשתמש רשום לכיתה אחרת — לא מציגים שיעורי בית כאן
-    if (currentUserGrade && currentUserGrade !== grade) {
-        const gradeNames = { 3: "ג'", 5: "ה'" };
-        const pageName = gradeNames[grade] || grade;
-        const myGradeName = gradeNames[currentUserGrade] || currentUserGrade;
-        const myGradeLink = currentUserGrade === 3 ? 'grade-3.html' : 'grade-5.html';
-        container.innerHTML = `
-            <p style="text-align:center; color:#888; margin:0; font-size: 0.95em;">
-                🔒 את/ה רשומה לכיתה ${myGradeName}
-                <br>
-                <a href="${myGradeLink}" style="color: #5c6bc0; font-weight: bold;">
-                    לחצי כאן לעבור לכיתה שלך →
-                </a>
-            </p>
-        `;
-        return;
-    }
-
     container.innerHTML = '<p style="text-align:center; color:#888;">⏳ טוען שיעורי בית...</p>';
 
     const auto = (typeof homeworkData !== 'undefined') ? homeworkData : [];
@@ -479,6 +302,7 @@ async function renderHomework(grade, containerId) {
 
     const doneData = await getDoneData();
 
+    // הפרדה: משימות פתוחות + משימות שהושלמו (ולא עבר שבוע)
     const pendingTasks = [];
     const completedTasks = [];
 
@@ -487,12 +311,14 @@ async function renderHomework(grade, containerId) {
         if (!doneInfo) {
             pendingTasks.push(task);
         } else {
+            // תאימות: אם הערך הוא true (פורמט ישן) — חשב כמושלם
             const completedAt = typeof doneInfo === 'object' ? doneInfo.completedAt : null;
             const completedDisplay = typeof doneInfo === 'object' ? doneInfo.completedAtDisplay : null;
             
             if (completedAt && !isExpired(completedAt)) {
                 completedTasks.push({ ...task, completedAt, completedDisplay });
             }
+            // אם עבר שבוע או פורמט ישן — לא מציגים כלל
         }
     });
 
@@ -503,6 +329,7 @@ async function renderHomework(grade, containerId) {
 
     let html = '';
 
+    // משימות פתוחות
     if (pendingTasks.length > 0) {
         html += '<h3 style="margin:0 0 10px 0; font-size:1.1em;">📝 שיעורי בית:</h3>';
         pendingTasks.forEach(task => {
@@ -524,6 +351,7 @@ async function renderHomework(grade, containerId) {
         });
     }
 
+    // משימות שהושלמו (מחיקה רכה)
     if (completedTasks.length > 0) {
         html += '<div class="hw-completed-section">';
         html += '<h4 class="hw-completed-title">✅ הושלמו:</h4>';
@@ -550,7 +378,7 @@ async function renderHomework(grade, containerId) {
     container.innerHTML = html;
 }
 
-// --- סימון משימה ---
+// --- סימון משימה (מחיקה רכה) ---
 
 window.markHomeworkDone = function(id) {
     if (typeof confetti !== 'undefined') {
@@ -564,12 +392,14 @@ window.markHomeworkDone = function(id) {
 
     saveTaskDone(id, taskInfo);
 
+    // אנימציה: הפיכה לחצי שקוף עם קו חוצה (לא מחיקה!)
     const taskItem = document.getElementById("task-" + id);
     if (taskItem) {
         taskItem.style.transition = "all 0.5s ease";
         
         setTimeout(() => {
             taskItem.classList.add("hw-done");
+            // החלפת כפתור ✓ באייקון ✔️
             const btn = taskItem.querySelector(".hw-done-btn");
             if (btn) {
                 const icon = document.createElement("span");
@@ -577,6 +407,7 @@ window.markHomeworkDone = function(id) {
                 icon.textContent = "✔️";
                 btn.replaceWith(icon);
             }
+            // הוספת טקסט "הושלם עכשיו"
             const infoDiv = taskItem.querySelector(".homework-info div:last-child");
             if (infoDiv) {
                 infoDiv.classList.add("hw-done-text");
@@ -585,107 +416,39 @@ window.markHomeworkDone = function(id) {
     }
 };
 
-// --- רינדור שיעורי בית לפי כיתת המשתמש ---
-
-function renderHomeworkForUser() {
-    renderHomework(3, 'hw-container-3');
-    renderHomework(5, 'hw-container-5');
-}
-
-// --- חישוב משימות פתוחות (לנוטיפיקציות) ---
-
-window.getPendingTasksCount = async function() {
-    if (!currentUser || !currentUserGrade) return 0;
-
-    const auto = (typeof homeworkData !== 'undefined') ? homeworkData : [];
-    const manual = (typeof manualTasks !== 'undefined') ? manualTasks : [];
-    const tasks = auto.concat(manual).filter(t => t.grade === currentUserGrade);
-
-    const doneData = await getDoneData();
-    
-    let count = 0;
-    tasks.forEach(task => {
-        if (!doneData[task.id]) count++;
-    });
-    return count;
-};
-
-window.getPendingTasksSummary = async function() {
-    if (!currentUser || !currentUserGrade) return null;
-
-    const auto = (typeof homeworkData !== 'undefined') ? homeworkData : [];
-    const manual = (typeof manualTasks !== 'undefined') ? manualTasks : [];
-    const tasks = auto.concat(manual).filter(t => t.grade === currentUserGrade);
-
-    const doneData = await getDoneData();
-    
-    const pending = [];
-    tasks.forEach(task => {
-        if (!doneData[task.id]) {
-            pending.push(task);
-        }
-    });
-
-    if (pending.length === 0) return null;
-
-    // קיבוץ לפי מקצוע
-    const bySubject = {};
-    pending.forEach(t => {
-        if (!bySubject[t.subject]) bySubject[t.subject] = 0;
-        bySubject[t.subject]++;
-    });
-
-    const subjects = Object.entries(bySubject)
-        .map(([subj, count]) => `${subj} (${count})`)
-        .join(', ');
-
-    return {
-        count: pending.length,
-        subjects: subjects,
-        grade: currentUserGrade
-    };
-};
-
 // --- הפעלה ---
 
-async function initHomework() {
+function initHomework() {
     showUserBadge();
-    renderHomeworkForUser();
+    renderHomework(3, 'hw-container-3');
+    renderHomework(5, 'hw-container-5');
+    // ניקוי משימות שעבר שבוע מאז שהושלמו
     cleanupExpiredTasks();
+    // טעינת ציוני אפליקציות והצגת כוכבים
     if (typeof initAppTracker === 'function') {
         initAppTracker();
-    }
-    // אתחול נוטיפיקציות
-    if (typeof initNotifications === 'function') {
-        initNotifications();
     }
 }
 
 // --- Firebase Auth listener ---
 
-auth.onAuthStateChanged(async (user) => {
+auth.onAuthStateChanged((user) => {
     if (user) {
+        // משתמש מחובר
         currentUser = user.uid;
         currentDisplayName = user.displayName || user.email.split('@')[0];
         currentEmail = user.email;
 
+        // הסרת מסך ההתחברות אם קיים
         const overlay = document.getElementById("user-select-overlay");
         if (overlay) overlay.remove();
 
-        // טעינת כיתת המשתמש
-        const grade = await loadUserGrade();
-
-        if (!grade) {
-            // אין כיתה — מציגים מסך בחירה
-            await showGradeSelection();
-        }
-
         initHomework();
     } else {
+        // לא מחובר — הצג מסך התחברות
         currentUser = null;
         currentDisplayName = null;
         currentEmail = null;
-        currentUserGrade = null;
         showLoginScreen();
     }
 });

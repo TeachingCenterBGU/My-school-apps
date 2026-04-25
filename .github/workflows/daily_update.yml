@@ -30,3 +30,9 @@ jobs:
           git config --global user.email "bot@github.com"
           git add homework_data.js
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update homework" && git push)
+      - name: Send notifications
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          pip install firebase-admin
+          python send_notifications.py
