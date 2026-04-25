@@ -154,9 +154,26 @@ def update_homework():
             
     return all_tasks
 
+# הוסיפי את הפונקציה הזו מעל הבלוק של ה-if __name__ == "__main__":
+def add_personal_tasks(tasks_list):
+    today = datetime.now()
+    # ב-Python, יום שישי הוא מספר 4 (0=שני, 4=שישי, 6=ראשון)
+    if today.weekday() == 4:
+        tasks_list.append({
+            "id": f"custom-tree-{today.strftime('%Y%m%d')}", # מזהה ייחודי לפי תאריך
+            "grade": 3,
+            "subject": "משימה ביתית",
+            "task": "🪴 להשקות את העץ במרפסת",
+            "date": today.strftime("%d/%m")
+        })
+    return tasks_list
+
 if __name__ == "__main__":
     tasks = update_homework()
     
+    # כאן אנחנו מוסיפים את המשימות האישיות שלך
+    tasks = add_personal_tasks(tasks)
+
     # מיון המשימות לפי כיתה ואז לפי מקצוע
     tasks.sort(key=lambda x: (x['grade'], x['subject']))
 
