@@ -35,6 +35,13 @@ const homeworkData = [
         "date": "15/04"
     },
     {
+        "id": "10514",
+        "grade": 3,
+        "subject": "חשבון",
+        "task": "לסיים עד עמ' 167",
+        "date": "27/04"
+    },
+    {
         "id": "10182",
         "grade": 3,
         "subject": "לשון",
