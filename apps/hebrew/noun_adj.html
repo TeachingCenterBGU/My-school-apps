@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חזרה למבחן בלשון - כיתה ג'</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #f39c12;
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --text-main: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 2.2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* --- Menu Styles --- */
+        #menu {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .menu-btn {
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .menu-btn:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(74, 144, 226, 0.2);
+        }
+
+        .menu-icon {
+            font-size: 1.5em;
+        }
+
+        /* --- Game Screens --- */
+        .game-screen {
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #95a5a6;
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+        }
+
+        .game-title {
+            text-align: center;
+            color: var(--primary);
+            margin-top: 10px;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+        }
+
+        .cards-counter {
+            text-align: center;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            background: #ecf0f1;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        .center-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .word-card {
+            font-size: 2.5em;
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0 30px;
+            padding: 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            color: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            background-color: #f8fbff;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+        }
+
+        .action-btn:hover {
+            background-color: #e3f2fd;
+            border-color: var(--primary);
+        }
+
+        .plural-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5em;
+            text-align: center;
+            border: 2px solid #bdc3c7;
+            border-radius: 12px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            font-family: inherit;
+        }
+
+        .plural-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* --- Game 5 (Full Analysis) Styles --- */
+        .analysis-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .analysis-label {
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .toggle-btn {
+            padding: 8px 15px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .check-btn {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.2em;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .check-btn:hover {
+            background-color: #27ae60;
+        }
+
+        /* --- Animations --- */
+        .correct { background-color: #d4edda !important; color: var(--success) !important; border-color: var(--success) !important; }
+        .wrong { animation: shake 0.4s; background-color: #f8d7da !important; color: var(--error) !important; border-color: var(--error) !important; }
+        .fade-out { animation: fadeOutLeft 0.4s forwards; }
+        .fade-in { animation: fadeInRight 0.4s forwards; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        @keyframes fadeOutLeft {
+            to { opacity: 0; transform: translateX(-50px); }
+        }
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .end-game {
+            display: none;
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .end-icon {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>אלופת הלשון 🏆</h1>
+    <p class="subtitle">בחרי נושא ונתחיל לשחק!</p>
+
+    <div id="menu">
+        <button class="menu-btn" onclick="startGame('game1')">
+            <span>1. מוחשי או מופשט?</span>
+            <span class="menu-icon">💭🍎</span>
+        </button>
+        <button class="menu-btn" onclick="startGame('game2')">
+            <span>2. שם עצם או שם תואר?</span>
+            <span class="menu-icon">📝</span>
+        </button>
+        <button class="menu-btn" onclick="startGame('game4')">
+            <span>3. זכר או נקבה?</span>
+            <span class="menu-icon">👦👧</span>
+        </button>
+        <button class="menu-btn" onclick="startGame('game3')">
+            <span>4. מיחיד לרבים</span>
+            <span class="menu-icon">👯‍♀️</span>
+        </button>
+        <button class="menu-btn" onclick="startGame('game5')" style="border-color: var(--secondary); color: var(--secondary);">
+            <span>5. אתגר הניתוח המלא!</span>
+            <span class="menu-icon">⭐</span>
+        </button>
+    </div>
+
+    <div class="game-screen" id="binary-game-screen">
+        <button class="back-btn" onclick="showMenu()">🏠 חזרה לתפריט</button>
+        <h2 class="game-title" id="binary-title">כותרת המשחק</h2>
+        <div class="center-wrapper"><div class="cards-counter" id="binary-counter">קלפים נותרו: 0</div></div>
+        
+        <div id="binary-game-area">
+            <div class="word-card" id="binary-word">טוען...</div>
+            <div class="buttons-container">
+                <button class="action-btn" id="btn-opt1" onclick="checkBinaryAnswer(1)">אפשרות 1</button>
+                <button class="action-btn" id="btn-opt2" onclick="checkBinaryAnswer(2)">אפשרות 2</button>
+            </div>
+        </div>
+
+        <div class="end-game" id="binary-end">
+            <div class="end-icon">🎉</div>
+            <h2>כל הכבוד! סיימת את החבילה!</h2>
+            <button class="check-btn" onclick="showMenu()">חזרה לתפריט</button>
+        </div>
+    </div>
+
+    <div class="game-screen" id="plural-game-screen">
+        <button class="back-btn" onclick="showMenu()">🏠 חזרה לתפריט</button>
+        <h2 class="game-title">מיחיד לרבים 👯‍♀️</h2>
+        <div class="center-wrapper"><div class="cards-counter" id="plural-counter">קלפים נותרו: 0</div></div>
+
+        <div id="plural-game-area">
+            <p style="text-align:center;">איך אומרים ברבים?</p>
+            <div class="word-card" id="plural-word">טוען...</div>
+            <input type="text" class="plural-input" id="plural-input" placeholder="הקלידי כאן..." autocomplete="off">
+            <button class="check-btn" onclick="checkPluralAnswer()">בדקי אותי</button>
+        </div>
+
+        <div class="end-game" id="plural-end">
+            <div class="end-icon">🌟</div>
+            <h2>אלופה! כתבת הכל נכון!</h2>
+            <button class="check-btn" onclick="showMenu()">חזרה לתפריט</button>
+        </div>
+    </div>
+
+    <div class="game-screen" id="analysis-game-screen">
+        <button class="back-btn" onclick="showMenu()">🏠 חזרה לתפריט</button>
+        <h2 class="game-title" style="color: var(--secondary)">הניתוח המלא ⭐</h2>
+        <div class="center-wrapper"><div class="cards-counter" id="analysis-counter">קלפים נותרו: 0</div></div>
+
+        <div id="analysis-game-area">
+            <div class="word-card" id="analysis-word">טוען...</div>
+            
+            <div class="analysis-row">
+                <span class="analysis-label">1. מוחשי או מופשט?</span>
+                <div class="toggle-group" id="group-ta">
+                    <button class="toggle-btn" onclick="selectToggle('ta', 'מוחשי')">מוחשי</button>
+                    <button class="toggle-btn" onclick="selectToggle('ta', 'מופשט')">מופשט</button>
+                </div>
+            </div>
+            
+            <div class="analysis-row">
+                <span class="analysis-label">2. זכר או נקבה?</span>
+                <div class="toggle-group" id="group-mf">
+                    <button class="toggle-btn" onclick="selectToggle('mf', 'זכר')">זכר</button>
+                    <button class="toggle-btn" onclick="selectToggle('mf', 'נקבה')">נקבה</button>
+                </div>
+            </div>
+
+            <div class="analysis-row">
+                <span class="analysis-label">3. יחיד או רבים?</span>
+                <div class="toggle-group" id="group-sp">
+                    <button class="toggle-btn" onclick="selectToggle('sp', 'יחיד')">יחיד</button>
+                    <button class="toggle-btn" onclick="selectToggle('sp', 'רבים')">רבים</button>
+                </div>
+            </div>
+
+            <button class="check-btn" style="background-color: var(--secondary);" onclick="checkAnalysisAnswer()">בדוק תשובה</button>
+        </div>
+
+        <div class="end-game" id="analysis-end">
+            <div class="end-icon">👑</div>
+            <h2>מושלם! את שולטת בחומר!</h2>
+            <button class="check-btn" style="background-color: var(--secondary);" onclick="showMenu()">חזרה לתפריט</button>
+        </div>
+    </div>
+
+    <script>
+        // --- מאגרי מילים (מתוך הלוח) ---
+        const banks = {
+            game1: { // מוחשי מופשט
+                title: 'מוחשי או מופשט? 💭🍎',
+                opt1: { text: 'מוחשי', value: 'מוחשי' },
+                opt2: { text: 'מופשט', value: 'מופשט' },
+                words: [
+                    { word: "כדור", answer: "מוחשי" }, { word: "ציור", answer: "מוחשי" },
+                    { word: "חולצה", answer: "מוחשי" }, { word: "שעון", answer: "מוחשי" },
+                    { word: "שולחן", answer: "מוחשי" }, { word: "אבטיח", answer: "מוחשי" },
+                    { word: "אהבה", answer: "מופשט" }, { word: "חלום", answer: "מופשט" },
+                    { word: "כעס", answer: "מופשט" }, { word: "שלווה", answer: "מופשט" },
+                    { word: "רצינות", answer: "מופשט" }, { word: "התרגשות", answer: "מופשט" },
+                    { word: "דאגה", answer: "מופשט" }
+                ]
+            },
+            game2: { // עצם או תואר
+                title: 'שם עצם או שם תואר? 📝',
+                opt1: { text: 'שם עצם (דבר/איש)', value: 'עצם' },
+                opt2: { text: 'שם תואר (תיאור)', value: 'תואר' },
+                words: [
+                    { word: "לוח", answer: "עצם" }, { word: "ילדה", answer: "עצם" },
+                    { word: "גרב", answer: "עצם" }, { word: "מנורה", answer: "עצם" },
+                    { word: "ארון", answer: "עצם" }, { word: "שעון", answer: "עצם" },
+                    { word: "גבוה", answer: "תואר" }, { word: "יפה", answer: "תואר" },
+                    { word: "ארוך", answer: "תואר" }, { word: "גדול", answer: "תואר" },
+                    { word: "רחב", answer: "תואר" }, { word: "עבה", answer: "תואר" }
+                ]
+            },
+            game4: { // זכר נקבה
+                title: 'זכר או נקבה? 👦👧',
+                opt1: { text: 'זכר', value: 'זכר' },
+                opt2: { text: 'נקבה', value: 'נקבה' },
+                words: [
+                    { word: "שולחן", answer: "זכר" }, { word: "ארון", answer: "זכר" },
+                    { word: "ארנק", answer: "זכר" }, { word: "שעון", answer: "זכר" },
+                    { word: "כדור", answer: "זכר" }, { word: "אבטיח", answer: "זכר" },
+                    { word: "מיטה", answer: "נקבה" }, { word: "ספריה", answer: "נקבה" },
+                    { word: "תיקייה", answer: "נקבה" }, { word: "מנורה", answer: "נקבה" },
+                    { word: "דאגה", answer: "נקבה" }, { word: "חולצה", answer: "נקבה" }
+                ]
+            },
+            game3: [ // יחיד רבים
+                { word: "ארון", answer: "ארונות" }, { word: "ארנק", answer: "ארנקים" },
+                { word: "מיטה", answer: "מיטות" }, { word: "ספריה", answer: "ספריות" },
+                { word: "רמקול", answer: "רמקולים" }, { word: "שיח", answer: "שיחים" },
+                { word: "תיקייה", answer: "תיקיות" }, { word: "שולחן", answer: "שולחנות" }
+            ],
+            game5: [ // ניתוח מלא
+                { word: "נעליים", ta: "מוחשי", mf: "נקבה", sp: "רבים" },
+                { word: "אהבה", ta: "מופשט", mf: "נקבה", sp: "יחיד" },
+                { word: "שולחנות", ta: "מוחשי", mf: "זכר", sp: "רבים" },
+                { word: "חלום", ta: "מופשט", mf: "זכר", sp: "יחיד" },
+                { word: "ילדות", ta: "מוחשי", mf: "נקבה", sp: "רבים" },
+                { word: "כדור", ta: "מוחשי", mf: "זכר", sp: "יחיד" },
+                { word: "דאגות", ta: "מופשט", mf: "נקבה", sp: "רבים" }
+            ]
+        };
+
+        // --- משתני מערכת ---
+        let currentDeck = [];
+        let currentGame = '';
+        let currentWordObj = null;
+        let analysisSelection = { ta: '', mf: '', sp: '' };
+
+        // פונקציית ערבוב מערך
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // --- ניווט ---
+        function hideAllScreens() {
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('binary-game-screen').style.display = 'none';
+            document.getElementById('plural-game-screen').style.display = 'none';
+            document.getElementById('analysis-game-screen').style.display = 'none';
+        }
+
+        function showMenu() {
+            hideAllScreens();
+            document.querySelector('.subtitle').style.display = 'block';
+            document.getElementById('menu').style.display = 'grid';
+        }
+
+        function startGame(gameId) {
+            hideAllScreens();
+            document.querySelector('.subtitle').style.display = 'none';
+            currentGame = gameId;
+
+            if (gameId === 'game1' || gameId === 'game2' || gameId === 'game4') {
+                setupBinaryGame(gameId);
+            } else if (gameId === 'game3') {
+                setupPluralGame();
+            } else if (gameId === 'game5') {
+                setupAnalysisGame();
+            }
+        }
+
+        // --- הגיון משחקי בחירה (1, 2, 4) ---
+        function setupBinaryGame(gameId) {
+            const config = banks[gameId];
+            document.getElementById('binary-game-screen').style.display = 'block';
+            document.getElementById('binary-game-area').style.display = 'block';
+            document.getElementById('binary-end').style.display = 'none';
+            
+            document.getElementById('binary-title').textContent = config.title;
+            document.getElementById('btn-opt1').textContent = config.opt1.text;
+            document.getElementById('btn-opt1').dataset.val = config.opt1.value;
+            document.getElementById('btn-opt2').textContent = config.opt2.text;
+            document.getElementById('btn-opt2').dataset.val = config.opt2.value;
+
+            // העתקה וערבוב החבילה
+            currentDeck = shuffle([...config.words]);
+            drawNextBinary();
+        }
+
+        function drawNextBinary() {
+            if (currentDeck.length === 0) {
+                document.getElementById('binary-game-area').style.display = 'none';
+                document.getElementById('binary-end').style.display = 'block';
+                return;
+            }
+            document.getElementById('binary-counter').textContent = `קלפים נותרו בחבילה: ${currentDeck.length}`;
+            currentWordObj = currentDeck.pop(); // שליפה! המילה לא חוזרת
+            
+            const wordEl = document.getElementById('binary-word');
+            wordEl.className = 'word-card fade-in';
+            wordEl.textContent = currentWordObj.word;
+        }
+
+        function checkBinaryAnswer(btnNum) {
+            const btn = document.getElementById(`btn-opt${btnNum}`);
+            const selectedVal = btn.dataset.val;
+            const wordEl = document.getElementById('binary-word');
+
+            if (selectedVal === currentWordObj.answer) {
+                wordEl.classList.add('correct');
+                setTimeout(() => {
+                    wordEl.classList.remove('fade-in', 'correct');
+                    wordEl.classList.add('fade-out');
+                    setTimeout(drawNextBinary, 300); // מעבר לקלף הבא
+                }, 600);
+            } else {
+                wordEl.classList.add('wrong');
+                setTimeout(() => { wordEl.classList.remove('wrong'); }, 400);
+                // במקרה של טעות - אפשר לתת לה לנסות שוב באותה מילה
+            }
+        }
+
+        // --- הגיון משחק 3 (יחיד רבים) ---
+        function setupPluralGame() {
+            document.getElementById('plural-game-screen').style.display = 'block';
+            document.getElementById('plural-game-area').style.display = 'block';
+            document.getElementById('plural-end').style.display = 'none';
+            
+            currentDeck = shuffle([...banks.game3]);
+            drawNextPlural();
+        }
+
+        function drawNextPlural() {
+            if (currentDeck.length === 0) {
+                document.getElementById('plural-game-area').style.display = 'none';
+                document.getElementById('plural-end').style.display = 'block';
+                return;
+            }
+            document.getElementById('plural-counter').textContent = `קלפים נותרו בחבילה: ${currentDeck.length}`;
+            currentWordObj = currentDeck.pop();
+            
+            document.getElementById('plural-word').textContent = currentWordObj.word;
+            document.getElementById('plural-word').className = 'word-card fade-in';
+            const inputEl = document.getElementById('plural-input');
+            inputEl.value = '';
+            inputEl.focus();
+        }
+
+        function checkPluralAnswer() {
+            const inputEl = document.getElementById('plural-input');
+            const answer = inputEl.value.trim();
+            const wordEl = document.getElementById('plural-word');
+
+            if (answer === currentWordObj.answer) {
+                inputEl.style.borderColor = "var(--success)";
+                inputEl.style.backgroundColor = "#d4edda";
+                setTimeout(() => {
+                    inputEl.style.borderColor = "";
+                    inputEl.style.backgroundColor = "";
+                    drawNextPlural();
+                }, 600);
+            } else {
+                inputEl.classList.add('wrong');
+                setTimeout(() => { inputEl.classList.remove('wrong'); }, 400);
+            }
+        }
+
+        // --- הגיון משחק 5 (ניתוח מלא) ---
+        function setupAnalysisGame() {
+            document.getElementById('analysis-game-screen').style.display = 'block';
+            document.getElementById('analysis-game-area').style.display = 'block';
+            document.getElementById('analysis-end').style.display = 'none';
+            
+            currentDeck = shuffle([...banks.game5]);
+            drawNextAnalysis();
+        }
+
+        function drawNextAnalysis() {
+            if (currentDeck.length === 0) {
+                document.getElementById('analysis-game-area').style.display = 'none';
+                document.getElementById('analysis-end').style.display = 'block';
+                return;
+            }
+            document.getElementById('analysis-counter').textContent = `קלפים נותרו בחבילה: ${currentDeck.length}`;
+            currentWordObj = currentDeck.pop();
+            
+            document.getElementById('analysis-word').textContent = currentWordObj.word;
+            document.getElementById('analysis-word').className = 'word-card fade-in';
+            
+            // איפוס בחירות
+            analysisSelection = { ta: '', mf: '', sp: '' };
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('selected'));
+        }
+
+        function selectToggle(group, value) {
+            analysisSelection[group] = value;
+            // ניקוי בחירה קודמת בקבוצה
+            document.querySelectorAll(`#group-${group} .toggle-btn`).forEach(btn => btn.classList.remove('selected'));
+            // סימון נוכחי
+            event.target.classList.add('selected');
+        }
+
+        function checkAnalysisAnswer() {
+            if (!analysisSelection.ta || !analysisSelection.mf || !analysisSelection.sp) {
+                alert("יש לסמן את כל שלושת המאפיינים!");
+                return;
+            }
+
+            const isCorrect = 
+                (analysisSelection.ta === currentWordObj.ta) &&
+                (analysisSelection.mf === currentWordObj.mf) &&
+                (analysisSelection.sp === currentWordObj.sp);
+
+            const wordEl = document.getElementById('analysis-word');
+
+            if (isCorrect) {
+                wordEl.classList.add('correct');
+                setTimeout(() => {
+                    wordEl.classList.remove('correct', 'fade-in');
+                    drawNextAnalysis();
+                }, 700);
+            } else {
+                wordEl.classList.add('wrong');
+                setTimeout(() => { wordEl.classList.remove('wrong'); }, 400);
+            }
+        }
+
+        // מאזין לאנטר בתיבת הטקסט של רבים
+        document.getElementById("plural-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                checkPluralAnswer();
+            }
+        });
+
+    </script>
+</body>
+</html>
