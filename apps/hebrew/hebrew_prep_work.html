@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דף עבודה — חזרה למבחן לשון</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800&family=Secular+One&display=swap" rel="stylesheet">
+<style>
+/* ===== SCREEN ===== */
+body {
+  font-family: 'Rubik', sans-serif;
+  background: #f5f5f5;
+  color: #222;
+  margin: 0;
+  padding: 20px;
+  line-height: 1.7;
+}
+.worksheet {
+  max-width: 750px;
+  margin: 0 auto;
+  background: white;
+  padding: 36px 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+/* Header */
+.ws-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 3px double #ccc;
+}
+.ws-header h1 {
+  font-family: 'Secular One', sans-serif;
+  font-size: 1.7em;
+  margin-bottom: 4px;
+}
+.ws-header .ws-sub { color: #666; font-size: 0.95em; }
+
+.name-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 0;
+  font-weight: 600;
+}
+.name-line .blank {
+  flex: 1;
+  max-width: 250px;
+  border-bottom: 2px solid #333;
+  height: 24px;
+}
+.name-line .date-blank {
+  width: 100px;
+  border-bottom: 2px solid #333;
+  height: 24px;
+}
+
+/* Exercises */
+.exercise {
+  margin: 28px 0;
+  page-break-inside: avoid;
+}
+.exercise h2 {
+  font-size: 1.1em;
+  font-weight: 800;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ex-num {
+  background: #333;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85em;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.exercise .instruction {
+  color: #555;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
+/* Word box */
+.word-box {
+  background: #f9f9f9;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: center;
+  font-size: 1.15em;
+  font-weight: 600;
+  line-height: 2;
+}
+.word-box span {
+  padding: 2px 6px;
+}
+
+/* Table */
+.ws-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+.ws-table th, .ws-table td {
+  border: 2px solid #333;
+  padding: 10px 14px;
+  text-align: center;
+  font-size: 1.05em;
+}
+.ws-table th {
+  background: #f0f0f0;
+  font-weight: 700;
+  font-size: 1em;
+}
+.ws-table td {
+  height: 38px;
+  vertical-align: middle;
+}
+.ws-table td.has-word {
+  font-weight: 600;
+  background: #fafafa;
+}
+
+/* Lines for writing */
+.write-lines {
+  margin: 10px 0;
+}
+.write-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+  padding: 4px 0;
+}
+.write-row .word-label {
+  font-weight: 700;
+  font-size: 1.1em;
+  min-width: 70px;
+  text-align: center;
+}
+.write-row .arrow { font-size: 1.2em; color: #999; }
+.write-row .write-blank {
+  flex: 1;
+  border-bottom: 2px solid #999;
+  height: 28px;
+  max-width: 250px;
+}
+
+/* Classify table */
+.classify-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+.classify-table th, .classify-table td {
+  border: 2px solid #333;
+  padding: 8px 10px;
+  text-align: center;
+  font-size: 0.95em;
+}
+.classify-table th {
+  background: #f0f0f0;
+  font-weight: 700;
+}
+.classify-table td.word-col {
+  font-weight: 700;
+  font-size: 1.1em;
+  background: #fafafa;
+  width: 90px;
+}
+.classify-table td { height: 34px; }
+
+/* Circle exercise */
+.circle-note {
+  font-size: 0.8em;
+  color: #888;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* Separator */
+.ws-sep {
+  border: 0;
+  border-top: 1px dashed #ccc;
+  margin: 24px 0;
+}
+
+/* ===== PRINT ===== */
+@media print {
+  body { background: white; padding: 0; margin: 0; }
+  .worksheet { box-shadow: none; border-radius: 0; padding: 20px 24px; max-width: 100%; }
+  .no-print { display: none !important; }
+  .exercise { page-break-inside: avoid; }
+  @page { margin: 1.5cm; }
+}
+
+/* Print button (screen only) */
+.print-bar {
+  text-align: center;
+  margin: 16px auto 0;
+  max-width: 750px;
+}
+.print-btn {
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 30px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+}
+.print-btn:hover { background: #555; }
+</style>
+</head>
+<body>
+
+<div class="print-bar no-print">
+  <button class="print-btn" onclick="window.print()">🖨️ הדפסה</button>
+</div>
+
+<div class="worksheet">
+  <div class="ws-header">
+    <h1>📝 דף עבודה — חזרה למבחן לשון</h1>
+    <div class="ws-sub">שם עצם · שם תואר · מוחשי ומופשט · יחיד ורבים · זכר ונקבה</div>
+    <div class="name-line">
+      <span>שם:</span><div class="blank"></div>
+      <span>תאריך:</span><div class="date-blank"></div>
+    </div>
+  </div>
+
+  <!-- ===== תרגיל 1 ===== -->
+  <div class="exercise">
+    <h2><span class="ex-num">1</span> הקיפו את שמות העצם בלבד:</h2>
+    <div class="word-box">
+      <span>רגוש</span>
+      <span>חזקים</span>
+      <span>נחמד</span>
+      <span>לוח</span>
+      <span>ילדה</span>
+      <span>יפה</span>
+      <span>אגוז</span>
+      <span>גרם</span>
+      <span>מנורה</span>
+      <span>זיכרונות</span>
+    </div>
+  </div>
+
+  <!-- ===== תרגיל 2 ===== -->
+  <div class="exercise">
+    <h2><span class="ex-num">2</span> הקיפו את שמות התואר בלבד:</h2>
+    <div class="word-box">
+      <span>גבוהה</span>
+      <span>שָׂמֵחַ</span>
+      <span>גדול</span>
+      <span>ארוך</span>
+      <span>תקרה</span>
+      <span>דאגה</span>
+      <span>רחב</span>
+      <span>עבה</span>
+      <span>דג</span>
+      <span>שטוח</span>
+      <span>קטן</span>
+    </div>
+  </div>
+
+  <hr class="ws-sep">
+
+  <!-- ===== תרגיל 3 ===== -->
+  <div class="exercise">
+    <h2><span class="ex-num">3</span> מיינו את שמות העצם בטבלה — מוחשי או מופשט:</h2>
+    <div class="word-box" style="margin-bottom: 14px;">
+      <span>שלווה</span>
+      <span>רצינות</span>
+      <span>סוכרייה</span>
+      <span>דאגה</span>
+      <span>עט</span>
+      <span>כיסון</span>
+      <span>ביטחון</span>
+      <span>התרגשות</span>
+      <span>חוברת</span>
+      <span>עיפרון</span>
+    </div>
+    <table class="ws-table">
+      <tr>
+        <th style="width:50%">🖐️ מוחשי</th>
+        <th style="width:50%">💭 מופשט</th>
+      </tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <hr class="ws-sep">
+
+  <!-- ===== תרגיל 4 ===== -->
+  <div class="exercise">
+    <h2><span class="ex-num">4</span> כתבו את שם העצם בצורת רבים:</h2>
+    <div class="write-lines">
+      <div class="write-row">
+        <span class="word-label">רמקול</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+      <div class="write-row">
+        <span class="word-label">שיח</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+      <div class="write-row">
+        <span class="word-label">תיקייה</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+      <div class="write-row">
+        <span class="word-label">שולחן</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+      <div class="write-row">
+        <span class="word-label">מנורה</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+      <div class="write-row">
+        <span class="word-label">נעל</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="ws-sep">
+
+  <!-- ===== תרגיל 5 ===== -->
+  <div class="exercise">
+    <h2><span class="ex-num">5</span> כתבו שם תואר מתאים לכל שם עצם:</h2>
+    <div class="write-lines">
+      <div class="write-row">
+        <span class="word-label">ארון</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+      <div class="write-row">
+        <span class="word-label">ארנק</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+      <div class="write-row">
+        <span class="word-label">מיטה</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+      <div class="write-row">
+        <span class="word-label">ספרייה</span>
+        <span class="arrow">←</span>
+        <div class="write-blank"></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="ws-sep">
+
+  <!-- ===== תרגיל 6 ===== -->
+  <div class="exercise">
+    <h2><span class="ex-num">6</span> השלימו את הטבלה:</h2>
+    <table class="ws-table">
+      <tr>
+        <th>שם עצם מסוג <u>זכר</u></th>
+        <th>שם עצם מסוג <u>נקבה</u></th>
+      </tr>
+      <tr>
+        <td class="has-word">כדור</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td class="has-word">ציור</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="has-word">חולצה</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="has-word">תמונה</td>
+      </tr>
+    </table>
+  </div>
+
+  <hr class="ws-sep">
+
+  <!-- ===== תרגיל 7 ===== -->
+  <div class="exercise">
+    <h2><span class="ex-num">7</span> סַוְּגו כל שם עצם — סמנו ✓ בעמודה הנכונה:</h2>
+    <table class="classify-table">
+      <tr>
+        <th>שם העצם</th>
+        <th colspan="2">מוחשי / מופשט</th>
+        <th colspan="2">יחיד / רבים</th>
+        <th colspan="2">זכר / נקבה</th>
+      </tr>
+      <tr>
+        <th></th>
+        <th>מוחשי</th><th>מופשט</th>
+        <th>יחיד</th><th>רבים</th>
+        <th>זכר</th><th>נקבה</th>
+      </tr>
+      <tr>
+        <td class="word-col">שולחן</td>
+        <td></td><td></td><td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td class="word-col">אהבה</td>
+        <td></td><td></td><td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td class="word-col">ילדים</td>
+        <td></td><td></td><td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td class="word-col">דלתות</td>
+        <td></td><td></td><td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td class="word-col">ביטחון</td>
+        <td></td><td></td><td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td class="word-col">חולצה</td>
+        <td></td><td></td><td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td class="word-col">כדורים</td>
+        <td></td><td></td><td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td class="word-col">פחד</td>
+        <td></td><td></td><td></td><td></td><td></td><td></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ===== תרגיל 8 ===== -->
+  <div class="exercise">
+    <h2><span class="ex-num">8</span> כתבו שם תואר מתאים ושם עצם מתאים:</h2>
+    <table class="ws-table">
+      <tr>
+        <th style="width:30%">שם עצם</th>
+        <th style="width:30%">+ שם תואר</th>
+        <th style="width:40%">משפט</th>
+      </tr>
+      <tr>
+        <td class="has-word">ילדה</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td class="has-word">ספר</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="has-word">גדול</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td class="has-word">יפה</td>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+<div class="print-bar no-print" style="margin-top: 12px; margin-bottom: 30px;">
+  <button class="print-btn" onclick="window.print()">🖨️ הדפסה</button>
+</div>
+
+</body>
+</html>
