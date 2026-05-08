@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 חזרה למבחן לשון</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Secular+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #ff6b9d;
+  --purple: #c44dff;
+  --blue: #4d9fff;
+  --green: #2dd4a8;
+  --orange: #ff9f43;
+  --red: #ff6b6b;
+  --yellow: #ffd93d;
+  --bg: #f0f4ff;
+  --card-bg: #ffffff;
+  --text: #2d3436;
+  --text-light: #636e72;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Rubik', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== HEADER ===== */
+.hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  padding: 30px 20px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  animation: shimmer 8s linear infinite;
+}
+@keyframes shimmer {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.hero h1 {
+  font-family: 'Secular One', sans-serif;
+  font-size: 2.2em;
+  color: white;
+  text-shadow: 2px 3px 6px rgba(0,0,0,0.2);
+  position: relative;
+}
+.hero p {
+  color: rgba(255,255,255,0.9);
+  font-size: 1.1em;
+  margin-top: 8px;
+  position: relative;
+}
+
+/* ===== SCORE BAR ===== */
+.score-bar {
+  background: white;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.95em;
+}
+.score-item .emoji { font-size: 1.3em; }
+.score-num { 
+  color: var(--purple);
+  font-size: 1.1em;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* ===== GAME MENU ===== */
+.game-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.menu-btn {
+  border: none;
+  border-radius: 16px;
+  padding: 18px 12px;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: 0.95em;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  position: relative;
+  overflow: hidden;
+}
+.menu-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+.menu-btn:active { transform: translateY(0); }
+.menu-btn .btn-emoji { font-size: 2em; display: block; margin-bottom: 6px; }
+.menu-btn.active { outline: 4px solid var(--yellow); outline-offset: 2px; }
+
+.m1 { background: linear-gradient(135deg, var(--pink), #ff8a65); }
+.m2 { background: linear-gradient(135deg, var(--blue), #26c6da); }
+.m3 { background: linear-gradient(135deg, var(--purple), #7c4dff); }
+.m4 { background: linear-gradient(135deg, var(--green), #69db7c); }
+.m5 { background: linear-gradient(135deg, var(--orange), #ffd93d); }
+.m6 { background: linear-gradient(135deg, #e91e63, #f06292); }
+.m7 { background: linear-gradient(135deg, #00bcd4, #4dd0e1); }
+
+/* ===== ID CARD GAME ===== */
+.id-card {
+  background: linear-gradient(145deg, #fafbff, #f0f0ff);
+  border: 3px solid var(--purple);
+  border-radius: 20px;
+  padding: 24px 20px;
+  margin: 16px auto;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 6px 24px rgba(196,77,255,0.12);
+}
+.id-card-header {
+  text-align: center;
+  font-family: 'Secular One', sans-serif;
+  font-size: 0.85em;
+  color: var(--purple);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.id-card-word {
+  text-align: center;
+  font-family: 'Secular One', sans-serif;
+  font-size: 2.4em;
+  color: var(--text);
+  margin: 10px 0 18px;
+}
+.id-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  padding: 8px 0;
+  border-bottom: 1px dashed #e0e0e0;
+}
+.id-row:last-child { border-bottom: none; }
+.id-label {
+  font-weight: 700;
+  font-size: 0.9em;
+  color: var(--text-light);
+  min-width: 80px;
+  text-align: start;
+}
+.id-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: center;
+}
+.id-opt {
+  border: 2.5px solid #e0e0e0;
+  background: white;
+  border-radius: 12px;
+  padding: 8px 18px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.id-opt:hover { border-color: var(--blue); background: #f0f8ff; }
+.id-opt.picked { border-color: var(--purple); background: #ece0ff; color: var(--purple); }
+.id-opt.correct-pick { border-color: var(--green); background: #e6fff5; color: #00b894; }
+.id-opt.wrong-pick { border-color: var(--red); background: #ffe6e6; color: var(--red); }
+.id-opt.was-correct { border-color: var(--green); border-style: dashed; }
+
+.id-stars {
+  text-align: center;
+  font-size: 1.8em;
+  margin: 10px 0;
+  letter-spacing: 4px;
+}
+.id-streak {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.1em;
+  color: var(--orange);
+  margin: 4px 0;
+}
+
+/* ===== GAME AREA ===== */
+.game-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.game-panel {
+  display: none;
+  background: var(--card-bg);
+  border-radius: 24px;
+  padding: 28px 22px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  animation: slideUp 0.4s ease;
+}
+.game-panel.active { display: block; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.game-title {
+  font-family: 'Secular One', sans-serif;
+  font-size: 1.5em;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.game-subtitle {
+  text-align: center;
+  color: var(--text-light);
+  margin-bottom: 20px;
+  font-size: 0.95em;
+}
+.game-progress {
+  text-align: center;
+  font-weight: 600;
+  color: var(--purple);
+  margin-bottom: 16px;
+}
+
+/* ===== WORD DISPLAY ===== */
+.word-display {
+  text-align: center;
+  font-family: 'Secular One', sans-serif;
+  font-size: 2.5em;
+  color: var(--purple);
+  margin: 20px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f0ff, #e8f4fd);
+  border-radius: 20px;
+  border: 3px dashed #d4b8ff;
+}
+
+/* ===== OPTION BUTTONS ===== */
+.options-row {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.opt-btn {
+  border: 3px solid #e0e0e0;
+  background: white;
+  border-radius: 16px;
+  padding: 14px 28px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 1.15em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  min-width: 120px;
+}
+.opt-btn:hover { border-color: var(--purple); background: #f8f0ff; transform: scale(1.05); }
+.opt-btn.correct {
+  border-color: var(--green);
+  background: #e6fff5;
+  color: #00b894;
+  animation: pop 0.4s ease;
+}
+.opt-btn.wrong {
+  border-color: var(--red);
+  background: #ffe6e6;
+  color: var(--red);
+  animation: shake 0.4s ease;
+}
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+/* ===== DRAG & DROP (for sorting) ===== */
+.sort-container {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.sort-column {
+  flex: 1;
+  min-width: 200px;
+  max-width: 280px;
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 16px;
+  min-height: 180px;
+  border: 3px dashed #ddd;
+  transition: border-color 0.3s;
+}
+.sort-column.drag-over { border-color: var(--purple); background: #f8f0ff; }
+.sort-column h3 {
+  text-align: center;
+  font-size: 1.1em;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+}
+.drag-word {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin: 6px 0;
+  font-weight: 600;
+  font-size: 1.05em;
+  cursor: grab;
+  transition: all 0.2s;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+.drag-word:active { cursor: grabbing; opacity: 0.7; }
+.drag-word.in-column { 
+  background: #f0f0ff;
+  border-color: var(--purple);
+}
+.word-bank {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 16px;
+  background: #fff9e6;
+  border-radius: 16px;
+  border: 2px solid var(--yellow);
+  min-height: 50px;
+}
+
+/* ===== INPUT GAME ===== */
+.input-card {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 20px;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.input-card .word-label {
+  font-weight: 700;
+  font-size: 1.3em;
+  color: var(--purple);
+  min-width: 80px;
+  text-align: center;
+}
+.input-card .arrow { font-size: 1.5em; }
+.text-input {
+  border: 3px solid #ddd;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 1.1em;
+  font-weight: 600;
+  width: 150px;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+.text-input:focus { outline: none; border-color: var(--purple); }
+.text-input.correct { border-color: var(--green); background: #e6fff5; }
+.text-input.wrong { border-color: var(--red); background: #ffe6e6; }
+
+/* ===== CHECK BUTTON ===== */
+.check-btn {
+  display: block;
+  margin: 24px auto;
+  background: linear-gradient(135deg, var(--purple), #7c4dff);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 14px 40px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 1.15em;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(196,77,255,0.3);
+  transition: all 0.3s;
+}
+.check-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(196,77,255,0.4); }
+
+/* ===== FEEDBACK ===== */
+.feedback {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: 700;
+  margin: 16px 0;
+  padding: 14px;
+  border-radius: 14px;
+  animation: slideUp 0.3s ease;
+}
+.feedback.good { background: #e6fff5; color: #00b894; }
+.feedback.bad { background: #ffe6e6; color: var(--red); }
+
+/* ===== WORD CLOUD for identification ===== */
+.word-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+.cloud-word {
+  border: 3px solid #e0e0e0;
+  background: white;
+  border-radius: 30px;
+  padding: 10px 22px;
+  font-weight: 600;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.25s;
+  user-select: none;
+}
+.cloud-word:hover { border-color: var(--purple); background: #f8f0ff; }
+.cloud-word.selected {
+  border-color: var(--purple);
+  background: #ece0ff;
+  color: var(--purple);
+  box-shadow: 0 2px 10px rgba(196,77,255,0.2);
+}
+.cloud-word.correct-marked { border-color: var(--green); background: #e6fff5; color: #00b894; }
+.cloud-word.wrong-marked { border-color: var(--red); background: #ffe6e6; color: var(--red); }
+.cloud-word.missed { border-color: var(--orange); background: #fff3e0; }
+
+/* ===== RESULTS ===== */
+.results-panel {
+  text-align: center;
+  padding: 30px;
+}
+.results-panel .big-emoji { font-size: 4em; margin-bottom: 10px; }
+.results-panel .result-text { font-size: 1.4em; font-weight: 700; margin: 10px 0; }
+.results-panel .result-score { font-size: 2em; color: var(--purple); font-weight: 800; }
+
+.next-btn {
+  background: linear-gradient(135deg, var(--green), #69db7c);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 32px;
+  font-family: 'Rubik', sans-serif;
+  font-size: 1.1em;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 16px;
+  box-shadow: 0 4px 12px rgba(45,212,168,0.3);
+  transition: all 0.3s;
+}
+.next-btn:hover { transform: translateY(-2px); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 500px) {
+  .hero h1 { font-size: 1.6em; }
+  .game-menu { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px; }
+  .menu-btn { padding: 14px 8px; font-size: 0.8em; }
+  .menu-btn .btn-emoji { font-size: 1.5em; }
+  .word-display { font-size: 2em; padding: 16px; }
+  .game-container { padding: 14px; }
+  .game-panel { padding: 20px 16px; }
+  .sort-container { flex-direction: column; align-items: center; }
+  .sort-column { min-width: 100%; }
+  .opt-btn { padding: 12px 20px; font-size: 1em; min-width: 100px; }
+  .input-card { padding: 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🎯 חזרה למבחן לשון</h1>
+
+</div>
+
+<div class="score-bar">
+  <div class="score-item"><span class="emoji">⭐</span> ניקוד: <span class="score-num" id="totalScore">0</span></div>
+  <div class="score-item"><span class="emoji">🏆</span> שיאי: <span class="score-num" id="bestScore">0</span></div>
+  <div class="score-item"><span class="emoji">🎮</span> משחקים: <span class="score-num" id="gamesPlayed">0</span></div>
+</div>
+
+<div class="game-menu">
+  <button class="menu-btn m1" onclick="startGame('concrete')"><span class="btn-emoji">🧸</span>מוחשי או מופשט?</button>
+  <button class="menu-btn m2" onclick="startGame('plural')"><span class="btn-emoji">👥</span>יחיד או רבים?</button>
+  <button class="menu-btn m3" onclick="startGame('gender')"><span class="btn-emoji">♂️</span>זכר או נקבה?</button>
+  <button class="menu-btn m4" onclick="startGame('adjective')"><span class="btn-emoji">🎨</span>מצאו שמות תואר</button>
+  <button class="menu-btn m5" onclick="startGame('nouns')"><span class="btn-emoji">🔍</span>מצאו שמות עצם</button>
+  <button class="menu-btn m6" onclick="startGame('pluralForm')"><span class="btn-emoji">✏️</span>כתבו צורת רבים</button>
+  <button class="menu-btn m7" onclick="startGame('idcard')"><span class="btn-emoji">🪪</span>תעודת זהות למילה</button>
+</div>
+
+<div class="game-container">
+  <!-- Game 1: Concrete/Abstract -->
+  <div class="game-panel" id="panel-concrete">
+    <div class="game-title">🧸 מוחשי או מופשט?</div>
+    <div class="game-subtitle">האם אפשר לגעת בזה? אם כן — מוחשי!</div>
+    <div class="game-progress" id="progress-concrete"></div>
+    <div class="word-display" id="word-concrete"></div>
+    <div class="options-row">
+      <button class="opt-btn" onclick="answerConcrete('מוחשי')">🖐️ מוחשי</button>
+      <button class="opt-btn" onclick="answerConcrete('מופשט')">💭 מופשט</button>
+    </div>
+    <div id="feedback-concrete"></div>
+  </div>
+
+  <!-- Game 2: Singular/Plural -->
+  <div class="game-panel" id="panel-plural">
+    <div class="game-title">👥 יחיד או רבים?</div>
+    <div class="game-subtitle">זה אחד או הרבה?</div>
+    <div class="game-progress" id="progress-plural"></div>
+    <div class="word-display" id="word-plural"></div>
+    <div class="options-row">
+      <button class="opt-btn" onclick="answerPlural('יחיד')">☝️ יחיד</button>
+      <button class="opt-btn" onclick="answerPlural('רבים')">👥 רבים</button>
+    </div>
+    <div id="feedback-plural"></div>
+  </div>
+
+  <!-- Game 3: Gender -->
+  <div class="game-panel" id="panel-gender">
+    <div class="game-title">♂️ זכר או נקבה?</div>
+    <div class="game-subtitle">שם העצם בלשון זכר או נקבה?</div>
+    <div class="game-progress" id="progress-gender"></div>
+    <div class="word-display" id="word-gender"></div>
+    <div class="options-row">
+      <button class="opt-btn" onclick="answerGender('זכר')">👦 זכר</button>
+      <button class="opt-btn" onclick="answerGender('נקבה')">👧 נקבה</button>
+    </div>
+    <div id="feedback-gender"></div>
+  </div>
+
+  <!-- Game 4: Find Adjectives -->
+  <div class="game-panel" id="panel-adjective">
+    <div class="game-title">🎨 מצאו את שמות התואר!</div>
+    <div class="game-subtitle">לחצו על כל המילים שהן שם תואר</div>
+    <div class="game-progress" id="progress-adjective"></div>
+    <div class="word-cloud" id="cloud-adjective"></div>
+    <button class="check-btn" onclick="checkAdjectives()">✅ בדקו!</button>
+    <div id="feedback-adjective"></div>
+  </div>
+
+  <!-- Game 5: Find Nouns -->
+  <div class="game-panel" id="panel-nouns">
+    <div class="game-title">🔍 מצאו את שמות העצם!</div>
+    <div class="game-subtitle">לחצו על כל המילים שהן שם עצם</div>
+    <div class="game-progress" id="progress-nouns"></div>
+    <div class="word-cloud" id="cloud-nouns"></div>
+    <button class="check-btn" onclick="checkNouns()">✅ בדקו!</button>
+    <div id="feedback-nouns"></div>
+  </div>
+
+  <!-- Game 6: Write Plural Form -->
+  <div class="game-panel" id="panel-pluralForm">
+    <div class="game-title">✏️ כתבו בצורת רבים</div>
+    <div class="game-subtitle">כתבו את המילה בצורת רבים</div>
+    <div class="game-progress" id="progress-pluralForm"></div>
+    <div id="pluralForm-cards"></div>
+    <button class="check-btn" onclick="checkPluralForms()">✅ בדקו!</button>
+    <div id="feedback-pluralForm"></div>
+  </div>
+
+  <!-- Game 7: ID Card -->
+  <div class="game-panel" id="panel-idcard">
+    <div class="game-title">🪪 תעודת זהות למילה</div>
+    <div class="game-subtitle">מלאו את התעודה — סמנו את הסיווג הנכון בכל שורה!</div>
+    <div class="game-progress" id="progress-idcard"></div>
+    <div class="id-streak" id="idcard-streak"></div>
+    <div id="idcard-area"></div>
+    <div id="feedback-idcard"></div>
+  </div>
+
+  <!-- Results -->
+  <div class="game-panel" id="panel-results">
+    <div class="results-panel">
+      <div class="big-emoji" id="result-emoji">🌟</div>
+      <div class="result-text" id="result-text"></div>
+      <div class="result-score" id="result-score"></div>
+      <button class="next-btn" onclick="hideAll()">🔙 חזרה לתפריט</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA ====================
+
+const concreteData = [
+  { word: 'שולחן', answer: 'מוחשי' }, { word: 'כיסא', answer: 'מוחשי' },
+  { word: 'עיפרון', answer: 'מוחשי' }, { word: 'חוברת', answer: 'מוחשי' },
+  { word: 'כדור', answer: 'מוחשי' }, { word: 'ציור', answer: 'מוחשי' },
+  { word: 'מחברת', answer: 'מוחשי' }, { word: 'תיקייה', answer: 'מוחשי' },
+  { word: 'רמקול', answer: 'מוחשי' }, { word: 'עט', answer: 'מוחשי' },
+  { word: 'כיסון', answer: 'מוחשי' }, { word: 'ארון', answer: 'מוחשי' },
+  { word: 'מיטה', answer: 'מוחשי' }, { word: 'ספרייה', answer: 'מוחשי' },
+  { word: 'חולצה', answer: 'מוחשי' }, { word: 'סוכרייה', answer: 'מוחשי' },
+  { word: 'מנורה', answer: 'מוחשי' }, { word: 'ארנק', answer: 'מוחשי' },
+  { word: 'שלווה', answer: 'מופשט' }, { word: 'רצינות', answer: 'מופשט' },
+  { word: 'דאגה', answer: 'מופשט' }, { word: 'ביטחון', answer: 'מופשט' },
+  { word: 'התרגשות', answer: 'מופשט' }, { word: 'אהבה', answer: 'מופשט' },
+  { word: 'שמחה', answer: 'מופשט' }, { word: 'עצב', answer: 'מופשט' },
+  { word: 'כעס', answer: 'מופשט' }, { word: 'גבורה', answer: 'מופשט' },
+  { word: 'חברות', answer: 'מופשט' }, { word: 'אומץ', answer: 'מופשט' },
+  { word: 'יופי', answer: 'מופשט' }, { word: 'חופש', answer: 'מופשט' },
+  { word: 'פחד', answer: 'מופשט' }, { word: 'זיכרון', answer: 'מופשט' },
+];
+
+const pluralData = [
+  { word: 'ילד', answer: 'יחיד' }, { word: 'ילדים', answer: 'רבים' },
+  { word: 'כיסא', answer: 'יחיד' }, { word: 'כיסאות', answer: 'רבים' },
+  { word: 'שולחן', answer: 'יחיד' }, { word: 'שולחנות', answer: 'רבים' },
+  { word: 'ספר', answer: 'יחיד' }, { word: 'ספרים', answer: 'רבים' },
+  { word: 'מחברת', answer: 'יחיד' }, { word: 'מחברות', answer: 'רבים' },
+  { word: 'עט', answer: 'יחיד' }, { word: 'עטים', answer: 'רבים' },
+  { word: 'כדור', answer: 'יחיד' }, { word: 'כדורים', answer: 'רבים' },
+  { word: 'חלון', answer: 'יחיד' }, { word: 'חלונות', answer: 'רבים' },
+  { word: 'ילדה', answer: 'יחיד' }, { word: 'ילדות', answer: 'רבים' },
+  { word: 'תמונה', answer: 'יחיד' }, { word: 'תמונות', answer: 'רבים' },
+  { word: 'מורה', answer: 'יחיד' }, { word: 'מורות', answer: 'רבים' },
+  { word: 'נעל', answer: 'יחיד' }, { word: 'נעליים', answer: 'רבים' },
+  { word: 'דלת', answer: 'יחיד' }, { word: 'דלתות', answer: 'רבים' },
+  { word: 'חתול', answer: 'יחיד' }, { word: 'חתולים', answer: 'רבים' },
+];
+
+const genderData = [
+  { word: 'שולחן', answer: 'זכר' }, { word: 'כיסא', answer: 'זכר' },
+  { word: 'ספר', answer: 'זכר' }, { word: 'עט', answer: 'זכר' },
+  { word: 'כדור', answer: 'זכר' }, { word: 'ציור', answer: 'זכר' },
+  { word: 'ארון', answer: 'זכר' }, { word: 'חלון', answer: 'זכר' },
+  { word: 'ילד', answer: 'זכר' }, { word: 'רמקול', answer: 'זכר' },
+  { word: 'שיח', answer: 'זכר' }, { word: 'דג', answer: 'זכר' },
+  { word: 'מחברת', answer: 'נקבה' }, { word: 'תיקייה', answer: 'נקבה' },
+  { word: 'מיטה', answer: 'נקבה' }, { word: 'חולצה', answer: 'נקבה' },
+  { word: 'ילדה', answer: 'נקבה' }, { word: 'מנורה', answer: 'נקבה' },
+  { word: 'ספרייה', answer: 'נקבה' }, { word: 'תמונה', answer: 'נקבה' },
+  { word: 'דלת', answer: 'נקבה' }, { word: 'חוברת', answer: 'נקבה' },
+  { word: 'נעל', answer: 'נקבה' }, { word: 'סוכרייה', answer: 'נקבה' },
+];
+
+const adjectiveSets = [
+  {
+    words: ['גבוהה','צר','גדול','ארוך','תקרה','דאגה','רחב','עבה','דג','כיסא','שטוח'],
+    adjectives: ['גבוהה','צר','גדול','ארוך','רחב','עבה','שטוח']
+  },
+  {
+    words: ['יפה','חזק','ילד','ספר','קטן','ארוך','שולחן','עגול','חלש','מנורה'],
+    adjectives: ['יפה','חזק','קטן','ארוך','עגול','חלש']
+  },
+  {
+    words: ['מהיר','איטי','כיסא','גבוה','נמוך','עיפרון','רך','קשה','מתוק','שמחה'],
+    adjectives: ['מהיר','איטי','גבוה','נמוך','רך','קשה','מתוק']
+  },
+  {
+    words: ['חם','קר','מלוכלך','נקי','דלת','כבד','קל','חמוד','בית','עצוב'],
+    adjectives: ['חם','קר','מלוכלך','נקי','כבד','קל','חמוד','עצוב']
+  },
+];
+
+const nounSets = [
+  {
+    words: ['עליז','ישן','נחמד','לוח','ילדה','יפה','סירה','גרם','מנורה','זיכרונות'],
+    nouns: ['לוח','ילדה','סירה','גרם','מנורה','זיכרונות']
+  },
+  {
+    words: ['ספר','גדול','תלמיד','חכם','שולחן','יפה','מורה','חזק','כיסא','נמוך'],
+    nouns: ['ספר','תלמיד','שולחן','מורה','כיסא']
+  },
+  {
+    words: ['ארנק','קטן','מיטה','רך','חתול','שקט','כדור','עגול','עיפרון','חד'],
+    nouns: ['ארנק','מיטה','חתול','כדור','עיפרון']
+  },
+  {
+    words: ['חלון','גבוה','דלת','כבדה','ילד','שמח','תמונה','יפה','עט','דק'],
+    nouns: ['חלון','דלת','ילד','תמונה','עט']
+  },
+];
+
+const pluralFormSets = [
+  [
+    { singular: 'רמקול', plural: 'רמקולים' },
+    { singular: 'שיח', plural: 'שיחים' },
+    { singular: 'תיקייה', plural: 'תיקיות' },
+    { singular: 'שולחן', plural: 'שולחנות' },
+  ],
+  [
+    { singular: 'ילד', plural: 'ילדים' },
+    { singular: 'ילדה', plural: 'ילדות' },
+    { singular: 'ספר', plural: 'ספרים' },
+    { singular: 'מחברת', plural: 'מחברות' },
+  ],
+  [
+    { singular: 'כיסא', plural: 'כיסאות' },
+    { singular: 'חלון', plural: 'חלונות' },
+    { singular: 'כדור', plural: 'כדורים' },
+    { singular: 'תמונה', plural: 'תמונות' },
+  ],
+  [
+    { singular: 'דלת', plural: 'דלתות' },
+    { singular: 'עט', plural: 'עטים' },
+    { singular: 'חולצה', plural: 'חולצות' },
+    { singular: 'ארון', plural: 'ארונות' },
+  ],
+  [
+    { singular: 'מנורה', plural: 'מנורות' },
+    { singular: 'ציור', plural: 'ציורים' },
+    { singular: 'נעל', plural: 'נעליים' },
+    { singular: 'מורה', plural: 'מורות' },
+  ],
+];
+
+// ==================== STATE ====================
+let totalScore = 0;
+let bestScore = 0;
+let gamesPlayed = 0;
+let currentGame = null;
+let currentIndex = 0;
+let currentScore = 0;
+let currentTotal = 0;
+let gameItems = [];
+let answered = false;
+
+// ==================== HELPERS ====================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function hideAll() {
+  document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+}
+
+function updateScoreBar() {
+  document.getElementById('totalScore').textContent = totalScore;
+  document.getElementById('bestScore').textContent = bestScore;
+  document.getElementById('gamesPlayed').textContent = gamesPlayed;
+}
+
+function showResults(score, total) {
+  gamesPlayed++;
+  totalScore += score;
+  if (score > bestScore) bestScore = score;
+  updateScoreBar();
+
+  hideAll();
+  const panel = document.getElementById('panel-results');
+  panel.classList.add('active');
+
+  const pct = Math.round((score / total) * 100);
+  let emoji, text;
+  if (pct === 100) { emoji = '🏆'; text = 'מושלם! 100%!'; }
+  else if (pct >= 80) { emoji = '🌟'; text = 'מעולה!'; }
+  else if (pct >= 60) { emoji = '👍'; text = 'כל הכבוד!'; }
+  else if (pct >= 40) { emoji = '💪'; text = 'אפשר להשתפר!'; }
+  else { emoji = '📚'; text = 'כדאי לחזור על החומר'; }
+
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-text').textContent = text;
+  document.getElementById('result-score').textContent = `${score} / ${total}`;
+}
+
+// ==================== GAME 1: CONCRETE/ABSTRACT ====================
+function startGame(type) {
+  hideAll();
+  currentGame = type;
+  currentIndex = 0;
+  currentScore = 0;
+  answered = false;
+
+  if (type === 'concrete') {
+    gameItems = shuffle(concreteData).slice(0, 10);
+    currentTotal = gameItems.length;
+    showConcreteWord();
+  } else if (type === 'plural') {
+    gameItems = shuffle(pluralData).slice(0, 10);
+    currentTotal = gameItems.length;
+    showPluralWord();
+  } else if (type === 'gender') {
+    gameItems = shuffle(genderData).slice(0, 10);
+    currentTotal = gameItems.length;
+    showGenderWord();
+  } else if (type === 'adjective') {
+    startAdjectiveGame();
+  } else if (type === 'nouns') {
+    startNounsGame();
+  } else if (type === 'pluralForm') {
+    startPluralFormGame();
+  } else if (type === 'idcard') {
+    startIdCardGame();
+  }
+
+  document.getElementById('panel-' + type).classList.add('active');
+}
+
+function showConcreteWord() {
+  if (currentIndex >= gameItems.length) { showResults(currentScore, currentTotal); return; }
+  answered = false;
+  document.getElementById('word-concrete').textContent = gameItems[currentIndex].word;
+  document.getElementById('progress-concrete').textContent = `שאלה ${currentIndex + 1} מתוך ${currentTotal}`;
+  document.getElementById('feedback-concrete').innerHTML = '';
+  document.querySelectorAll('#panel-concrete .opt-btn').forEach(b => { b.className = 'opt-btn'; b.disabled = false; });
+}
+
+function answerConcrete(choice) {
+  if (answered) return;
+  answered = true;
+  const correct = gameItems[currentIndex].answer;
+  const fb = document.getElementById('feedback-concrete');
+  const btns = document.querySelectorAll('#panel-concrete .opt-btn');
+
+  btns.forEach(b => {
+    if (b.textContent.includes(correct)) b.classList.add('correct');
+    if (b.textContent.includes(choice) && choice !== correct) b.classList.add('wrong');
+    b.disabled = true;
+  });
+
+  if (choice === correct) {
+    currentScore++;
+    fb.innerHTML = '<div class="feedback good">✅ נכון!</div>';
+  } else {
+    fb.innerHTML = `<div class="feedback bad">❌ התשובה הנכונה: ${correct}</div>`;
+  }
+  setTimeout(() => { currentIndex++; showConcreteWord(); }, 1200);
+}
+
+// ==================== GAME 2: SINGULAR/PLURAL ====================
+function showPluralWord() {
+  if (currentIndex >= gameItems.length) { showResults(currentScore, currentTotal); return; }
+  answered = false;
+  document.getElementById('word-plural').textContent = gameItems[currentIndex].word;
+  document.getElementById('progress-plural').textContent = `שאלה ${currentIndex + 1} מתוך ${currentTotal}`;
+  document.getElementById('feedback-plural').innerHTML = '';
+  document.querySelectorAll('#panel-plural .opt-btn').forEach(b => { b.className = 'opt-btn'; b.disabled = false; });
+}
+
+function answerPlural(choice) {
+  if (answered) return;
+  answered = true;
+  const correct = gameItems[currentIndex].answer;
+  const fb = document.getElementById('feedback-plural');
+  const btns = document.querySelectorAll('#panel-plural .opt-btn');
+
+  btns.forEach(b => {
+    if (b.textContent.includes(correct)) b.classList.add('correct');
+    if (b.textContent.includes(choice) && choice !== correct) b.classList.add('wrong');
+    b.disabled = true;
+  });
+
+  if (choice === correct) {
+    currentScore++;
+    fb.innerHTML = '<div class="feedback good">✅ נכון!</div>';
+  } else {
+    fb.innerHTML = `<div class="feedback bad">❌ התשובה הנכונה: ${correct}</div>`;
+  }
+  setTimeout(() => { currentIndex++; showPluralWord(); }, 1200);
+}
+
+// ==================== GAME 3: GENDER ====================
+function showGenderWord() {
+  if (currentIndex >= gameItems.length) { showResults(currentScore, currentTotal); return; }
+  answered = false;
+  document.getElementById('word-gender').textContent = gameItems[currentIndex].word;
+  document.getElementById('progress-gender').textContent = `שאלה ${currentIndex + 1} מתוך ${currentTotal}`;
+  document.getElementById('feedback-gender').innerHTML = '';
+  document.querySelectorAll('#panel-gender .opt-btn').forEach(b => { b.className = 'opt-btn'; b.disabled = false; });
+}
+
+function answerGender(choice) {
+  if (answered) return;
+  answered = true;
+  const correct = gameItems[currentIndex].answer;
+  const fb = document.getElementById('feedback-gender');
+  const btns = document.querySelectorAll('#panel-gender .opt-btn');
+
+  btns.forEach(b => {
+    if (b.textContent.includes(correct)) b.classList.add('correct');
+    if (b.textContent.includes(choice) && choice !== correct) b.classList.add('wrong');
+    b.disabled = true;
+  });
+
+  if (choice === correct) {
+    currentScore++;
+    fb.innerHTML = '<div class="feedback good">✅ נכון!</div>';
+  } else {
+    fb.innerHTML = `<div class="feedback bad">❌ התשובה הנכונה: ${correct}</div>`;
+  }
+  setTimeout(() => { currentIndex++; showGenderWord(); }, 1200);
+}
+
+// ==================== GAME 4: FIND ADJECTIVES ====================
+let adjRound = 0;
+let adjSelected = new Set();
+
+function startAdjectiveGame() {
+  adjRound = Math.floor(Math.random() * adjectiveSets.length);
+  adjSelected = new Set();
+  const set = adjectiveSets[adjRound];
+  const cloud = document.getElementById('cloud-adjective');
+  cloud.innerHTML = '';
+  const shuffled = shuffle(set.words);
+  shuffled.forEach(w => {
+    const span = document.createElement('span');
+    span.className = 'cloud-word';
+    span.textContent = w;
+    span.onclick = () => toggleSelect(span, w, adjSelected);
+    cloud.appendChild(span);
+  });
+  document.getElementById('progress-adjective').textContent = 'לחצו על כל שמות התואר';
+  document.getElementById('feedback-adjective').innerHTML = '';
+}
+
+function toggleSelect(el, word, selectedSet) {
+  if (el.classList.contains('correct-marked') || el.classList.contains('wrong-marked')) return;
+  el.classList.toggle('selected');
+  if (selectedSet.has(word)) selectedSet.delete(word); else selectedSet.add(word);
+}
+
+function checkAdjectives() {
+  const set = adjectiveSets[adjRound];
+  const correctSet = new Set(set.adjectives);
+  let score = 0;
+  let total = correctSet.size;
+
+  document.querySelectorAll('#cloud-adjective .cloud-word').forEach(el => {
+    const w = el.textContent;
+    const isAdj = correctSet.has(w);
+    const wasSelected = adjSelected.has(w);
+
+    if (isAdj && wasSelected) { el.className = 'cloud-word correct-marked'; score++; }
+    else if (!isAdj && wasSelected) { el.className = 'cloud-word wrong-marked'; }
+    else if (isAdj && !wasSelected) { el.className = 'cloud-word missed'; }
+  });
+
+  const fb = document.getElementById('feedback-adjective');
+  fb.innerHTML = `<div class="feedback ${score >= total * 0.7 ? 'good' : 'bad'}">${score} מתוך ${total} שמות תואר!</div>`;
+  setTimeout(() => showResults(score, total), 2000);
+}
+
+// ==================== GAME 5: FIND NOUNS ====================
+let nounRound = 0;
+let nounSelected = new Set();
+
+function startNounsGame() {
+  nounRound = Math.floor(Math.random() * nounSets.length);
+  nounSelected = new Set();
+  const set = nounSets[nounRound];
+  const cloud = document.getElementById('cloud-nouns');
+  cloud.innerHTML = '';
+  const shuffled = shuffle(set.words);
+  shuffled.forEach(w => {
+    const span = document.createElement('span');
+    span.className = 'cloud-word';
+    span.textContent = w;
+    span.onclick = () => toggleSelect(span, w, nounSelected);
+    cloud.appendChild(span);
+  });
+  document.getElementById('progress-nouns').textContent = 'לחצו על כל שמות העצם';
+  document.getElementById('feedback-nouns').innerHTML = '';
+}
+
+function checkNouns() {
+  const set = nounSets[nounRound];
+  const correctSet = new Set(set.nouns);
+  let score = 0;
+  let total = correctSet.size;
+
+  document.querySelectorAll('#cloud-nouns .cloud-word').forEach(el => {
+    const w = el.textContent;
+    const isNoun = correctSet.has(w);
+    const wasSelected = nounSelected.has(w);
+
+    if (isNoun && wasSelected) { el.className = 'cloud-word correct-marked'; score++; }
+    else if (!isNoun && wasSelected) { el.className = 'cloud-word wrong-marked'; }
+    else if (isNoun && !wasSelected) { el.className = 'cloud-word missed'; }
+  });
+
+  const fb = document.getElementById('feedback-nouns');
+  fb.innerHTML = `<div class="feedback ${score >= total * 0.7 ? 'good' : 'bad'}">${score} מתוך ${total} שמות עצם!</div>`;
+  setTimeout(() => showResults(score, total), 2000);
+}
+
+// ==================== GAME 6: WRITE PLURAL FORM ====================
+let pfRound = 0;
+
+function startPluralFormGame() {
+  pfRound = Math.floor(Math.random() * pluralFormSets.length);
+  const set = pluralFormSets[pfRound];
+  const container = document.getElementById('pluralForm-cards');
+  container.innerHTML = '';
+  set.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'input-card';
+    div.innerHTML = `
+      <span class="word-label">${item.singular}</span>
+      <span class="arrow">⬅️</span>
+      <input type="text" class="text-input" id="pf-input-${i}" placeholder="צורת רבים" autocomplete="off">
+    `;
+    container.appendChild(div);
+  });
+  document.getElementById('progress-pluralForm').textContent = `כתבו את צורת הרבים של כל מילה`;
+  document.getElementById('feedback-pluralForm').innerHTML = '';
+}
+
+function checkPluralForms() {
+  const set = pluralFormSets[pfRound];
+  let score = 0;
+  set.forEach((item, i) => {
+    const input = document.getElementById(`pf-input-${i}`);
+    const val = input.value.trim();
+    if (val === item.plural) {
+      input.classList.add('correct');
+      input.classList.remove('wrong');
+      score++;
+    } else {
+      input.classList.add('wrong');
+      input.classList.remove('correct');
+      // show correct answer
+      setTimeout(() => { input.value = item.plural; input.classList.remove('wrong'); input.classList.add('correct'); }, 800);
+    }
+  });
+  const total = set.length;
+  const fb = document.getElementById('feedback-pluralForm');
+  fb.innerHTML = `<div class="feedback ${score >= total * 0.7 ? 'good' : 'bad'}">${score} מתוך ${total} נכון!</div>`;
+  setTimeout(() => showResults(score, total), 2500);
+}
+
+// ==================== GAME 7: ID CARD ====================
+const idCardWords = [
+  { word: 'שולחן', type: 'שם עצם', gender: 'זכר', number: 'יחיד', concrete: 'מוחשי' },
+  { word: 'מחברות', type: 'שם עצם', gender: 'נקבה', number: 'רבים', concrete: 'מוחשי' },
+  { word: 'שמחה', type: 'שם עצם', gender: 'נקבה', number: 'יחיד', concrete: 'מופשט' },
+  { word: 'כדורים', type: 'שם עצם', gender: 'זכר', number: 'רבים', concrete: 'מוחשי' },
+  { word: 'דאגה', type: 'שם עצם', gender: 'נקבה', number: 'יחיד', concrete: 'מופשט' },
+  { word: 'ארון', type: 'שם עצם', gender: 'זכר', number: 'יחיד', concrete: 'מוחשי' },
+  { word: 'מנורה', type: 'שם עצם', gender: 'נקבה', number: 'יחיד', concrete: 'מוחשי' },
+  { word: 'ילדים', type: 'שם עצם', gender: 'זכר', number: 'רבים', concrete: 'מוחשי' },
+  { word: 'ביטחון', type: 'שם עצם', gender: 'זכר', number: 'יחיד', concrete: 'מופשט' },
+  { word: 'חולצה', type: 'שם עצם', gender: 'נקבה', number: 'יחיד', concrete: 'מוחשי' },
+  { word: 'אהבה', type: 'שם עצם', gender: 'נקבה', number: 'יחיד', concrete: 'מופשט' },
+  { word: 'ספרים', type: 'שם עצם', gender: 'זכר', number: 'רבים', concrete: 'מוחשי' },
+  { word: 'דלתות', type: 'שם עצם', gender: 'נקבה', number: 'רבים', concrete: 'מוחשי' },
+  { word: 'כיסא', type: 'שם עצם', gender: 'זכר', number: 'יחיד', concrete: 'מוחשי' },
+  { word: 'גבורה', type: 'שם עצם', gender: 'נקבה', number: 'יחיד', concrete: 'מופשט' },
+  { word: 'עיפרון', type: 'שם עצם', gender: 'זכר', number: 'יחיד', concrete: 'מוחשי' },
+  { word: 'תמונות', type: 'שם עצם', gender: 'נקבה', number: 'רבים', concrete: 'מוחשי' },
+  { word: 'חברות', type: 'שם עצם', gender: 'נקבה', number: 'יחיד', concrete: 'מופשט' },
+  { word: 'רמקול', type: 'שם עצם', gender: 'זכר', number: 'יחיד', concrete: 'מוחשי' },
+  { word: 'פחד', type: 'שם עצם', gender: 'זכר', number: 'יחיד', concrete: 'מופשט' },
+];
+
+const idCategories = [
+  { key: 'concrete', label: '🧸 מוחשי / מופשט', options: ['מוחשי', 'מופשט'] },
+  { key: 'number', label: '👥 יחיד / רבים', options: ['יחיד', 'רבים'] },
+  { key: 'gender', label: '♂️ זכר / נקבה', options: ['זכר', 'נקבה'] },
+];
+
+let idIndex = 0;
+let idItems = [];
+let idScore = 0;
+let idTotal = 0;
+let idStreak = 0;
+let idChecked = false;
+const ID_COUNT = 8;
+
+function startIdCardGame() {
+  idItems = shuffle(idCardWords).slice(0, ID_COUNT);
+  idIndex = 0;
+  idScore = 0;
+  idTotal = ID_COUNT * 3; // 3 categories per word
+  idStreak = 0;
+  showIdCard();
+}
+
+function showIdCard() {
+  if (idIndex >= idItems.length) {
+    showResults(idScore, idTotal);
+    return;
+  }
+  idChecked = false;
+  const item = idItems[idIndex];
+  const area = document.getElementById('idcard-area');
+  document.getElementById('progress-idcard').textContent = `מילה ${idIndex + 1} מתוך ${ID_COUNT}`;
+  document.getElementById('idcard-streak').textContent = idStreak > 1 ? `🔥 רצף: ${idStreak} נכונות ברצף!` : '';
+  document.getElementById('feedback-idcard').innerHTML = '';
+
+  let rowsHTML = '';
+  idCategories.forEach((cat, ci) => {
+    let optsHTML = cat.options.map((opt, oi) =>
+      `<button class="id-opt" data-cat="${cat.key}" data-val="${opt}" onclick="pickIdOpt(this, '${cat.key}')">${opt}</button>`
+    ).join('');
+    rowsHTML += `<div class="id-row"><span class="id-label">${cat.label}</span><div class="id-options">${optsHTML}</div></div>`;
+  });
+
+  area.innerHTML = `
+    <div class="id-card">
+      <div class="id-card-header">🪪 תעודת זהות</div>
+      <div class="id-card-word">${item.word}</div>
+      ${rowsHTML}
+      <button class="check-btn" onclick="checkIdCard()" style="margin-top:18px;">🏷️ חתמו את התעודה!</button>
+    </div>
+  `;
+}
+
+function pickIdOpt(el, catKey) {
+  if (idChecked) return;
+  // deselect siblings in same category
+  el.closest('.id-row').querySelectorAll('.id-opt').forEach(b => b.classList.remove('picked'));
+  el.classList.add('picked');
+}
+
+function checkIdCard() {
+  if (idChecked) return;
+  idChecked = true;
+  const item = idItems[idIndex];
+  let roundCorrect = 0;
+
+  document.querySelectorAll('.id-card .id-opt').forEach(btn => {
+    const cat = btn.dataset.cat;
+    const val = btn.dataset.val;
+    const isPicked = btn.classList.contains('picked');
+    const isCorrect = item[cat] === val;
+
+    if (isPicked && isCorrect) {
+      btn.className = 'id-opt correct-pick';
+      roundCorrect++;
+    } else if (isPicked && !isCorrect) {
+      btn.className = 'id-opt wrong-pick';
+    } else if (!isPicked && isCorrect) {
+      btn.className = 'id-opt was-correct';
+    }
+  });
+
+  idScore += roundCorrect;
+  const fb = document.getElementById('feedback-idcard');
+
+  if (roundCorrect === 3) {
+    idStreak++;
+    const msgs = ['מושלם! 🌟', 'אלופה! 💪', 'מדהים! ✨', '100%! 🎯'];
+    fb.innerHTML = `<div class="feedback good">${msgs[Math.floor(Math.random() * msgs.length)]}</div>`;
+  } else if (roundCorrect >= 2) {
+    idStreak = 0;
+    fb.innerHTML = `<div class="feedback good">כמעט! ${roundCorrect} מתוך 3 👍</div>`;
+  } else {
+    idStreak = 0;
+    fb.innerHTML = `<div class="feedback bad">${roundCorrect} מתוך 3 — בפעם הבאה! 💪</div>`;
+  }
+
+  setTimeout(() => { idIndex++; showIdCard(); }, 1800);
+}
+
+// Init
+updateScoreBar();
+</script>
+</body>
+</html>
