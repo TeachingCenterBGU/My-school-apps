@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תרגול שליפה - מזון ומערכת העיכול</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap');
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: linear-gradient(150deg, #e8f5e9 0%, #fff8e1 40%, #fce4ec 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #2d3436;
+        }
+        
+        .app { max-width: 700px; margin: 0 auto; }
+        
+        .header {
+            text-align: center;
+            padding: 18px 14px;
+            background: linear-gradient(135deg, #e65100, #ff8f00);
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 15px rgba(230,81,0,0.25);
+        }
+        .header h1 { font-size: 1.4em; font-weight: 800; }
+        .header p { font-size: 0.85em; opacity: 0.9; margin-top: 4px; }
+        
+        /* ── nav tabs ── */
+        .nav-tabs {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 6px 0 10px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        
+        .tab {
+            flex-shrink: 0;
+            padding: 8px 13px;
+            border-radius: 25px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.78em;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.25s;
+            position: relative;
+        }
+        .tab.active { background: #ff8f00; color: white; border-color: #ff8f00; }
+        .tab.done { border-color: #43a047; }
+        .tab.done::after {
+            content: '✓';
+            position: absolute;
+            top: -5px;
+            left: -3px;
+            background: #43a047;
+            color: white;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            font-size: 10px;
+            line-height: 16px;
+            text-align: center;
+        }
+        
+        /* ── progress ── */
+        .progress-wrap { margin-bottom: 12px; }
+        .progress-bar-bg { background: #e0e0e0; border-radius: 20px; height: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #ff8f00, #e65100); border-radius: 20px; transition: width 0.5s; }
+        .progress-label { text-align: center; font-size: 0.8em; color: #888; margin-top: 4px; }
+        
+        /* ── sections ── */
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        .section-card {
+            background: white;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        
+        .section-title {
+            font-size: 1.15em;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .section-subtitle { font-size: 0.85em; color: #888; margin-bottom: 14px; }
+        
+        /* ── shared ── */
+        .check-btn {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #43a047, #66bb6a);
+            color: white;
+            font-family: 'Rubik', sans-serif;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 14px;
+            transition: transform 0.15s;
+        }
+        .check-btn:active { transform: scale(0.97); }
+        .check-btn:disabled { background: #ccc; cursor: default; }
+        
+        .feedback {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 600;
+            line-height: 1.6;
+            display: none;
+        }
+        .feedback.correct { background: #e8f5e9; color: #2e7d32; border: 2px solid #a5d6a7; display: block; }
+        .feedback.wrong { background: #fff3e0; color: #e65100; border: 2px solid #ffcc80; display: block; }
+        .feedback.info { background: #e3f2fd; color: #1565c0; border: 2px solid #90caf9; display: block; }
+        
+        .reset-section-btn {
+            background: none; border: none; color: #999;
+            font-family: 'Rubik', sans-serif; font-size: 0.8em;
+            cursor: pointer; margin-top: 10px; text-decoration: underline;
+        }
+        
+        /* ═══ 1. ORDER ═══ */
+        .organ-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; justify-content: center; }
+        .organ-chip {
+            padding: 10px 16px; background: #fff3e0; border: 2px solid #ffcc80;
+            border-radius: 30px; font-weight: 600; font-size: 0.95em;
+            cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .organ-chip:hover { background: #ffe0b2; }
+        .organ-chip.used { opacity: 0.3; pointer-events: none; }
+        .order-slots { display: flex; flex-direction: column; gap: 8px; }
+        .order-slot {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; background: #fafafa;
+            border: 2px dashed #ddd; border-radius: 14px; min-height: 48px; transition: all 0.25s;
+        }
+        .order-slot.filled { border-style: solid; border-color: #ff8f00; background: #fff8f0; }
+        .order-slot.correct-slot { border-color: #43a047; background: #f1f8e9; }
+        .order-slot.wrong-slot { border-color: #e53935; background: #ffebee; }
+        .slot-num {
+            width: 28px; height: 28px; background: #ff8f00; color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.85em; flex-shrink: 0;
+        }
+        .slot-arrow { color: #ccc; font-size: 1.2em; text-align: center; }
+        .slot-text { font-weight: 600; flex: 1; }
+        .slot-remove { background: none; border: none; color: #e53935; font-size: 1.1em; cursor: pointer; padding: 4px; }
+        
+        /* ═══ 2. MATCH ═══ */
+        .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .match-col-title { font-weight: 700; font-size: 0.85em; color: #888; text-align: center; margin-bottom: 6px; }
+        .match-item {
+            padding: 10px 12px; border: 2px solid #e0e0e0; border-radius: 12px;
+            font-size: 0.9em; font-weight: 600; cursor: pointer; text-align: center;
+            transition: all 0.2s; user-select: none; min-height: 44px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .match-item:hover { border-color: #ff8f00; }
+        .match-item.selected { background: #fff3e0; border-color: #ff8f00; box-shadow: 0 0 0 3px rgba(255,143,0,0.2); }
+        .match-item.matched { background: #e8f5e9; border-color: #43a047; cursor: default; opacity: 0.7; }
+        .match-pairs { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+        .match-pair { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f5f5f5; border-radius: 10px; font-size: 0.85em; }
+        .match-pair .arrow { color: #ff8f00; font-weight: 800; }
+        .match-pair .remove-pair { background: none; border: none; color: #e53935; cursor: pointer; margin-right: auto; font-size: 1em; }
+        
+        /* ═══ 3. PLATE ═══ */
+        .meals-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+        .meal-tab {
+            flex: 1; padding: 10px 6px; border: 2px solid #e0e0e0; border-radius: 12px;
+            background: white; font-family: 'Rubik', sans-serif; font-size: 0.8em;
+            font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s;
+        }
+        .meal-tab.active { background: #ff8f00; color: white; border-color: #ff8f00; }
+        .meal-tab .meal-emoji { font-size: 1.4em; display: block; margin-bottom: 2px; }
+        .meal-tab.meal-done { border-color: #43a047; }
+        .plate-area {
+            background: linear-gradient(135deg, #fafafa, #f5f5f5);
+            border: 3px dashed #ddd; border-radius: 50%;
+            width: min(260px, 70vw); height: min(260px, 70vw);
+            margin: 0 auto 14px; display: flex; flex-wrap: wrap;
+            align-items: center; justify-content: center; gap: 5px;
+            padding: 18px; position: relative; transition: all 0.3s;
+        }
+        .plate-area.has-food { border-style: solid; border-color: #ff8f00; }
+        .plate-area::before {
+            content: attr(data-label); position: absolute; bottom: -28px;
+            font-size: 0.8em; color: #999; font-weight: 600;
+        }
+        .plate-food {
+            padding: 5px 9px; background: white; border: 1px solid #e0e0e0;
+            border-radius: 20px; font-size: 0.75em; font-weight: 600;
+            cursor: pointer; transition: all 0.15s; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .plate-food:hover { background: #ffebee; }
+        .food-bank-label { font-size: 0.85em; color: #888; font-weight: 600; margin: 18px 0 8px; }
+        .food-bank { display: flex; flex-wrap: wrap; gap: 6px; }
+        .food-option {
+            padding: 7px 12px; background: white; border: 2px solid #e0e0e0;
+            border-radius: 20px; font-size: 0.82em; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .food-option:hover { border-color: #ff8f00; background: #fff8f0; }
+        .food-option.on-plate { background: #e8f5e9; border-color: #43a047; opacity: 0.6; }
+        .plate-analysis { margin-top: 14px; padding: 12px; background: #f5f5f5; border-radius: 12px; font-size: 0.85em; }
+        .group-check { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+        .group-dot { width: 10px; height: 10px; border-radius: 50%; background: #e0e0e0; }
+        .group-dot.present { background: #43a047; }
+        .group-dot.missing { background: #e53935; }
+        
+        /* ═══ 4. SORT ═══ */
+        .sort-food-bank { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; justify-content: center; }
+        .sort-food {
+            padding: 8px 14px; background: white; border: 2px solid #e0e0e0;
+            border-radius: 25px; font-size: 0.85em; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .sort-food.selected { background: #fff3e0; border-color: #ff8f00; box-shadow: 0 0 0 3px rgba(255,143,0,0.15); }
+        .sort-food.placed { opacity: 0.3; pointer-events: none; }
+        .sort-categories { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .sort-cat {
+            border: 2px solid #e0e0e0; border-radius: 14px; padding: 10px;
+            cursor: pointer; transition: all 0.2s; min-height: 80px;
+        }
+        .sort-cat:hover { border-color: #ff8f00; }
+        .sort-cat-title { font-weight: 700; font-size: 0.85em; margin-bottom: 6px; text-align: center; }
+        .sort-cat-items { display: flex; flex-wrap: wrap; gap: 4px; }
+        .sorted-item { padding: 4px 8px; background: #e8f5e9; border-radius: 12px; font-size: 0.78em; cursor: pointer; }
+        .sorted-item:hover { background: #ffcdd2; }
+        
+        /* ═══ 5. T/F ═══ */
+        .tf-item {
+            padding: 14px; background: #fafafa; border-radius: 14px;
+            margin-bottom: 10px; border-right: 4px solid #e0e0e0; transition: all 0.3s;
+        }
+        .tf-item.answered-tf { border-right-color: #43a047; }
+        .tf-text { font-size: 0.95em; font-weight: 600; margin-bottom: 10px; line-height: 1.6; }
+        .tf-buttons { display: flex; gap: 8px; }
+        .tf-btn {
+            flex: 1; padding: 10px; border: 2px solid #e0e0e0; border-radius: 10px;
+            background: white; font-family: 'Rubik', sans-serif; font-size: 0.9em;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .tf-btn:hover { background: #f5f5f5; }
+        .tf-btn.chosen-true { background: #e8f5e9; border-color: #43a047; color: #2e7d32; }
+        .tf-btn.chosen-false { background: #ffebee; border-color: #e53935; color: #c62828; }
+        .tf-explain { margin-top: 8px; display: none; }
+        .tf-explain textarea {
+            width: 100%; min-height: 55px; border: 2px solid #e0e0e0;
+            border-radius: 10px; padding: 10px; font-family: 'Rubik', sans-serif;
+            font-size: 0.9em; resize: vertical; direction: rtl;
+        }
+        .tf-explain textarea:focus { outline: none; border-color: #ff8f00; }
+        .tf-explain-label { font-size: 0.8em; color: #e65100; font-weight: 600; margin-bottom: 4px; }
+        
+        /* ═══ 6. EXPERIMENT ═══ */
+        .exp-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+        .exp-tab {
+            flex: 1; padding: 10px 6px; border: 2px solid #e0e0e0; border-radius: 12px;
+            background: white; font-family: 'Rubik', sans-serif; font-size: 0.78em;
+            font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s;
+        }
+        .exp-tab.active { background: #5c6bc0; color: white; border-color: #5c6bc0; }
+        .exp-tab.exp-done { border-color: #43a047; }
+        .exp-tab .etab-emoji { font-size: 1.3em; display: block; margin-bottom: 2px; }
+        .exp-desc {
+            font-size: 0.88em; line-height: 1.8; background: #f5f5f5;
+            padding: 14px; border-radius: 12px; margin-bottom: 14px;
+        }
+        .exp-hint-box {
+            background: #e8eaf6; border-radius: 10px; padding: 10px 14px;
+            margin-bottom: 14px; font-size: 0.82em; color: #3f51b5; line-height: 1.5;
+        }
+        .exp-parts { display: flex; flex-direction: column; gap: 10px; }
+        .exp-part {
+            padding: 12px; background: #fafafa; border: 2px solid #e0e0e0;
+            border-radius: 12px; transition: all 0.3s;
+        }
+        .exp-part.has-answer { border-color: #5c6bc0; background: #f8f7ff; }
+        .exp-part.correct-part { border-color: #43a047; background: #f1f8e9; }
+        .exp-part.wrong-part { border-color: #e53935; background: #fff8f7; }
+        .exp-part-text { font-size: 0.88em; line-height: 1.6; margin-bottom: 8px; font-weight: 500; }
+        .exp-part-label { font-size: 0.78em; color: #5c6bc0; font-weight: 700; margin-bottom: 4px; }
+        .exp-input {
+            width: 100%; padding: 10px 12px; border: 2px solid #e0e0e0;
+            border-radius: 10px; font-family: 'Rubik', sans-serif; font-size: 0.9em;
+            font-weight: 600; direction: rtl; transition: border-color 0.3s;
+        }
+        .exp-input:focus { outline: none; border-color: #5c6bc0; box-shadow: 0 0 0 3px rgba(92,107,192,0.15); }
+        .exp-input.filled { border-color: #7986cb; background: #fafafe; }
+        .exp-correction { font-size: 0.82em; margin-top: 4px; font-weight: 600; }
+        .exp-correction.right { color: #2e7d32; }
+        .exp-correction.fix { color: #e65100; }
+        /* match mode (salt) */
+        .exp-term-bank { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; justify-content: center; }
+        .exp-term-chip {
+            padding: 9px 15px; background: #e8eaf6; border: 2px solid #9fa8da;
+            border-radius: 25px; font-size: 0.85em; font-weight: 600;
+            cursor: pointer; user-select: none; transition: all 0.2s;
+        }
+        .exp-term-chip:hover { background: #c5cae9; }
+        .exp-term-chip.sel { background: #5c6bc0; color: white; border-color: #5c6bc0; }
+        .exp-term-chip.used { opacity: 0.3; pointer-events: none; }
+        .exp-match-slot {
+            display: inline-block; padding: 4px 12px; background: #e8eaf6;
+            border-radius: 8px; font-weight: 700; color: #3f51b5; font-size: 0.88em;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .exp-match-slot:hover { background: #ffcdd2; }
+        .exp-match-placeholder { color: #bbb; font-size: 0.82em; font-style: italic; }
+        /* open mode (saliva) */
+        .exp-open-area {
+            width: 100%; min-height: 60px; border: 2px solid #e0e0e0;
+            border-radius: 10px; padding: 10px; font-family: 'Rubik', sans-serif;
+            font-size: 0.9em; resize: vertical; direction: rtl; line-height: 1.6;
+        }
+        .exp-open-area:focus { outline: none; border-color: #5c6bc0; box-shadow: 0 0 0 3px rgba(92,107,192,0.12); }
+        .exp-open-area.filled { border-color: #7986cb; background: #fafafe; }
+        
+        /* ═══ 7. OPEN ═══ */
+        .open-q {
+            margin-bottom: 14px; padding: 16px; background: #fafafa;
+            border-radius: 14px; border-right: 4px solid #ff8f00;
+        }
+        .open-q.answered-open { border-right-color: #43a047; background: #fafff9; }
+        .open-q-num {
+            display: inline-block; background: #ff8f00; color: white;
+            width: 24px; height: 24px; line-height: 24px; text-align: center;
+            border-radius: 50%; font-weight: 700; font-size: 0.75em; margin-left: 8px;
+        }
+        .open-q.answered-open .open-q-num { background: #43a047; }
+        .open-q-text { font-size: 0.95em; font-weight: 600; line-height: 1.7; margin-bottom: 8px; }
+        .open-q-hint { font-size: 0.78em; color: #999; margin-bottom: 8px; font-style: italic; }
+        .open-q textarea {
+            width: 100%; min-height: 70px; border: 2px solid #e0e0e0;
+            border-radius: 12px; padding: 10px; font-family: 'Rubik', sans-serif;
+            font-size: 0.92em; resize: vertical; direction: rtl; line-height: 1.6;
+        }
+        .open-q textarea:focus { outline: none; border-color: #ff8f00; box-shadow: 0 0 0 3px rgba(255,143,0,0.12); }
+        .open-q textarea.has-text { border-color: #43a047; background: #fafff9; }
+        
+        /* ═══ REVIEW ═══ */
+        .review-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 100; overflow-y: auto; padding: 20px 10px;
+        }
+        .review-overlay.show { display: block; }
+        .review-panel { max-width: 650px; margin: 0 auto; background: white; border-radius: 20px; padding: 20px; }
+        .review-header { text-align: center; margin-bottom: 16px; }
+        .review-header h2 { font-size: 1.3em; }
+        .review-header p { color: #888; font-size: 0.85em; }
+        .review-item { border-bottom: 1px solid #eee; padding: 12px 0; }
+        .review-item:last-child { border-bottom: none; }
+        .review-label { font-weight: 700; font-size: 0.9em; margin-bottom: 6px; }
+        .review-child { background: #e3f2fd; padding: 10px; border-radius: 10px; margin-bottom: 6px; font-size: 0.88em; line-height: 1.6; white-space: pre-wrap; }
+        .review-child.empty { background: #fff3e0; color: #e65100; font-style: italic; }
+        .review-suggested { background: #f1f8e9; padding: 10px; border-radius: 10px; font-size: 0.85em; color: #33691e; line-height: 1.6; display: none; white-space: pre-wrap; }
+        .review-toggle { background: #e8eaf6; color: #3f51b5; border: none; padding: 5px 12px; border-radius: 8px; font-family: 'Rubik', sans-serif; font-size: 0.78em; font-weight: 600; cursor: pointer; margin-top: 4px; }
+        .close-review { position: sticky; top: 0; background: #e53935; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-family: 'Rubik', sans-serif; font-size: 0.9em; font-weight: 700; cursor: pointer; display: block; margin: 0 auto 14px; z-index: 2; }
+        
+        /* ── summary bar ── */
+        .summary-float {
+            position: sticky; bottom: 10px; background: white; border-radius: 16px;
+            padding: 12px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            display: flex; align-items: center; gap: 10px; margin-top: 16px; z-index: 10;
+        }
+        .summary-float .sf-text { flex: 1; font-size: 0.85em; font-weight: 600; }
+        .sf-btn {
+            padding: 8px 14px; border: none; border-radius: 10px;
+            font-family: 'Rubik', sans-serif; font-size: 0.8em; font-weight: 700; cursor: pointer;
+        }
+        .sf-review { background: #1976d2; color: white; }
+        .sf-reset { background: #ffebee; color: #c62828; }
+        
+        .back-link { display: block; text-align: center; margin: 16px 0; color: #1976d2; text-decoration: none; font-weight: 600; font-size: 0.9em; }
+
+        @media print {
+            .nav-tabs, .summary-float, .check-btn, .reset-section-btn, .back-link, .review-overlay { display: none !important; }
+            .section { display: block !important; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="header">
+        <h1>🧠 תרגול שליפה — מזון ומערכת העיכול</h1>
+        <p>7 סוגי פעילויות שונות • הכל נשמר אוטומטית 💾</p>
+    </div>
+    <div class="nav-tabs" id="navTabs"></div>
+    <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progFill" style="width:0%"></div></div>
+        <div class="progress-label" id="progLabel">0 / 7 חלקים הושלמו</div>
+    </div>
+    <div id="sectionsWrap"></div>
+    <div class="summary-float">
+        <div class="sf-text" id="sfText">📝 סיימת? הראי לאמא!</div>
+        <button class="sf-btn sf-review" onclick="openReview()">👩 בדיקה</button>
+        <button class="sf-btn sf-reset" onclick="resetAll()">🔄</button>
+    </div>
+    <a href="../../grade-5.html" class="back-link">🏠 חזרה לעמוד הכיתה</a>
+</div>
+<div class="review-overlay" id="reviewOverlay">
+    <div class="review-panel" id="reviewPanel"></div>
+</div>
+
+<script>
+const SAVE_KEY = 'digestion_practice_v2';
+let state = {};
+function load() { try { state = JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch(e) { state = {}; } }
+function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch(e) {} }
+
+const sections = [
+    { id: 'order', short: '🫁 מסלול' },
+    { id: 'match', short: '🔬 התאמה' },
+    { id: 'plate', short: '🍽️ צלחת' },
+    { id: 'sort',  short: '🥗 מיון' },
+    { id: 'tf',    short: '✅ נכון?' },
+    { id: 'exp',   short: '🧪 ניסוי' },
+    { id: 'open',  short: '✍️ פתוח' }
+];
+let activeTab = 'order';
+
+function renderNav() {
+    document.getElementById('navTabs').innerHTML = sections.map(s => {
+        const done = state[s.id] && state[s.id].done;
+        return `<div class="tab ${s.id===activeTab?'active':''} ${done?'done':''}" onclick="switchTab('${s.id}')">${s.short}</div>`;
+    }).join('');
+}
+function switchTab(id) {
+    activeTab = id;
+    renderNav();
+    document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+    document.getElementById('sec-'+id).classList.add('active');
+}
+function updateProgress() {
+    const done = sections.filter(s => state[s.id] && state[s.id].done).length;
+    document.getElementById('progFill').style.width = Math.round(done/sections.length*100)+'%';
+    document.getElementById('progLabel').textContent = `${done} / ${sections.length} חלקים הושלמו`;
+    document.getElementById('sfText').textContent = done >= 3 ? `✨ ${done}/${sections.length} — יופי! הראי לאמא` : '📝 סיימת? הראי לאמא!';
+    renderNav();
+}
+
+/* ══════ 1. ORDER ══════ */
+const organCorrect = ['פה','ושט','קיבה','מעי דק','מעי גס'];
+let organUser = [];
+function initOrder() {
+    organUser = (state.order && state.order.u) || [];
+    renderOrder();
+}
+function renderOrder() {
+    const shuffled = ['קיבה','מעי גס','פה','מעי דק','ושט'];
+    document.getElementById('sec-order').innerHTML = `<div class="section-card">
+        <div class="section-title">🫁 סדרי את מסלול המזון בגוף</div>
+        <div class="section-subtitle">לחצי על האיברים לפי הסדר — מהראשון שהמזון מגיע אליו ועד האחרון</div>
+        <div class="organ-bank">${shuffled.map(o => `<div class="organ-chip ${organUser.includes(o)?'used':''}" onclick="addOrgan('${o}')">${o}</div>`).join('')}</div>
+        <div class="order-slots">${[1,2,3,4,5].map(i => {
+            const item = organUser[i-1]||'';
+            return `${i>1?'<div class="slot-arrow">⬇️</div>':''}
+            <div class="order-slot ${item?'filled':''}" id="os-${i}">
+                <div class="slot-num">${i}</div>
+                <div class="slot-text">${item||'לחצי על איבר...'}</div>
+                ${item?`<button class="slot-remove" onclick="removeOrgan(${i-1})">✕</button>`:''}
+            </div>`;
+        }).join('')}</div>
+        <button class="check-btn" onclick="checkOrder()" ${organUser.length<5?'disabled':''}>🔍 בדקי את הסדר</button>
+        <div class="feedback" id="fb-order"></div>
+        <button class="reset-section-btn" onclick="resetSec('order')">🔄 התחלה מחדש</button>
+    </div>`;
+}
+function addOrgan(n) { if(organUser.length>=5||organUser.includes(n))return; organUser.push(n); state.order={...state.order,u:[...organUser]}; save(); renderOrder(); }
+function removeOrgan(i) { organUser.splice(i,1); state.order={...state.order,u:[...organUser]}; save(); renderOrder(); }
+function checkOrder() {
+    let c=0;
+    for(let i=0;i<5;i++){const s=document.getElementById('os-'+(i+1));if(organUser[i]===organCorrect[i]){s.classList.add('correct-slot');c++;}else{s.classList.add('wrong-slot');}}
+    const fb=document.getElementById('fb-order');
+    if(c===5){fb.className='feedback correct';fb.textContent='🌟 מושלם! פה → ושט → קיבה → מעי דק → מעי גס';state.order={...state.order,done:true};}
+    else{fb.className='feedback wrong';fb.innerHTML=`${c}/5 נכונים. הסדר: פה → ושט → קיבה → מעי דק → מעי גס. נסי שוב!`;}
+    save(); updateProgress();
+}
+
+/* ══════ 2. MATCH ══════ */
+const matchData = [
+    {organ:'פה',func:'לעיסה, טחינה ופירוק ראשוני בעזרת הרוק'},
+    {organ:'ושט',func:'צינור שמעביר את המזון אל הקיבה'},
+    {organ:'קיבה',func:'פירוק המזון בעזרת מיצי קיבה חומציים'},
+    {organ:'מעי דק',func:'ספיגת רכיבי המזון המפורקים אל הדם'},
+    {organ:'כבד',func:'מייצר מיצי מרה שעוזרים לפרק שומנים'}
+];
+let matchSel=null, matchPairs=[];
+function initMatch() { matchPairs=(state.match&&state.match.p)||[]; renderMatch(); }
+function renderMatch() {
+    const uo=matchPairs.map(p=>p[0]),uf=matchPairs.map(p=>p[1]);
+    const sf=[2,4,0,3,1];
+    document.getElementById('sec-match').innerHTML = `<div class="section-card">
+        <div class="section-title">🔬 התאימי איבר לתפקיד</div>
+        <div class="section-subtitle">לחצי על איבר, ואז על התפקיד המתאים</div>
+        <div class="match-grid">
+            <div><div class="match-col-title">🫁 איבר</div>
+            ${matchData.map((m,i)=>`<div class="match-item ${uo.includes(i)?'matched':''} ${matchSel&&matchSel.s==='o'&&matchSel.i===i?'selected':''}" onclick="mClick('o',${i})" style="margin-bottom:8px">${m.organ}</div>`).join('')}</div>
+            <div><div class="match-col-title">⚙️ תפקיד</div>
+            ${sf.map(i=>`<div class="match-item ${uf.includes(i)?'matched':''} ${matchSel&&matchSel.s==='f'&&matchSel.i===i?'selected':''}" onclick="mClick('f',${i})" style="margin-bottom:8px;font-size:0.78em">${matchData[i].func}</div>`).join('')}</div>
+        </div>
+        ${matchPairs.length?`<div class="match-pairs"><div style="font-size:0.8em;color:#888;font-weight:600;margin-bottom:4px">ההתאמות שלך:</div>
+        ${matchPairs.map((p,i)=>`<div class="match-pair"><span>${matchData[p[0]].organ}</span><span class="arrow">←</span><span style="font-size:0.82em">${matchData[p[1]].func}</span><button class="remove-pair" onclick="rmPair(${i})">✕</button></div>`).join('')}</div>`:''}
+        <button class="check-btn" onclick="checkMatch()" ${matchPairs.length<5?'disabled':''}>🔍 בדקי</button>
+        <div class="feedback" id="fb-match"></div>
+        <button class="reset-section-btn" onclick="resetSec('match')">🔄 התחלה מחדש</button>
+    </div>`;
+}
+function mClick(side,idx) {
+    const uo=matchPairs.map(p=>p[0]),uf=matchPairs.map(p=>p[1]);
+    if(side==='o'&&uo.includes(idx))return;if(side==='f'&&uf.includes(idx))return;
+    if(!matchSel){matchSel={s:side,i:idx};}else if(matchSel.s===side){matchSel={s:side,i:idx};}
+    else{const oi=side==='o'?idx:matchSel.i,fi=side==='f'?idx:matchSel.i;matchPairs.push([oi,fi]);state.match={...state.match,p:[...matchPairs]};save();matchSel=null;}
+    renderMatch();
+}
+function rmPair(i){matchPairs.splice(i,1);state.match={...state.match,p:[...matchPairs]};save();renderMatch();}
+function checkMatch(){let c=0;matchPairs.forEach(p=>{if(p[0]===p[1])c++;});const fb=document.getElementById('fb-match');
+if(c===5){fb.className='feedback correct';fb.textContent='🌟 מושלם! כל ההתאמות נכונות!';state.match={...state.match,done:true};}
+else{fb.className='feedback wrong';fb.textContent=`${c}/5 נכונים. נסי שוב!`;}save();updateProgress();}
+
+/* ══════ 3. PLATE ══════ */
+const meals=[{id:'breakfast',name:'ארוחת בוקר',emoji:'🌅'},{id:'lunch',name:'ארוחת צהריים',emoji:'☀️'},{id:'snack',name:'ארוחת ביניים',emoji:'🍎'}];
+const foodItems=[
+    {name:'לחם',g:['פחמימות'],e:'🍞'},{name:'אורז',g:['פחמימות'],e:'🍚'},{name:'פסטה',g:['פחמימות'],e:'🍝'},{name:'פיתה',g:['פחמימות'],e:'🫓'},
+    {name:'עוף',g:['חלבונים'],e:'🍗'},{name:'ביצה',g:['חלבונים'],e:'🥚'},{name:'טונה',g:['חלבונים'],e:'🐟'},{name:'גבינה',g:['חלבונים','סידן'],e:'🧀'},{name:'חומוס',g:['חלבונים'],e:'🫘'},
+    {name:'עגבנייה',g:['ויטמינים'],e:'🍅'},{name:'מלפפון',g:['ויטמינים'],e:'🥒'},{name:'תפוח',g:['ויטמינים'],e:'🍎'},{name:'תפוז',g:['ויטמינים'],e:'🍊'},{name:'גזר',g:['ויטמינים'],e:'🥕'},
+    {name:'חלב',g:['חלבונים','סידן'],e:'🥛'},{name:'יוגורט',g:['חלבונים','סידן'],e:'🫙'},
+    {name:'שמן זית',g:['שומנים'],e:'🫒'},{name:'אבוקדו',g:['שומנים'],e:'🥑'},
+    {name:'מים',g:['מים'],e:'💧'},
+    {name:'ביסלי',g:['חטיפים'],e:'🟠'},{name:'שוקולד',g:['חטיפים'],e:'🍫'},{name:'סוכריה',g:['חטיפים'],e:'🍬'}
+];
+let activeMeal='breakfast',plateFoods={};
+function initPlate(){plateFoods=(state.plate&&state.plate.f)||{breakfast:[],lunch:[],snack:[]};renderPlate();}
+function renderPlate(){
+    const cur=plateFoods[activeMeal]||[];
+    const groups=new Set(cur.flatMap(f=>{const it=foodItems.find(fi=>fi.name===f);return it?it.g:[];}));
+    document.getElementById('sec-plate').innerHTML=`<div class="section-card">
+        <div class="section-title">🍽️ בני ארוחה מאוזנת</div>
+        <div class="section-subtitle">בחרי מזונות לכל ארוחה — נסי לכלול כמה שיותר קבוצות!</div>
+        <div class="meals-tabs">${meals.map(m=>`<div class="meal-tab ${m.id===activeMeal?'active':''} ${(plateFoods[m.id]||[]).length?'meal-done':''}" onclick="switchMeal('${m.id}')"><span class="meal-emoji">${m.emoji}</span>${m.name}</div>`).join('')}</div>
+        <div class="plate-area ${cur.length?'has-food':''}" data-label="${meals.find(m=>m.id===activeMeal).name}">
+            ${cur.length===0?'<span style="color:#ccc;font-size:0.85em">🍽️ הצלחת ריקה</span>':
+            cur.map(f=>{const it=foodItems.find(fi=>fi.name===f);return`<div class="plate-food" onclick="rmPlate('${f}')">${it?it.e:''} ${f}</div>`;}).join('')}
+        </div>
+        <div class="plate-analysis">
+            <div style="font-weight:700;font-size:0.85em;margin-bottom:6px">📊 מה יש בצלחת:</div>
+            ${['פחמימות','חלבונים','ויטמינים','סידן','שומנים','מים'].map(g=>`<div class="group-check"><div class="group-dot ${groups.has(g)?'present':'missing'}"></div><span style="font-size:0.82em">${g} ${groups.has(g)?'✅':'—'}</span></div>`).join('')}
+            ${groups.has('חטיפים')?'<div class="group-check"><div class="group-dot" style="background:#e53935"></div><span style="font-size:0.82em;color:#e53935">⚠️ חטיפים!</span></div>':''}
+        </div>
+        <div class="food-bank-label">🏪 בחרי מזונות:</div>
+        <div class="food-bank">${foodItems.map(f=>`<div class="food-option ${cur.includes(f.name)?'on-plate':''}" onclick="addPlate('${f.name}')">${f.e} ${f.name}</div>`).join('')}</div>
+        <button class="check-btn" onclick="savePlate()">💾 שמרי ארוחה</button>
+        <div class="feedback" id="fb-plate"></div>
+        <button class="reset-section-btn" onclick="resetSec('plate')">🔄 נקי הכל</button>
+    </div>`;
+}
+function switchMeal(id){activeMeal=id;renderPlate();}
+function addPlate(n){if(!plateFoods[activeMeal])plateFoods[activeMeal]=[];if(plateFoods[activeMeal].includes(n))return;plateFoods[activeMeal].push(n);state.plate={...state.plate,f:{...plateFoods}};save();renderPlate();}
+function rmPlate(n){plateFoods[activeMeal]=(plateFoods[activeMeal]||[]).filter(f=>f!==n);state.plate={...state.plate,f:{...plateFoods}};save();renderPlate();}
+function savePlate(){
+    const all=meals.every(m=>(plateFoods[m.id]||[]).length>0);const fb=document.getElementById('fb-plate');
+    if(!all){fb.className='feedback info';fb.textContent='📌 נשמר! עברי לארוחות הבאות.';}
+    else{fb.className='feedback correct';fb.textContent='🌟 כל 3 הארוחות מוכנות!';state.plate={...state.plate,done:true};}
+    state.plate={...state.plate,f:{...plateFoods}};save();updateProgress();
+}
+
+/* ══════ 4. SORT ══════ */
+const sortFoods=[
+    {n:'לחם',g:'פחמימות'},{n:'אורז',g:'פחמימות'},{n:'עוגה',g:'פחמימות'},{n:'פיתה',g:'פחמימות'},{n:'תפוחי אדמה',g:'פחמימות'},
+    {n:'בשר',g:'חלבונים'},{n:'דגים',g:'חלבונים'},{n:'ביצים',g:'חלבונים'},{n:'חלב',g:'חלבונים'},
+    {n:'חמאה',g:'שומנים'},{n:'שמן',g:'שומנים'},{n:'מרגרינה',g:'שומנים'},
+    {n:'ירקות',g:'ויטמינים'},{n:'פירות',g:'ויטמינים'},
+    {n:'מים',g:'מים'}
+];
+const sortGroups=['פחמימות','חלבונים','שומנים','ויטמינים','מים'];
+let sortSel=null,sortPlace={};
+function initSort(){sortPlace=(state.sort&&state.sort.p)||{};renderSort();}
+function renderSort(){
+    const placed=Object.keys(sortPlace);
+    document.getElementById('sec-sort').innerHTML=`<div class="section-card">
+        <div class="section-title">🥗 מייני מזונות לקבוצות</div>
+        <div class="section-subtitle">לחצי על מזון ← ואז לחצי על הקבוצה</div>
+        <div class="sort-food-bank">${sortFoods.map(f=>`<div class="sort-food ${placed.includes(f.n)?'placed':''} ${sortSel===f.n?'selected':''}" onclick="selSort('${f.n}')">${f.n}</div>`).join('')}</div>
+        <div class="sort-categories">${sortGroups.map(g=>`<div class="sort-cat" onclick="placeSort('${g}')">
+            <div class="sort-cat-title">${g}</div>
+            <div class="sort-cat-items">${Object.entries(sortPlace).filter(([,v])=>v===g).map(([k])=>`<span class="sorted-item" onclick="event.stopPropagation();unsort('${k}')">${k} ✕</span>`).join('')}</div>
+        </div>`).join('')}</div>
+        <button class="check-btn" onclick="checkSort()" ${placed.length<sortFoods.length?'disabled':''}>🔍 בדקי</button>
+        <div class="feedback" id="fb-sort"></div>
+        <button class="reset-section-btn" onclick="resetSec('sort')">🔄 התחלה מחדש</button>
+    </div>`;
+}
+function selSort(n){if(sortPlace[n])return;sortSel=sortSel===n?null:n;renderSort();}
+function placeSort(g){if(!sortSel)return;sortPlace[sortSel]=g;state.sort={...state.sort,p:{...sortPlace}};save();sortSel=null;renderSort();}
+function unsort(n){delete sortPlace[n];state.sort={...state.sort,p:{...sortPlace}};save();renderSort();}
+function checkSort(){
+    let c=0;sortFoods.forEach(f=>{if(sortPlace[f.n]===f.g)c++;});const fb=document.getElementById('fb-sort');
+    if(c===sortFoods.length){fb.className='feedback correct';fb.textContent='🌟 מושלם! כל המזונות מוינו נכון!';state.sort={...state.sort,done:true};}
+    else{const w=sortFoods.filter(f=>sortPlace[f.n]!==f.g).map(f=>f.n);fb.className='feedback wrong';fb.innerHTML=`${c}/${sortFoods.length} נכונים. בדקי: ${w.join(', ')}`;}
+    save();updateProgress();
+}
+
+/* ══════ 5. T/F ══════ */
+const tfItems=[
+    {t:'המזון מספק לגופינו אנרגיה.',a:true,x:''},
+    {t:'אין קשר בין המזון שאנו אוכלים לבין בריאותינו.',a:false,x:'יש קשר ישיר! תזונה נכונה שומרת על הבריאות.'},
+    {t:'תהליך העיכול מתחיל בפה.',a:true,x:''},
+    {t:'הסיבים התזונתיים מועילים לתהליך העיכול.',a:true,x:''},
+    {t:'המים מרכיבים פחות ממחצית ממשקל גופינו.',a:false,x:'המים מרכיבים יותר ממחצית — כ-60%!'},
+    {t:'ויטמינים ומינרלים מצויים בירקות ופירות.',a:true,x:''},
+    {t:'המזון מתעכל בוושט.',a:false,x:'הוושט רק מעביר — העיכול בקיבה ובמעי.'},
+    {t:'השיניים חותכות וגורסות את המזון.',a:true,x:''},
+    {t:'החיידקים בשיניים עוזרים לבריאות השן.',a:false,x:'חיידקים בשיניים גורמים לעששת! הם מזיקים.'},
+    {t:'שומן מזיק לגוף ולכן אסור לאכול ממנו כלל.',a:false,x:'שומן נחוץ בכמות קטנה — לאנרגיה ולשמירה על איברים.'}
+];
+let tfAns={};
+function initTF(){tfAns=(state.tf&&state.tf.a)||{};renderTF();}
+function renderTF(){
+    document.getElementById('sec-tf').innerHTML=`<div class="section-card">
+        <div class="section-title">✅ נכון או לא נכון?</div>
+        <div class="section-subtitle">סמני נכון / לא נכון. אם לא נכון — כתבי למה!</div>
+        ${tfItems.map((item,i)=>{const ans=tfAns[i];const ch=ans?ans.c:null;return`
+        <div class="tf-item ${ch!==null&&ch!==undefined?'answered-tf':''}" id="tf-${i}">
+            <div class="tf-text">${i+1}. ${item.t}</div>
+            <div class="tf-buttons">
+                <button class="tf-btn ${ch===true?'chosen-true':''}" onclick="chooseTF(${i},true)">✅ נכון</button>
+                <button class="tf-btn ${ch===false?'chosen-false':''}" onclick="chooseTF(${i},false)">❌ לא נכון</button>
+            </div>
+            <div class="tf-explain" id="tfe-${i}" ${ch===false?'style="display:block"':''}>
+                <div class="tf-explain-label">💡 הסבירי למה לא נכון:</div>
+                <textarea oninput="saveTFE(${i},this.value)" placeholder="כתבי...">${(ans&&ans.e)||''}</textarea>
+            </div>
+        </div>`;}).join('')}
+        <button class="check-btn" onclick="checkTF()">🔍 בדקי</button>
+        <div class="feedback" id="fb-tf"></div>
+        <button class="reset-section-btn" onclick="resetSec('tf')">🔄 התחלה מחדש</button>
+    </div>`;
+}
+function chooseTF(i,v){if(!tfAns[i])tfAns[i]={};tfAns[i].c=v;state.tf={...state.tf,a:{...tfAns}};save();
+document.getElementById('tfe-'+i).style.display=v===false?'block':'none';
+const it=document.getElementById('tf-'+i);it.classList.add('answered-tf');
+const bs=it.querySelectorAll('.tf-btn');bs[0].className='tf-btn'+(v===true?' chosen-true':'');bs[1].className='tf-btn'+(v===false?' chosen-false':'');}
+function saveTFE(i,v){if(!tfAns[i])tfAns[i]={};tfAns[i].e=v;state.tf={...state.tf,a:{...tfAns}};save();}
+function checkTF(){const tot=tfItems.length;const ans=Object.keys(tfAns).filter(k=>tfAns[k].c!==undefined).length;
+if(ans<tot){const fb=document.getElementById('fb-tf');fb.className='feedback info';fb.textContent=`ענית על ${ans}/${tot}. השלימי!`;return;}
+let c=0;tfItems.forEach((item,i)=>{if(tfAns[i]&&tfAns[i].c===item.a)c++;});const fb=document.getElementById('fb-tf');
+if(c===tot){fb.className='feedback correct';fb.textContent=`🌟 ${c}/${tot} נכונות!`;}
+else{fb.className='feedback wrong';fb.textContent=`${c}/${tot} — חזרי על: ${tfItems.map((it,i)=>tfAns[i]?.c!==it.a?(i+1):null).filter(Boolean).join(', ')}`;}
+state.tf={...state.tf,done:true};save();updateProgress();}
+
+/* ══════ 6. EXPERIMENTS — 3 modes ══════ */
+const experiments = [
+    {
+        id: 'salt', mode: 'match', name: 'ניסוי המלח', emoji: '🧂',
+        desc: 'שיר ואיתמר רצו לבדוק אם מלח בישול מונע התפתחות חיידקים ופטריות בתפוח אדמה.\n\nהם חתכו תפוח אדמה ל-6 פרוסות עבות וזהות. על 3 פרוסות פיזרו כמות זהה של מלח (קבוצת הניסוי). את 3 הפרוסות הנותרות השאירו ללא מלח (קבוצת הביקורת).\n\nהם הניחו את כל הצלחות על מדף במטבח.\n\n📋 תוצאות: אחרי מספר ימים — הפרוסות ללא מלח התכסו בכתמים שחורים ולבנים. הפרוסות עם המלח נשארו כמעט ללא שינוי.',
+        subtitle: 'לחצי על מושג מהמחסן ← ואז לחצי על המשפט שהוא מתאר',
+        parts: [
+            { text: 'הוספת מלח על פרוסות תפו"א תמנע את התפתחות החיידקים והפטריות עליהן.', answer: 'השערה' },
+            { text: 'לבדוק אם מלח בישול מונע התפתחות חיידקים ופטריות במזון.', answer: 'מטרת הניסוי' },
+            { text: 'מלח בישול אכן מנע התפתחות חיידקים ופטריות על תפוחי האדמה.', answer: 'מסקנה' },
+            { text: 'שלוש פרוסות תפוחי האדמה ללא מלח בישול.', answer: 'קבוצת הביקורת' },
+            { text: 'כתמים שחורים ולבנים מכסים את הפרוסות ללא המלח; הפרוסות עם המלח נקיות.', answer: 'תוצאות הניסוי' }
+        ]
+    },
+    {
+        id: 'freeze', mode: 'type', name: 'ניסוי ההקפאה', emoji: '🧊',
+        desc: 'נועה רצתה לבדוק אם הקפאה שומרת על טריות הלחם.\n\nהיא לקחה כיכר לחם וחתכה 6 פרוסות זהות. 3 פרוסות שמה במקפיא (קבוצת הניסוי), ו-3 פרוסות השאירה על השיש במטבח (קבוצת הביקורת).\n\n📋 תוצאות: אחרי שבוע — הפרוסות על השיש התכסו בעובש ירוק. הפרוסות מהמקפיא נראו טריות, ללא עובש.',
+        subtitle: 'קראי כל משפט והקלידי בעצמך — מה הוא מייצג בתהליך החקר?',
+        parts: [
+            { text: '«לבדוק אם הקפאה מונעת התפתחות עובש בלחם»', label: 'מה מייצג המשפט?', answer: 'מטרת הניסוי' },
+            { text: '«הקפאת הלחם תמנע התפתחות עובש עליו»', label: 'מה מייצג המשפט?', answer: 'השערה' },
+            { text: '«שלוש פרוסות הלחם שנשארו על השיש»', label: 'מה זו הקבוצה הזו?', answer: 'קבוצת הביקורת' },
+            { text: '«הפרוסות על השיש התעפשו; הפרוסות מהמקפיא נשארו טריות»', label: 'מה מייצג המשפט?', answer: 'תוצאות הניסוי' },
+            { text: '«הקפאה אכן מונעת התפתחות עובש בלחם»', label: 'מה מייצג המשפט?', answer: 'מסקנה' }
+        ]
+    },
+    {
+        id: 'saliva', mode: 'open', name: 'ניסוי הרוק', emoji: '💧',
+        desc: 'בשיעור מדעים, ביקשה המורה מהתלמידים לבדוק מה תפקיד הרוק בתהליך העיכול.\n\nהם לקחו 2 כוסות זהות. בכל כוס שמו פרור ביסקוויט זהה. לכוס אחת הוסיפו מים רגילים (קבוצת הביקורת). לכוס השנייה הוסיפו תמיסת רוק מלאכותי (קבוצת הניסוי). את שתי הכוסות הניחו בטמפרטורת הגוף (37°C).\n\n📋 תוצאות: אחרי 20 דקות — בכוס עם המים הביסקוויט התרכך אבל שמר על צורתו. בכוס עם תמיסת הרוק הביסקוויט התפרק לחלוטין.',
+        subtitle: 'כתבי בעצמך — מה ההשערה? מה המסקנה? ענו במשפטים שלמים!',
+        questions: [
+            { label: 'מטרת הניסוי', prompt: 'מה רצו לבדוק בניסוי? כתבי במשפט שלם.', suggested: 'רצו לבדוק האם הרוק מסייע בפירוק המזון (ולא רק מים רגילים).' },
+            { label: 'השערה', prompt: 'מה לדעתך הניחו התלמידים שיקרה לפני שהתחילו? כתבי במשפט.', suggested: 'הביסקוויט בכוס עם תמיסת הרוק יתפרק יותר מאשר הביסקוויט בכוס עם מים רגילים.' },
+            { label: 'קבוצת הביקורת', prompt: 'מהי קבוצת הביקורת בניסוי? מדוע היא חשובה?', suggested: 'קבוצת הביקורת היא הכוס עם המים הרגילים. היא חשובה כדי שנוכל להשוות ולדעת שדווקא הרוק גרם לפירוק — ולא סתם הנוזל.' },
+            { label: 'תוצאות הניסוי', prompt: 'מה קרה בפועל? תארי את מה שראו בשתי הכוסות.', suggested: 'בכוס עם תמיסת הרוק הביסקוויט התפרק לחלוטין. בכוס עם המים הביסקוויט רק התרכך אבל שמר על צורתו.' },
+            { label: 'מסקנה', prompt: 'מה אפשר להסיק מהניסוי? כתבי מסקנה.', suggested: 'הרוק מסייע בפירוק המזון — הוא מכיל חומרים (אנזימים) שמפרקים את המזון כימית, ולא רק ההרטבה גורמת לפירוק.' }
+        ]
+    }
+];
+const termOptions = ['מטרת הניסוי','השערה','תוצאות הניסוי','מסקנה','קבוצת הביקורת'];
+let activeExp = 'salt';
+let expData = {}; // { salt: { match: {0:'השערה',...}, sel:null }, freeze: { typed: {0:'...'} }, saliva: { open: {0:'...'} } }
+
+function initExp() {
+    expData = (state.exp && state.exp.data) || {};
+    renderExp();
+}
+
+function getExpAnswers(expId) { return expData[expId] || {}; }
+function setExpData(expId, val) { expData[expId] = val; state.exp = { ...state.exp, data: { ...expData } }; save(); }
+
+function renderExp() {
+    const exp = experiments.find(e => e.id === activeExp);
+    const checked = state.exp && state.exp.checked && state.exp.checked[activeExp];
+
+    let body = '';
+    if (exp.mode === 'match') body = renderMatchExp(exp, checked);
+    else if (exp.mode === 'type') body = renderTypeExp(exp, checked);
+    else if (exp.mode === 'open') body = renderOpenExp(exp, checked);
+
+    const modeLabel = exp.mode === 'match' ? '🎯 התאמה' : exp.mode === 'type' ? '⌨️ הקלדה' : '✍️ כתיבה חופשית';
+
+    document.getElementById('sec-exp').innerHTML = `<div class="section-card">
+        <div class="section-title">🧪 ניסויים מדעיים</div>
+        <div class="section-subtitle">3 ניסויים · 3 סוגי שאלות שונים!</div>
+        <div class="exp-tabs">${experiments.map(e => {
+            const done = state.exp && state.exp.checked && state.exp.checked[e.id];
+            return `<div class="exp-tab ${e.id===activeExp?'active':''} ${done?'exp-done':''}" onclick="switchExp('${e.id}')">
+                <span class="etab-emoji">${e.emoji}</span>${e.name}
+            </div>`;
+        }).join('')}</div>
+        <div style="text-align:center;margin-bottom:8px"><span style="background:#e8eaf6;padding:4px 12px;border-radius:15px;font-size:0.78em;font-weight:600;color:#5c6bc0">${modeLabel}</span></div>
+        <div class="exp-desc">${exp.desc.replace(/\n/g,'<br>')}</div>
+        <div class="exp-hint-box">💡 <strong>${exp.subtitle}</strong><br>מחסן מילים: ${termOptions.join(' · ')}</div>
+        ${body}
+        <button class="check-btn" onclick="checkCurrentExp()" ${checked?'disabled':''}>🔍 בדקי ניסוי זה</button>
+        <div class="feedback" id="fb-exp"></div>
+        <button class="reset-section-btn" onclick="resetOneExp()">🔄 נסי ניסוי זה מחדש</button>
+    </div>`;
+    if (checked) showExpFeedback();
+}
+
+/* ── MATCH mode (salt) ── */
+function renderMatchExp(exp, checked) {
+    const d = getExpAnswers(exp.id);
+    const matched = d.match || {};
+    const usedTerms = Object.values(matched);
+    const sel = d.sel || null;
+
+    let h = `<div class="exp-term-bank">${termOptions.map(t =>
+        `<div class="exp-term-chip ${usedTerms.includes(t)?'used':''} ${sel===t?'sel':''}" onclick="selMatchTerm('${t}')">${t}</div>`
+    ).join('')}</div>`;
+    h += '<div class="exp-parts">';
+    exp.parts.forEach((p, i) => {
+        const ans = matched[i] || '';
+        const cls = !checked ? (ans ? 'has-answer' : '') : (ans === p.answer ? 'correct-part' : 'wrong-part');
+        h += `<div class="exp-part ${cls}" onclick="placeMatchTerm(${i})" style="cursor:pointer">
+            <div class="exp-part-text">📌 ${p.text}</div>
+            ${ans ? `<span class="exp-match-slot" onclick="event.stopPropagation();removeMatchTerm(${i})">${ans} ✕</span>`
+                  : '<span class="exp-match-placeholder">👆 בחרי מושג ולחצי כאן</span>'}
+            ${checked ? `<div class="exp-correction ${ans===p.answer?'right':'fix'}">${ans===p.answer?'✅ נכון!':'❌ '+p.answer}</div>` : ''}
+        </div>`;
+    });
+    h += '</div>';
+    return h;
+}
+
+function selMatchTerm(t) {
+    const d = getExpAnswers(activeExp);
+    const matched = d.match || {};
+    if (Object.values(matched).includes(t)) return;
+    d.sel = (d.sel === t) ? null : t;
+    setExpData(activeExp, d);
+    renderExp();
+}
+
+function placeMatchTerm(i) {
+    const d = getExpAnswers(activeExp);
+    if (!d.sel || (d.match && d.match[i])) return;
+    if (!d.match) d.match = {};
+    d.match[i] = d.sel;
+    d.sel = null;
+    setExpData(activeExp, d);
+    renderExp();
+}
+
+function removeMatchTerm(i) {
+    const d = getExpAnswers(activeExp);
+    if (d.match) { delete d.match[i]; }
+    setExpData(activeExp, d);
+    renderExp();
+}
+
+/* ── TYPE mode (freeze) ── */
+function renderTypeExp(exp, checked) {
+    const d = getExpAnswers(exp.id);
+    const typed = d.typed || {};
+    let h = '<div class="exp-parts">';
+    exp.parts.forEach((p, i) => {
+        const val = typed[i] || '';
+        const cls = !checked ? (val ? 'has-answer' : '') : (norm(val) === norm(p.answer) ? 'correct-part' : 'wrong-part');
+        h += `<div class="exp-part ${cls}">
+            <div class="exp-part-text">📌 ${p.text}</div>
+            <div class="exp-part-label">${p.label}</div>
+            <input class="exp-input ${val?'filled':''}" type="text" value="${esc(val)}"
+                oninput="typeExpVal(${i},this.value)"
+                placeholder="הקלידי: ${termOptions.join(' / ')}" ${checked?'disabled':''}>
+            ${checked ? `<div class="exp-correction ${norm(val)===norm(p.answer)?'right':'fix'}">${norm(val)===norm(p.answer)?'✅ נכון!':'❌ '+p.answer}</div>` : ''}
+        </div>`;
+    });
+    h += '</div>';
+    return h;
+}
+
+function typeExpVal(i, val) {
+    const d = getExpAnswers(activeExp);
+    if (!d.typed) d.typed = {};
+    d.typed[i] = val;
+    setExpData(activeExp, d);
+}
+
+/* ── OPEN mode (saliva) ── */
+function renderOpenExp(exp, checked) {
+    const d = getExpAnswers(exp.id);
+    const written = d.open || {};
+    let h = '<div class="exp-parts">';
+    exp.questions.forEach((q, i) => {
+        const val = written[i] || '';
+        const cls = val.trim() ? 'has-answer' : '';
+        h += `<div class="exp-part ${cls}">
+            <div class="exp-part-label" style="font-size:0.9em;color:#e65100">📝 ${q.label}</div>
+            <div class="exp-part-text">${q.prompt}</div>
+            <textarea class="exp-open-area ${val.trim()?'filled':''}"
+                oninput="writeExpVal(${i},this.value)"
+                placeholder="כתבי במשפט שלם...">${esc(val)}</textarea>
+            ${checked ? `<div class="exp-correction right" style="color:#33691e;background:#f1f8e9;padding:8px 10px;border-radius:8px;margin-top:6px;font-weight:500">
+                <strong>💡 תשובה מומלצת:</strong> ${q.suggested}
+            </div>` : ''}
+        </div>`;
+    });
+    h += '</div>';
+    return h;
+}
+
+function writeExpVal(i, val) {
+    const d = getExpAnswers(activeExp);
+    if (!d.open) d.open = {};
+    d.open[i] = val;
+    setExpData(activeExp, d);
+}
+
+/* ── shared ── */
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function norm(s) { return (s||'').trim().replace(/[\s]+/g,' ').replace(/[״"]/g,'"').replace(/[׳']/g,"'"); }
+function switchExp(id) { activeExp = id; renderExp(); }
+
+function checkCurrentExp() {
+    const exp = experiments.find(e => e.id === activeExp);
+    const d = getExpAnswers(activeExp);
+
+    if (exp.mode === 'match') {
+        const matched = d.match || {};
+        if (Object.keys(matched).length < exp.parts.length) {
+            document.getElementById('fb-exp').className = 'feedback info';
+            document.getElementById('fb-exp').textContent = 'השלימי את כל ההתאמות!';
+            return;
+        }
+    }
+
+    if (!state.exp) state.exp = {};
+    if (!state.exp.checked) state.exp.checked = {};
+    state.exp.checked[activeExp] = true;
+    const allDone = experiments.every(e => state.exp.checked && state.exp.checked[e.id]);
+    if (allDone) state.exp.done = true;
+    save(); renderExp(); updateProgress();
+}
+
+function showExpFeedback() {
+    const exp = experiments.find(e => e.id === activeExp);
+    const d = getExpAnswers(activeExp);
+    const fb = document.getElementById('fb-exp');
+
+    if (exp.mode === 'match') {
+        const m = d.match || {};
+        let c = 0; exp.parts.forEach((p,i) => { if (m[i] === p.answer) c++; });
+        fb.className = c === exp.parts.length ? 'feedback correct' : 'feedback wrong';
+        fb.textContent = c === exp.parts.length ? `🌟 מושלם! ${c}/${exp.parts.length}` : `${c}/${exp.parts.length} — ראי תיקונים למעלה`;
+    } else if (exp.mode === 'type') {
+        const t = d.typed || {};
+        let c = 0; exp.parts.forEach((p,i) => { if (norm(t[i]) === norm(p.answer)) c++; });
+        fb.className = c === exp.parts.length ? 'feedback correct' : 'feedback wrong';
+        fb.textContent = c === exp.parts.length ? `🌟 מושלם! ${c}/${exp.parts.length}` : `${c}/${exp.parts.length} — ראי תיקונים למעלה`;
+    } else {
+        const o = d.open || {};
+        const answered = exp.questions.filter((q,i) => (o[i]||'').trim()).length;
+        fb.className = answered === exp.questions.length ? 'feedback correct' : 'feedback info';
+        fb.textContent = answered === exp.questions.length ? '🌟 כל הכבוד! ענית על כל השאלות. השוואי לתשובות המומלצות.' : `ענית על ${answered}/${exp.questions.length}. השוואי לתשובות למעלה.`;
+    }
+}
+
+function resetOneExp() {
+    if (!confirm(`לאפס את "${experiments.find(e=>e.id===activeExp).name}"?`)) return;
+    if (expData[activeExp]) delete expData[activeExp];
+    if (state.exp && state.exp.checked) delete state.exp.checked[activeExp];
+    if (state.exp) { state.exp.data = { ...expData }; state.exp.done = false; }
+    save(); renderExp(); updateProgress();
+}
+
+/* ══════ 7. OPEN ══════ */
+const openQs=[
+    {t:'מהם 5 רכיבי המזון (אבות המזון)? כתבי ליד כל אחד מה התפקיד שלו.',h:'רכיבי מזון ≠ קבוצות מזון!',s:'פחמימות — אנרגיה. חלבונים — בניית תאים. שומנים — אנרגיה ושמירה. ויטמינים — הגנה ותפקוד. מינרלים — עצמות ושיניים.'},
+    {t:'הסבירי: מה ההבדל בין "קבוצת מזון" ל"רכיב מזון"? תני דוגמה.',h:'ירקות זה קבוצה או רכיב?',s:'קבוצת מזון = סיווג מזונות (ירקות, לחם ומוצריו). רכיב מזון = חומר שבתוך המזון (פחמימות, חלבונים).'},
+    {t:'למה חשוב לשתות הרבה מים? ציינו 2 סיבות.',h:'מה מים עושים בגוף?',s:'1) משתתפים בתהליכים רבים (עיכול, ויסות חום). 2) מחסור גורם התייבשות. 3) מים = יותר ממחצית הגוף.'},
+    {t:'מה חשוב לבדוק כשקונים מוצר מזון ארוז? 3 דברים.',h:'מה כתוב על האריזה?',s:'תאריך תפוגה, רשימת רכיבים, ערכים תזונתיים, מדבקות ירוק/אדום.'},
+    {t:'הסבירי מהי פירמידת המזון.',h:'למה דווקא פירמידה?',s:'תצוגה גרפית של המלצות לאכילה מאוזנת. בבסיס — מה שכדאי לאכול הרבה. בקודקוד — ממתקים (מעט).'}
+];
+let openAns={};
+function initOpen(){openAns=(state.open&&state.open.a)||{};renderOpen();}
+function renderOpen(){
+    document.getElementById('sec-open').innerHTML=`<div class="section-card">
+        <div class="section-title">✍️ שאלות פתוחות</div>
+        <div class="section-subtitle">כתבי את התשובות במילים שלך!</div>
+        ${openQs.map((q,i)=>`
+        <div class="open-q ${(openAns[i]||'').trim()?'answered-open':''}">
+            <span class="open-q-num">${i+1}</span>
+            <div class="open-q-text">${q.t}</div>
+            <div class="open-q-hint">💡 ${q.h}</div>
+            <textarea class="${(openAns[i]||'').trim()?'has-text':''}" oninput="saveOA(${i},this.value)" placeholder="כתבי כאן...">${openAns[i]||''}</textarea>
+        </div>`).join('')}
+        <button class="check-btn" onclick="saveOpen()">💾 שמרי</button>
+        <div class="feedback" id="fb-open"></div>
+    </div>`;
+}
+function saveOA(i,v){openAns[i]=v;state.open={...state.open,a:{...openAns}};save();}
+function saveOpen(){
+    const ans=Object.values(openAns).filter(a=>a&&a.trim()).length;const fb=document.getElementById('fb-open');
+    if(ans>=openQs.length){fb.className='feedback correct';fb.textContent='🌟 כל השאלות נענו!';}
+    else{fb.className='feedback info';fb.textContent=`💾 נשמר! ${ans}/${openQs.length}`;}
+    if(ans>0)state.open={...state.open,done:true};save();updateProgress();
+}
+
+/* ══════ RESET ══════ */
+function resetSec(id){if(!confirm('לאפס חלק זה?'))return;delete state[id];save();
+if(id==='order'){organUser=[];initOrder();}if(id==='match'){matchPairs=[];matchSel=null;initMatch();}
+if(id==='plate'){plateFoods={breakfast:[],lunch:[],snack:[]};initPlate();}
+if(id==='sort'){sortPlace={};sortSel=null;initSort();}if(id==='tf'){tfAns={};initTF();}
+if(id==='exp'){expData={};initExp();}if(id==='open'){openAns={};initOpen();}
+updateProgress();}
+function resetAll(){if(!confirm('למחוק הכל?'))return;state={};localStorage.removeItem(SAVE_KEY);location.reload();}
+
+/* ══════ REVIEW ══════ */
+function openReview(){
+    const p=document.getElementById('reviewPanel');
+    let h=`<button class="close-review" onclick="closeReview()">✕ סגרי</button>
+    <div class="review-header"><h2>👩 בדיקת תשובות</h2><p>לחצי "הצג תשובה" להשוואה</p></div>`;
+
+    // 1
+    h+=reviewItem('🫁 סדר מסלול',(state.order&&state.order.u)?state.order.u.join(' → '):'לא בוצע','פה → ושט → קיבה → מעי דק → מעי גס');
+    // 2
+    h+=reviewItem('🔬 התאמת איברים',matchPairs.length?matchPairs.map(p=>`${matchData[p[0]].organ} ← ${matchData[p[1]].func}`).join('\n'):'לא בוצע',matchData.map(m=>`${m.organ} ← ${m.func}`).join('\n'));
+    // 3
+    h+=reviewItem('🍽️ ארוחות',(state.plate&&state.plate.f)?meals.map(m=>`${m.name}: ${(state.plate.f[m.id]||[]).join(', ')||'(ריק)'}`).join('\n'):'לא בוצע','ארוחה מאוזנת = פחמימות + חלבונים + ירקות + מים. לצמצם חטיפים.');
+    // 4
+    h+=reviewItem('🥗 מיון מזונות',Object.keys(sortPlace).length?sortGroups.map(g=>`${g}: ${Object.entries(sortPlace).filter(([,v])=>v===g).map(([k])=>k).join(', ')||'—'}`).join('\n'):'לא בוצע',
+    sortGroups.map(g=>`${g}: ${sortFoods.filter(f=>f.g===g).map(f=>f.n).join(', ')}`).join('\n'));
+    // 5
+    h+=reviewItem('✅ נכון/לא נכון',Object.keys(tfAns).length?tfItems.map((it,i)=>{const a=tfAns[i];if(!a)return`${i+1}. לא ענתה`;const m=a.c===it.a?'✅':'❌';let l=`${i+1}. ${a.c?'נכון':'לא נכון'} ${m}`;if(a.c===false&&a.e)l+=` — "${a.e}"`;return l;}).join('\n'):'לא בוצע',
+    tfItems.map((it,i)=>`${i+1}. ${it.a?'נכון':'לא נכון'}${it.x?' — '+it.x:''}`).join('\n'));
+    // 6 - experiments (3 modes)
+    h+='<div class="review-item"><div class="review-label">🧪 ניסויים מדעיים</div>';
+    experiments.forEach(exp => {
+        const d = expData[exp.id] || {};
+        let childText = '', sugText = '';
+
+        if (exp.mode === 'match') {
+            const m = d.match || {};
+            const hasAny = Object.keys(m).length > 0;
+            exp.parts.forEach((p,i) => {
+                const ans = m[i] || '';
+                childText += `${p.text}\n→ ${ans || '(לא ענתה)'} ${ans ? (ans===p.answer?'✅':'❌') : ''}\n`;
+                sugText += `${p.answer}: ${p.text}\n`;
+            });
+            h += `<div style="border-bottom:1px solid #f0f0f0;padding:8px 0">
+            <div style="font-weight:700;font-size:0.88em;margin-bottom:4px">${exp.emoji} ${exp.name} <span style="font-size:0.75em;color:#888">(התאמה)</span></div>
+            <div class="review-child ${!hasAny?'empty':''}">${hasAny ? childText : 'לא בוצע'}</div>
+            <button class="review-toggle" onclick="toggleRA(this)">📖 הצג תשובות</button>
+            <div class="review-suggested">${sugText}</div></div>`;
+        } else if (exp.mode === 'type') {
+            const t = d.typed || {};
+            const hasAny = Object.values(t).some(v => v && v.trim());
+            exp.parts.forEach((p,i) => {
+                const val = t[i] || '';
+                childText += `${p.text}\n→ ${val || '(לא ענתה)'} ${val ? (norm(val)===norm(p.answer)?'✅':'❌') : ''}\n`;
+                sugText += `${p.answer}: ${p.text}\n`;
+            });
+            h += `<div style="border-bottom:1px solid #f0f0f0;padding:8px 0">
+            <div style="font-weight:700;font-size:0.88em;margin-bottom:4px">${exp.emoji} ${exp.name} <span style="font-size:0.75em;color:#888">(הקלדה)</span></div>
+            <div class="review-child ${!hasAny?'empty':''}">${hasAny ? childText : 'לא בוצע'}</div>
+            <button class="review-toggle" onclick="toggleRA(this)">📖 הצג תשובות</button>
+            <div class="review-suggested">${sugText}</div></div>`;
+        } else {
+            const o = d.open || {};
+            const hasAny = Object.values(o).some(v => v && v.trim());
+            exp.questions.forEach((q,i) => {
+                const val = o[i] || '';
+                childText += `${q.label}:\n${val || '(לא ענתה)'}\n\n`;
+                sugText += `${q.label}:\n${q.suggested}\n\n`;
+            });
+            h += `<div style="border-bottom:1px solid #f0f0f0;padding:8px 0">
+            <div style="font-weight:700;font-size:0.88em;margin-bottom:4px">${exp.emoji} ${exp.name} <span style="font-size:0.75em;color:#888">(כתיבה חופשית)</span></div>
+            <div class="review-child ${!hasAny?'empty':''}">${hasAny ? childText : 'לא בוצע'}</div>
+            <button class="review-toggle" onclick="toggleRA(this)">📖 הצג תשובות</button>
+            <div class="review-suggested">${sugText}</div></div>`;
+        }
+    });
+    h+='</div>';
+    // 7
+    h+='<div class="review-item"><div class="review-label">✍️ שאלות פתוחות</div>';
+    openQs.forEach((q,i)=>{
+        h+=`<div style="border-bottom:1px solid #f0f0f0;padding:8px 0">
+        <div style="font-weight:600;font-size:0.85em;margin-bottom:4px">${i+1}. ${q.t}</div>
+        <div class="review-child ${!(openAns[i]||'').trim()?'empty':''}">${(openAns[i]||'').trim()||'לא ענתה'}</div>
+        <button class="review-toggle" onclick="toggleRA(this)">📖 הצג תשובה</button>
+        <div class="review-suggested">${q.s}</div></div>`;
+    });
+    h+='</div>';
+
+    p.innerHTML=h;
+    document.getElementById('reviewOverlay').classList.add('show');
+    document.body.style.overflow='hidden';
+}
+function reviewItem(label,child,suggested){
+    const empty=!child||child==='לא בוצע';
+    return`<div class="review-item"><div class="review-label">${label}</div>
+    <div class="review-child ${empty?'empty':''}">${child}</div>
+    <button class="review-toggle" onclick="toggleRA(this)">📖 הצג תשובה</button>
+    <div class="review-suggested">${suggested}</div></div>`;
+}
+function closeReview(){document.getElementById('reviewOverlay').classList.remove('show');document.body.style.overflow='';}
+function toggleRA(btn){const s=btn.nextElementSibling;if(s.style.display==='block'){s.style.display='none';btn.textContent='📖 הצג תשובה';}else{s.style.display='block';btn.textContent='🔽 הסתר';}}
+
+/* ══════ INIT ══════ */
+load();
+document.getElementById('sectionsWrap').innerHTML=sections.map(s=>`<div class="section ${s.id===activeTab?'active':''}" id="sec-${s.id}"></div>`).join('');
+renderNav(); initOrder(); initMatch(); initPlate(); initSort(); initTF(); initExp(); initOpen(); updateProgress();
+</script>
+</body>
+</html>
