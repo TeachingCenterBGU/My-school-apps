@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מזון ומערכת העיכול - חזרה למבחן</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap');
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #fff3e0 50%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 12px;
+            color: #2d3436;
+        }
+        
+        .app-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .app-header {
+            text-align: center;
+            padding: 20px 15px;
+            background: linear-gradient(135deg, #43a047, #66bb6a);
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(67,160,71,0.3);
+        }
+        
+        .app-header h1 {
+            font-size: 1.6em;
+            font-weight: 800;
+        }
+        
+        .app-header p {
+            font-size: 0.95em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 20px;
+            height: 12px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #66bb6a, #43a047);
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        /* Section selector */
+        .section-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .section-btn {
+            padding: 14px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.9em;
+        }
+        
+        .section-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .section-btn.active {
+            border-color: #43a047;
+            background: #e8f5e9;
+            font-weight: 600;
+        }
+        
+        .section-btn .section-icon {
+            font-size: 1.8em;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .section-btn .section-label {
+            font-size: 0.85em;
+            color: #555;
+        }
+        
+        .section-btn .section-score {
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 3px;
+        }
+        
+        /* Question card */
+        .question-card {
+            background: white;
+            border-radius: 20px;
+            padding: 22px 18px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            margin-bottom: 15px;
+            animation: slideIn 0.4s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question-type-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .badge-basic { background: #e3f2fd; color: #1565c0; }
+        .badge-analysis { background: #fff3e0; color: #e65100; }
+        .badge-experiment { background: #f3e5f5; color: #7b1fa2; }
+        
+        .question-text {
+            font-size: 1.05em;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #2d3436;
+        }
+        
+        /* Experiment/text box */
+        .context-box {
+            background: #f5f5f5;
+            border-right: 4px solid #7b1fa2;
+            border-radius: 0 12px 12px 0;
+            padding: 14px;
+            margin-bottom: 15px;
+            font-size: 0.92em;
+            line-height: 1.7;
+            color: #444;
+        }
+        
+        .context-box.text-analysis {
+            border-right-color: #e65100;
+        }
+        
+        .context-box-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+        }
+        
+        /* Options */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .option-btn {
+            padding: 13px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            background: #fafafa;
+            cursor: pointer;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.95em;
+            text-align: right;
+            transition: all 0.2s;
+            line-height: 1.5;
+        }
+        
+        .option-btn:hover:not(.disabled) {
+            border-color: #90caf9;
+            background: #e3f2fd;
+        }
+        
+        .option-btn.correct {
+            border-color: #43a047;
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+        
+        .option-btn.wrong {
+            border-color: #e53935;
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .option-btn.disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+        
+        .option-btn.show-correct {
+            border-color: #43a047;
+            background: #e8f5e9;
+        }
+        
+        /* Feedback */
+        .feedback {
+            margin-top: 12px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            line-height: 1.6;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .feedback.correct {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            color: #2e7d32;
+        }
+        
+        .feedback.wrong {
+            background: #fff3e0;
+            border: 1px solid #ffcc80;
+            color: #e65100;
+        }
+        
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .nav-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-btn:hover { transform: translateY(-1px); }
+        
+        .nav-btn.primary {
+            background: linear-gradient(135deg, #43a047, #66bb6a);
+            color: white;
+            flex: 1;
+        }
+        
+        .nav-btn.secondary {
+            background: #f5f5f5;
+            color: #555;
+        }
+        
+        /* Results */
+        .results-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+        
+        .results-emoji {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .results-score {
+            font-size: 2em;
+            font-weight: 800;
+            color: #43a047;
+            margin-bottom: 5px;
+        }
+        
+        .results-text {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .results-breakdown {
+            text-align: right;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 12px;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 0.9em;
+        }
+        
+        .back-home {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #f5f5f5;
+            border-radius: 14px;
+            color: #555;
+            text-decoration: none;
+            font-family: 'Rubik', sans-serif;
+            font-weight: 600;
+        }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="app-header">
+        <h1>🍎 מזון ומערכת העיכול</h1>
+        <p>חזרה למבחן - כיתה ה'</p>
+    </div>
+
+    <!-- Section Selection Screen -->
+    <div id="sectionScreen">
+        <p style="text-align:center; margin-bottom:12px; font-weight:600; color:#555;">בחרי נושא לתרגול:</p>
+        <div class="section-selector">
+            <button class="section-btn" onclick="startSection(0)">
+                <span class="section-icon">🥦</span>
+                <span class="section-label">קבוצות מזון ורכיבים</span>
+                <span class="section-score" id="score-0"></span>
+            </button>
+            <button class="section-btn" onclick="startSection(1)">
+                <span class="section-icon">🍽️</span>
+                <span class="section-label">תפריט מאוזן ושימור</span>
+                <span class="section-score" id="score-1"></span>
+            </button>
+            <button class="section-btn" onclick="startSection(2)">
+                <span class="section-icon">🫁</span>
+                <span class="section-label">מערכת העיכול</span>
+                <span class="section-score" id="score-2"></span>
+            </button>
+            <button class="section-btn" onclick="startSection(3)">
+                <span class="section-icon">🧪</span>
+                <span class="section-label">ניסויים וניתוח</span>
+                <span class="section-score" id="score-3"></span>
+            </button>
+        </div>
+        <button class="nav-btn primary" style="width:100%" onclick="startSection('all')">🎯 תרגול מלא - כל הנושאים</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quizScreen" class="hidden">
+        <div class="progress-text" id="progressText"></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div id="questionArea"></div>
+        <div class="nav-buttons" id="navButtons" class="hidden">
+            <button class="nav-btn secondary" onclick="goToSections()">🏠 חזרה</button>
+            <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()" style="display:none">שאלה הבאה ←</button>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="resultsScreen" class="hidden"></div>
+</div>
+
+<script>
+// ============ QUESTION BANK ============
+const sections = [
+    {
+        name: "קבוצות מזון ורכיבים",
+        questions: [
+            {
+                type: "basic",
+                text: "איזה מהבאים הוא רכיב מזון ולא קבוצת מזון?",
+                options: ["ירקות ופירות", "פחמימות", "הלחם ומוצריו", "השומנים"],
+                correct: 1,
+                explanation: "פחמימות הן רכיב מזון (נוטריאנט). ירקות ופירות, הלחם ומוצריו, והשומנים הם קבוצות מזון."
+            },
+            {
+                type: "basic",
+                text: "מה התפקיד העיקרי של הפחמימות בגוף?",
+                options: ["בניית שרירים", "מתן אנרגיה לגוף", "חיזוק העצמות", "הגנה מפני מחלות"],
+                correct: 1,
+                explanation: "פחמימות הן מקור האנרגיה העיקרי של הגוף. לחם, אורז ופסטה עשירים בפחמימות."
+            },
+            {
+                type: "basic",
+                text: "לאיזו קבוצת מזון שייכים ביצים, עוף ודגים?",
+                options: ["השומנים", "הלחם ומוצריו", "הבשר ותחליפיו", "הממתקים"],
+                correct: 2,
+                explanation: "ביצים, עוף ודגים שייכים לקבוצת הבשר ותחליפיו. הם עשירים בחלבונים."
+            },
+            {
+                type: "basic",
+                text: "מהו התפקיד העיקרי של ויטמינים ומינרלים?",
+                options: ["מתן אנרגיה", "בניית רקמות חדשות", "שמירה על תפקוד תקין של הגוף והגנה מפני מחלות", "עיכול המזון"],
+                correct: 2,
+                explanation: "ויטמינים ומינרלים נחוצים לתפקוד תקין של הגוף, לחיזוק מערכת החיסון ולשמירה על הבריאות."
+            },
+            {
+                type: "basic",
+                text: "מהו התפקיד העיקרי של החלבונים בגוף?",
+                options: ["מתן אנרגיה מהירה", "בניית תאים ורקמות בגוף", "שמירה על חום הגוף", "עזרה בעיכול"],
+                correct: 1,
+                explanation: "חלבונים אחראים על בניית תאים ורקמות חדשות בגוף, ועל תיקון רקמות פגועות."
+            },
+            {
+                type: "analysis",
+                context: "דנה רוצה לשפר את התזונה שלה. היא כותבת מה אכלה ביום אחד:\nארוחת בוקר: לחם לבן עם שוקולד למריחה ומיץ תפוזים.\nארוחת צהריים: פסטה עם רוטב עגבניות.\nארוחת ערב: פיצה עם גבינה.",
+                text: "איזו קבוצת מזון כמעט לא מופיעה בתפריט של דנה?",
+                options: ["הלחם ומוצריו", "הירקות והפירות הטריים", "השומנים", "הממתקים"],
+                correct: 1,
+                explanation: "בתפריט של דנה יש הרבה פחמימות (לחם, פסטה, פיצה), אבל כמעט אין ירקות ופירות טריים. מיץ תפוזים הוא מעובד ולא מחליף פירות טריים."
+            },
+            {
+                type: "analysis",
+                context: "בשיעור מדעים, המורה ביקשה מהתלמידים למיין מזונות לפי מקור: מן הצומח או מן החי.\nיוסי כתב: חלב - מן החי, אורז - מן הצומח, ביצה - מן הצומח, תפוח - מן הצומח, דבש - מן הצומח.",
+                text: "באילו מזונות טעה יוסי במיון?",
+                options: ["חלב ואורז", "ביצה ודבש", "תפוח וחלב", "אורז ודבש"],
+                correct: 1,
+                explanation: "יוסי טעה בביצה (מגיעה מתרנגולת - מן החי) ובדבש (מגיע מדבורים - מן החי). שאר המיון שלו נכון."
+            }
+        ]
+    },
+    {
+        name: "תפריט מאוזן ושימור",
+        questions: [
+            {
+                type: "basic",
+                text: "מהו ההבדל העיקרי בין מזון טבעי למזון מעובד?",
+                options: [
+                    "מזון טבעי יקר יותר",
+                    "מזון מעובד עבר תהליכים תעשייתיים שמשנים אותו מהמצב הטבעי",
+                    "מזון טבעי נמכר רק בשוק",
+                    "אין הבדל אמיתי ביניהם"
+                ],
+                correct: 1,
+                explanation: "מזון מעובד עבר תהליכים כמו חימום, הוספת חומרים משמרים, צבעי מאכל ועוד. מזון טבעי נשאר קרוב למצבו המקורי בטבע."
+            },
+            {
+                type: "basic",
+                text: "איזו שיטת שימור מזון כוללת הכנסת המזון לטמפרטורה נמוכה מאוד?",
+                options: ["פסטור", "המלחה", "הקפאה", "ייבוש"],
+                correct: 2,
+                explanation: "הקפאה שומרת על המזון בטמפרטורה נמוכה מאוד (מתחת ל-0 מעלות). זה מאט את פעולת החיידקים ומאריך את חיי המדף."
+            },
+            {
+                type: "basic",
+                text: "מה המטרה של פסטור?",
+                options: ["להוסיף טעם למזון", "להרוג חיידקים על ידי חימום ואז קירור מהיר", "לייבש את המזון", "להוסיף מלח למזון"],
+                correct: 1,
+                explanation: "פסטור הוא תהליך שבו מחממים את המזון (בעיקר חלב) לטמפרטורה גבוהה ואז מקררים מהר. זה הורג חיידקים מזיקים."
+            },
+            {
+                type: "basic",
+                text: "מהו 'תאריך תפוגה' על אריזת מזון?",
+                options: [
+                    "התאריך שבו יוצר המוצר",
+                    "התאריך האחרון שבו מומלץ לצרוך את המוצר",
+                    "התאריך שבו המוצר הגיע לחנות",
+                    "התאריך שבו יש לפתוח את האריזה"
+                ],
+                correct: 1,
+                explanation: "תאריך תפוגה מציין את התאריך האחרון שבו המוצר בטוח ומומלץ לאכילה. אחרי תאריך זה, המזון עלול להתקלקל."
+            },
+            {
+                type: "basic",
+                text: "מה כוללת צרכנות נבונה בתחום המזון?",
+                options: [
+                    "לקנות רק מותגים יקרים",
+                    "לבדוק תאריך תפוגה, רשימת רכיבים, ולהשוות מוצרים",
+                    "לקנות כמה שיותר כדי לחסוך",
+                    "לקנות רק מזון מעובד כי הוא נשמר יותר"
+                ],
+                correct: 1,
+                explanation: "צרכן נבון בודק תאריכי תפוגה, קורא את רשימת הרכיבים על האריזה, ומשווה מחירים ואיכות בין מוצרים."
+            },
+            {
+                type: "analysis",
+                context: "פירמידת המזון הישראלית ממליצה:\nבבסיס (הכי הרבה): דגנים, לחם, אורז, פסטה\nבאמצע: ירקות ופירות, ואז חלב ומוצריו, בשר ותחליפיו\nבקודקוד (הכי מעט): שומנים, שמנים, מלח וממתקים",
+                text: "לפי הפירמידה, מה צריך לאכול הכי הרבה ומה הכי מעט?",
+                options: [
+                    "הכי הרבה ירקות, הכי מעט לחם",
+                    "הכי הרבה דגנים ולחם, הכי מעט שומנים וממתקים",
+                    "הכי הרבה בשר, הכי מעט פירות",
+                    "הכי הרבה חלב, הכי מעט דגנים"
+                ],
+                correct: 1,
+                explanation: "בפירמידה, הבסיס (= הכי הרבה) הוא דגנים ולחם, והקודקוד (= הכי מעט) הוא שומנים, מלח וממתקים."
+            },
+            {
+                type: "analysis",
+                context: "בבית של משפחת כהן היו שתי חבילות גבינה:\nחבילה א': תאריך תפוגה 10.5.2026, נשמרה במקרר\nחבילה ב': תאריך תפוגה 15.5.2026, נשכחה על השיש כל הלילה (8 שעות)\n\nהיום התאריך הוא 8.5.2026.",
+                text: "איזו חבילת גבינה עדיף לא לאכול, ולמה?",
+                options: [
+                    "חבילה א' כי התאריך שלה קרוב יותר",
+                    "חבילה ב' כי היא לא נשמרה בקירור, גם אם התאריך לא עבר",
+                    "שתיהן בסדר כי התאריך לא עבר",
+                    "חבילה א' כי היא ישנה יותר"
+                ],
+                correct: 1,
+                explanation: "גם אם תאריך התפוגה לא עבר, מוצר חלב שנשאר מחוץ למקרר לזמן ממושך עלול להתקלקל. חיידקים מתרבים מהר בטמפרטורת החדר. היגיינה בטיפול מזון כוללת שמירה על קירור!"
+            }
+        ]
+    },
+    {
+        name: "מערכת העיכול",
+        questions: [
+            {
+                type: "basic",
+                text: "מהו הסדר הנכון של מעבר המזון במערכת העיכול?",
+                options: [
+                    "פה → קיבה → וושט → מעיים",
+                    "פה → וושט → קיבה → מעיים",
+                    "וושט → פה → מעיים → קיבה",
+                    "פה → מעיים → קיבה → וושט"
+                ],
+                correct: 1,
+                explanation: "צינור העיכול: המזון נכנס דרך הפה, עובר בוושט לקיבה, ומשם למעיים (דק ואז גס)."
+            },
+            {
+                type: "basic",
+                text: "מה קורה למזון בפה?",
+                options: [
+                    "רק בליעה",
+                    "לעיסה מכנית + תחילת פירוק כימי על ידי הרוק",
+                    "ספיגה לדם",
+                    "רק פירוק כימי"
+                ],
+                correct: 1,
+                explanation: "בפה מתרחשים שני תהליכים: לעיסה (פירוק מכני של המזון לחתיכות קטנות) ופירוק כימי ראשוני של פחמימות על ידי אנזימים ברוק."
+            },
+            {
+                type: "basic",
+                text: "מה תפקיד הוושט?",
+                options: [
+                    "עיכול המזון", 
+                    "ספיגת מים", 
+                    "העברת המזון מהפה לקיבה", 
+                    "הפרשת מיצי עיכול"
+                ],
+                correct: 2,
+                explanation: "הוושט הוא צינור שרירי שמעביר את המזון מהפה אל הקיבה בעזרת תנועות שריריות (פריסטלטיקה)."
+            },
+            {
+                type: "basic",
+                text: "איזו בלוטה מפרישה רוק?",
+                options: ["הכבד", "הלבלב", "בלוטות הרוק", "הקיבה"],
+                correct: 2,
+                explanation: "בלוטות הרוק נמצאות בפה ומפרישות רוק שמכיל אנזימים. הרוק עוזר ללחלח את המזון ומתחיל לפרק פחמימות."
+            },
+            {
+                type: "basic",
+                text: "מה תפקיד הכבד במערכת העיכול?",
+                options: [
+                    "לעכל חלבונים",
+                    "לייצר מרה שעוזרת לפרק שומנים",
+                    "לספוג מים",
+                    "ללעוס את המזון"
+                ],
+                correct: 1,
+                explanation: "הכבד מייצר נוזל הנקרא מרה (מָרָה), שעוזר לפרק שומנים במעי הדק. הכבד הוא בלוטה חשובה במערכת העיכול."
+            },
+            {
+                type: "basic",
+                text: "מה תפקיד הלבלב?",
+                options: [
+                    "אחסון מזון",
+                    "הפרשת אנזימים שעוזרים לפרק מזון במעי הדק",
+                    "ספיגת ויטמינים",
+                    "סינון רעלים"
+                ],
+                correct: 1,
+                explanation: "הלבלב מפריש אנזימי עיכול למעי הדק שעוזרים לפרק חלבונים, שומנים ופחמימות."
+            },
+            {
+                type: "basic",
+                text: "היכן מתרחשת עיקר ספיגת המזון לדם?",
+                options: ["בפה", "בקיבה", "במעי הדק", "בוושט"],
+                correct: 2,
+                explanation: "במעי הדק מתרחשת עיקר הספיגה: רכיבי המזון שפורקו (סוכרים, חומצות אמינו, חומצות שומן) נספגים דרך דופן המעי אל הדם."
+            },
+            {
+                type: "analysis",
+                context: "שני התפקידים העיקריים של מערכת העיכול הם:\n1. פירוק - לפרק מזון לחלקיקים קטנים מספיק\n2. ספיגה - להעביר את החלקיקים הקטנים אל הדם\n\nהפירוק יכול להיות מכני (כמו לעיסה, לישה) או כימי (בעזרת אנזימים וחומצות).",
+                text: "איזה מהבאים הוא דוגמה לפירוק מכני?",
+                options: [
+                    "הרוק מפרק פחמימות",
+                    "חומצת הקיבה מפרקת חלבונים",
+                    "השיניים לועסות וטוחנות את המזון",
+                    "אנזימים בלבלב מפרקים שומנים"
+                ],
+                correct: 2,
+                explanation: "לעיסה בשיניים היא פירוק מכני - חיתוך וטחינה פיזית של המזון לחלקיקים קטנים. כל שאר הדוגמאות הן פירוק כימי בעזרת אנזימים או חומצות."
+            }
+        ]
+    },
+    {
+        name: "ניסויים וניתוח",
+        questions: [
+            {
+                type: "experiment",
+                context: "ניסוי: שמנו פרוסת לחם בשלושה מקומות שונים:\nכוס A - במקרר (4°C)\nכוס B - על השיש בטמפרטורת חדר (25°C)\nכוס C - ליד תנור חם (35°C)\n\nאחרי שבוע בדקנו:\nכוס A - הלחם נראה כמעט רגיל\nכוס B - הופיע עובש ירוק קטן\nכוס C - הלחם מלא עובש ירוק ושחור",
+                text: "מה המסקנה העיקרית מהניסוי?",
+                options: [
+                    "לחם לא יכול להתעפש",
+                    "ככל שהטמפרטורה גבוהה יותר, העובש מתפתח מהר יותר",
+                    "עובש גדל רק באור שמש",
+                    "המקרר גורם ללחם להתעפש"
+                ],
+                correct: 1,
+                explanation: "הניסוי מראה שטמפרטורה גבוהה מאיצה את התפתחות העובש. לכן אנחנו שומרים מזון במקרר (שיטת שימור!) — הטמפרטורה הנמוכה מאטה את התפתחות החיידקים והעובש."
+            },
+            {
+                type: "experiment",
+                context: "ניסוי בכיתה: הילדים לקחו ביסקוויט ולעסו אותו לאט מאוד בפה בלי לבלוע, במשך 2 דקות.\n\nתוצאה: אחרי דקה-שתיים, הרבה ילדים דיווחו שהביסקוויט התחיל להרגיש מתוק יותר ממה שהוא היה בהתחלה.",
+                text: "למה הביסקוויט הפך מתוק יותר עם הזמן?",
+                options: [
+                    "כי הילדים דמיינו שזה מתוק",
+                    "כי הרוק הוסיף סוכר לביסקוויט",
+                    "כי אנזימים ברוק פירקו את הפחמימות (עמילן) לסוכרים פשוטים",
+                    "כי השיניים שחררו סוכר חבוי"
+                ],
+                correct: 2,
+                explanation: "ברוק יש אנזים (עמילאז) שמפרק עמילן (פחמימה מורכבת) לסוכרים פשוטים. זו דוגמה לפירוק כימי שמתחיל כבר בפה! לכן ככל שלועסים יותר, מרגישים יותר מתיקות."
+            },
+            {
+                type: "experiment",
+                context: "ניסוי: לקחנו שתי כוסות עם מים ושמן:\nכוס 1 - הוספנו מים + שמן בלבד → השמן צף למעלה ולא התערבב\nכוס 2 - הוספנו מים + שמן + כמה טיפות סבון כלים → השמן התפזר לטיפות קטנות בתוך המים",
+                text: "הסבון בניסוי מדמה חומר שהגוף מייצר. איזה חומר זה, ומאיפה הוא מגיע?",
+                options: [
+                    "רוק, מבלוטות הרוק",
+                    "מרה, מהכבד — שמפרקת שומנים לטיפות קטנות",
+                    "חומצה, מהקיבה",
+                    "אנזימים, מהלבלב"
+                ],
+                correct: 1,
+                explanation: "הסבון מדמה את המרה שמיוצרת בכבד. כמו שהסבון מפזר את השמן לטיפות קטנות במים, כך המרה מפרקת שומנים לטיפות קטנות כדי שהאנזימים יוכלו לעכל אותם. תהליך זה נקרא תחליב."
+            },
+            {
+                type: "experiment",
+                context: "שני תלמידים בישלו ביצה:\nתלמיד A: שטף ידיים לפני הבישול, בדק תאריך תפוגה על הביצה, אחסן את הביצה המבושלת במקרר.\nתלמיד B: לא שטף ידיים, לא בדק תאריך, השאיר את הביצה המבושלת על השולחן כל אחר הצהריים.",
+                text: "איזה כלל היגיינה בטיפול מזון הפר תלמיד B, ומה הסיכון?",
+                options: [
+                    "הפר רק את כלל הניקיון - הסיכון קטן",
+                    "הפר כללי ניקיון, בדיקת תפוגה, ואחסון נכון - סיכון להרעלת מזון",
+                    "לא הפר כלום, הכל בסדר",
+                    "הפר רק את כלל האחסון"
+                ],
+                correct: 1,
+                explanation: "תלמיד B הפר שלושה כללי היגיינה: 1) ניקיון - לא שטף ידיים, 2) בדיקה - לא בדק תאריך תפוגה, 3) אחסון - לא שמר בקירור. כל אלה מגדילים את הסיכון לחיידקים ולהרעלת מזון."
+            },
+            {
+                type: "experiment",
+                context: "ניסוי: לקחנו שני תפוחים חתוכים:\nתפוח 1 - הושאר פתוח באוויר\nתפוח 2 - הושם בשקית ואקום (ללא אוויר)\n\nאחרי 3 ימים:\nתפוח 1 - השחים, התרכך, הריח חמוץ\nתפוח 2 - נראה כמעט טרי, קצת השחים בקצוות",
+                text: "מה אפשר ללמוד מהניסוי על שימור מזון?",
+                options: [
+                    "תפוחים לא מתקלקלים לעולם",
+                    "הסרת אוויר (חמצן) מאטה את התקלקלות המזון כי חיידקים צריכים חמצן",
+                    "אריזה לא משפיעה על המזון",
+                    "תפוחים מתקלקלים רק מקור"
+                ],
+                correct: 1,
+                explanation: "הניסוי מראה שחמצן מזרז התקלקלות. חיידקים רבים צריכים חמצן כדי לגדול. לכן אריזת ואקום היא שיטת שימור: מסירים את האוויר כדי להאריך את חיי המדף של המזון."
+            },
+            {
+                type: "experiment",
+                context: "נתונים מתווית מזון של שני מוצרים:\n\nמוצר א' - חטיף שוקולד:\nרכיבים: סוכר, שומן צמחי, קקאו, חלב, תמצית וניל, חומר משמר E202\nפחמימות: 62 גרם | שומנים: 28 גרם | חלבונים: 5 גרם\n\nמוצר ב' - חטיף גרנולה:\nרכיבים: שיבולת שועל, דבש, שקדים, צימוקים, שמן קוקוס\nפחמימות: 45 גרם | שומנים: 12 גרם | חלבונים: 8 גרם",
+                text: "איזה מוצר בריא יותר ומדוע?",
+                options: [
+                    "מוצר א' כי יש בו שוקולד שהוא בריא",
+                    "מוצר ב' כי יש בו פחות סוכר ושומן, יותר חלבון, רכיבים טבעיים וללא חומרים משמרים",
+                    "שניהם בריאים באותה מידה",
+                    "מוצר א' כי יש בו יותר פחמימות = יותר אנרגיה"
+                ],
+                correct: 1,
+                explanation: "מוצר ב' בריא יותר: הרכיבים שלו טבעיים (שיבולת שועל, שקדים, דבש), יש בו פחות שומן ופחמימות, יותר חלבון, ואין חומרים משמרים מלאכותיים. צרכן נבון ישווה תוויות!"
+            }
+        ]
+    }
+];
+
+// ============ STATE ============
+let currentSection = null;
+let currentQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let answered = false;
+let sectionScores = {};
+
+// ============ FUNCTIONS ============
+function startSection(sectionId) {
+    if (sectionId === 'all') {
+        currentQuestions = [];
+        sections.forEach(s => currentQuestions.push(...s.questions));
+        shuffleArray(currentQuestions);
+        currentSection = 'all';
+    } else {
+        currentQuestions = [...sections[sectionId].questions];
+        shuffleArray(currentQuestions);
+        currentSection = sectionId;
+    }
+    
+    currentIndex = 0;
+    score = 0;
+    answered = false;
+    
+    document.getElementById('sectionScreen').classList.add('hidden');
+    document.getElementById('quizScreen').classList.remove('hidden');
+    document.getElementById('resultsScreen').classList.add('hidden');
+    
+    showQuestion();
+}
+
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
+
+function showQuestion() {
+    const q = currentQuestions[currentIndex];
+    const total = currentQuestions.length;
+    
+    document.getElementById('progressText').textContent = `שאלה ${currentIndex + 1} מתוך ${total}`;
+    document.getElementById('progressBar').style.width = ((currentIndex) / total * 100) + '%';
+    document.getElementById('nextBtn').style.display = 'none';
+    answered = false;
+    
+    let badgeClass = 'badge-basic';
+    let badgeText = '📘 ידע בסיסי';
+    if (q.type === 'analysis') {
+        badgeClass = 'badge-analysis';
+        badgeText = '📊 ניתוח טקסט';
+    } else if (q.type === 'experiment') {
+        badgeClass = 'badge-experiment';
+        badgeText = '🧪 ניתוח ניסוי';
+    }
+    
+    let contextHtml = '';
+    if (q.context) {
+        const contextClass = q.type === 'experiment' ? '' : 'text-analysis';
+        const titleText = q.type === 'experiment' ? '🔬 תיאור הניסוי:' : '📄 קראו את הטקסט:';
+        contextHtml = `
+            <div class="context-box ${contextClass}">
+                <div class="context-box-title">${titleText}</div>
+                ${q.context.replace(/\n/g, '<br>')}
+            </div>`;
+    }
+    
+    let optionsHtml = q.options.map((opt, i) => 
+        `<button class="option-btn" onclick="checkAnswer(${i})" id="opt-${i}">${opt}</button>`
+    ).join('');
+    
+    document.getElementById('questionArea').innerHTML = `
+        <div class="question-card">
+            <span class="question-type-badge ${badgeClass}">${badgeText}</span>
+            ${contextHtml}
+            <div class="question-text">${q.text}</div>
+            <div class="options-list">${optionsHtml}</div>
+            <div id="feedback"></div>
+        </div>`;
+}
+
+function checkAnswer(selected) {
+    if (answered) return;
+    answered = true;
+    
+    const q = currentQuestions[currentIndex];
+    const correct = q.correct;
+    const feedbackEl = document.getElementById('feedback');
+    
+    document.querySelectorAll('.option-btn').forEach(btn => btn.classList.add('disabled'));
+    
+    if (selected === correct) {
+        score++;
+        document.getElementById(`opt-${selected}`).classList.add('correct');
+        feedbackEl.innerHTML = `<div class="feedback correct">✅ נכון מאוד! ${q.explanation}</div>`;
+    } else {
+        document.getElementById(`opt-${selected}`).classList.add('wrong');
+        document.getElementById(`opt-${correct}`).classList.add('show-correct');
+        feedbackEl.innerHTML = `<div class="feedback wrong">❌ לא מדויק. ${q.explanation}</div>`;
+    }
+    
+    document.getElementById('nextBtn').style.display = 'block';
+    
+    if (currentIndex === currentQuestions.length - 1) {
+        document.getElementById('nextBtn').textContent = '📊 לתוצאות';
+    }
+}
+
+function nextQuestion() {
+    currentIndex++;
+    if (currentIndex >= currentQuestions.length) {
+        showResults();
+    } else {
+        showQuestion();
+    }
+}
+
+function showResults() {
+    const total = currentQuestions.length;
+    const pct = Math.round(score / total * 100);
+    let emoji = '🌟';
+    let msg = 'מעולה!';
+    if (pct < 50) { emoji = '💪'; msg = 'כדאי לחזור על החומר'; }
+    else if (pct < 70) { emoji = '👍'; msg = 'לא רע! עוד קצת תרגול'; }
+    else if (pct < 90) { emoji = '🎉'; msg = 'כל הכבוד!'; }
+    
+    // Save score
+    if (currentSection !== 'all' && currentSection !== null) {
+        sectionScores[currentSection] = { score, total };
+        document.getElementById(`score-${currentSection}`).textContent = `${score}/${total}`;
+    }
+    
+    // Report score to app-tracker if available
+    if (typeof saveAppScore === 'function') {
+        saveAppScore('nutrition-quiz', score, total);
+    }
+    
+    document.getElementById('quizScreen').classList.add('hidden');
+    document.getElementById('resultsScreen').classList.remove('hidden');
+    document.getElementById('resultsScreen').innerHTML = `
+        <div class="results-card">
+            <div class="results-emoji">${emoji}</div>
+            <div class="results-score">${score} / ${total}</div>
+            <div class="results-text">${pct}% — ${msg}</div>
+            <button class="nav-btn primary" onclick="goToSections()" style="margin:10px 5px">🔄 תרגול נוסף</button>
+            <a href="../../grade-5.html" class="back-home">🏠 חזרה לעמוד הכיתה</a>
+        </div>`;
+}
+
+function goToSections() {
+    document.getElementById('sectionScreen').classList.remove('hidden');
+    document.getElementById('quizScreen').classList.add('hidden');
+    document.getElementById('resultsScreen').classList.add('hidden');
+}
+</script>
+
+</body>
+</html>
