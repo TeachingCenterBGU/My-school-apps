@@ -114,6 +114,31 @@
             color: #888;
             margin-top: 3px;
         }
+
+        /* AI section button special style */
+        .section-btn.ai-section {
+            border-color: #7c4dff;
+            background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+            grid-column: 1 / -1;
+        }
+        .section-btn.ai-section:hover {
+            border-color: #651fff;
+            box-shadow: 0 4px 16px rgba(124, 77, 255, 0.2);
+        }
+        .section-btn.ai-section .section-label {
+            color: #4a148c;
+            font-weight: 600;
+        }
+        .ai-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #7c4dff, #b388ff);
+            color: white;
+            font-size: 0.65em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 4px;
+            font-weight: 600;
+        }
         
         /* Question card */
         .question-card {
@@ -142,6 +167,7 @@
         .badge-basic { background: #e3f2fd; color: #1565c0; }
         .badge-analysis { background: #fff3e0; color: #e65100; }
         .badge-experiment { background: #f3e5f5; color: #7b1fa2; }
+        .badge-open { background: linear-gradient(135deg, #ede7f6, #e8eaf6); color: #4a148c; }
         
         .question-text {
             font-size: 1.05em;
@@ -247,6 +273,12 @@
             border: 1px solid #ffcc80;
             color: #e65100;
         }
+
+        .feedback.ai-feedback {
+            background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+            border: 1px solid #ce93d8;
+            color: #4a148c;
+        }
         
         /* Navigation */
         .nav-buttons {
@@ -334,6 +366,147 @@
         }
         
         .hidden { display: none !important; }
+
+        /* ============ OPEN QUESTION STYLES ============ */
+        .open-answer-area {
+            margin-top: 10px;
+        }
+
+        .open-answer-area textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.95em;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.3s;
+            direction: rtl;
+        }
+
+        .open-answer-area textarea:focus {
+            outline: none;
+            border-color: #7c4dff;
+            box-shadow: 0 0 0 3px rgba(124, 77, 255, 0.1);
+        }
+
+        .open-answer-area textarea:disabled {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .submit-answer-btn {
+            margin-top: 10px;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #7c4dff, #b388ff);
+            color: white;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .submit-answer-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 77, 255, 0.3);
+        }
+
+        .submit-answer-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* AI Loading animation */
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+            border-radius: 14px;
+            color: #7c4dff;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .ai-loading .dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .ai-loading .dots span {
+            width: 8px;
+            height: 8px;
+            background: #7c4dff;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .ai-loading .dots span:nth-child(1) { animation-delay: 0s; }
+        .ai-loading .dots span:nth-child(2) { animation-delay: 0.2s; }
+        .ai-loading .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* AI Setup notice */
+        .ai-setup-notice {
+            background: #fff8e1;
+            border: 1px solid #ffcc02;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            line-height: 1.6;
+            color: #6d4c00;
+        }
+
+        .ai-setup-notice strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Hint from AI */
+        .ai-hint-text {
+            white-space: pre-wrap;
+            line-height: 1.7;
+        }
+
+        .try-again-btn {
+            margin-top: 10px;
+            padding: 10px 24px;
+            border: 2px solid #7c4dff;
+            border-radius: 12px;
+            background: white;
+            color: #7c4dff;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .try-again-btn:hover {
+            background: #ede7f6;
+        }
+
+        /* Character count */
+        .char-count {
+            text-align: left;
+            font-size: 0.75em;
+            color: #aaa;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -368,8 +541,15 @@
                 <span class="section-label">ניסויים וניתוח</span>
                 <span class="section-score" id="score-3"></span>
             </button>
+            <!-- New AI open questions section -->
+            <button class="section-btn ai-section" onclick="startSection(4)">
+                <span class="section-icon">✍️</span>
+                <span class="section-label">שאלות פתוחות — כתבי בעצמך!</span>
+                <span class="ai-badge">🤖 בדיקה חכמה עם AI</span>
+                <span class="section-score" id="score-4"></span>
+            </button>
         </div>
-        <button class="nav-btn primary" style="width:100%" onclick="startSection('all')">🎯 תרגול מלא - כל הנושאים</button>
+        <button class="nav-btn primary" style="width:100%" onclick="startSection('all')">🎯 תרגול מלא - כל הנושאים (אמריקאי)</button>
     </div>
 
     <!-- Quiz Screen -->
@@ -388,6 +568,186 @@
     <!-- Results Screen -->
     <div id="resultsScreen" class="hidden"></div>
 </div>
+
+<!-- ============ Firebase AI Logic — בדיקת תשובות עם Gemini ============ -->
+<script type="module">
+// ==============================================
+// Firebase AI Logic — בדיקת תשובות פתוחות עם Gemini
+// ==============================================
+//
+// הפעלה (פעם אחת):
+// 1. Firebase Console → AI Services → AI Logic → Get started
+// 2. בחרי "Gemini Developer API" (חינמי!)
+// 3. זהו! לא צריך Blaze plan בכלל.
+//
+// עד שמפעילים — השאלות עדיין עובדות, פשוט בלי בדיקת AI.
+// ==============================================
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+let aiService = null;
+let aiModel = null;
+let aiAvailable = false;
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAi0YrEfLEr7GK2VRjJ9FOuhz4066_7T5M",
+    authDomain: "homework-barad.firebaseapp.com",
+    databaseURL: "https://homework-barad-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "homework-barad",
+    storageBucket: "homework-barad.firebasestorage.app",
+    messagingSenderId: "324035760311",
+    appId: "1:324035760311:web:2b9793e3924cc2840a3d32"
+};
+
+const app = initializeApp(firebaseConfig, "ai-app");
+const auth = getAuth(app);
+
+// ==============================
+// System Prompt — הפרומפט לבדיקת תשובות
+// ==============================
+const TUTOR_SYSTEM_PROMPT = `אתה חונך סבלני וחם לילדה בכיתה ה' בבית ספר יסודי בישראל.
+היא כותבת תשובות לשאלות פתוחות בנושא מזון ומערכת העיכול.
+
+הנחיות חשובות:
+• התעלם משגיאות כתיב לחלוטין ואל תתקן אותן, אלא אם הן מונעות ממך להבין את המשפט.
+• התמקד אך ורק בבדיקה האם התשובה נכונה מבחינת התוכן.
+• אם התשובה נכונה — אמור את זה בשמחה עם חיזוק חיובי, והוסף פרט מעניין קשור.
+• אם התשובה חלקית — תתחיל בחיזוק חיובי על מה שנכון, ואז שאל שאלת מכוון אחת כדי לעזור לה להשלים.
+• אם התשובה לא נכונה — תחזק את המאמץ, ותן רמז או שאלה מכוונת שתעזור לה לחשוב מחדש. אל תגיד את התשובה!
+• תמיד תתחיל בחיזוק חיובי על המאמץ.
+• כתוב בעברית פשוטה, בגובה העיניים של ילדה בת 10-11.
+• תשובה קצרה — 2-4 משפטים מספיקים.
+• אל תשתמש בכוכביות או בפורמט מורכב. כתוב טקסט רגיל.
+
+בסוף כל תשובה, הוסף בשורה נפרדת:
+[ציון: X/3]
+כאשר: 3 = תשובה מלאה ונכונה, 2 = חלקית, 1 = לא נכונה אבל ניסתה, 0 = ריק או לא רלוונטי`;
+
+// ==============================
+// אתחול Firebase AI Logic
+// ==============================
+async function initAI() {
+    try {
+        // ניסיון 1: Firebase AI Logic API חדש (firebase/ai)
+        const aiModule = await import(
+            "https://www.gstatic.com/firebasejs/11.8.1/firebase-ai.js"
+        );
+        const { getAI, getGenerativeModel, GoogleAIBackend } = aiModule;
+        
+        // Gemini Developer API — חינמי!
+        aiService = getAI(app, { backend: new GoogleAIBackend() });
+        aiModel = getGenerativeModel(aiService, { 
+            model: "gemini-2.5-flash",
+            systemInstruction: TUTOR_SYSTEM_PROMPT,
+            generationConfig: {
+                temperature: 0.3,
+                maxOutputTokens: 500,
+            }
+        });
+        aiAvailable = true;
+        console.log("✅ Firebase AI Logic initialized (Gemini Developer API)");
+        
+    } catch (err1) {
+        console.warn("⚠️ firebase-ai.js not available, trying firebase-vertexai.js...", err1.message);
+        
+        try {
+            // ניסיון 2: Vertex AI API ישן (fallback)
+            const vtxModule = await import(
+                "https://www.gstatic.com/firebasejs/11.8.1/firebase-vertexai.js"
+            );
+            const { getVertexAI, getGenerativeModel } = vtxModule;
+            
+            aiService = getVertexAI(app);
+            aiModel = getGenerativeModel(aiService, { 
+                model: "gemini-2.0-flash",
+                systemInstruction: TUTOR_SYSTEM_PROMPT,
+                generationConfig: {
+                    temperature: 0.3,
+                    maxOutputTokens: 500,
+                }
+            });
+            aiAvailable = true;
+            console.log("✅ Vertex AI initialized (fallback)");
+            
+        } catch (err2) {
+            console.warn("⚠️ AI not available:", err2.message);
+            aiAvailable = false;
+        }
+    }
+    
+    return aiAvailable;
+}
+
+// בדיקת מצב התחברות + אתחול AI
+onAuthStateChanged(auth, async (user) => {
+    if (user && !aiAvailable) {
+        console.log("👤 User signed in:", user.displayName);
+        await initAI();
+    }
+    window._aiStatus = { available: aiAvailable, signedIn: !!user };
+    window.dispatchEvent(new Event('ai-status-changed'));
+});
+
+// ==============================
+// פונקציית בדיקת תשובה עם AI
+// ==============================
+window.checkWithAI = async function(question, expectedAnswer, studentAnswer) {
+    if (!aiAvailable || !aiModel) {
+        return {
+            success: false,
+            error: "AI_NOT_AVAILABLE",
+            message: "בדיקת AI לא זמינה כרגע. בדקי שהתחברת עם חשבון גוגל."
+        };
+    }
+
+    const prompt = `השאלה: ${question}
+
+התשובה המצופה (לשימושך הפנימי בלבד — אל תחשפי אותה!): ${expectedAnswer}
+
+התשובה של התלמידה: ${studentAnswer}
+
+בדוק את התשובה לפי ההנחיות שלך ותן משוב.`;
+
+    try {
+        const result = await aiModel.generateContent(prompt);
+        const response = result.response;
+        const text = response.text();
+        
+        // חילוץ הציון
+        const scoreMatch = text.match(/\[ציון:\s*(\d)\/3\]/);
+        const score = scoreMatch ? parseInt(scoreMatch[1]) : null;
+        const feedbackText = text.replace(/\[ציון:\s*\d\/3\]/, '').trim();
+
+        return {
+            success: true,
+            feedback: feedbackText,
+            score: score,
+            raw: text
+        };
+    } catch (err) {
+        console.error("AI check error:", err);
+        return {
+            success: false,
+            error: err.message,
+            message: "שגיאה בבדיקת AI. נסי שוב."
+        };
+    }
+};
+
+// פונקציית התחברות עם גוגל
+window.signInForAI = async function() {
+    try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+    } catch (err) {
+        console.error("Sign in error:", err);
+    }
+};
+
+// ניסיון אתחול ראשוני (גם לפני sign-in, במקרה שיש session פעיל)
+initAI();
+</script>
 
 <script>
 // ============ QUESTION BANK ============
@@ -703,6 +1063,42 @@ const sections = [
                 explanation: "מוצר ב' בריא יותר: הרכיבים שלו טבעיים (שיבולת שועל, שקדים, דבש), יש בו פחות שומן ופחמימות, יותר חלבון, ואין חומרים משמרים מלאכותיים. צרכן נבון ישווה תוויות!"
             }
         ]
+    },
+    // ============ SECTION 5: OPEN QUESTIONS WITH AI ============
+    {
+        name: "שאלות פתוחות",
+        questions: [
+            {
+                type: "open",
+                text: "תארי את המסע של פרוסת לחם במערכת העיכול — מהפה ועד הסוף. מה קורה בכל תחנה?",
+                expectedAnswer: "המזון נכנס לפה, שם הוא נלעס (פירוק מכני) ומתערבב עם רוק שמתחיל לפרק פחמימות (פירוק כימי). אחרי הבליעה הוא עובר בוושט (צינור שרירי) לקיבה. בקיבה יש חומצה ואנזימים שממשיכים לפרק את המזון. מהקיבה המזון עובר למעי הדק, שם הוא מתערבב עם מרה (מהכבד) ואנזימים (מהלבלב), והמזון המפורק נספג לדם. מה שלא נספג עובר למעי הגס שם נספגים מים, והשאריות יוצאות מהגוף.",
+                hint: "חשבי על כל האיברים לפי הסדר: פה, וושט, קיבה, מעי דק, מעי גס. מה קורה בכל אחד?"
+            },
+            {
+                type: "open",
+                text: "מה ההבדל בין פירוק מכני לפירוק כימי? תני דוגמה אחת לכל סוג.",
+                expectedAnswer: "פירוק מכני הוא שבירה פיזית של המזון לחתיכות קטנות יותר, בלי לשנות את ההרכב הכימי שלו. דוגמה: לעיסה בשיניים, או לישה בקיבה. פירוק כימי הוא פירוק המולקולות של המזון באמצעות חומרים כימיים כמו אנזימים או חומצות. דוגמה: הרוק מפרק עמילן לסוכרים, או חומצת הקיבה מפרקת חלבונים.",
+                hint: "מכני = כמו לשבור משהו לחתיכות. כימי = כמו להמיס משהו. חשבי על דוגמאות מהפה ומהקיבה."
+            },
+            {
+                type: "open",
+                text: "למה חשוב ללעוס את המזון היטב לפני הבליעה?",
+                expectedAnswer: "לעיסה טובה חשובה כי היא מפרקת את המזון לחתיכות קטנות (פירוק מכני), מה שמגדיל את שטח הפנים של המזון ומאפשר לאנזימים לעבוד יותר טוב ומהר. בנוסף, בזמן הלעיסה הרוק מתערבב עם המזון ומתחיל פירוק כימי של פחמימות. מזון שנלעס היטב גם קל יותר לבלוע ולעכל בקיבה.",
+                hint: "חשבי: מה יקרה אם תבלעי חתיכה גדולה? האם הקיבה תצליח לעבד אותה באותה קלות?"
+            },
+            {
+                type: "open",
+                text: "הכבד והלבלב הם לא חלק מצינור העיכול עצמו, אבל הם מאוד חשובים לעיכול. הסבירי מה כל אחד מהם עושה.",
+                expectedAnswer: "הכבד מייצר מרה — נוזל שעוזר לפרק שומנים לטיפות קטנות (כמו סבון שמפזר שמן במים). המרה מגיעה למעי הדק. הלבלב מפריש אנזימי עיכול למעי הדק שעוזרים לפרק חלבונים, שומנים ופחמימות. שניהם שולחים את החומרים שלהם למעי הדק, שם מתרחש עיקר העיכול והספיגה.",
+                hint: "חשבי על כבד ולבלב כמו 'עוזרים' שנמצאים בחוץ אבל שולחים חומרים פנימה. מה כל אחד שולח ולאן?"
+            },
+            {
+                type: "open",
+                text: "למה לדעתך המעי הדק ארוך כל כך (כ-6 מטר!)? מה היתרון באורך הזה?",
+                expectedAnswer: "המעי הדק ארוך כי התפקיד העיקרי שלו הוא ספיגת המזון לדם. ככל שהמעי ארוך יותר, יש יותר שטח פנים שבו המזון יכול להיספג. בנוסף, הדופן הפנימית של המעי מכוסה בסיסים זעירים (כמו אצבעות קטנטנות) שמגדילים עוד יותר את שטח הספיגה. המזון צריך מספיק זמן ומרחק כדי שכל הרכיבים הקטנים שלו יספיקו לעבור לדם.",
+                hint: "חשבי על תפקיד המעי הדק — ספיגה. אם הוא היה קצר, מה היה קורה? האם הגוף היה מצליח לספוג את כל המזון?"
+            }
+        ]
     }
 ];
 
@@ -713,12 +1109,17 @@ let currentIndex = 0;
 let score = 0;
 let answered = false;
 let sectionScores = {};
+let openQuestionAttempts = 0; // כמה ניסיונות בשאלה פתוחה נוכחית
+let totalOpenScore = 0;       // סכום ציוני AI
 
 // ============ FUNCTIONS ============
 function startSection(sectionId) {
     if (sectionId === 'all') {
+        // תרגול מלא — רק שאלות אמריקאיות (בלי פתוחות)
         currentQuestions = [];
-        sections.forEach(s => currentQuestions.push(...s.questions));
+        sections.forEach((s, i) => {
+            if (i < 4) currentQuestions.push(...s.questions);  // skip open questions section
+        });
         shuffleArray(currentQuestions);
         currentSection = 'all';
     } else {
@@ -729,6 +1130,7 @@ function startSection(sectionId) {
     
     currentIndex = 0;
     score = 0;
+    totalOpenScore = 0;
     answered = false;
     
     document.getElementById('sectionScreen').classList.add('hidden');
@@ -753,6 +1155,13 @@ function showQuestion() {
     document.getElementById('progressBar').style.width = ((currentIndex) / total * 100) + '%';
     document.getElementById('nextBtn').style.display = 'none';
     answered = false;
+    openQuestionAttempts = 0;
+    
+    // Check if it's an open question
+    if (q.type === 'open') {
+        showOpenQuestion(q);
+        return;
+    }
     
     let badgeClass = 'badge-basic';
     let badgeText = '📘 ידע בסיסי';
@@ -789,6 +1198,208 @@ function showQuestion() {
         </div>`;
 }
 
+// ============ OPEN QUESTION DISPLAY ============
+function showOpenQuestion(q) {
+    const aiStatus = window._aiStatus || { available: false, signedIn: false };
+    
+    let noticeHtml = '';
+    if (!aiStatus.signedIn) {
+        noticeHtml = `
+            <div class="ai-setup-notice">
+                <strong>🔑 כדי לקבל בדיקה חכמה מה-AI, צריך להתחבר:</strong>
+                <button onclick="window.signInForAI()" style="
+                    padding: 8px 20px; border: none; border-radius: 10px;
+                    background: linear-gradient(135deg, #4285f4, #356ac3); color: white;
+                    font-family: 'Rubik', sans-serif; font-weight: 600; cursor: pointer;
+                    margin-top: 6px; font-size: 0.9em;
+                ">🔐 התחברות עם Google</button>
+                <div style="margin-top: 6px; font-size: 0.8em; color: #888;">
+                    גם בלי — אפשר לכתוב תשובה ולראות את התשובה הנכונה
+                </div>
+            </div>`;
+    } else if (!aiStatus.available) {
+        noticeHtml = `
+            <div class="ai-setup-notice">
+                <strong>⚠️ בדיקת AI לא פעילה כרגע</strong>
+                צריך להפעיל Firebase AI Logic ב-Firebase Console
+                (AI Services → AI Logic → Get started → Gemini Developer API).
+                בינתיים — כתבי תשובה ותוכלי לראות את התשובה הנכונה.
+            </div>`;
+    }
+    
+    document.getElementById('questionArea').innerHTML = `
+        <div class="question-card">
+            <span class="question-type-badge badge-open">✍️ שאלה פתוחה</span>
+            ${noticeHtml}
+            <div class="question-text">${q.text}</div>
+            <div class="open-answer-area">
+                <textarea id="openAnswer" placeholder="כתבי את התשובה שלך כאן..." 
+                    oninput="updateCharCount(this)"></textarea>
+                <div class="char-count" id="charCount">0 תווים</div>
+                <button class="submit-answer-btn" id="submitOpenBtn" onclick="submitOpenAnswer()">
+                    🤖 שלחי לבדיקה
+                </button>
+            </div>
+            <div id="feedback"></div>
+            <div id="hintArea"></div>
+        </div>`;
+}
+
+function updateCharCount(textarea) {
+    document.getElementById('charCount').textContent = textarea.value.length + ' תווים';
+}
+
+// ============ SUBMIT OPEN ANSWER ============
+async function submitOpenAnswer() {
+    const textarea = document.getElementById('openAnswer');
+    const answer = textarea.value.trim();
+    const q = currentQuestions[currentIndex];
+    
+    if (answer.length < 3) {
+        document.getElementById('feedback').innerHTML = 
+            '<div class="feedback wrong">✏️ כתבי תשובה קצת יותר ארוכה...</div>';
+        return;
+    }
+    
+    openQuestionAttempts++;
+    
+    // Disable input while checking
+    textarea.disabled = true;
+    document.getElementById('submitOpenBtn').disabled = true;
+    
+    const feedbackEl = document.getElementById('feedback');
+    const aiStatus = window._aiStatus || { available: false, signedIn: false };
+    
+    // Show loading
+    if (aiStatus.available) {
+        feedbackEl.innerHTML = `
+            <div class="ai-loading">
+                🤖 הבודק החכם קורא את התשובה שלך
+                <div class="dots"><span></span><span></span><span></span></div>
+            </div>`;
+        
+        // Call AI
+        const result = await window.checkWithAI(q.text, q.expectedAnswer, answer);
+        
+        if (result.success) {
+            const scoreEmoji = result.score >= 3 ? '🌟' : result.score >= 2 ? '👍' : '💪';
+            
+            feedbackEl.innerHTML = `
+                <div class="feedback ai-feedback">
+                    <div style="font-weight:700; margin-bottom:6px;">${scoreEmoji} משוב מהבודק החכם:</div>
+                    <div class="ai-hint-text">${result.feedback}</div>
+                </div>`;
+            
+            // If score is 3/3, mark as fully correct
+            if (result.score >= 3) {
+                totalOpenScore += 3;
+                answered = true;
+                document.getElementById('nextBtn').style.display = 'block';
+                if (currentIndex === currentQuestions.length - 1) {
+                    document.getElementById('nextBtn').textContent = '📊 לתוצאות';
+                }
+                score++;
+            } else if (result.score >= 2) {
+                // Partial — allow retry or move on
+                totalOpenScore += 2;
+                showRetryOrContinue(q);
+            } else {
+                // Incorrect — allow retry with hint
+                totalOpenScore += result.score || 0;
+                showRetryOrContinue(q);
+            }
+        } else {
+            // AI failed — fallback to showing correct answer
+            feedbackEl.innerHTML = `
+                <div class="feedback wrong">
+                    ⚠️ ${result.message}
+                </div>`;
+            showFallbackAnswer(q);
+        }
+    } else {
+        // No AI — show correct answer
+        showFallbackAnswer(q);
+    }
+}
+
+function showRetryOrContinue(q) {
+    const hintArea = document.getElementById('hintArea');
+    const textarea = document.getElementById('openAnswer');
+    
+    if (openQuestionAttempts < 2) {
+        // Allow retry
+        textarea.disabled = false;
+        document.getElementById('submitOpenBtn').disabled = false;
+        
+        hintArea.innerHTML = `
+            <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                <button class="try-again-btn" onclick="retryOpen()">✏️ לנסות שוב</button>
+                <button class="try-again-btn" onclick="showHint()" style="border-color: #ff9800; color: #ff9800;">
+                    💡 רמז
+                </button>
+                <button class="try-again-btn" onclick="showCorrectAndContinue()" style="border-color: #66bb6a; color: #2e7d32;">
+                    ← המשך לשאלה הבאה
+                </button>
+            </div>`;
+    } else {
+        // Max retries — show answer and continue
+        showCorrectAndContinue();
+    }
+}
+
+function retryOpen() {
+    const textarea = document.getElementById('openAnswer');
+    textarea.disabled = false;
+    textarea.focus();
+    document.getElementById('submitOpenBtn').disabled = false;
+    document.getElementById('hintArea').innerHTML = '';
+}
+
+function showHint() {
+    const q = currentQuestions[currentIndex];
+    if (q.hint) {
+        document.getElementById('hintArea').innerHTML = `
+            <div class="feedback" style="background:#fff8e1; border:1px solid #ffcc02; color:#6d4c00; margin-top:10px;">
+                💡 <strong>רמז:</strong> ${q.hint}
+            </div>
+            <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                <button class="try-again-btn" onclick="retryOpen()">✏️ לנסות שוב</button>
+                <button class="try-again-btn" onclick="showCorrectAndContinue()" style="border-color: #66bb6a; color: #2e7d32;">
+                    ← המשך לשאלה הבאה
+                </button>
+            </div>`;
+    }
+}
+
+function showCorrectAndContinue() {
+    const q = currentQuestions[currentIndex];
+    answered = true;
+    
+    document.getElementById('hintArea').innerHTML = `
+        <div class="feedback correct" style="margin-top:10px;">
+            <div style="font-weight:700; margin-bottom:6px;">✅ התשובה המלאה:</div>
+            <div class="ai-hint-text">${q.expectedAnswer}</div>
+        </div>`;
+    
+    document.getElementById('nextBtn').style.display = 'block';
+    if (currentIndex === currentQuestions.length - 1) {
+        document.getElementById('nextBtn').textContent = '📊 לתוצאות';
+    }
+}
+
+function showFallbackAnswer(q) {
+    document.getElementById('hintArea').innerHTML = `
+        <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+            <button class="try-again-btn" onclick="showCorrectAndContinue()" style="border-color: #66bb6a; color: #2e7d32;">
+                📖 ראי את התשובה הנכונה
+            </button>
+        </div>`;
+    
+    document.getElementById('openAnswer').disabled = false;
+    document.getElementById('submitOpenBtn').disabled = false;
+}
+
+// ============ MULTIPLE CHOICE CHECK ============
 function checkAnswer(selected) {
     if (answered) return;
     answered = true;
@@ -837,7 +1448,8 @@ function showResults() {
     // Save score
     if (currentSection !== 'all' && currentSection !== null) {
         sectionScores[currentSection] = { score, total };
-        document.getElementById(`score-${currentSection}`).textContent = `${score}/${total}`;
+        const scoreEl = document.getElementById(`score-${currentSection}`);
+        if (scoreEl) scoreEl.textContent = `${score}/${total}`;
     }
     
     // Report score to app-tracker if available
@@ -862,6 +1474,14 @@ function goToSections() {
     document.getElementById('quizScreen').classList.add('hidden');
     document.getElementById('resultsScreen').classList.add('hidden');
 }
+
+// Listen for AI status changes to update UI
+window.addEventListener('ai-status-changed', () => {
+    // If we're currently showing an open question, refresh the notice
+    if (currentQuestions[currentIndex]?.type === 'open' && !answered) {
+        showOpenQuestion(currentQuestions[currentIndex]);
+    }
+});
 </script>
 
 </body>
