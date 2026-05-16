@@ -1,19 +1,5 @@
 const homeworkData = [
     {
-        "id": "9960",
-        "grade": 3,
-        "subject": "הנדסה",
-        "task": "סיום עמ' 99",
-        "date": "15/04"
-    },
-    {
-        "id": "9991",
-        "grade": 3,
-        "subject": "חשבון",
-        "task": "לסיים עד עמ' 75 כולל.",
-        "date": "15/04"
-    },
-    {
         "id": "10514",
         "grade": 3,
         "subject": "חשבון",
@@ -75,13 +61,6 @@ const homeworkData = [
         "subject": "מדעים",
         "task": "עמוד 138",
         "date": "03/05"
-    },
-    {
-        "id": "custom-tree-20260515",
-        "grade": 3,
-        "subject": "משימה ביתית",
-        "task": "🪴 להשקות את העץ במרפסת",
-        "date": "15/05"
     },
     {
         "id": "10087",
