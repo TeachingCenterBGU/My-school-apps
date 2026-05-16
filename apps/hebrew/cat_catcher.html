@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>החתול התופס - משחק אותיות</title>
+    <style>
+        body { 
+            text-align: center; 
+            background: #e0f7fa; 
+            padding: 20px; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            margin: 0;
+            overflow: hidden; 
+        }
+        canvas { 
+            border: 4px solid #00bcd4; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            display: block;
+            margin: 0 auto;
+        }
+        #instructions {
+            color: #00838f;
+            font-size: 18px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>🐱 תופסים את האות הראשונה! 🐱</h2>
+    <canvas id="gameCanvas" width="600" height="500"></canvas>
+    <p id="instructions">השתמשו בחצים ⬅️ ➡️ כדי להזיז את הדמות</p>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // נתיב התיקייה שבה נמצאים קבצי הקול. 
+        // ../../ אומר "לצאת שתי תיקיות החוצה" (מתוך apps/hebrew) אל התיקייה הראשית.
+        const AUDIO_BASE_PATH = "../../letters/";
+
+        // מאגר המילים המלא
+        // מאגר המילים המעודכן - מותאם בדיוק לשמות הקבצים שלך
+        const gameData = [
+            { emoji: "🍉", letter: "א", word: "אבטיח", audio: "Aleph1.mp3" },
+            { emoji: "🦁", letter: "א", word: "אריה", audio: "aryeh.mp3" },
+            { emoji: "⛺", letter: "א", word: "אוהל", audio: "Aleph1.mp3" },
+            { emoji: "🐰", letter: "א", word: "ארנב", audio: "Aleph1.mp3" },
+            { emoji: "🍌", letter: "ב", word: "בננה", audio: "beit.mp3" },
+            { emoji: "🏠", letter: "ב", word: "בית", audio: "beit.mp3" },
+            { emoji: "🦆", letter: "ב", word: "ברווז", audio: "barvaz.mp3" },
+            { emoji: "🎈", letter: "ב", word: "בלון", audio: "beit.mp3" },
+            { emoji: "🍦", letter: "ג", word: "גלידה", audio: "gimel_1.mp3" },
+            { emoji: "🥕", letter: "ג", word: "גזר", audio: "gimel_1.mp3" },
+            { emoji: "🦒", letter: "ג", word: "ג'ירפה", audio: "gimel_1.mp3" },
+            { emoji: "🐫", letter: "ג", word: "גמל", audio: "gamal.mp3" },
+            { emoji: "🐟", letter: "ד", word: "דג", audio: "dalet_1.mp3" },
+            { emoji: "🐻", letter: "ד", word: "דוב", audio: "dov.mp3" },
+            { emoji: "🚪", letter: "ד", word: "דלת", audio: "dalet_1.mp3" },
+            { emoji: "⛰️", letter: "ה", word: "הר", audio: "har.mp3" },
+            { emoji: "🍔", letter: "ה", word: "המבורגר", audio: "hei_1.mp3" },
+            { emoji: "🦛", letter: "ה", word: "היפופוטם", audio: "hei_1.mp3" },
+            { emoji: "🌹", letter: "ו", word: "ורד", audio: "vered.mp3" },
+            { emoji: "🧇", letter: "ו", word: "וופל", audio: "vav_1.mp3" },
+            { emoji: "🦓", letter: "ז", word: "זברה", audio: "zebra.mp3" },
+            { emoji: "🐛", letter: "ז", word: "זחל", audio: "zain_1.mp3" },
+            { emoji: "🐱", letter: "ח", word: "חתול", audio: "chatul.mp3" },
+            { emoji: "🐌", letter: "ח", word: "חילזון", audio: "chet_1.mp3" },
+            { emoji: "🐷", letter: "ח", word: "חזיר", audio: "chet_1.mp3" },
+            { emoji: "🌻", letter: "ח", word: "חמניה", audio: "chet_1.mp3" },
+            { emoji: "🚜", letter: "ט", word: "טרקטור", audio: "traktor.mp3" },
+            { emoji: "🦚", letter: "ט", word: "טווס", audio: "tet.mp3" },
+            { emoji: "📱", letter: "ט", word: "טלפון", audio: "tet.mp3" },
+            { emoji: "🦉", letter: "י", word: "ינשוף", audio: "yanshuf.mp3" },
+            { emoji: "🌙", letter: "י", word: "ירח", audio: "yud.mp3" },
+            { emoji: "💎", letter: "י", word: "יהלום", audio: "yud.mp3" },
+            { emoji: "🐶", letter: "כ", word: "כלב", audio: "kelev.mp3" },
+            { emoji: "⚽", letter: "כ", word: "כדור", audio: "chaf_1.mp3" },
+            { emoji: "👑", letter: "כ", word: "כתר", audio: "chaf_1.mp3" },
+            { emoji: "🍋", letter: "ל", word: "לימון", audio: "lamed.mp3" },
+            { emoji: "🤡", letter: "ל", word: "ליצן", audio: "leitzan.mp3" },
+            { emoji: "❤️", letter: "ל", word: "לב", audio: "lamed.mp3" },
+            { emoji: "🚗", letter: "מ", word: "מכונית", audio: "mechonit.mp3" },
+            { emoji: "✈️", letter: "מ", word: "מטוס", audio: "mem_1.mp3" },
+            { emoji: "🔑", letter: "מ", word: "מפתח", audio: "mem_1.mp3" },
+            { emoji: "🐯", letter: "נ", word: "נמר", audio: "nun.mp3" },
+            { emoji: "🐜", letter: "נ", word: "נמלה", audio: "nun.mp3" },
+            { emoji: "🐍", letter: "נ", word: "נחש", audio: "nachash.mp3" },
+            { emoji: "🐎", letter: "ס", word: "סוס", audio: "sus.mp3" },
+            { emoji: "⛵", letter: "ס", word: "סירה", audio: "samech.mp3" },
+            { emoji: "🦀", letter: "ס", word: "סרטן", audio: "samech.mp3" },
+            { emoji: "🕷️", letter: "ע", word: "עכביש", audio: "ain.mp3" },
+            { emoji: "🍇", letter: "ע", word: "ענבים", audio: "ain.mp3" },
+            { emoji: "🌳", letter: "ע", word: "עץ", audio: "ain.mp3" },
+            { emoji: "🐭", letter: "ע", word: "עכבר", audio: "achbar.mp3" },
+            { emoji: "🐘", letter: "פ", word: "פיל", audio: "pil.mp3" },
+            { emoji: "🐄", letter: "פ", word: "פרה", audio: "peh_1.mp3" },
+            { emoji: "🍕", letter: "פ", word: "פיצה", audio: "peh_1.mp3" },
+            { emoji: "🐢", letter: "צ", word: "צב", audio: "tzav.mp3" },
+            { emoji: "🐸", letter: "צ", word: "צפרדע", audio: "tzadik_1.mp3" },
+            { emoji: "🐒", letter: "ק", word: "קוף", audio: "kof.mp3" },
+            { emoji: "🚂", letter: "ק", word: "קטר", audio: "kuf.mp3" },
+            { emoji: "🪄", letter: "ק", word: "קסם", audio: "kuf.mp3" },
+            { emoji: "🚆", letter: "ר", word: "רכבת", audio: "rakevet.mp3" },
+            { emoji: "🚦", letter: "ר", word: "רמזור", audio: "reish.mp3" },
+            { emoji: "🤖", letter: "ר", word: "רובוט", audio: "reish.mp3" },
+            { emoji: "☀️", letter: "ש", word: "שמש", audio: "shemesh.mp3" },
+            { emoji: "⌚", letter: "ש", word: "שעון", audio: "shin.mp3" },
+            { emoji: "🍎", letter: "ת", word: "תפוח", audio: "tapuach.mp3" },
+            { emoji: "🍓", letter: "ת", word: "תות", audio: "taf_1.mp3" },
+            { emoji: "🐊", letter: "ת", word: "תנין", audio: "taf_1.mp3" }
+        ];
+        
+        // "חפיסת הקלפים" שלנו - שכפול של מאגר המילים
+        let availableWords = [...gameData];
+
+        const levelsConfig = [
+            { avatar: "🐱", bgColor: "#e1f5fe", decor: ["☁️", "☁️"], decorPos: [[80,120], [450,160]] }, 
+            { avatar: "🐶", bgColor: "#bbdefb", decor: ["☀️", "☁️"], decorPos: [[480,100], [100,140]] }, 
+            { avatar: "🦊", bgColor: "#ffe0b2", decor: ["🌅", "☁️"], decorPos: [[480,120], [150,100]] }, 
+            { avatar: "🐯", bgColor: "#e1bee7", decor: ["☁️", "🦇"], decorPos: [[100,120], [450,100]] }, 
+            { avatar: "🦁", bgColor: "#9fa8da", decor: ["🌙", "⭐"], decorPos: [[500,100], [150,150]] }, 
+            { avatar: "🦄", bgColor: "#f8bbd0", decor: ["🌈", "✨"], decorPos: [[300,120], [100,100]] }  
+        ];
+
+        let currentTarget = null;
+        let fallingLetters = [];
+        let score = 0;
+        let correctGuessesCount = 0; 
+        let frameCount = 0;
+        let isGameOver = false; 
+
+        const player = {
+            x: 270,
+            y: 420,
+            width: 60,
+            height: 60,
+            speed: 6,
+            dx: 0
+        };
+
+        const allLetters = "אבגדהוזחטיכלמנסעפצקרשת".split("");
+
+        function playAudio(filename) {
+            // הוספנו את נתיב התיקייה לפני שם הקובץ
+            const audio = new Audio(AUDIO_BASE_PATH + filename);
+            audio.play().catch(e => console.log("Audio play prevented:", e));
+        }
+
+        function pickNewTarget() {
+            // אם במקרה נגמרו המילים (לא יקרה במשחק של 30 שלבים, אבל ליתר ביטחון)
+            if (availableWords.length === 0) {
+                availableWords = [...gameData];
+            }
+
+            // בחירת מילה אקראית מתוך מה שנשאר במאגר הזמין
+            const randomIndex = Math.floor(Math.random() * availableWords.length);
+            currentTarget = availableWords[randomIndex];
+            
+            // מחיקת המילה שנבחרה מתוך המאגר הזמין כדי שלא תופיע שוב
+            availableWords.splice(randomIndex, 1);
+            
+            fallingLetters = []; 
+        }
+
+        function spawnLetter() {
+            const isCorrectLetter = Math.random() < 0.4;
+            let letterToSpawn;
+
+            if (isCorrectLetter && currentTarget) {
+                letterToSpawn = currentTarget.letter;
+            } else {
+                letterToSpawn = allLetters[Math.floor(Math.random() * allLetters.length)];
+            }
+
+            fallingLetters.push({
+                char: letterToSpawn,
+                x: Math.random() * (canvas.width - 40) + 20,
+                y: -30,
+                speed: 2 + Math.random() * 1.5,
+                size: 30,
+                isTarget: letterToSpawn === currentTarget.letter,
+                isError: false,
+                errorFrames: 0,
+                originalX: 0,
+                ignored: false
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (isGameOver) return; 
+            if (e.key === 'ArrowRight' || e.key === 'Right') {
+                player.dx = player.speed;
+            } else if (e.key === 'ArrowLeft' || e.key === 'Left') {
+                player.dx = -player.speed;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Right' || e.key === 'ArrowLeft' || e.key === 'Left') {
+                player.dx = 0;
+            }
+        });
+
+        function getCurrentLevelIndex() {
+            let index = Math.floor(correctGuessesCount / 5);
+            if (index >= levelsConfig.length) index = levelsConfig.length - 1;
+            return index;
+        }
+
+        function drawBackground() {
+            let levelData = levelsConfig[getCurrentLevelIndex()];
+            
+            ctx.fillStyle = levelData.bgColor; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.textAlign = "left";
+            ctx.font = "60px Arial";
+            ctx.fillText(levelData.decor[0], levelData.decorPos[0][0], levelData.decorPos[0][1]);
+            ctx.fillText(levelData.decor[1], levelData.decorPos[1][0], levelData.decorPos[1][1]);
+        }
+
+        function drawPlayer() {
+            let levelData = levelsConfig[getCurrentLevelIndex()];
+            ctx.font = "50px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(levelData.avatar, player.x + player.width / 2, player.y + player.height - 10);
+        }
+
+        function drawTarget() {
+            if (!currentTarget) return;
+            
+            ctx.fillStyle = "#fff9c4";
+            ctx.fillRoundRect = function(x, y, w, h, r) {
+                ctx.beginPath();
+                ctx.roundRect(x, y, w, h, r);
+                ctx.fill();
+                ctx.stroke();
+            }
+            ctx.strokeStyle = "#fbc02d";
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            ctx.roundRect(canvas.width/2 - 60, 10, 120, 80, 15);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "40px Arial";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#000";
+            ctx.fillText(currentTarget.emoji, canvas.width/2, 60);
+        }
+
+        function drawUI() {
+            ctx.font = "22px Arial";
+            ctx.fillStyle = "#333";
+            ctx.textAlign = "right";
+            ctx.fillText("נקודות: " + score, canvas.width - 20, 40);
+            
+            ctx.textAlign = "left";
+            ctx.fillStyle = "#e65100";
+            ctx.font = "bold 22px Arial";
+            ctx.fillText("שלב: " + (getCurrentLevelIndex() + 1) + " / " + levelsConfig.length, 20, 40);
+        }
+
+        function drawWinScreen() {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = "#e91e63";
+            ctx.font = "bold 50px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("🏆 כל הכבוד! 🏆", canvas.width/2, canvas.height/2 - 40);
+            
+            ctx.fillStyle = "#333";
+            ctx.font = "28px Arial";
+            ctx.fillText("את אלופה! סיימת את כל השלבים!", canvas.width/2, canvas.height/2 + 20);
+            
+            ctx.fillStyle = "#00838f";
+            ctx.font = "20px Arial";
+            ctx.fillText("לחצו על רענן (F5) כדי לשחק שוב", canvas.width/2, canvas.height/2 + 80);
+        }
+
+        function gameLoop() {
+            if (correctGuessesCount >= levelsConfig.length * 5) {
+                isGameOver = true;
+                drawWinScreen();
+                return; 
+            }
+
+            drawBackground();
+
+            player.x += player.dx;
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+            frameCount++;
+            if (frameCount % 60 === 0) {
+                spawnLetter();
+            }
+
+            drawTarget();
+            drawUI();
+            drawPlayer();
+
+            for (let i = 0; i < fallingLetters.length; i++) {
+                let l = fallingLetters[i];
+
+                if (l.isError) {
+                    if (l.errorFrames > 0) {
+                        l.errorFrames--;
+                        l.x = l.originalX + (Math.random() * 10 - 5);
+                        ctx.fillStyle = "#ef5350"; 
+                        ctx.strokeStyle = "#c62828";
+                    } else {
+                        l.x = l.originalX;
+                        l.y += l.speed;
+                        ctx.fillStyle = "#ef5350"; 
+                        ctx.strokeStyle = "#c62828";
+                    }
+                } else {
+                    l.y += l.speed;
+                    ctx.fillStyle = "#ffcc80";
+                    ctx.strokeStyle = "#ff9800";
+                }
+
+                ctx.beginPath();
+                ctx.arc(l.x, l.y, l.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.font = "30px Arial";
+                ctx.fillStyle = l.isError ? "#ffffff" : "#e65100";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(l.char, l.x, l.y);
+
+                if (
+                    !l.ignored && 
+                    l.y + l.size > player.y && 
+                    l.y - l.size < player.y + player.height &&
+                    l.x + l.size > player.x && 
+                    l.x - l.size < player.x + player.width
+                ) {
+                    if (l.isTarget) {
+                        score += 10;
+                        correctGuessesCount++; 
+                        
+                        playAudio(currentTarget.audio);
+                        pickNewTarget();
+                        fallingLetters.splice(i, 1);
+                        i--;
+                        continue;
+                    } else {
+                        l.isError = true;
+                        l.errorFrames = 60; 
+                        l.originalX = l.x;
+                        l.ignored = true; 
+                    }
+                }
+
+                if (l.y > canvas.height + 50) {
+                    fallingLetters.splice(i, 1);
+                    i--;
+                }
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        pickNewTarget();
+        gameLoop();
+    </script>
+</body>
+</html>

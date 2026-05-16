@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>אתר משחקים · עיגולים</title>
+<style>
+  /* ═══════════════════════════════════════════════════════════
+     רק לעריכה ויזואלית — את הרשימה של העיגולים עורכים בסקריפט למטה
+     ═══════════════════════════════════════════════════════════ */
+  :root{
+    --bg:        #eaf7f6;
+    --ink:       #1f2a37;
+    --label:     #2a3441;
+    --ring:      #f7c948;       /* צבע הטבעת של "נבחר" */
+    --shadow:    0 10px 24px rgba(20,40,60,.12), inset 0 -6px 12px rgba(0,0,0,.08);
+
+    /* פלטה של צבעי רקע לעיגולים — נבחר אוטומטית אם לא הוגדר color */
+    --c-orange:  #ffb27a;
+    --c-teal:    #6fd1c8;
+    --c-yellow:  #ffd964;
+    --c-pink:    #ff9ec2;
+    --c-purple:  #b39ddb;
+    --c-mint:    #a8e6a3;
+    --c-sky:     #8ec9ff;
+    --c-coral:   #ff8a80;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    font-family: 'Heebo', 'Assistant', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: var(--ink);
+    min-height:100vh;
+    padding: 48px 24px 80px;
+  }
+
+  /* קונטיינר */
+  .bubbles{
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .bubble-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:flex-start;
+    gap: 28px;
+  }
+  .bubble-row.offset{ transform: translateX(28px); }
+
+  /* כרטיס עיגול + תווית */
+  .bubble-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    color: var(--label);
+    transition: transform .18s ease;
+  }
+  .bubble-wrap:hover{ transform: translateY(-4px); }
+
+  /* עיגול עצמו */
+  .bubble{
+    position:relative;
+    border-radius: 50%;
+    background: var(--c-orange);
+    background-size: cover;
+    background-position: center;
+    box-shadow: var(--shadow);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .bubble-wrap:hover .bubble{
+    box-shadow: 0 14px 30px rgba(20,40,60,.18), inset 0 -6px 12px rgba(0,0,0,.08);
+  }
+
+  /* גרדיאנט עדין לעומק — מתבטל אם יש תמונה (קובע ה-style inline) */
+  .bubble::after{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at 30% 25%,
+                rgba(255,255,255,.55) 0%,
+                rgba(255,255,255,0) 50%);
+    pointer-events:none;
+  }
+  .bubble.has-image::after{ display:none; }
+
+  /* אימוג'י / ראשי תיבות במקרה שאין תמונה */
+  .bubble .glyph{
+    position:relative;
+    z-index:1;
+    font-size: 50%;
+    line-height:1;
+    filter: drop-shadow(0 2px 0 rgba(0,0,0,.08));
+  }
+
+  /* טבעת זהב לעיגול "נבחר" */
+  .bubble.featured{
+    box-shadow:
+      0 0 0 6px var(--ring),
+      0 12px 28px rgba(247,201,72,.4),
+      inset 0 -6px 12px rgba(0,0,0,.08);
+  }
+  .featured-badge{
+    position:absolute;
+    bottom:-6px; right:50%;
+    transform: translateX(50%);
+    background: var(--ring);
+    color:#3a2a00;
+    font-weight:800;
+    font-size: 13px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    z-index:2;
+    white-space:nowrap;
+  }
+
+  /* תג קישור חיצוני */
+  .ext-badge{
+    position:absolute;
+    top:8px; left:8px;
+    background: rgba(255,255,255,.92);
+    color:#1f2a37;
+    width:22px; height:22px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700;
+    z-index:2;
+  }
+
+  /* תווית מתחת לעיגול */
+  .bubble-label{
+    font-size: 16px;
+    font-weight: 600;
+    text-align:center;
+    max-width: 140px;
+    line-height: 1.2;
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800&display=swap">
+</head>
+<body>
+
+<div class="bubbles" id="bubbles"></div>
+
+<script>
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║   ✏️  עריכת העיגולים — שנו פה הכל                                  ║
+   ╠══════════════════════════════════════════════════════════════════╣
+   ║  לכל עיגול:                                                       ║
+   ║    name   – הטקסט מתחת לעיגול                                     ║
+   ║    image  – נתיב לתמונה (assets/foo.jpg) או URL. השאירו '' לאימוג'י║
+   ║    emoji  – אימוג'י שיוצג אם אין תמונה                            ║
+   ║    color  – orange / teal / yellow / pink / purple / mint / sky / ║
+   ║             coral (נקבע צבע הרקע אם אין תמונה)                    ║
+   ║    link   – הקישור (URL לסרטון / יוטיוב / משחק / קובץ מקומי)      ║
+   ║    size   – גודל בפיקסלים: 80 / 100 / 130 / 170                   ║
+   ║    featured – true כדי להציג טבעת זהב + תווית "נבחר"              ║
+   ║    external – true פותח בטאב חדש                                  ║
+   ║                                                                    ║
+   ║  סדר הפריטים = הסדר בו יוצגו (משמאל לימין, בשורות).               ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+const ITEMS = [
+  // ─── שורה 1 ───
+  { name: 'סופר קופים',   image: 'assets/images/monkey-mart.png',   color: 'orange', size: 170,
+    link: 'https://poki.com/il/g/monkey-mart', external: true },
+  { name: 'מטיפיק',     image: 'assets/images/matific.png',   color: 'teal',   size: 100,
+    link: 'https://www.matific.com/il/he/login-page/', external: true },
+  { name: 'משחק הזיכרון', image: 'assets/images/memory.png',   color: 'yellow', size: 80,
+    link: 'apps/hebrew/memory.html', external: false },
+  { name: 'פארק החיות',image: 'assets/images/pets-park.png',   color: 'pink',   size: 130,
+    link: 'https://poki.com/il/g/pets-park', external: true },
+  { name: 'התאמת צליל',   image: '', emoji: '🦄',   color: 'purple', size: 100,
+    link: 'apps/hebrew/memory-initial.html', external: false },
+  { name: 'אמן צבעים',    image: '', emoji: '🎨',   color: 'mint',   size: 80,
+    link: 'https://poki.com/il/g/color-artist', external: true },
+
+  // ─── שורה 2 ───
+  { name: 'פארק חיות',    image: '', emoji: '🐶',   color: 'sky',    size: 80,
+    link: 'https://poki.com/il/g/cats-drop', external: true },
+  { name: 'מה מתחיל ב?',  image: '', emoji: '🍎',   color: 'orange', size: 130,
+    link: 'apps/hebrew/start_with.html', external: false },
+  { name: 'אות פותחת',    image: '', emoji: '🦉',   color: 'yellow', size: 100,
+    link: 'apps/hebrew/word_game_2.html', external: false },
+  { name: 'משחק פופקה',   image: '', emoji: '🕹️',   color: 'pink',   size: 80,
+    link: 'https://www.popka.co.il/game-1571.html', external: true },
+  { name: 'Memory Game',  image: '', emoji: '🇬🇧',   color: 'purple', size: 130,
+    link: 'apps/english/memory_en.html', external: false },
+  { name: 'מגני המספרים!',image: '', emoji: '🛡️',   color: 'mint',   size: 100,
+    link: 'apps/math/addition.html', external: false },
+
+  // ─── שורה 3 ───
+  { name: 'חתולים',       image: '', emoji: '🐈',   color: 'orange', size: 100,
+    link: 'https://poki.com/il/g/cat-simulator', external: true },
+  { name: 'Slice Master', image: '', emoji: '🔪',   color: 'coral',  size: 80,
+    link: 'https://poki.com/il/g/slice-master', external: true },
+  { name: 'מספרים',       image: '', emoji: '🔢',   color: 'yellow', size: 130,
+    link: '#', external: false },
+  { name: 'פיצה',         image: '', emoji: '🍕',   color: 'pink',   size: 100,
+    link: '#', external: false },
+  { name: 'דרקון אש',     image: '', emoji: '🐲',   color: 'purple', size: 80,
+    link: '#', external: false },
+  { name: 'גן חיות',      image: '', emoji: '🦁',   color: 'mint',   size: 130,
+    link: '#', external: false },
+
+  // ─── שורה 4 ───
+  { name: 'מכוניות',      image: '', emoji: '🚙',   color: 'orange', size: 100,
+    link: '#', external: false },
+  { name: 'קרקס',         image: '', emoji: '🤹',   color: 'teal',   size: 170, featured: true,
+    link: '#', external: false },
+  { name: 'קופים',        image: '', emoji: '🐵',   color: 'mint',   size: 80,
+    link: '#', external: false },
+  { name: 'רובוט',        image: '', emoji: '🤖',   color: 'purple', size: 130,
+    link: '#', external: false },
+  { name: 'גלידה',        image: '', emoji: '🍦',   color: 'pink',   size: 100,
+    link: '#', external: false },
+  { name: 'מילים',        image: '', emoji: '🔤',   color: 'sky',    size: 80,
+    link: '#', external: false },
+];
+
+/* כמה פריטים בשורה (סדר ויזואלי) — שנו אם רוצים לסדר אחרת */
+const PER_ROW = 6;
+
+/* ═══════════════════════════════════════════════════════════════════
+   מכאן והלאה — קוד התצוגה. אין צורך לערוך.
+   ═══════════════════════════════════════════════════════════════════ */
+
+(function render() {
+  const root = document.getElementById('bubbles');
+
+  // חלוקה לשורות
+  const rows = [];
+  for (let i = 0; i < ITEMS.length; i += PER_ROW) {
+    rows.push(ITEMS.slice(i, i + PER_ROW));
+  }
+
+  rows.forEach((row, ri) => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'bubble-row' + (ri % 2 === 1 ? ' offset' : '');
+
+    row.forEach((it) => {
+      const a = document.createElement('a');
+      a.className = 'bubble-wrap';
+      a.href = it.link || '#';
+      if (it.external) {
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+      }
+
+      const size = it.size || 100;
+      a.style.width = size + 'px';
+
+      const circle = document.createElement('div');
+      circle.className = 'bubble';
+      if (it.featured) circle.classList.add('featured');
+      circle.style.width = size + 'px';
+      circle.style.height = size + 'px';
+
+      if (it.image) {
+        circle.classList.add('has-image');
+        circle.style.backgroundImage = `url("${it.image}")`;
+      } else {
+        const colorVar = `var(--c-${it.color || 'orange'})`;
+        circle.style.background = colorVar;
+
+        const glyph = document.createElement('span');
+        glyph.className = 'glyph';
+        glyph.style.fontSize = Math.round(size * 0.5) + 'px';
+        glyph.textContent = it.emoji || '🎮';
+        circle.appendChild(glyph);
+      }
+
+      if (it.featured) {
+        const badge = document.createElement('span');
+        badge.className = 'featured-badge';
+        badge.textContent = '⭐ נבחר';
+        circle.appendChild(badge);
+      }
+
+      if (it.external && size >= 100) {
+        const ext = document.createElement('span');
+        ext.className = 'ext-badge';
+        ext.textContent = '↗';
+        ext.title = 'נפתח בטאב חדש';
+        circle.appendChild(ext);
+      }
+
+      const label = document.createElement('div');
+      label.className = 'bubble-label';
+      label.textContent = it.name;
+
+      a.appendChild(circle);
+      a.appendChild(label);
+      rowEl.appendChild(a);
+    });
+
+    root.appendChild(rowEl);
+  });
+})();
+</script>
+</body>
+</html>
