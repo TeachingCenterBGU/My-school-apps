@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תרגול מדעים – צמחים 🌱</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green:  #2e7d32; --green-l: #66bb6a; --green-p: #e8f5e9;
+            --teal:   #00695c; --teal-l:  #4db6ac;
+            --orange: #e65100; --orange-l:#ffa726;
+            --purple: #6a1b9a; --purple-l:#ce93d8;
+            --blue:   #1565c0; --blue-l:  #64b5f6;
+            --red:    #c62828; --bg: #f1f8e9;
+        }
+
+        body { font-family:'Rubik',sans-serif; background:var(--bg); min-height:100vh; color:#2d3436; }
+
+        .top-bar {
+            background:linear-gradient(135deg,var(--green),var(--teal));
+            color:white; padding:10px 16px;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100;
+            box-shadow:0 3px 12px rgba(0,0,0,.2);
+        }
+        .top-bar .title { font-weight:800; font-size:1.1em; }
+        .top-bar .stars { background:rgba(255,255,255,.25); padding:4px 12px; border-radius:20px; font-weight:700; }
+        .top-bar .back { background:rgba(255,255,255,.2); border:none; color:white; padding:5px 12px; border-radius:16px; font-family:'Rubik',sans-serif; font-size:.85em; cursor:pointer; text-decoration:none; }
+
+        .nav-tabs { display:flex; gap:6px; padding:12px 12px 0; overflow-x:auto; scrollbar-width:none; }
+        .nav-tab { flex-shrink:0; padding:8px 14px; border-radius:20px; border:none; font-family:'Rubik',sans-serif; font-size:.88em; font-weight:600; cursor:pointer; background:white; color:#555; box-shadow:0 2px 6px rgba(0,0,0,.1); transition:all .2s; }
+        .nav-tab.active { color:white; box-shadow:0 3px 10px rgba(0,0,0,.2); }
+        .nav-tab[data-tab="quiz"].active   { background:var(--orange); }
+        .nav-tab[data-tab="match"].active  { background:var(--purple); }
+        .nav-tab[data-tab="sort"].active   { background:var(--teal); }
+        .nav-tab[data-tab="order"].active  { background:var(--blue); }
+        .nav-tab[data-tab="fill"].active   { background:#795548; }
+        .nav-tab[data-tab="open"].active   { background:var(--red); }
+
+        .content { padding:14px 12px 30px; max-width:680px; margin:0 auto; }
+        .section { display:none; }
+        .section.active { display:block; }
+
+        .card { background:white; border-radius:16px; padding:18px; box-shadow:0 2px 10px rgba(0,0,0,.08); margin-bottom:12px; }
+        .card-title { font-weight:700; margin-bottom:8px; font-size:1em; }
+
+        .prog-bar { background:#e0e0e0; border-radius:99px; height:7px; overflow:hidden; margin-bottom:5px; }
+        .prog-fill { height:100%; border-radius:99px; transition:width .4s; }
+        .prog-fill.orange { background:var(--orange); }
+        .prog-fill.purple { background:var(--purple); }
+        .prog-fill.brown  { background:#795548; }
+        .prog-meta { display:flex; justify-content:space-between; font-size:.82em; color:#777; margin-bottom:12px; }
+
+        .btn { padding:9px 20px; border-radius:20px; border:none; font-family:'Rubik',sans-serif; font-size:.9em; font-weight:600; cursor:pointer; transition:all .15s; }
+        .btn:active { transform:scale(.96); }
+        .btn-orange { background:var(--orange); color:white; }
+        .btn-purple { background:var(--purple); color:white; }
+        .btn-teal   { background:var(--teal);   color:white; }
+        .btn-blue   { background:var(--blue);   color:white; }
+        .btn-brown  { background:#795548;        color:white; }
+        .btn-red    { background:var(--red);     color:white; }
+        .btn-gray   { background:#eee; color:#555; }
+
+        /* QUIZ */
+        .quiz-q { font-size:1.05em; font-weight:700; margin-bottom:14px; line-height:1.5; }
+        .opt { display:block; width:100%; text-align:right; padding:12px 16px; margin-bottom:8px; border-radius:12px; border:2px solid #e0e0e0; background:white; color:#333; font-family:'Rubik',sans-serif; font-size:.93em; font-weight:500; cursor:pointer; transition:all .15s; }
+        .opt:hover:not(:disabled) { border-color:var(--orange-l); background:#fff8f0; }
+        .opt.correct { border-color:var(--green); background:var(--green-p); color:var(--green); }
+        .opt.wrong   { border-color:var(--red);   background:#ffebee;        color:var(--red);   }
+        .fb { padding:12px 16px; border-radius:12px; margin-top:10px; font-size:.9em; line-height:1.6; display:none; }
+        .fb.show { display:block; }
+        .fb.ok  { background:var(--green-p); color:var(--green); }
+        .fb.err { background:#ffebee;        color:var(--red);   }
+        .q-next { margin-top:12px; display:none; }
+        .q-next.show { display:block; }
+        .score-screen { text-align:center; padding:2rem 1rem; display:none; }
+        .score-screen.show { display:block; }
+        .score-big { font-size:3em; font-weight:900; color:var(--orange); }
+        .win-card { background:linear-gradient(135deg,var(--green),var(--teal)); color:white; border-radius:16px; padding:20px; text-align:center; margin-bottom:12px; }
+        .win-card h3 { font-size:1.3em; font-weight:800; }
+
+        /* MATCHING */
+        .match-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .tile { padding:11px 8px; border-radius:12px; border:2px solid #e0e0e0; background:white; text-align:center; font-size:.87em; font-weight:600; cursor:pointer; transition:all .18s; min-height:54px; display:flex; align-items:center; justify-content:center; line-height:1.4; }
+        .tile:hover      { border-color:var(--purple-l); background:#f3e5f5; }
+        .tile.selected   { border-color:var(--purple); background:#ede7f6; color:var(--purple); }
+        .tile.matched    { border-color:var(--green-l); background:var(--green-p); color:var(--green); cursor:default; opacity:.75; }
+        .tile.shake      { animation:shake .28s; border-color:var(--red); background:#ffebee; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+        /* SORTING */
+        .sort-bank { background:#f5f5f5; border-radius:12px; padding:12px; min-height:56px; margin-bottom:14px; }
+        .sort-item { display:inline-block; padding:8px 14px; margin:4px; border-radius:99px; background:white; border:2px solid #ddd; font-size:.88em; font-weight:600; cursor:grab; user-select:none; transition:all .15s; }
+        .sort-item:hover { border-color:var(--teal-l); background:#e0f2f1; }
+        .sort-item.dragging { opacity:.4; }
+        .sort-item.placed   { display:none; }
+        .sort-cols { display:grid; gap:10px; }
+        .sort-cols.two   { grid-template-columns:1fr 1fr; }
+        .sort-cols.three { grid-template-columns:1fr 1fr 1fr; }
+        .sort-col { border:2px dashed #ccc; border-radius:12px; padding:10px; min-height:80px; transition:border-color .2s; }
+        .sort-col.drag-over { border-color:var(--teal); background:#e0f2f1; }
+        .sort-col-title { font-size:.82em; font-weight:700; color:white; background:var(--teal); border-radius:8px; padding:4px 10px; text-align:center; margin-bottom:8px; }
+        .sort-drop-item { display:inline-block; padding:6px 12px; margin:3px; border-radius:99px; font-size:.85em; font-weight:600; cursor:pointer; }
+        .sort-drop-item.placed-item { background:#e3f2fd; color:#1565c0; border:1px solid #90caf9; }
+        .sort-drop-item.correct { background:var(--green-p); color:var(--green); border:1px solid var(--green-l); }
+        .sort-drop-item.wrong   { background:#ffebee; color:var(--red); border:1px solid #ef9a9a; }
+        .gen-fb { padding:10px 14px; border-radius:10px; margin-top:10px; font-size:.9em; line-height:1.6; display:none; }
+        .gen-fb.show { display:block; }
+        .gen-fb.ok  { background:var(--green-p); color:var(--green); }
+        .gen-fb.err { background:#ffebee;        color:var(--red);   }
+
+        /* SEQUENCING */
+        .seq-pool { background:#f5f5f5; border-radius:12px; padding:12px; min-height:52px; margin-bottom:14px; display:flex; flex-wrap:wrap; gap:8px; }
+        .seq-item { padding:8px 14px; border-radius:99px; background:white; border:2px solid #ddd; font-size:.87em; font-weight:600; cursor:grab; user-select:none; transition:all .15s; }
+        .seq-item:hover { border-color:var(--blue-l); background:#e3f2fd; }
+        .seq-item.dragging { opacity:.4; }
+        .seq-item.placed   { display:none; }
+        .seq-row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+        .seq-slot { min-width:90px; min-height:40px; border:2px dashed #bbb; border-radius:99px; display:flex; align-items:center; justify-content:center; font-size:.83em; color:#aaa; padding:0 10px; transition:all .2s; text-align:center; }
+        .seq-slot.drag-over { border-color:var(--blue); background:#e3f2fd; }
+        .seq-slot.filled { border-style:solid; border-color:var(--blue-l); background:#e3f2fd; color:var(--blue); font-weight:600; cursor:pointer; }
+        .seq-arrow { font-size:1.1em; color:#bbb; flex-shrink:0; }
+
+        /* FILL */
+        .fill-q { font-size:.97em; line-height:2; margin-bottom:6px; }
+        .fill-in { border:none; border-bottom:2px solid var(--orange); font-family:'Rubik',sans-serif; font-size:.93em; font-weight:600; color:#333; background:transparent; padding:0 4px; width:95px; text-align:center; outline:none; }
+        .fill-in.correct { border-color:var(--green); color:var(--green); background:#f1fff1; border-radius:6px; }
+        .fill-in.wrong   { border-color:var(--red);   color:var(--red);   background:#fff5f5; border-radius:6px; }
+        .fill-hint { font-size:.78em; color:#aaa; }
+
+        /* OPEN */
+        .open-q-text { font-size:1em; font-weight:700; margin-bottom:10px; line-height:1.5; }
+        .open-ta { width:100%; min-height:88px; padding:12px; border-radius:10px; border:2px solid #ddd; font-family:'Rubik',sans-serif; font-size:.93em; resize:vertical; color:#333; transition:border-color .2s; }
+        .open-ta:focus { outline:none; border-color:var(--red); }
+        .open-actions { display:flex; gap:8px; margin-top:8px; }
+        .ai-res { margin-top:10px; background:#fce4ec; border-radius:10px; padding:14px; font-size:.9em; line-height:1.7; color:#5d0020; display:none; }
+        .ai-res.show { display:block; }
+        .loading { display:flex; align-items:center; gap:7px; color:#555; font-size:.9em; }
+        .dot { width:7px; height:7px; border-radius:50%; background:var(--red); animation:bounce .7s infinite; }
+        .dot:nth-child(2){animation-delay:.15s} .dot:nth-child(3){animation-delay:.3s}
+        @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-7px)} }
+
+        .note { font-size:.82em; color:#777; margin-bottom:10px; }
+        .row-btns { display:flex; gap:8px; margin-top:12px; }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="../../grade-5.html" class="back">🏠 חזרה</a>
+    <div class="title">🌱 צמחים – תרגול מלא</div>
+    <div class="stars" id="star-count">⭐ 0</div>
+</div>
+
+<div class="nav-tabs">
+    <button class="nav-tab active" data-tab="quiz"  onclick="showTab('quiz')">❓ חידון</button>
+    <button class="nav-tab"        data-tab="match" onclick="showTab('match')">🔗 התאמה</button>
+    <button class="nav-tab"        data-tab="sort"  onclick="showTab('sort')">📂 מיון</button>
+    <button class="nav-tab"        data-tab="order" onclick="showTab('order')">🔢 סדר נכון</button>
+    <button class="nav-tab"        data-tab="fill"  onclick="showTab('fill')">✏️ השלמה</button>
+    <button class="nav-tab"        data-tab="open"  onclick="showTab('open')">🤖 שאלות AI</button>
+</div>
+
+<div class="content">
+
+<!-- ══ QUIZ ══ -->
+<div class="section active" id="sec-quiz">
+  <div id="quiz-body">
+    <div class="prog-bar"><div class="prog-fill orange" id="qbar" style="width:0%"></div></div>
+    <div class="prog-meta"><span id="qctr">שאלה 1 / 14</span><span>ניקוד: <b id="qsc">0</b></span></div>
+    <div class="card">
+      <div class="quiz-q" id="qq"></div>
+      <div id="qopts"></div>
+      <div class="fb" id="qfb"></div>
+      <div class="q-next" id="qnxt"><button class="btn btn-orange" onclick="quizNext()">הבאה ←</button></div>
+    </div>
+  </div>
+  <div class="score-screen" id="qres">
+    <div class="win-card"><h3 id="rtitle"></h3><p id="rsub" style="opacity:.9;margin-top:4px"></p></div>
+    <div class="score-big" id="rscore"></div>
+    <div style="color:#777;font-size:.9em;margin:6px 0 20px">מתוך 14 שאלות</div>
+    <button class="btn btn-orange" onclick="resetQuiz()">שחק/י שוב</button>
+  </div>
+</div>
+
+<!-- ══ MATCHING ══ -->
+<div class="section" id="sec-match">
+  <div class="card">
+    <div style="text-align:center;font-size:.9em;color:#666;margin-bottom:12px" id="mscore">0 / 9 זוגות</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div style="font-size:.8em;font-weight:700;color:white;background:var(--purple);border-radius:8px;padding:5px 10px;text-align:center;margin-bottom:8px">מושגים</div>
+        <div id="mgrid-terms"></div>
+      </div>
+      <div>
+        <div style="font-size:.8em;font-weight:700;color:white;background:#5c6bc0;border-radius:8px;padding:5px 10px;text-align:center;margin-bottom:8px">הגדרות</div>
+        <div id="mgrid-defs"></div>
+      </div>
+    </div>
+    <div style="display:none;text-align:center;padding:1rem 0" id="mwin">
+      <div style="font-size:2em">🎉</div>
+      <div style="font-size:1.1em;font-weight:800;color:var(--green);margin:6px 0">כל הכבוד! כל ההתאמות נכונות!</div>
+      <button class="btn btn-purple" onclick="resetMatch()">שוב</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SORTING ══ -->
+<div class="section" id="sec-sort">
+  <div class="card">
+    <div class="card-title">מיון 1 – פירות עסיסיים ופירות יבשים</div>
+    <div class="note">גרור/י כל פרי לקטגוריה הנכונה</div>
+    <div class="sort-bank" id="bank1"></div>
+    <div class="sort-cols two">
+      <div class="sort-col" id="col-juicy"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="dropSort(event,'juicy',1)">
+        <div class="sort-col-title">🍊 פרי עסיסי</div>
+      </div>
+      <div class="sort-col" id="col-dry"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="dropSort(event,'dry',1)">
+        <div class="sort-col-title">🌰 פרי יבש</div>
+      </div>
+    </div>
+    <div class="row-btns">
+      <button class="btn btn-teal" onclick="checkSort(1)">בדוק ✓</button>
+      <button class="btn btn-gray" onclick="resetSort(1)">אפס</button>
+    </div>
+    <div class="gen-fb" id="sfb1"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">מיון 2 – שיטות הפצת זרעים</div>
+    <div class="note">גרור/י כל צמח/זרע לדרך ההפצה שלו</div>
+    <div class="sort-bank" id="bank2"></div>
+    <div class="sort-cols three">
+      <div class="sort-col" id="col-wind"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="dropSort(event,'wind',2)">
+        <div class="sort-col-title">🌬️ רוח</div>
+      </div>
+      <div class="sort-col" id="col-animal"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="dropSort(event,'animal',2)">
+        <div class="sort-col-title">🐦 בעלי חיים</div>
+      </div>
+      <div class="sort-col" id="col-water"
+           ondragover="event.preventDefault();this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="dropSort(event,'water',2)">
+        <div class="sort-col-title">💧 מים</div>
+      </div>
+    </div>
+    <div class="row-btns">
+      <button class="btn btn-teal" onclick="checkSort(2)">בדוק ✓</button>
+      <button class="btn btn-gray" onclick="resetSort(2)">אפס</button>
+    </div>
+    <div class="gen-fb" id="sfb2"></div>
+  </div>
+</div>
+
+<!-- ══ SEQUENCING ══ -->
+<div class="section" id="sec-order">
+  <div class="card">
+    <div class="card-title">סדר 1 – מחזור החיים של הצמח</div>
+    <div class="note">גרור/י את השלבים לתיבות לפי הסדר הנכון. לחץ/י על תיבה מלאה להחזרה.</div>
+    <div class="seq-pool" id="pool1"></div>
+    <div class="seq-row" id="slots1"></div>
+    <div class="row-btns">
+      <button class="btn btn-blue" onclick="checkSeq(1)">בדוק ✓</button>
+      <button class="btn btn-gray" onclick="resetSeq(1)">אפס</button>
+    </div>
+    <div class="gen-fb" id="sres1"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">סדר 2 – שלבי הנביטה</div>
+    <div class="note">גרור/י את שלבי הנביטה לפי הסדר הנכון</div>
+    <div class="seq-pool" id="pool2"></div>
+    <div class="seq-row" id="slots2"></div>
+    <div class="row-btns">
+      <button class="btn btn-blue" onclick="checkSeq(2)">בדוק ✓</button>
+      <button class="btn btn-gray" onclick="resetSeq(2)">אפס</button>
+    </div>
+    <div class="gen-fb" id="sres2"></div>
+  </div>
+</div>
+
+<!-- ══ FILL ══ -->
+<div class="section" id="sec-fill">
+  <div class="card">
+    <div class="card-title">השלם/י את המשפטים עם המילה הנכונה</div>
+    <div id="fill-qs"></div>
+    <div class="row-btns">
+      <button class="btn btn-brown" onclick="checkFill()">בדוק ✓</button>
+      <button class="btn btn-gray" onclick="resetFill()">אפס</button>
+    </div>
+    <div class="gen-fb" id="fillfb"></div>
+  </div>
+</div>
+
+<!-- ══ OPEN ══ -->
+<div class="section" id="sec-open">
+  <div id="open-list"></div>
+</div>
+
+</div>
+
+<script>
+/* ═══════ DATA ═══════ */
+const QUIZ=[
+  {q:"מה תפקיד השורש?",opts:["ייצור מזון מהשמש","קליטת מים ומינרלים מהקרקע","משיכת מאביקים","הגנה על זרעים"],a:1,ex:"השורש קולט מים ומינרלים מהקרקע ומעגן את הצמח."},
+  {q:"באיזה איבר הצמח מייצר מזון?",opts:["הפרי","הפרח","הגבעול","העלה"],a:3,ex:"העלה הירוק מכיל כלורופיל וסופג אור לייצור מזון (פוטוסינתזה)."},
+  {q:"מה מאפייני החיים של הצמח?",opts:["נשימה, תנועה, התרבות, הזנה, גדילה","רק גדילה והתרבות","נשימה ושינה","תנועה ואכילה בלבד"],a:0,ex:"לצמחים 7 מאפייני חיים: נשימה, תנועה, התרבות, הזנה, גדילה, התפתחות ותקשורת."},
+  {q:"מה קורה לזרע כשהוא קולט מים?",opts:["מתייבש","מתפוצץ","מתחיל לנבוט","לא קורה כלום"],a:2,ex:"הזרע מתנפח, מוציא שורשון ואחר כך נצרון — תהליך הנביטה."},
+  {q:"מאיזה חלק בפרח מתפתח הפרי?",opts:["עלי הכותרת","עלי הגביע","השחלה","האבקנים"],a:2,ex:"לאחר ההאבקה השחלה מתפתחת לפרי, וגרגירי האבקה הופכים לזרעים."},
+  {q:"מה תפקיד עלי הכותרת?",opts:["קליטת מים","ייצור מזון","הגנה על השורש","משיכת מאביקים"],a:3,ex:"עלי הכותרת הצבעוניים מושכים מאביקים (דבורים, ציפורים, פרפרים) לשם ההאבקה."},
+  {q:"איזה פרי הוא פרי עסיסי?",opts:["תורמוס","חמניות","אגוז","תפוז"],a:3,ex:"פרי עסיסי מכיל ציפה עשירה בנוזלים. תורמוס, חמניות ואגוז הם פירות יבשים."},
+  {q:"מה אינו צורך קיום של הצמח?",opts:["מים","אור","חרקים","אוויר"],a:2,ex:"הצמח צריך מים, אור ואוויר. חרקים לא הכרחיים לקיומו."},
+  {q:"כיצד הסביון מפיץ זרעים?",opts:["בעלי חיים","מים","הצמח עצמו","רוח"],a:3,ex:"לסביון מבנה דמוי מצנח שמאפשר לרוח לנשוא זרעים למרחקים."},
+  {q:"מה ההבדל בין פרי עסיסי לפרי יבש?",opts:["פרי עסיסי גדול יותר","לפרי עסיסי יש ציפה, לפרי יבש יש רק קליפה","פרי יבש לא אכיל","פרי עסיסי ללא זרעים"],a:1,ex:"לפרי עסיסי ציפה עשירה בנוזלים. לפרי יבש רק קליפה קשה."},
+  {q:"מה חלקי הפרח?",opts:["עלה, גבעול, שורש, פרי","עלי גביע, עלי כותרת, אבקנים, שחלה","קליפה, ציפה, זרע, שורשון","שורשון, נצרון, גבעול, עלה"],a:1,ex:"חלקי הפרח: עלי גביע (מגנים), עלי כותרת (צבעוניים), אבקנים (אבקה), שחלה (הופכת לפרי)."},
+  {q:"מי עוזר להפצת פירות עסיסיים?",opts:["הרוח","המים","ציפורים ויונקים","הצמח עצמו"],a:2,ex:"בעלי חיים אוכלים פירות עסיסיים; הזרעים עוברים במערכת העיכול ומתפזרים במקומות חדשים."},
+  {q:"מה מיוחד בנביטת זרעי לימון?",opts:["נובטים רק בחושך","יכולים לנבוט בתוך הפרי","צריכים שנתיים","צריכים קרח"],a:1,ex:"לעיתים זרעי לימון מתחילים לנבוט בתוך הפרי עצמו עוד לפני שנפלו לאדמה."},
+  {q:"מה הכלורופיל?",opts:["חלק מהשורש","הפיגמנט הירוק בעלה לייצור מזון","סוג פרח","חלק מהפרי"],a:1,ex:"כלורופיל הוא הפיגמנט הירוק בעלים שסופג אור ומאפשר פוטוסינתזה."}
+];
+
+const MATCH_PAIRS=[
+  {term:"שורש",       def:"קולט מים ומינרלים מהקרקע"},
+  {term:"עלה",        def:"מייצר מזון מהאור"},
+  {term:"פרח",        def:"מושך מאביקים להאבקה"},
+  {term:"פרי",        def:"עוטף ומגן על הזרעים"},
+  {term:"נביטה",      def:"זרע הופך לנבט"},
+  {term:"ציפה",       def:"החלק העסיסי של הפרי"},
+  {term:"גבעול",      def:"מוביל חומרים לכל האיברים"},
+  {term:"שחלה",       def:"מתפתחת לפרי לאחר האבקה"},
+  {term:"כלורופיל",   def:"הפיגמנט הירוק בעלה"}
+];
+
+const SORT1=[
+  {name:"תפוז",cat:"juicy"},{name:"ענבים",cat:"juicy"},{name:"מלפפון",cat:"juicy"},
+  {name:"תפוח",cat:"juicy"},{name:"עגבנייה",cat:"juicy"},
+  {name:"אגוז",cat:"dry"},{name:"תורמוס",cat:"dry"},{name:"חמניות",cat:"dry"},{name:"שקד",cat:"dry"}
+];
+const SORT2=[
+  {name:"סביון",cat:"wind"},{name:"כלנית",cat:"wind"},{name:"אורן",cat:"wind"},
+  {name:"ענבים",cat:"animal"},{name:"תות",cat:"animal"},{name:"זרעי דרדר",cat:"animal"},
+  {name:"קוקוס",cat:"water"},{name:"חבצלת חוף",cat:"water"}
+];
+
+const SEQ1=["זרע","נביטה","נבט","צמח בוגר","פריחה","פרי","הפצת זרעים"];
+const SEQ2=["קליטת מים","הזרע מתנפח","יציאת שורשון","יציאת נצרון","הנבט גדל לאור"];
+
+const FILL_QS=[
+  {b:"הצמח זקוק ל",a:" כדי לייצר מזון בתהליך הפוטוסינתזה.",ans:"אור",hint:"(האנרגיה מהשמש)"},
+  {b:"האיבר הקולט מים מהקרקע הוא ה",a:".",ans:"שורש",hint:""},
+  {b:"פרי שיש לו ציפה נקרא פרי ",a:", ופרי שיש לו רק קליפה נקרא פרי יבש.",ans:"עסיסי",hint:""},
+  {b:"לאחר ההאבקה ה",a:" מתפתחת לפרי.",ans:"שחלה",hint:"(איבר בפרח)"},
+  {b:"הצמח הצעיר שמתפתח מזרע נקרא ",a:".",ans:"נבט",hint:""},
+  {b:"עלי ה",a:" הם האיברים הצבעוניים בפרח המושכים מאביקים.",ans:"כותרת",hint:""},
+  {b:"צמחים הם יצורים חיים כי יש להם מאפייני ",a:".",ans:"חיים",hint:""},
+  {b:"לזרעי הסביון יש מבנה דמוי ",a:" שמסייע להפצה ברוח.",ans:"מצנח",hint:""}
+];
+
+const OPEN_QS=[
+  "הסבר/י מדוע צמחים נחשבים ליצורים חיים. ציין/י לפחות 4 מאפייני חיים עם דוגמה לכל אחד מהצמח.",
+  "תאר/י את מחזור החיים של הצמח — משלב הזרע ועד ליצירת זרעים חדשים.",
+  "השווה/י בין פרי עסיסי לפרי יבש: מה ההבדל? תן/י 2 דוגמאות לכל סוג. כיצד כל אחד מהם עוזר בהפצת זרעים?",
+  "מה צריך הצמח כדי לקיים את עצמו? הסבר/י כיצד הצמח מקבל כל אחד מצרכי הקיום.",
+  "תאר/י 4 דרכים להפצת זרעים. לכל דרך: תן/י דוגמה, וציין/י מה בפרי/זרע מאפשר הפצה כזו."
+];
+
+/* ═══════ UTILS ═══════ */
+let stars=0;
+function addStar(n){stars+=n;document.getElementById('star-count').textContent='⭐ '+stars;}
+function showTab(t){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+t).classList.add('active');
+  document.querySelector('[data-tab="'+t+'"]').classList.add('active');
+}
+function shuffle(a){return [...a].sort(()=>Math.random()-.5);}
+
+/* ═══════ QUIZ ═══════ */
+let qi=0,qs=0,qa=false;
+function renderQuiz(){
+  if(qi>=QUIZ.length){showQRes();return;}
+  const q=QUIZ[qi];
+  document.getElementById('qctr').textContent='שאלה '+(qi+1)+' / '+QUIZ.length;
+  document.getElementById('qbar').style.width=((qi+1)/QUIZ.length*100)+'%';
+  document.getElementById('qq').textContent=q.q;
+  document.getElementById('qfb').className='fb';
+  document.getElementById('qnxt').className='q-next';
+  qa=false;
+  const opts=document.getElementById('qopts');opts.innerHTML='';
+  q.opts.forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>ansQ(i);opts.appendChild(b);});
+}
+function ansQ(i){
+  if(qa)return;qa=true;
+  const q=QUIZ[qi],bs=document.querySelectorAll('.opt');
+  bs.forEach(b=>b.disabled=true);bs[q.a].classList.add('correct');
+  const fb=document.getElementById('qfb');
+  if(i===q.a){qs++;addStar(1);document.getElementById('qsc').textContent=qs;fb.textContent='✓ נכון! '+q.ex;fb.className='fb show ok';}
+  else{bs[i].classList.add('wrong');fb.textContent='✗ לא נכון. '+q.ex;fb.className='fb show err';}
+  document.getElementById('qnxt').className='q-next show';
+}
+function quizNext(){qi++;renderQuiz();}
+function showQRes(){
+  document.getElementById('quiz-body').style.display='none';
+  document.getElementById('qres').className='score-screen show';
+  document.getElementById('rscore').textContent=qs+' / '+QUIZ.length;
+  const p=qs/QUIZ.length;
+  document.getElementById('rtitle').textContent=p>=.9?'🌟 מצוין!':p>=.7?'👏 יפה מאוד!':p>=.5?'📚 כמעט!':'💪 כדאי לחזור';
+  document.getElementById('rsub').textContent='צברת '+qs+' נקודות';
+}
+function resetQuiz(){qi=0;qs=0;qa=false;document.getElementById('qsc').textContent='0';document.getElementById('quiz-body').style.display='block';document.getElementById('qres').className='score-screen';renderQuiz();}
+renderQuiz();
+
+/* ═══════ MATCHING ═══════ */
+let msel=null,mdone=0;
+function renderMatch(){
+  msel=null;mdone=0;
+  document.getElementById('mwin').style.display='none';
+  document.getElementById('mscore').textContent='0 / '+MATCH_PAIRS.length+' זוגות';
+  const terms=shuffle(MATCH_PAIRS.map(p=>({txt:p.term,key:p.term,type:'T'})));
+  const defs =shuffle(MATCH_PAIRS.map(p=>({txt:p.def, key:p.term,type:'D'})));
+  const gt=document.getElementById('mgrid-terms');gt.innerHTML='';
+  const gd=document.getElementById('mgrid-defs'); gd.innerHTML='';
+  terms.forEach(item=>{const d=document.createElement('div');d.className='tile';d.style.marginBottom='6px';d.textContent=item.txt;d.dataset.key=item.key;d.dataset.type=item.type;d.onclick=()=>clickTile(d,item);gt.appendChild(d);});
+  defs.forEach(item=>{const d=document.createElement('div');d.className='tile';d.style.marginBottom='6px';d.textContent=item.txt;d.dataset.key=item.key;d.dataset.type=item.type;d.onclick=()=>clickTile(d,item);gd.appendChild(d);});
+}
+function clickTile(el,item){
+  if(el.classList.contains('matched'))return;
+  if(!msel){el.classList.add('selected');msel={el,item};return;}
+  if(msel.el===el){el.classList.remove('selected');msel=null;return;}
+  if(msel.item.type===item.type){msel.el.classList.remove('selected');el.classList.add('selected');msel={el,item};return;}
+  if(msel.item.key===item.key){
+    msel.el.classList.remove('selected');msel.el.classList.add('matched');el.classList.add('matched');
+    mdone++;addStar(1);document.getElementById('mscore').textContent=mdone+' / '+MATCH_PAIRS.length+' זוגות';
+    msel=null;if(mdone===MATCH_PAIRS.length)document.getElementById('mwin').style.display='block';
+  } else {
+    const a=msel.el;[a,el].forEach(e=>{e.classList.add('shake');e.classList.remove('selected');setTimeout(()=>e.classList.remove('shake'),300);});msel=null;
+  }
+}
+function resetMatch(){renderMatch();}
+renderMatch();
+
+/* ═══════ SORTING ═══════ */
+const SORTS=[null,SORT1,SORT2];
+let placed=[null,{},{}];
+
+function initSort(n){
+  placed[n]={};
+  const colIds=n===1?['col-juicy','col-dry']:['col-wind','col-animal','col-water'];
+  colIds.forEach(id=>{const c=document.getElementById(id);while(c.children.length>1)c.removeChild(c.lastChild);});
+  const bank=document.getElementById('bank'+n);bank.innerHTML='';
+  document.getElementById('sfb'+n).className='gen-fb';
+  shuffle(SORTS[n]).forEach(f=>{
+    const el=document.createElement('span');el.className='sort-item';el.textContent=f.name;el.id='si'+n+'-'+f.name;
+    el.draggable=true;
+    el.ondragstart=ev=>{ev.dataTransfer.setData('text',JSON.stringify({name:f.name,cat:f.cat,n}));el.classList.add('dragging');};
+    el.ondragend=()=>el.classList.remove('dragging');
+    bank.appendChild(el);
+  });
+}
+function dropSort(ev,cat,n){
+  ev.preventDefault();ev.currentTarget.classList.remove('drag-over');
+  const data=JSON.parse(ev.dataTransfer.getData('text'));
+  if(data.n!==n)return;
+  const src=document.getElementById('si'+n+'-'+data.name);if(src)src.classList.add('placed');
+  placed[n][data.name]=cat;
+  const drop=document.createElement('span');drop.className='sort-drop-item placed-item';
+  drop.textContent=data.name;drop.dataset.name=data.name;drop.dataset.n=n;
+  drop.onclick=()=>returnSort(data.name,n);
+  ev.currentTarget.appendChild(drop);
+}
+function returnSort(name,n){
+  const src=document.getElementById('si'+n+'-'+name);if(src)src.classList.remove('placed');
+  delete placed[n][name];
+  document.querySelectorAll('[data-name="'+name+'"][data-n="'+n+'"]').forEach(el=>el.remove());
+}
+function checkSort(n){
+  const data=SORTS[n];
+  let ok=0,total=data.length;
+  document.querySelectorAll('#bank'+n+' ~ * .sort-drop-item').forEach(el=>{
+    const name=el.dataset.name,correct=data.find(f=>f.name===name)?.cat,pl=placed[n][name];
+    el.className='sort-drop-item '+(pl===correct?'correct':'wrong');if(pl===correct)ok++;
+  });
+  const fb=document.getElementById('sfb'+n);
+  if(ok===total){fb.textContent='✅ מצוין! הכל נכון!';fb.className='gen-fb show ok';addStar(3);}
+  else{fb.textContent='✗ '+ok+'/'+total+' נכון. לחץ/י על פריט להחזרה.';fb.className='gen-fb show err';}
+}
+function resetSort(n){initSort(n);}
+initSort(1);initSort(2);
+
+/* ═══════ SEQUENCING ═══════ */
+const SEQ_ITEMS=[null,SEQ1,SEQ2];
+let seqFilled=[null,{},{}];
+
+function buildSeq(n){
+  seqFilled[n]={};
+  const items=SEQ_ITEMS[n];
+  const pool=document.getElementById('pool'+n);pool.innerHTML='';
+  const slotsEl=document.getElementById('slots'+n);slotsEl.innerHTML='';
+  document.getElementById('sres'+n).className='gen-fb';
+  shuffle(items).forEach(item=>{
+    const el=document.createElement('div');el.className='seq-item';el.textContent=item;el.id='sp'+n+'-'+item;
+    el.draggable=true;
+    el.ondragstart=ev=>{ev.dataTransfer.setData('text',JSON.stringify({item,n}));el.classList.add('dragging');};
+    el.ondragend=()=>el.classList.remove('dragging');
+    pool.appendChild(el);
+  });
+  items.forEach((item,idx)=>{
+    if(idx>0){const arr=document.createElement('span');arr.className='seq-arrow';arr.textContent='←';slotsEl.appendChild(arr);}
+    const slot=document.createElement('div');slot.className='seq-slot';slot.textContent='?';slot.dataset.idx=idx;slot.dataset.sn=n;
+    slot.ondragover=ev=>{ev.preventDefault();slot.classList.add('drag-over');};
+    slot.ondragleave=()=>slot.classList.remove('drag-over');
+    slot.ondrop=ev=>{
+      ev.preventDefault();slot.classList.remove('drag-over');
+      const data=JSON.parse(ev.dataTransfer.getData('text'));if(data.n!==n)return;
+      const prev=Object.entries(seqFilled[n]).find(([k,v])=>v===data.item);
+      if(prev){const ps=document.querySelector('[data-idx="'+prev[0]+'"][data-sn="'+n+'"]');if(ps){ps.className='seq-slot';ps.textContent='?';}}
+      const old=seqFilled[n][idx];if(old){const s2=document.getElementById('sp'+n+'-'+old);if(s2)s2.classList.remove('placed');}
+      const src=document.getElementById('sp'+n+'-'+data.item);if(src)src.classList.add('placed');
+      seqFilled[n][idx]=data.item;slot.className='seq-slot filled';slot.textContent=data.item;
+    };
+    slot.onclick=()=>{
+      if(!slot.classList.contains('filled'))return;
+      const it=seqFilled[n][idx];delete seqFilled[n][idx];
+      const src=document.getElementById('sp'+n+'-'+it);if(src)src.classList.remove('placed');
+      slot.className='seq-slot';slot.textContent='?';
+    };
+    slotsEl.appendChild(slot);
+  });
+}
+function checkSeq(n){
+  const items=SEQ_ITEMS[n];
+  let ok=items.every((item,idx)=>seqFilled[n][idx]===item);
+  const r=document.getElementById('sres'+n);
+  if(ok){r.textContent='✅ מצוין! הסדר נכון!';r.className='gen-fb show ok';addStar(3);}
+  else{r.textContent='✗ הסדר לא נכון — לחץ/י על תיבה מלאה להחזרה ונסה/י שוב.';r.className='gen-fb show err';}
+}
+function resetSeq(n){buildSeq(n);}
+buildSeq(1);buildSeq(2);
+
+/* ═══════ FILL ═══════ */
+function buildFill(){
+  const c=document.getElementById('fill-qs');c.innerHTML='';
+  document.getElementById('fillfb').className='gen-fb';
+  FILL_QS.forEach((q,i)=>{
+    const div=document.createElement('div');div.style.cssText='margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #f0f0f0;';
+    div.innerHTML=`<div class="fill-q">${i+1}. ${q.b}<input class="fill-in" id="fi${i}" autocomplete="off" spellcheck="false" placeholder="___">${q.a} <span class="fill-hint">${q.hint}</span></div>`;
+    c.appendChild(div);
+  });
+}
+function checkFill(){
+  let ok=0;
+  FILL_QS.forEach((q,i)=>{
+    const v=document.getElementById('fi'+i).value.trim();
+    const correct=(v===q.ans)||(v.length>1&&q.ans.includes(v))||(q.ans.length>1&&v.includes(q.ans));
+    document.getElementById('fi'+i).className='fill-in '+(correct?'correct':'wrong');
+    if(correct)ok++;
+  });
+  const fb=document.getElementById('fillfb');
+  if(ok===FILL_QS.length){fb.textContent='✅ מצוין! כל התשובות נכונות!';fb.className='gen-fb show ok';addStar(4);}
+  else{fb.textContent='✗ '+ok+'/'+FILL_QS.length+' נכון. התשובות האדומות שגויות — נסה/י שוב.';fb.className='gen-fb show err';}
+}
+function resetFill(){buildFill();}
+buildFill();
+
+/* ═══════ OPEN ═══════ */
+function buildOpen(){
+  const list=document.getElementById('open-list');list.innerHTML='';
+  OPEN_QS.forEach((q,i)=>{
+    const card=document.createElement('div');card.className='card';card.style.marginBottom='12px';
+    card.innerHTML=`<div class="open-q-text">${i+1}. ${q}</div>
+      <textarea class="open-ta" id="oa${i}" placeholder="כתוב/י את תשובתך כאן..."></textarea>
+      <div class="open-actions">
+        <button class="btn btn-red" onclick="checkOpen(${i})">בדיקת AI 🤖</button>
+        <button class="btn btn-gray" onclick="clearOpen(${i})">נקה</button>
+      </div>
+      <div class="ai-res" id="oar${i}"></div>`;
+    list.appendChild(card);
+  });
+}
+function clearOpen(i){document.getElementById('oa'+i).value='';const r=document.getElementById('oar'+i);r.className='ai-res';r.innerHTML='';}
+async function checkOpen(i){
+  const ans=document.getElementById('oa'+i).value.trim();
+  const res=document.getElementById('oar'+i);
+  if(!ans){res.className='ai-res show';res.textContent='✏️ יש לכתוב תשובה לפני הגשה.';return;}
+  res.className='ai-res show';
+  res.innerHTML='<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>בודק/ת...</span></div>';
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",max_tokens:1000,
+      system:`אתה מורה למדעים לכיתה ה' בישראל. בדוק/י את תשובת התלמיד/ה לשאלה על הנושא "צמחים".
+הנושאים: יצורים חיים, מאפייני חיים, איברי הצמח, חלקי הפרח, נביטה, הפצת זרעים, פרי עסיסי ויבש, צורכי קיום, מחזור החיים.
+תן/י משוב בפורמט (בעברית):
+✅ מה נכון בתשובה:
+[מה נכון]
+
+➕ מה כדאי להוסיף / מה חסר:
+[מה חסר]
+
+⭐ רמה: [בחר/י אחת מהאפשרויות הבאות בדיוק: "בלתי מספיק" / "מספיק" / "טוב" / "טוב מאוד" / "מצוין"]
+[משפט עידוד קצר]
+היה/י חם ומעודד!`,
+      messages:[{role:"user",content:"שאלה: "+OPEN_QS[i]+"\n\nתשובה: "+ans}]
+    })});
+    const data=await r.json();
+    const text=data.content?.find(c=>c.type==='text')?.text||'שגיאה. נסה/י שוב.';
+    res.innerHTML=text.replace(/\n/g,'<br>');addStar(2);
+  }catch(e){res.innerHTML='⚠️ שגיאת חיבור. נסה/י שוב.';}
+}
+buildOpen();
+</script>
+</body>
+</html>
