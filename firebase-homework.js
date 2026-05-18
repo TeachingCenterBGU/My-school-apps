@@ -436,15 +436,7 @@ function isExpired(completedAt) {
 }
 
 async function cleanupExpiredTasks() {
-    if (!currentUser) return;
-    const doneData = await getDoneData();
-    
-    for (const [taskId, info] of Object.entries(doneData)) {
-        const completedAt = typeof info === 'object' ? info.completedAt : null;
-        if (completedAt && isExpired(completedAt)) {
-            db.ref('done/' + currentUser + '/' + taskId).remove();
-        }
-    }
+    return;
 }
 
 // --- רינדור שיעורי בית ---

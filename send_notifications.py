@@ -70,37 +70,14 @@ def get_all_tasks():
 # --- בדיקת משימות פתוחות לכל משתמש ---
 
 def get_pending_tasks(all_tasks, grade, done_data):
-    """מחזיר רשימת משימות שעדיין לא בוצעו"""
-    SOFT_DELETE_DAYS = 7
-    now = datetime.now()
-    
     pending = []
     for task in all_tasks:
         if task.get('grade') != grade:
             continue
-        
         task_id = str(task.get('id', ''))
-        done_info = done_data.get(task_id)
-        
-        if done_info:
-            # בדיקה אם הסימון פג תוקף (מחיקה רכה)
-            if isinstance(done_info, dict):
-                completed_at = done_info.get('completedAt')
-                if completed_at:
-                    try:
-                        completed_date = datetime.fromisoformat(completed_at.replace('Z', '+00:00'))
-                        days_ago = (now - completed_date.replace(tzinfo=None)).days
-                        if days_ago < SOFT_DELETE_DAYS:
-                            continue  # המשימה בוצעה ועדיין בתוקף — לא פתוחה
-                    except:
-                        continue
-                else:
-                    continue
-            else:
-                continue  # פורמט ישן — חשב כמושלם
-        
+        if done_data.get(task_id):
+            continue
         pending.append(task)
-    
     return pending
 
 
