@@ -38,39 +38,35 @@
         .nav-tab[data-tab="match"].active  { background:var(--purple); }
         .nav-tab[data-tab="sort"].active   { background:var(--teal); }
         .nav-tab[data-tab="order"].active  { background:var(--blue); }
-        .nav-tab[data-tab="fill"].active   { background:#795548; }
+        .nav-tab[data-tab="fill"].active   { background:#6d4c41; }
         .nav-tab[data-tab="open"].active   { background:var(--red); }
 
-        .content { padding:14px 12px 30px; max-width:680px; margin:0 auto; }
+        .content { padding:12px; }
         .section { display:none; }
         .section.active { display:block; }
-
-        .card { background:white; border-radius:16px; padding:18px; box-shadow:0 2px 10px rgba(0,0,0,.08); margin-bottom:12px; }
-        .card-title { font-weight:700; margin-bottom:8px; font-size:1em; }
-
-        .prog-bar { background:#e0e0e0; border-radius:99px; height:7px; overflow:hidden; margin-bottom:5px; }
-        .prog-fill { height:100%; border-radius:99px; transition:width .4s; }
-        .prog-fill.orange { background:var(--orange); }
-        .prog-fill.purple { background:var(--purple); }
-        .prog-fill.brown  { background:#795548; }
-        .prog-meta { display:flex; justify-content:space-between; font-size:.82em; color:#777; margin-bottom:12px; }
-
-        .btn { padding:9px 20px; border-radius:20px; border:none; font-family:'Rubik',sans-serif; font-size:.9em; font-weight:600; cursor:pointer; transition:all .15s; }
-        .btn:active { transform:scale(.96); }
+        .card { background:white; border-radius:16px; padding:18px; margin-bottom:14px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+        .card-title { font-weight:800; font-size:1em; color:var(--teal); margin-bottom:6px; }
+        .note { font-size:.82em; color:#888; margin-bottom:12px; }
+        .btn { display:inline-block; padding:10px 22px; border-radius:99px; border:none; font-family:'Rubik',sans-serif; font-size:.9em; font-weight:700; cursor:pointer; transition:all .15s; }
         .btn-orange { background:var(--orange); color:white; }
         .btn-purple { background:var(--purple); color:white; }
         .btn-teal   { background:var(--teal);   color:white; }
         .btn-blue   { background:var(--blue);   color:white; }
-        .btn-brown  { background:#795548;        color:white; }
+        .btn-brown  { background:#6d4c41;       color:white; }
         .btn-red    { background:var(--red);     color:white; }
-        .btn-gray   { background:#eee; color:#555; }
+        .btn-gray   { background:#bbb;          color:white; }
+        .row-btns { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
 
         /* QUIZ */
-        .quiz-q { font-size:1.05em; font-weight:700; margin-bottom:14px; line-height:1.5; }
-        .opt { display:block; width:100%; text-align:right; padding:12px 16px; margin-bottom:8px; border-radius:12px; border:2px solid #e0e0e0; background:white; color:#333; font-family:'Rubik',sans-serif; font-size:.93em; font-weight:500; cursor:pointer; transition:all .15s; }
-        .opt:hover:not(:disabled) { border-color:var(--orange-l); background:#fff8f0; }
-        .opt.correct { border-color:var(--green); background:var(--green-p); color:var(--green); }
-        .opt.wrong   { border-color:var(--red);   background:#ffebee;        color:var(--red);   }
+        .prog-bar { height:8px; background:#e0e0e0; border-radius:99px; overflow:hidden; margin-bottom:6px; }
+        .prog-fill { height:100%; border-radius:99px; transition:width .3s; }
+        .prog-fill.orange { background:var(--orange); }
+        .prog-meta { display:flex; justify-content:space-between; font-size:.8em; color:#888; margin-bottom:14px; }
+        .quiz-q { font-size:1.05em; font-weight:700; margin-bottom:14px; line-height:1.6; }
+        .opt { display:block; width:100%; text-align:right; padding:12px 16px; border:2px solid #e0e0e0; border-radius:12px; background:white; font-family:'Rubik',sans-serif; font-size:.92em; font-weight:600; cursor:pointer; margin-bottom:8px; transition:all .15s; }
+        .opt:hover { border-color:var(--orange-l); background:#fff3e0; }
+        .opt.correct { border-color:var(--green-l); background:var(--green-p); color:var(--green); }
+        .opt.wrong   { border-color:var(--red); background:#ffebee; color:var(--red); }
         .fb { padding:12px 16px; border-radius:12px; margin-top:10px; font-size:.9em; line-height:1.6; display:none; }
         .fb.show { display:block; }
         .fb.ok  { background:var(--green-p); color:var(--green); }
@@ -84,7 +80,6 @@
         .win-card h3 { font-size:1.3em; font-weight:800; }
 
         /* MATCHING */
-        .match-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
         .tile { padding:11px 8px; border-radius:12px; border:2px solid #e0e0e0; background:white; text-align:center; font-size:.87em; font-weight:600; cursor:pointer; transition:all .18s; min-height:54px; display:flex; align-items:center; justify-content:center; line-height:1.4; }
         .tile:hover      { border-color:var(--purple-l); background:#f3e5f5; }
         .tile.selected   { border-color:var(--purple); background:#ede7f6; color:var(--purple); }
@@ -98,6 +93,7 @@
         .sort-item:hover { border-color:var(--teal-l); background:#e0f2f1; }
         .sort-item.dragging { opacity:.4; }
         .sort-item.placed   { display:none; }
+        .sort-item.touch-selected { border-color:var(--teal); background:#b2dfdb; box-shadow:0 0 0 3px rgba(0,105,92,.3); transform:scale(1.05); }
         .sort-cols { display:grid; gap:10px; }
         .sort-cols.two   { grid-template-columns:1fr 1fr; }
         .sort-cols.three { grid-template-columns:1fr 1fr 1fr; }
@@ -119,45 +115,53 @@
         .seq-item:hover { border-color:var(--blue-l); background:#e3f2fd; }
         .seq-item.dragging { opacity:.4; }
         .seq-item.placed   { display:none; }
+        .seq-item.touch-selected { border-color:var(--blue); background:#bbdefb; box-shadow:0 0 0 3px rgba(21,101,192,.3); transform:scale(1.05); }
         .seq-row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
         .seq-slot { min-width:90px; min-height:40px; border:2px dashed #bbb; border-radius:99px; display:flex; align-items:center; justify-content:center; font-size:.83em; color:#aaa; padding:0 10px; transition:all .2s; text-align:center; }
         .seq-slot.drag-over { border-color:var(--blue); background:#e3f2fd; }
         .seq-slot.filled { border-style:solid; border-color:var(--blue-l); background:#e3f2fd; color:var(--blue); font-weight:600; cursor:pointer; }
-        .seq-arrow { font-size:1.1em; color:#bbb; flex-shrink:0; }
+        .seq-arrow { font-size:1.2em; color:#bbb; }
 
         /* FILL */
-        .fill-q { font-size:.97em; line-height:2; margin-bottom:6px; }
-        .fill-in { border:none; border-bottom:2px solid var(--orange); font-family:'Rubik',sans-serif; font-size:.93em; font-weight:600; color:#333; background:transparent; padding:0 4px; width:95px; text-align:center; outline:none; }
-        .fill-in.correct { border-color:var(--green); color:var(--green); background:#f1fff1; border-radius:6px; }
-        .fill-in.wrong   { border-color:var(--red);   color:var(--red);   background:#fff5f5; border-radius:6px; }
+        .fill-q { font-size:.95em; line-height:2.2; }
+        .fill-in { border:none; border-bottom:2px dashed var(--teal); background:transparent; font-family:'Rubik',sans-serif; font-size:.95em; font-weight:700; color:var(--teal); width:80px; text-align:center; outline:none; margin:0 2px; }
+        .fill-in.correct { border-bottom-color:var(--green); color:var(--green); background:var(--green-p); border-radius:6px; }
+        .fill-in.wrong   { border-bottom-color:var(--red); color:var(--red); background:#ffebee; border-radius:6px; }
         .fill-hint { font-size:.78em; color:#aaa; }
 
         /* OPEN */
-        .open-q-text { font-size:1em; font-weight:700; margin-bottom:10px; line-height:1.5; }
-        .open-ta { width:100%; min-height:88px; padding:12px; border-radius:10px; border:2px solid #ddd; font-family:'Rubik',sans-serif; font-size:.93em; resize:vertical; color:#333; transition:border-color .2s; }
-        .open-ta:focus { outline:none; border-color:var(--red); }
-        .open-actions { display:flex; gap:8px; margin-top:8px; }
-        .ai-res { margin-top:10px; background:#fce4ec; border-radius:10px; padding:14px; font-size:.9em; line-height:1.7; color:#5d0020; display:none; }
+        .open-q-text { font-weight:700; font-size:.95em; margin-bottom:10px; line-height:1.6; }
+        .open-ta { width:100%; min-height:100px; border:2px solid #e0e0e0; border-radius:12px; padding:12px; font-family:'Rubik',sans-serif; font-size:.92em; resize:vertical; outline:none; transition:border-color .2s; }
+        .open-ta:focus { border-color:var(--blue-l); }
+        .open-actions { display:flex; gap:8px; margin-top:10px; }
+        .ai-res { padding:14px; border-radius:12px; margin-top:10px; font-size:.9em; line-height:1.7; display:none; background:#f5f5f5; }
         .ai-res.show { display:block; }
-        .loading { display:flex; align-items:center; gap:7px; color:#555; font-size:.9em; }
-        .dot { width:7px; height:7px; border-radius:50%; background:var(--red); animation:bounce .7s infinite; }
-        .dot:nth-child(2){animation-delay:.15s} .dot:nth-child(3){animation-delay:.3s}
-        @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-7px)} }
+        .loading { display:flex; align-items:center; gap:6px; justify-content:center; }
+        .dot { width:8px; height:8px; border-radius:50%; background:var(--teal); animation:bounce .6s infinite alternate; }
+        .dot:nth-child(2) { animation-delay:.2s; }
+        .dot:nth-child(3) { animation-delay:.4s; }
+        @keyframes bounce { to { transform:translateY(-8px); opacity:.4; } }
 
-        .note { font-size:.82em; color:#777; margin-bottom:10px; }
-        .row-btns { display:flex; gap:8px; margin-top:12px; }
+        /* AI setup notice */
+        .ai-setup-notice { background:#fff3e0; border:1px solid #ffe0b2; border-radius:12px; padding:14px; margin-bottom:14px; text-align:center; font-size:.88em; line-height:1.6; }
+
+        /* Touch hint for mobile */
+        .touch-hint { display:none; font-size:.78em; color:var(--teal); font-weight:600; margin-bottom:8px; }
+        @media (hover: none) and (pointer: coarse) {
+            .touch-hint { display:block; }
+        }
     </style>
 </head>
 <body>
 
 <div class="top-bar">
-    <a href="../../grade-5.html" class="back">🏠 חזרה</a>
-    <div class="title">🌱 צמחים – תרגול מלא</div>
-    <div class="stars" id="star-count">⭐ 0</div>
+    <a class="back" href="../../grade-3.html">← חזרה</a>
+    <span class="title">🌱 צמחים – תרגול</span>
+    <span class="stars" id="star-count">⭐ 0</span>
 </div>
 
 <div class="nav-tabs">
-    <button class="nav-tab active" data-tab="quiz"  onclick="showTab('quiz')">❓ חידון</button>
+    <button class="nav-tab active" data-tab="quiz"  onclick="showTab('quiz')">🧠 חידון</button>
     <button class="nav-tab"        data-tab="match" onclick="showTab('match')">🔗 התאמה</button>
     <button class="nav-tab"        data-tab="sort"  onclick="showTab('sort')">📂 מיון</button>
     <button class="nav-tab"        data-tab="order" onclick="showTab('order')">🔢 סדר נכון</button>
@@ -213,16 +217,17 @@
 <div class="section" id="sec-sort">
   <div class="card">
     <div class="card-title">מיון 1 – פירות עסיסיים ופירות יבשים</div>
-    <div class="note">גרור/י כל פרי לקטגוריה הנכונה</div>
+    <div class="note">גרור/י כל פרי לקטגוריה הנכונה (בטלפון: לחצ/י על פרי ואז על הקטגוריה)</div>
+    <div class="touch-hint">👆 לחצ/י על פרי ← ואז לחצ/י על הקטגוריה המתאימה</div>
     <div class="sort-bank" id="bank1"></div>
     <div class="sort-cols two">
-      <div class="sort-col" id="col-juicy"
+      <div class="sort-col" id="col-juicy" data-cat="juicy" data-sort-n="1"
            ondragover="event.preventDefault();this.classList.add('drag-over')"
            ondragleave="this.classList.remove('drag-over')"
            ondrop="dropSort(event,'juicy',1)">
         <div class="sort-col-title">🍊 פרי עסיסי</div>
       </div>
-      <div class="sort-col" id="col-dry"
+      <div class="sort-col" id="col-dry" data-cat="dry" data-sort-n="1"
            ondragover="event.preventDefault();this.classList.add('drag-over')"
            ondragleave="this.classList.remove('drag-over')"
            ondrop="dropSort(event,'dry',1)">
@@ -238,22 +243,23 @@
 
   <div class="card">
     <div class="card-title">מיון 2 – שיטות הפצת זרעים</div>
-    <div class="note">גרור/י כל צמח/זרע לדרך ההפצה שלו</div>
+    <div class="note">גרור/י כל צמח/זרע לדרך ההפצה שלו (בטלפון: לחצ/י על פריט ואז על הקטגוריה)</div>
+    <div class="touch-hint">👆 לחצ/י על פריט ← ואז לחצ/י על הקטגוריה המתאימה</div>
     <div class="sort-bank" id="bank2"></div>
     <div class="sort-cols three">
-      <div class="sort-col" id="col-wind"
+      <div class="sort-col" id="col-wind" data-cat="wind" data-sort-n="2"
            ondragover="event.preventDefault();this.classList.add('drag-over')"
            ondragleave="this.classList.remove('drag-over')"
            ondrop="dropSort(event,'wind',2)">
         <div class="sort-col-title">🌬️ רוח</div>
       </div>
-      <div class="sort-col" id="col-animal"
+      <div class="sort-col" id="col-animal" data-cat="animal" data-sort-n="2"
            ondragover="event.preventDefault();this.classList.add('drag-over')"
            ondragleave="this.classList.remove('drag-over')"
            ondrop="dropSort(event,'animal',2)">
         <div class="sort-col-title">🐦 בעלי חיים</div>
       </div>
-      <div class="sort-col" id="col-water"
+      <div class="sort-col" id="col-water" data-cat="water" data-sort-n="2"
            ondragover="event.preventDefault();this.classList.add('drag-over')"
            ondragleave="this.classList.remove('drag-over')"
            ondrop="dropSort(event,'water',2)">
@@ -272,7 +278,8 @@
 <div class="section" id="sec-order">
   <div class="card">
     <div class="card-title">סדר 1 – מחזור החיים של הצמח</div>
-    <div class="note">גרור/י את השלבים לתיבות לפי הסדר הנכון. לחץ/י על תיבה מלאה להחזרה.</div>
+    <div class="note">גרור/י את השלבים לתיבות לפי הסדר הנכון (בטלפון: לחצ/י על שלב ואז על תיבה)</div>
+    <div class="touch-hint">👆 לחצ/י על שלב ← ואז לחצ/י על תיבה מלאה להחזרה</div>
     <div class="seq-pool" id="pool1"></div>
     <div class="seq-row" id="slots1"></div>
     <div class="row-btns">
@@ -285,6 +292,7 @@
   <div class="card">
     <div class="card-title">סדר 2 – שלבי הנביטה</div>
     <div class="note">גרור/י את שלבי הנביטה לפי הסדר הנכון</div>
+    <div class="touch-hint">👆 לחצ/י על שלב ← ואז לחצ/י על התיבה המתאימה</div>
     <div class="seq-pool" id="pool2"></div>
     <div class="seq-row" id="slots2"></div>
     <div class="row-btns">
@@ -390,6 +398,9 @@ function showTab(t){
 }
 function shuffle(a){return [...a].sort(()=>Math.random()-.5);}
 
+/* ═══════ TOUCH DETECTION ═══════ */
+const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
 /* ═══════ QUIZ ═══════ */
 let qi=0,qs=0,qa=false;
 function renderQuiz(){
@@ -454,9 +465,17 @@ function clickTile(el,item){
 function resetMatch(){renderMatch();}
 renderMatch();
 
-/* ═══════ SORTING ═══════ */
+/* ═══════ SORTING (with touch support) ═══════ */
 const SORTS=[null,SORT1,SORT2];
 let placed=[null,{},{}];
+let _sortSelected = null; // {name, cat, n, el} — for touch tap-to-place
+
+function clearSortSelection(){
+  if(_sortSelected){
+    _sortSelected.el.classList.remove('touch-selected');
+    _sortSelected=null;
+  }
+}
 
 function initSort(n){
   placed[n]={};
@@ -467,22 +486,57 @@ function initSort(n){
   shuffle(SORTS[n]).forEach(f=>{
     const el=document.createElement('span');el.className='sort-item';el.textContent=f.name;el.id='si'+n+'-'+f.name;
     el.draggable=true;
+    // Desktop drag events
     el.ondragstart=ev=>{ev.dataTransfer.setData('text',JSON.stringify({name:f.name,cat:f.cat,n}));el.classList.add('dragging');};
     el.ondragend=()=>el.classList.remove('dragging');
+    // Touch/click: tap to select
+    el.onclick=(ev)=>{
+      ev.stopPropagation();
+      if(el.classList.contains('placed'))return;
+      if(_sortSelected && _sortSelected.el===el){
+        clearSortSelection();return;
+      }
+      clearSortSelection();
+      _sortSelected={name:f.name,cat:f.cat,n,el};
+      el.classList.add('touch-selected');
+    };
     bank.appendChild(el);
   });
 }
+
 function dropSort(ev,cat,n){
   ev.preventDefault();ev.currentTarget.classList.remove('drag-over');
   const data=JSON.parse(ev.dataTransfer.getData('text'));
   if(data.n!==n)return;
-  const src=document.getElementById('si'+n+'-'+data.name);if(src)src.classList.add('placed');
-  placed[n][data.name]=cat;
-  const drop=document.createElement('span');drop.className='sort-drop-item placed-item';
-  drop.textContent=data.name;drop.dataset.name=data.name;drop.dataset.n=n;
-  drop.onclick=()=>returnSort(data.name,n);
-  ev.currentTarget.appendChild(drop);
+  placeSortItem(data.name,cat,n);
 }
+
+// Shared logic for placing a sort item (used by both drag and touch)
+function placeSortItem(name,cat,n){
+  const src=document.getElementById('si'+n+'-'+name);if(src)src.classList.add('placed');
+  placed[n][name]=cat;
+  const col=document.querySelector('.sort-col[data-cat="'+cat+'"][data-sort-n="'+n+'"]');
+  if(!col)return;
+  const drop=document.createElement('span');drop.className='sort-drop-item placed-item';
+  drop.textContent=name;drop.dataset.name=name;drop.dataset.n=n;
+  drop.onclick=()=>returnSort(name,n);
+  col.appendChild(drop);
+}
+
+// Touch: tap on column to place selected item
+document.addEventListener('click',function(ev){
+  if(!_sortSelected)return;
+  const col=ev.target.closest('.sort-col');
+  if(!col)return;
+  const cat=col.dataset.cat;
+  const n=parseInt(col.dataset.sortN);
+  if(!cat || isNaN(n))return;
+  if(_sortSelected.n!==n)return;
+  placeSortItem(_sortSelected.name,cat,n);
+  _sortSelected.el.classList.remove('touch-selected');
+  _sortSelected=null;
+});
+
 function returnSort(name,n){
   const src=document.getElementById('si'+n+'-'+name);if(src)src.classList.remove('placed');
   delete placed[n][name];
@@ -499,12 +553,20 @@ function checkSort(n){
   if(ok===total){fb.textContent='✅ מצוין! הכל נכון!';fb.className='gen-fb show ok';addStar(3);}
   else{fb.textContent='✗ '+ok+'/'+total+' נכון. לחץ/י על פריט להחזרה.';fb.className='gen-fb show err';}
 }
-function resetSort(n){initSort(n);}
+function resetSort(n){clearSortSelection();initSort(n);}
 initSort(1);initSort(2);
 
-/* ═══════ SEQUENCING ═══════ */
+/* ═══════ SEQUENCING (with touch support) ═══════ */
 const SEQ_ITEMS=[null,SEQ1,SEQ2];
 let seqFilled=[null,{},{}];
+let _seqSelected = null; // {item, n, el} — for touch tap-to-place
+
+function clearSeqSelection(){
+  if(_seqSelected){
+    _seqSelected.el.classList.remove('touch-selected');
+    _seqSelected=null;
+  }
+}
 
 function buildSeq(n){
   seqFilled[n]={};
@@ -515,33 +577,65 @@ function buildSeq(n){
   shuffle(items).forEach(item=>{
     const el=document.createElement('div');el.className='seq-item';el.textContent=item;el.id='sp'+n+'-'+item;
     el.draggable=true;
+    // Desktop drag
     el.ondragstart=ev=>{ev.dataTransfer.setData('text',JSON.stringify({item,n}));el.classList.add('dragging');};
     el.ondragend=()=>el.classList.remove('dragging');
+    // Touch/click: tap to select
+    el.onclick=(ev)=>{
+      ev.stopPropagation();
+      if(el.classList.contains('placed'))return;
+      if(_seqSelected && _seqSelected.el===el){
+        clearSeqSelection();return;
+      }
+      clearSeqSelection();
+      _seqSelected={item,n,el};
+      el.classList.add('touch-selected');
+    };
     pool.appendChild(el);
   });
   items.forEach((item,idx)=>{
     if(idx>0){const arr=document.createElement('span');arr.className='seq-arrow';arr.textContent='←';slotsEl.appendChild(arr);}
     const slot=document.createElement('div');slot.className='seq-slot';slot.textContent='?';slot.dataset.idx=idx;slot.dataset.sn=n;
+    // Desktop drag
     slot.ondragover=ev=>{ev.preventDefault();slot.classList.add('drag-over');};
     slot.ondragleave=()=>slot.classList.remove('drag-over');
     slot.ondrop=ev=>{
       ev.preventDefault();slot.classList.remove('drag-over');
       const data=JSON.parse(ev.dataTransfer.getData('text'));if(data.n!==n)return;
-      const prev=Object.entries(seqFilled[n]).find(([k,v])=>v===data.item);
-      if(prev){const ps=document.querySelector('[data-idx="'+prev[0]+'"][data-sn="'+n+'"]');if(ps){ps.className='seq-slot';ps.textContent='?';}}
-      const old=seqFilled[n][idx];if(old){const s2=document.getElementById('sp'+n+'-'+old);if(s2)s2.classList.remove('placed');}
-      const src=document.getElementById('sp'+n+'-'+data.item);if(src)src.classList.add('placed');
-      seqFilled[n][idx]=data.item;slot.className='seq-slot filled';slot.textContent=data.item;
+      placeSeqItem(data.item,n,idx,slot);
     };
-    slot.onclick=()=>{
-      if(!slot.classList.contains('filled'))return;
-      const it=seqFilled[n][idx];delete seqFilled[n][idx];
-      const src=document.getElementById('sp'+n+'-'+it);if(src)src.classList.remove('placed');
-      slot.className='seq-slot';slot.textContent='?';
+    // Touch/click: tap to place OR tap filled slot to return
+    slot.onclick=(ev)=>{
+      ev.stopPropagation();
+      // If slot is filled → return the item
+      if(slot.classList.contains('filled')){
+        const it=seqFilled[n][idx];delete seqFilled[n][idx];
+        const src=document.getElementById('sp'+n+'-'+it);if(src)src.classList.remove('placed');
+        slot.className='seq-slot';slot.textContent='?';
+        return;
+      }
+      // If we have a selected seq item → place it
+      if(_seqSelected && _seqSelected.n===n){
+        placeSeqItem(_seqSelected.item,n,idx,slot);
+        _seqSelected.el.classList.remove('touch-selected');
+        _seqSelected=null;
+      }
     };
     slotsEl.appendChild(slot);
   });
 }
+
+// Shared logic for placing a seq item
+function placeSeqItem(itemText,n,idx,slot){
+  // If this item was already placed somewhere else, clear that slot
+  const prev=Object.entries(seqFilled[n]).find(([k,v])=>v===itemText);
+  if(prev){const ps=document.querySelector('[data-idx="'+prev[0]+'"][data-sn="'+n+'"]');if(ps){ps.className='seq-slot';ps.textContent='?';}}
+  // If this slot already had an item, free it
+  const old=seqFilled[n][idx];if(old){const s2=document.getElementById('sp'+n+'-'+old);if(s2)s2.classList.remove('placed');}
+  const src=document.getElementById('sp'+n+'-'+itemText);if(src)src.classList.add('placed');
+  seqFilled[n][idx]=itemText;slot.className='seq-slot filled';slot.textContent=itemText;
+}
+
 function checkSeq(n){
   const items=SEQ_ITEMS[n];
   let ok=items.every((item,idx)=>seqFilled[n][idx]===item);
@@ -549,7 +643,7 @@ function checkSeq(n){
   if(ok){r.textContent='✅ מצוין! הסדר נכון!';r.className='gen-fb show ok';addStar(3);}
   else{r.textContent='✗ הסדר לא נכון — לחץ/י על תיבה מלאה להחזרה ונסה/י שוב.';r.className='gen-fb show err';}
 }
-function resetSeq(n){buildSeq(n);}
+function resetSeq(n){clearSeqSelection();buildSeq(n);}
 buildSeq(1);buildSeq(2);
 
 /* ═══════ FILL ═══════ */
@@ -577,7 +671,7 @@ function checkFill(){
 function resetFill(){buildFill();}
 buildFill();
 
-/* ═══════ OPEN ═══════ */
+/* ═══════ OPEN (with Firebase AI) ═══════ */
 function buildOpen(){
   const list=document.getElementById('open-list');list.innerHTML='';
   OPEN_QS.forEach((q,i)=>{
@@ -591,37 +685,232 @@ function buildOpen(){
       <div class="ai-res" id="oar${i}"></div>`;
     list.appendChild(card);
   });
+
+  // Show sign-in notice if not signed in
+  updateAINotice();
 }
 function clearOpen(i){document.getElementById('oa'+i).value='';const r=document.getElementById('oar'+i);r.className='ai-res';r.innerHTML='';}
+
 async function checkOpen(i){
   const ans=document.getElementById('oa'+i).value.trim();
   const res=document.getElementById('oar'+i);
   if(!ans){res.className='ai-res show';res.textContent='✏️ יש לכתוב תשובה לפני הגשה.';return;}
+
+  // Check AI availability
+  const aiStatus = window._aiStatus || { available: false, signedIn: false };
+  if(!aiStatus.signedIn){
+    res.className='ai-res show';
+    res.innerHTML='🔑 צריך להתחבר עם Google כדי לקבל בדיקת AI.<br><button onclick="window.signInForAI()" style="margin-top:8px;padding:8px 20px;border:none;border-radius:10px;background:linear-gradient(135deg,#4285f4,#356ac3);color:white;font-family:Rubik,sans-serif;font-weight:600;cursor:pointer;">🔐 התחברות עם Google</button>';
+    return;
+  }
+  if(!aiStatus.available){
+    res.className='ai-res show';
+    res.innerHTML='⚠️ בדיקת AI לא פעילה כרגע. צריך להפעיל Firebase AI Logic ב-Console.';
+    return;
+  }
+
   res.className='ai-res show';
   res.innerHTML='<div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>בודק/ת...</span></div>';
+
   try{
-    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-      model:"claude-sonnet-4-20250514",max_tokens:1000,
-      system:`אתה מורה למדעים לכיתה ה' בישראל. בדוק/י את תשובת התלמיד/ה לשאלה על הנושא "צמחים".
+    const result = await window.checkWithAI(OPEN_QS[i], ans);
+    if(result.success){
+      res.innerHTML=result.text.replace(/\n/g,'<br>');
+      addStar(2);
+    } else {
+      res.innerHTML='⚠️ ' + (result.message || 'שגיאה. נסה/י שוב.');
+    }
+  }catch(e){
+    res.innerHTML='⚠️ שגיאת חיבור. נסה/י שוב.';
+  }
+}
+
+function updateAINotice(){
+  const aiStatus = window._aiStatus || { available: false, signedIn: false };
+  // Notices are shown inline when user clicks "check" if not signed in
+}
+
+buildOpen();
+
+// Listen for AI status changes
+window.addEventListener('ai-status-changed', ()=>{ /* notices updated on demand */ });
+
+// Clear selections when tapping outside
+document.addEventListener('click', (ev)=>{
+  if(!ev.target.closest('.sort-item') && !ev.target.closest('.sort-col')){
+    clearSortSelection();
+  }
+  if(!ev.target.closest('.seq-item') && !ev.target.closest('.seq-slot')){
+    clearSeqSelection();
+  }
+});
+</script>
+
+<!-- ============ Firebase AI Logic — בדיקת תשובות עם Gemini ============ -->
+<script type="module">
+// ==============================================
+// Firebase AI Logic — בדיקת תשובות פתוחות עם Gemini
+// ==============================================
+//
+// הפעלה (פעם אחת):
+// 1. Firebase Console → AI Services → AI Logic → Get started
+// 2. בחרי "Gemini Developer API" (חינמי!)
+// 3. זהו! לא צריך Blaze plan בכלל.
+//
+// עד שמפעילים — השאלות עדיין עובדות, פשוט בלי בדיקת AI.
+// ==============================================
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+let aiService = null;
+let aiModel = null;
+let aiAvailable = false;
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAi0YrEfLEr7GK2VRjJ9FOuhz4066_7T5M",
+    authDomain: "homework-barad.firebaseapp.com",
+    databaseURL: "https://homework-barad-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "homework-barad",
+    storageBucket: "homework-barad.firebasestorage.app",
+    messagingSenderId: "324035760311",
+    appId: "1:324035760311:web:2b9793e3924cc2840a3d32"
+};
+
+const app = initializeApp(firebaseConfig, "ai-plants");
+const auth = getAuth(app);
+
+// ==============================
+// System Prompt — הפרומפט לבדיקת תשובות
+// ==============================
+const TUTOR_SYSTEM_PROMPT = `אתה מורה למדעים לכיתה ה' בישראל. בדוק/י את תשובת התלמיד/ה לשאלה על הנושא "צמחים".
 הנושאים: יצורים חיים, מאפייני חיים, איברי הצמח, חלקי הפרח, נביטה, הפצת זרעים, פרי עסיסי ויבש, צורכי קיום, מחזור החיים.
-תן/י משוב בפורמט (בעברית):
+
+הנחיות חשובות:
+• התעלם משגיאות כתיב לחלוטין ואל תתקן אותן.
+• התמקד אך ורק בבדיקה האם התשובה נכונה מבחינת התוכן.
+• אם התשובה נכונה — אמור את זה בשמחה עם חיזוק חיובי.
+• אם התשובה חלקית — תתחיל בחיזוק חיובי על מה שנכון, ואז שאל שאלת מכוון.
+• אם התשובה לא נכונה — תחזק את המאמץ, ותן רמז. אל תגיד את התשובה!
+• תמיד תתחיל בחיזוק חיובי.
+• כתוב בעברית פשוטה, בגובה העיניים של ילדה בת 10-11.
+• תשובה קצרה — 2-4 משפטים מספיקים.
+• אל תשתמש בכוכביות או בפורמט מורכב. כתוב טקסט רגיל.
+
+תן/י משוב בפורמט:
 ✅ מה נכון בתשובה:
 [מה נכון]
 
 ➕ מה כדאי להוסיף / מה חסר:
 [מה חסר]
 
-⭐ רמה: [בחר/י אחת מהאפשרויות הבאות בדיוק: "בלתי מספיק" / "מספיק" / "טוב" / "טוב מאוד" / "מצוין"]
-[משפט עידוד קצר]
-היה/י חם ומעודד!`,
-      messages:[{role:"user",content:"שאלה: "+OPEN_QS[i]+"\n\nתשובה: "+ans}]
-    })});
-    const data=await r.json();
-    const text=data.content?.find(c=>c.type==='text')?.text||'שגיאה. נסה/י שוב.';
-    res.innerHTML=text.replace(/\n/g,'<br>');addStar(2);
-  }catch(e){res.innerHTML='⚠️ שגיאת חיבור. נסה/י שוב.';}
+⭐ רמה: [בחר/י: "בלתי מספיק" / "מספיק" / "טוב" / "טוב מאוד" / "מצוין"]
+[משפט עידוד קצר]`;
+
+// ==============================
+// אתחול Firebase AI Logic
+// ==============================
+async function initAI() {
+    try {
+        // ניסיון 1: Firebase AI Logic API חדש (firebase/ai)
+        const aiModule = await import(
+            "https://www.gstatic.com/firebasejs/11.8.1/firebase-ai.js"
+        );
+        const { getAI, getGenerativeModel, GoogleAIBackend } = aiModule;
+        
+        aiService = getAI(app, { backend: new GoogleAIBackend() });
+        aiModel = getGenerativeModel(aiService, { 
+            model: "gemini-2.5-flash",
+            systemInstruction: TUTOR_SYSTEM_PROMPT,
+            generationConfig: {
+                temperature: 0.3,
+                maxOutputTokens: 1500,
+            }
+        });
+        aiAvailable = true;
+        console.log("✅ Firebase AI Logic initialized (Gemini Developer API)");
+        
+    } catch (err1) {
+        console.warn("⚠️ firebase-ai.js not available, trying firebase-vertexai.js...", err1.message);
+        
+        try {
+            // ניסיון 2: Vertex AI API ישן (fallback)
+            const vtxModule = await import(
+                "https://www.gstatic.com/firebasejs/11.8.1/firebase-vertexai.js"
+            );
+            const { getVertexAI, getGenerativeModel } = vtxModule;
+            
+            aiService = getVertexAI(app);
+            aiModel = getGenerativeModel(aiService, { 
+                model: "gemini-2.5-flash",
+                systemInstruction: TUTOR_SYSTEM_PROMPT,
+                generationConfig: {
+                    temperature: 0.3,
+                    maxOutputTokens: 1500,
+                }
+            });
+            aiAvailable = true;
+            console.log("✅ Vertex AI initialized (fallback)");
+            
+        } catch (err2) {
+            console.warn("⚠️ AI not available:", err2.message);
+            aiAvailable = false;
+        }
+    }
+    
+    return aiAvailable;
 }
-buildOpen();
+
+// בדיקת מצב התחברות + אתחול AI
+onAuthStateChanged(auth, async (user) => {
+    if (user && !aiAvailable) {
+        console.log("👤 User signed in:", user.displayName);
+        await initAI();
+    }
+    window._aiStatus = { available: aiAvailable, signedIn: !!user };
+    window.dispatchEvent(new Event('ai-status-changed'));
+});
+
+// ==============================
+// פונקציית בדיקת תשובה עם AI
+// ==============================
+window.checkWithAI = async function(question, studentAnswer) {
+    if (!aiAvailable || !aiModel) {
+        return {
+            success: false,
+            message: "בדיקת AI לא זמינה כרגע. בדקי שהתחברת עם חשבון גוגל."
+        };
+    }
+
+    try {
+        const prompt = `שאלה: ${question}\n\nתשובת התלמיד/ה: ${studentAnswer}`;
+        const result = await aiModel.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        
+        return { success: true, text };
+    } catch (err) {
+        console.error("AI check error:", err);
+        return {
+            success: false,
+            message: "שגיאה בבדיקת AI. נסה/י שוב."
+        };
+    }
+};
+
+// ==============================
+// התחברות עם Google
+// ==============================
+window.signInForAI = async function() {
+    try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+    } catch (err) {
+        console.error("Sign-in error:", err);
+        alert("שגיאה בהתחברות. נסה/י שוב.");
+    }
+};
 </script>
+
 </body>
 </html>
