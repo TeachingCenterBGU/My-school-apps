@@ -3,15 +3,20 @@
 // ניהול מבחנים אוטומטי — עיצוב, באנרים, ותפוגה
 // 
 // שימוש:
-// 1. על <details class="subject-box">:
-//    data-exam-date="2026-04-20"          ← תאריך המבחן
-//    data-exam-title="מבחן Unit 3"        ← כותרת (אופציונלי)
-//    data-exam-desc="אותיות, צלילים..."   ← פירוט (אופציונלי)
-//
-// 2. על כרטיסים שקשורים למבחן:
+// על כרטיסים שקשורים למבחן:
 //    data-for-exam                        ← סימון כרטיס למבחן
+//    data-exam-date="2026-05-26"          ← תאריך המבחן
+//    data-exam-title="מבחן גיאוגרפיה"    ← כותרת (אופציונלי)
+//    data-exam-desc="הים התיכון · יבשות"  ← פירוט (אופציונלי)
 //
-// הכל אוטומטי — אחרי שהתאריך עובר, הכל חוזר לרגיל.
+// אופציונלי — על <details class="subject-box">:
+//    data-exam-date, data-exam-title, data-exam-desc
+//    (אם קיים ועדיין רלוונטי — עדיפות על כרטיסיות)
+//
+// הכל אוטומטי — אחרי שהתאריך עובר:
+//   • המבחן הזה נעלם
+//   • אם יש מבחן הבא — הוא מופיע אוטומטית
+//   • אם אין — הכל חוזר לרגיל
 // ==============================================
 
 (function() {
@@ -143,7 +148,6 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const examDate = new Date(dateStr + 'T00:00:00');
-        // המבחן עדיין רלוונטי עד סוף יום המבחן
         return examDate >= today;
     }
 
@@ -152,6 +156,66 @@
         today.setHours(0, 0, 0, 0);
         const examDate = new Date(dateStr + 'T00:00:00');
         return Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
+    }
+
+    // --- מציאת המבחן הקרוב ביותר בקטגוריה ---
+    function findNextExam(subjectBox) {
+        // אוספים את כל תאריכי המבחנים מהכרטיסיות
+        const examCards = subjectBox.querySelectorAll('.card[data-for-exam][data-exam-date]');
+        
+        let bestDate = null;
+        let bestTitle = '';
+        let bestDesc = '';
+        let bestCards = [];
+
+        examCards.forEach(card => {
+            const cardDate = card.getAttribute('data-exam-date');
+            if (!isExamUpcoming(cardDate)) return; // עבר — דלג
+
+            if (!bestDate || cardDate < bestDate) {
+                // מצאנו תאריך קרוב יותר
+                bestDate = cardDate;
+                bestTitle = card.getAttribute('data-exam-title') || '';
+                bestDesc = card.getAttribute('data-exam-desc') || '';
+                bestCards = [card];
+            } else if (cardDate === bestDate) {
+                // עוד כרטיס לאותו מבחן
+                bestCards.push(card);
+                if (!bestTitle) bestTitle = card.getAttribute('data-exam-title') || '';
+                if (!bestDesc) bestDesc = card.getAttribute('data-exam-desc') || '';
+            }
+        });
+
+        // בדיקה גם ברמת ה-section (עדיפות אם עדיין רלוונטי ויותר קרוב)
+        const sectionDate = subjectBox.getAttribute('data-exam-date');
+        if (sectionDate && isExamUpcoming(sectionDate)) {
+            if (!bestDate || sectionDate <= bestDate) {
+                bestDate = sectionDate;
+                bestTitle = subjectBox.getAttribute('data-exam-title') || bestTitle;
+                bestDesc = subjectBox.getAttribute('data-exam-desc') || bestDesc;
+                // כרטיסיות עם data-for-exam בלי תאריך ספציפי — שייכות למבחן הזה
+            }
+        }
+
+        if (!bestDate) return null;
+
+        // אוספים את כל הכרטיסיות שצריך לסמן:
+        // 1. כרטיסיות עם data-exam-date תואם
+        // 2. כרטיסיות עם data-for-exam בלי תאריך (שייכות למבחן הקרוב)
+        const cardsToMark = [];
+        subjectBox.querySelectorAll('.card[data-for-exam]').forEach(card => {
+            const cardDate = card.getAttribute('data-exam-date');
+            if (!cardDate || cardDate === bestDate) {
+                cardsToMark.push(card);
+            }
+        });
+
+        return {
+            date: bestDate,
+            title: bestTitle || 'מבחן קרוב',
+            desc: bestDesc,
+            cards: cardsToMark
+        };
     }
 
     // --- יצירת באנר מבחן ---
@@ -172,7 +236,7 @@
             <div class="exam-alert-text">
                 <div class="exam-alert-title">
                     <span class="exam-alert-date">${formattedDate}</span>
-                    ${title || 'מבחן קרוב'}
+                    ${title}
                 </div>`;
         
         if (desc) {
@@ -215,7 +279,6 @@
         tag.setAttribute('data-exam-generated', 'true');
         tag.textContent = 'למבחן';
         
-        // מוסיפים את התג לפני האייקון
         const icon = cardMain.querySelector('.icon');
         if (icon) {
             cardMain.insertBefore(tag, icon);
@@ -226,20 +289,13 @@
 
     // --- הוספת קו הפרדה "תרגולים נוספים" ---
     function addSectionDivider(subjectBox) {
-        const examCards = subjectBox.querySelectorAll('.card[data-for-exam]');
+        const examCards = subjectBox.querySelectorAll('.card.for-exam');
         const allCards = subjectBox.querySelectorAll('.card');
-        const nonExamCards = Array.from(allCards).filter(c => !c.hasAttribute('data-for-exam'));
+        const nonExamCards = Array.from(allCards).filter(c => !c.classList.contains('for-exam'));
         
         if (examCards.length === 0 || nonExamCards.length === 0) return;
-
-        // מוצאים את הכרטיס האחרון למבחן
-        const lastExamCard = examCards[examCards.length - 1];
-        const lastExamGrid = lastExamCard.closest('.apps-grid');
-        
-        // בודקים אם כבר יש divider
         if (subjectBox.querySelector('.exam-section-divider')) return;
 
-        // מחפשים את ה-grid הבא אחרי ה-grid של הכרטיסים למבחן
         const grids = subjectBox.querySelectorAll('.apps-grid');
         if (grids.length < 2) return;
         
@@ -256,10 +312,7 @@
 
     // --- ניקוי כל העיצובים שנוצרו ---
     function cleanupExamStyling(subjectBox) {
-        // מסירים אלמנטים שנוצרו
         subjectBox.querySelectorAll('[data-exam-generated]').forEach(el => el.remove());
-        
-        // מסירים class מכרטיסים
         subjectBox.querySelectorAll('.card.for-exam').forEach(card => {
             card.classList.remove('for-exam');
         });
@@ -269,22 +322,15 @@
     function processExams() {
         injectStyles();
 
-        const subjects = document.querySelectorAll('.subject-box[data-exam-date]');
+        // סורקים את כל הקטגוריות — גם כאלה בלי data-exam-date!
+        const subjects = document.querySelectorAll('.subject-box');
         
         subjects.forEach(subjectBox => {
-            const examDate = subjectBox.getAttribute('data-exam-date');
-            const examTitle = subjectBox.getAttribute('data-exam-title') || '';
-            const examDesc = subjectBox.getAttribute('data-exam-desc') || '';
-
-            // תמיד ננקה קודם (למקרה שהסקריפט רץ שוב)
             cleanupExamStyling(subjectBox);
 
-            if (!isExamUpcoming(examDate)) {
-                // המבחן עבר — הכל נשאר רגיל
-                return;
-            }
-
-            // --- המבחן עדיין רלוונטי ---
+            // מוצאים את המבחן הקרוב ביותר (מכרטיסיות או מ-section)
+            const exam = findNextExam(subjectBox);
+            if (!exam) return; // אין מבחנים — הכל רגיל
 
             // 1. פותחים את ה-details
             subjectBox.open = true;
@@ -292,15 +338,15 @@
             // 2. מוסיפים באדג' לכותרת המקצוע
             const summary = subjectBox.querySelector('.subject-title');
             if (summary) {
-                summary.appendChild(createExamBadge(examDate));
+                summary.appendChild(createExamBadge(exam.date));
             }
 
             // 3. מוסיפים באנר אחרי ה-summary
-            const banner = createExamBanner(examDate, examTitle, examDesc);
+            const banner = createExamBanner(exam.date, exam.title, exam.desc);
             summary.insertAdjacentElement('afterend', banner);
 
-            // 4. מעצבים כרטיסים למבחן
-            subjectBox.querySelectorAll('.card[data-for-exam]').forEach(card => {
+            // 4. מעצבים את הכרטיסיות הרלוונטיות
+            exam.cards.forEach(card => {
                 addExamTagToCard(card);
             });
 
