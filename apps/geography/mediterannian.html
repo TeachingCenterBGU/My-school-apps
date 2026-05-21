@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🌊 מסביב לים התיכון</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&family=Secular+One&display=swap');
+
+  :root {
+    --sea: #0077B6;
+    --sea-light: #90E0EF;
+    --sea-dark: #023E8A;
+    --sand: #FFD166;
+    --sand-light: #FFF3D0;
+    --green: #06D6A0;
+    --green-dark: #059669;
+    --coral: #EF476F;
+    --coral-light: #FFB3C6;
+    --purple: #7B2FF7;
+    --orange: #FF6B35;
+    --white: #FAFFFE;
+    --bg: #E8F8FF;
+    --text: #1A1A2E;
+    --card-shadow: 0 4px 20px rgba(0,119,182,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Rubik', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .waves-bg {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    animation: wave-move 8s ease-in-out infinite alternate;
+  }
+  .wave:nth-child(2) { animation-duration: 12s; animation-direction: alternate-reverse; opacity: 0.5; }
+  @keyframes wave-move { from { transform: translateX(0); } to { transform: translateX(-25%); } }
+
+  .main-container {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 16px 220px;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, var(--sea) 0%, var(--sea-dark) 100%);
+    border-radius: 24px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero h1 { font-family: 'Secular One', sans-serif; font-size: 2rem; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+  .hero p { font-size: 1rem; opacity: 0.9; }
+  .hero-emoji { font-size: 3rem; display: block; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .menu-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--card-shadow);
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .menu-card:hover, .menu-card:active { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,119,182,0.25); }
+  .menu-card .card-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+  .menu-card .card-title { font-family: 'Secular One', sans-serif; font-size: 1.05rem; color: var(--sea-dark); line-height: 1.4; }
+  .menu-card .card-desc { font-size: 0.8rem; color: #666; margin-top: 6px; }
+  .menu-card.c1 { border-bottom: 4px solid var(--sea); }
+  .menu-card.c2 { border-bottom: 4px solid var(--green); }
+  .menu-card.c3 { border-bottom: 4px solid var(--coral); }
+  .menu-card.c4 { border-bottom: 4px solid var(--purple); }
+  .menu-card.c5 { border-bottom: 4px solid var(--orange); }
+  .menu-card.c6 { border-bottom: 4px solid var(--sand); }
+  .menu-card .star-badge {
+    position: absolute; top: 8px; left: 8px;
+    background: var(--sand); color: var(--text);
+    font-size: 0.7rem; font-weight: 700;
+    padding: 3px 8px; border-radius: 20px; display: none;
+  }
+  .menu-card .star-badge.show { display: block; }
+
+  .screen { display: none; animation: fadeIn 0.4s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; margin-bottom: 16px; }
+  .back-btn {
+    background: white; border: 2px solid var(--sea); color: var(--sea);
+    font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 0.95rem;
+    padding: 8px 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s;
+  }
+  .back-btn:hover { background: var(--sea); color: white; }
+  .score-display {
+    background: white; padding: 8px 16px; border-radius: 12px;
+    font-weight: 700; color: var(--sea-dark); box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+
+  /* LEARN */
+  .learn-card {
+    background: white; border-radius: 20px; padding: 24px;
+    margin-bottom: 16px; box-shadow: var(--card-shadow); border-right: 5px solid var(--sea);
+  }
+  .learn-card h3 { font-family: 'Secular One', sans-serif; font-size: 1.2rem; color: var(--sea-dark); margin-bottom: 10px; }
+  .learn-card p { font-size: 0.95rem; line-height: 1.7; color: #333; }
+  .learn-card .highlight { background: var(--sand-light); padding: 2px 6px; border-radius: 6px; font-weight: 600; }
+
+  /* QUIZ */
+  .quiz-question {
+    background: white; border-radius: 20px; padding: 28px 24px;
+    margin-bottom: 16px; box-shadow: var(--card-shadow); text-align: center;
+  }
+  .quiz-question h3 { font-family: 'Secular One', sans-serif; font-size: 1.3rem; color: var(--sea-dark); margin-bottom: 6px; }
+  .quiz-question .q-num { font-size: 0.85rem; color: #999; margin-bottom: 12px; }
+  .quiz-question .q-text { font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .option-btn {
+    background: var(--bg); border: 2px solid #d0e8f5; border-radius: 14px;
+    padding: 14px 12px; font-family: 'Rubik', sans-serif; font-size: 0.95rem;
+    font-weight: 500; cursor: pointer; transition: all 0.25s; color: var(--text); line-height: 1.4;
+  }
+  .option-btn:hover { border-color: var(--sea); background: #d6f0ff; }
+  .option-btn.correct { background: #d4edda; border-color: var(--green-dark); color: var(--green-dark); font-weight: 700; animation: pulse-correct 0.5s ease; }
+  .option-btn.wrong { background: #f8d7da; border-color: var(--coral); color: var(--coral); }
+  @keyframes pulse-correct { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+  .explanation-box {
+    display: none; background: var(--sand-light); border-radius: 14px;
+    padding: 14px 16px; margin-top: 14px; font-size: 0.9rem;
+    line-height: 1.6; border-right: 4px solid var(--sand); text-align: right;
+  }
+  .explanation-box.show { display: block; animation: fadeIn 0.3s; }
+
+  .next-btn {
+    display: none; margin: 16px auto 0; background: var(--sea); color: white;
+    border: none; padding: 14px 40px; border-radius: 14px;
+    font-family: 'Rubik', sans-serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:hover { background: var(--sea-dark); transform: translateY(-2px); }
+
+  /* SORT */
+  .sort-instruction { text-align: center; font-size: 1rem; color: #555; margin-bottom: 16px; background: white; padding: 16px; border-radius: 16px; box-shadow: var(--card-shadow); }
+  .sort-instruction b { color: var(--sea-dark); }
+  .sort-zone-btn {
+    padding: 14px; font-family: 'Rubik', sans-serif; font-size: 0.95rem; font-weight: 700;
+    border: 2px solid #ccc; border-radius: 14px; cursor: pointer;
+    transition: all 0.2s; background: white; width: 100%; margin-bottom: 8px;
+  }
+  .sort-zone-btn.developed-btn { border-color: var(--green); color: var(--green-dark); }
+  .sort-zone-btn.developing-btn { border-color: var(--orange); color: var(--orange); }
+  .sort-zone-btn:hover { transform: scale(1.02); }
+  .sort-zone-btn.correct-choice { background: #d4edda; }
+  .sort-zone-btn.wrong-choice { background: #f8d7da; }
+  .current-sort-item { text-align: center; background: white; border-radius: 20px; padding: 28px; box-shadow: var(--card-shadow); margin-bottom: 16px; }
+  .current-sort-item .country-flag { font-size: 3rem; display: block; margin-bottom: 10px; }
+  .current-sort-item .country-name { font-family: 'Secular One', sans-serif; font-size: 1.4rem; color: var(--sea-dark); margin-bottom: 4px; }
+  .current-sort-item .country-continent { font-size: 0.85rem; color: #888; }
+
+  /* === MATCH GAME — FIXED LAYOUT: terms right, defs left === */
+  .match-instruction { text-align: center; font-size: 1rem; color: #555; margin-bottom: 16px; background: white; padding: 16px; border-radius: 16px; box-shadow: var(--card-shadow); }
+  .match-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .match-column { display: flex; flex-direction: column; gap: 10px; }
+  .match-col-header { font-family: 'Secular One', sans-serif; font-size: 1rem; text-align: center; padding: 10px; border-radius: 12px; color: white; }
+  .match-col-header.terms-header { background: var(--sea); }
+  .match-col-header.defs-header { background: var(--purple); }
+  .match-item {
+    background: white; border: 2px solid #d0e8f5; border-radius: 14px;
+    padding: 14px 12px; text-align: center; cursor: pointer;
+    transition: all 0.25s; font-size: 0.9rem; line-height: 1.5;
+    min-height: 52px; display: flex; align-items: center; justify-content: center;
+  }
+  .match-item.term-item { font-weight: 700; color: var(--sea-dark); border-color: #a3d4f7; }
+  .match-item.def-item { color: #444; border-color: #d4bff7; }
+  .match-item.selected { border-color: var(--sea); background: #d6f0ff; box-shadow: 0 0 0 3px rgba(0,119,182,0.2); }
+  .match-item.matched { background: #d4edda; border-color: var(--green-dark); cursor: default; opacity: 0.75; pointer-events: none; }
+  .match-item.wrong-flash { animation: shake 0.4s ease; border-color: var(--coral); background: #fff0f0; }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  .match-line-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+  /* === MAP DRAG GAME === */
+  .map-game-wrapper { background: white; border-radius: 20px; padding: 16px; box-shadow: var(--card-shadow); margin-bottom: 16px; }
+  .map-layout {
+    display: flex; gap: 12px; align-items: flex-start;
+    direction: ltr; /* force LTR so map is left, labels are right */
+  }
+  .map-image-wrapper {
+    position: relative; flex: 1; min-width: 0;
+    border: 2px solid #ddd; border-radius: 12px; overflow: hidden;
+  }
+  .map-image-wrapper img { display: block; width: 100%; height: auto; }
+  .map-countries-sidebar {
+    width: 100px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 500px; overflow-y: auto;
+    padding: 4px; direction: rtl;
+  }
+  .map-country-label {
+    background: var(--sea); color: white; padding: 7px 6px;
+    border-radius: 10px; cursor: grab; font-weight: 700; font-size: 0.78rem;
+    user-select: none; box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: transform 0.2s, opacity 0.2s;
+    touch-action: none; text-align: center; white-space: nowrap;
+  }
+  .map-country-label:active { cursor: grabbing; transform: scale(1.05); }
+  .map-country-label.dragging { opacity: 0.4; }
+  .map-country-label.placed { display: none; }
+  .map-country-label.selected-for-tap {
+    background: var(--orange); transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(255,107,53,0.4);
+  }
+  .map-drop-dot {
+    position: absolute; width: 26px; height: 26px;
+    background: rgba(231, 76, 60, 0.55); border: 2px solid #c0392b;
+    border-radius: 50%; transform: translate(-50%, -50%);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; cursor: pointer; z-index: 10;
+  }
+  .map-drop-dot:hover { background: rgba(231, 76, 60, 0.8); transform: translate(-50%, -50%) scale(1.2); }
+  .map-drop-dot.correct {
+    background: rgba(46, 204, 113, 0.9); border-color: #27ae60;
+    width: auto; height: auto; padding: 4px 8px; border-radius: 6px;
+    color: white; font-weight: 700; font-size: 0.7rem;
+    pointer-events: none; white-space: nowrap;
+  }
+  .map-drop-dot .dot-num { color: white; font-size: 0.7rem; font-weight: 700; }
+  .map-tap-hint {
+    text-align: center; font-size: 0.8rem; color: #888; margin-top: 10px; padding: 8px;
+  }
+  .map-success {
+    display: none; text-align: center; padding: 20px;
+    background: #d4edda; border-radius: 14px; margin-top: 12px;
+    color: var(--green-dark); font-weight: 700; font-size: 1.1rem;
+  }
+  .map-success.show { display: block; animation: fadeIn 0.4s; }
+  .map-reset-btn {
+    display: block; margin: 12px auto 0; background: var(--sea);
+    color: white; border: none; padding: 10px 24px; border-radius: 10px;
+    font-family: 'Rubik', sans-serif; font-size: 0.9rem; font-weight: 700;
+    cursor: pointer;
+  }
+  @media (max-width: 500px) {
+    .map-countries-sidebar { width: 80px; }
+    .map-country-label { font-size: 0.7rem; padding: 6px 4px; }
+    .map-drop-dot { width: 22px; height: 22px; }
+    .map-drop-dot .dot-num { font-size: 0.6rem; }
+    .map-drop-dot.correct { font-size: 0.6rem; }
+  }
+
+  /* === OPEN QUESTIONS === */
+  .open-q-card {
+    background: white; border-radius: 20px; padding: 24px;
+    margin-bottom: 16px; box-shadow: var(--card-shadow); text-align: center;
+  }
+  .open-q-card .q-num { font-size: 0.85rem; color: #999; margin-bottom: 10px; }
+  .open-q-card .q-text {
+    font-size: 1.15rem; font-weight: 600; line-height: 1.6;
+    color: var(--sea-dark); margin-bottom: 18px;
+  }
+  .open-q-input-row { display: flex; gap: 8px; align-items: center; direction: rtl; }
+  .open-q-input {
+    flex: 1; padding: 14px 16px; border: 2px solid #d0e8f5; border-radius: 14px;
+    font-family: 'Rubik', sans-serif; font-size: 1rem; text-align: right;
+    outline: none; transition: border-color 0.3s;
+  }
+  .open-q-input:focus { border-color: var(--sea); }
+  .open-q-input.correct-input { border-color: var(--green-dark); background: #eafbef; }
+  .open-q-input.wrong-input { border-color: var(--coral); background: #fff0f0; }
+  .open-q-check-btn {
+    padding: 14px 20px; background: var(--sea); color: white; border: none;
+    border-radius: 14px; font-family: 'Rubik', sans-serif; font-size: 0.95rem;
+    font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s;
+  }
+  .open-q-check-btn:hover { background: var(--sea-dark); }
+  .open-q-check-btn:disabled { background: #aaa; cursor: default; }
+  .open-q-feedback {
+    margin-top: 14px; padding: 12px 16px; border-radius: 12px;
+    font-size: 0.95rem; line-height: 1.5; display: none; text-align: right;
+  }
+  .open-q-feedback.show { display: block; animation: fadeIn 0.3s; }
+  .open-q-feedback.correct-fb { background: #d4edda; color: var(--green-dark); border-right: 4px solid var(--green); }
+  .open-q-feedback.wrong-fb { background: #f8d7da; color: #721c24; border-right: 4px solid var(--coral); }
+
+  /* AI Loading & Status */
+  .ai-loading {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 16px; margin-top: 12px;
+    background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+    border-radius: 14px; color: #7c4dff; font-weight: 600; font-size: 0.9rem;
+  }
+  .ai-loading .dots { display: inline-flex; gap: 4px; }
+  .ai-loading .dots span {
+    width: 8px; height: 8px; background: #7c4dff;
+    border-radius: 50%; display: inline-block;
+    animation: ai-bounce 1.4s infinite ease-in-out;
+  }
+  .ai-loading .dots span:nth-child(1) { animation-delay: 0s; }
+  .ai-loading .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .ai-loading .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes ai-bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+  .ai-setup-notice {
+    background: #fff8e1; border: 1px solid #ffcc02; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 15px; font-size: 0.85rem;
+    line-height: 1.6; color: #6d4c00; text-align: center;
+  }
+  .ai-setup-notice strong { display: block; margin-bottom: 4px; }
+  .ai-signin-btn {
+    padding: 8px 20px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #4285f4, #356ac3); color: white;
+    font-family: 'Rubik', sans-serif; font-weight: 600; cursor: pointer;
+    margin-top: 6px; font-size: 0.9rem;
+  }
+  .ai-feedback-box {
+    background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+    border: 1px solid #ce93d8; color: #4a148c;
+    border-radius: 12px; padding: 14px 16px; margin-top: 12px;
+    font-size: 0.9rem; line-height: 1.7; white-space: pre-wrap;
+  }
+  .open-retry-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+  .open-retry-btn {
+    padding: 10px 20px; border: 2px solid #7c4dff; border-radius: 12px;
+    background: white; color: #7c4dff; font-family: 'Rubik', sans-serif;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  }
+  .open-retry-btn:hover { background: #ede7f6; }
+  .open-retry-btn.continue-btn { border-color: var(--green); color: var(--green-dark); }
+
+  /* RESULTS */
+  .results-screen { text-align: center; padding: 40px 20px; }
+  .results-screen .big-emoji { font-size: 4rem; display: block; margin-bottom: 16px; }
+  .results-screen h2 { font-family: 'Secular One', sans-serif; font-size: 1.8rem; color: var(--sea-dark); margin-bottom: 10px; }
+  .results-screen .score-text { font-size: 1.2rem; color: #555; margin-bottom: 8px; }
+  .results-screen .stars { font-size: 2.5rem; margin: 16px 0; }
+  .results-screen .stars .star { opacity: 0.2; }
+  .results-screen .stars .star.earned { opacity: 1; animation: star-pop 0.5s ease backwards; }
+  .results-screen .stars .star:nth-child(2) { animation-delay: 0.2s; }
+  .results-screen .stars .star:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes star-pop { from { transform: scale(0) rotate(-45deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+  .retry-btn {
+    background: var(--sea); color: white; border: none; padding: 14px 40px;
+    border-radius: 14px; font-family: 'Rubik', sans-serif; font-size: 1.05rem;
+    font-weight: 700; cursor: pointer; margin: 8px; transition: all 0.2s;
+  }
+  .retry-btn:hover { background: var(--sea-dark); transform: translateY(-2px); }
+  .retry-btn.secondary { background: white; color: var(--sea); border: 2px solid var(--sea); }
+
+  .progress-bar-container { background: #e0e0e0; border-radius: 20px; height: 10px; margin-bottom: 16px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--sea-light), var(--sea)); border-radius: 20px; transition: width 0.5s ease; }
+
+  .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
+  .confetti-piece { position: absolute; width: 10px; height: 10px; top: -10px; animation: confetti-fall 3s ease-out forwards; }
+  @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+  @media (max-width: 500px) {
+    .hero h1 { font-size: 1.6rem; }
+    .menu-grid { gap: 10px; }
+    .menu-card { padding: 16px 10px; }
+    .menu-card .card-icon { font-size: 2.2rem; }
+    .menu-card .card-title { font-size: 0.9rem; }
+    .options-grid { grid-template-columns: 1fr; }
+    .match-columns { gap: 8px; }
+    .match-item { font-size: 0.8rem; padding: 10px 8px; min-height: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<svg class="waves-bg" viewBox="0 0 1440 200" preserveAspectRatio="none">
+  <path class="wave" fill="rgba(0,119,182,0.1)" d="M0,120 C320,180 640,60 960,120 C1280,180 1440,100 1440,100 L1440,200 L0,200 Z"/>
+  <path class="wave" fill="rgba(0,119,182,0.08)" d="M0,140 C240,80 480,160 720,120 C960,80 1200,160 1440,120 L1440,200 L0,200 Z"/>
+</svg>
+
+<div class="main-container">
+  <!-- MAIN MENU -->
+  <div class="screen active" id="menuScreen">
+    <div class="hero">
+      <span class="hero-emoji">🌊</span>
+      <h1>מסביב לים התיכון</h1>
+      <p>גיאוגרפיה · כיתה ה׳</p>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-card c1" onclick="showScreen('learnScreen')">
+        <span class="card-icon">📖</span>
+        <span class="card-title">לומדים!</span>
+        <span class="card-desc">כרטיסיות מידע</span>
+      </div>
+      <div class="menu-card c2" onclick="startQuiz()">
+        <span class="card-icon">❓</span>
+        <span class="card-title">חידון ידע</span>
+        <span class="card-desc">שאלות אמריקאיות</span>
+        <span class="star-badge" id="quizBadge">⭐</span>
+      </div>
+      <div class="menu-card c3" onclick="startSort()">
+        <span class="card-icon">🏗️</span>
+        <span class="card-title">מפותחת או מתפתחת?</span>
+        <span class="card-desc">מיון מדינות</span>
+        <span class="star-badge" id="sortBadge">⭐</span>
+      </div>
+      <div class="menu-card c4" onclick="startMatch()">
+        <span class="card-icon">🧩</span>
+        <span class="card-title">התאמת מושגים</span>
+        <span class="card-desc">מושג ← הגדרה</span>
+        <span class="star-badge" id="matchBadge">⭐</span>
+      </div>
+      <div class="menu-card c5" onclick="startMapGame()">
+        <span class="card-icon">🗺️</span>
+        <span class="card-title">מפת מדינות</span>
+        <span class="card-desc">גררו למפה</span>
+        <span class="star-badge" id="mapBadge">⭐</span>
+      </div>
+      <div class="menu-card c6" onclick="startMixQuiz()">
+        <span class="card-icon">🎯</span>
+        <span class="card-title">אתגר מסכם</span>
+        <span class="card-desc">כל הנושאים ביחד</span>
+        <span class="star-badge" id="mixBadge">⭐</span>
+      </div>
+      <div class="menu-card" style="border-bottom:4px solid #E91E63;" onclick="startOpenQ()">
+        <span class="card-icon">✍️</span>
+        <span class="card-title">שאלות פתוחות</span>
+        <span class="card-desc">כתבו את התשובה</span>
+        <span class="star-badge" id="openBadge">⭐</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEARN -->
+  <div class="screen" id="learnScreen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="showScreen('menuScreen')">→ חזרה</button>
+      <span style="font-family:'Secular One'; font-size:1.1rem; color:var(--sea-dark);">📖 לומדים!</span>
+    </div>
+    <div id="learnCards"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quizScreen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="showScreen('menuScreen')">→ חזרה</button>
+      <span class="score-display" id="quizScore">0 / 0</span>
+    </div>
+    <div class="progress-bar-container"><div class="progress-bar-fill" id="quizProgress" style="width:0%"></div></div>
+    <div id="quizContent"></div>
+  </div>
+
+  <!-- SORT -->
+  <div class="screen" id="sortScreen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="showScreen('menuScreen')">→ חזרה</button>
+      <span class="score-display" id="sortScore">0 / 0</span>
+    </div>
+    <div class="progress-bar-container"><div class="progress-bar-fill" id="sortProgress" style="width:0%"></div></div>
+    <div id="sortContent"></div>
+  </div>
+
+  <!-- MATCH -->
+  <div class="screen" id="matchScreen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="showScreen('menuScreen')">→ חזרה</button>
+      <span class="score-display" id="matchScore">0 / 0</span>
+    </div>
+    <div id="matchContent"></div>
+  </div>
+
+  <!-- MAP DRAG -->
+  <div class="screen" id="mapScreen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="showScreen('menuScreen')">→ חזרה</button>
+      <span class="score-display" id="mapScore">0 / 0</span>
+    </div>
+    <div id="mapContent"></div>
+  </div>
+
+  <!-- MIX QUIZ -->
+  <div class="screen" id="mixScreen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="showScreen('menuScreen')">→ חזרה</button>
+      <span class="score-display" id="mixScore">0 / 0</span>
+    </div>
+    <div class="progress-bar-container"><div class="progress-bar-fill" id="mixProgress" style="width:0%"></div></div>
+    <div id="mixContent"></div>
+  </div>
+
+  <!-- OPEN QUESTIONS -->
+  <div class="screen" id="openScreen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="showScreen('menuScreen')">→ חזרה</button>
+      <span class="score-display" id="openScore">0 / 0</span>
+    </div>
+    <div class="progress-bar-container"><div class="progress-bar-fill" id="openProgress" style="width:0%"></div></div>
+    <div id="openContent"></div>
+  </div>
+</div>
+
+<!-- Firebase AI Logic — בדיקת תשובות עם Gemini -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+let aiService = null, aiModel = null, aiAvailable = false;
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAi0YrEfLEr7GK2VRjJ9FOuhz4066_7T5M",
+    authDomain: "homework-barad.firebaseapp.com",
+    databaseURL: "https://homework-barad-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "homework-barad",
+    storageBucket: "homework-barad.firebasestorage.app",
+    messagingSenderId: "324035760311",
+    appId: "1:324035760311:web:2b9793e3924cc2840a3d32"
+};
+
+const app = initializeApp(firebaseConfig, "ai-app");
+const auth = getAuth(app);
+
+const TUTOR_SYSTEM_PROMPT = `אתה חונך סבלני וחם לילדה בכיתה ה' בבית ספר יסודי בישראל.
+היא כותבת תשובות לשאלות פתוחות בנושא גיאוגרפיה — הים התיכון, מדינות, יבשות ומושגים.
+
+הנחיות חשובות:
+• התעלם משגיאות כתיב לחלוטין ואל תתקן אותן.
+• התמקד אך ורק בבדיקה האם התשובה נכונה מבחינת התוכן.
+• אם התשובה נכונה — אמור את זה בשמחה עם חיזוק חיובי, והוסף פרט מעניין.
+• אם התשובה חלקית — תתחיל בחיזוק חיובי על מה שנכון, ואז תן רמז קצר.
+• אם התשובה לא נכונה — תחזק את המאמץ, ותן רמז. אל תגיד את התשובה!
+• תמיד תתחיל בחיזוק חיובי.
+• כתוב בעברית פשוטה, בגובה העיניים של ילדה בת 10-11.
+• תשובה קצרה — 2-3 משפטים מספיקים.
+• בלי כוכביות או פורמט מורכב.
+• התשובות פה קצרות (מילה עד שורה) אז תהיה סולחני.
+
+בסוף כל תשובה, הוסף בשורה נפרדת:
+[ציון: X/3]
+כאשר: 3 = תשובה נכונה, 2 = חלקית, 1 = לא נכונה אבל ניסתה, 0 = ריק`;
+
+async function initAI() {
+    try {
+        const m = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-ai.js");
+        aiService = m.getAI(app, { backend: new m.GoogleAIBackend() });
+        aiModel = m.getGenerativeModel(aiService, {
+            model: "gemini-2.5-flash", systemInstruction: TUTOR_SYSTEM_PROMPT,
+            generationConfig: { temperature: 0.3, maxOutputTokens: 800 }
+        });
+        aiAvailable = true;
+    } catch (e1) {
+        try {
+            const v = await import("https://www.gstatic.com/firebasejs/11.8.1/firebase-vertexai.js");
+            aiService = v.getVertexAI(app);
+            aiModel = v.getGenerativeModel(aiService, {
+                model: "gemini-2.5-flash", systemInstruction: TUTOR_SYSTEM_PROMPT,
+                generationConfig: { temperature: 0.3, maxOutputTokens: 800 }
+            });
+            aiAvailable = true;
+        } catch (e2) { aiAvailable = false; }
+    }
+}
+
+onAuthStateChanged(auth, async (user) => {
+    if (user && !aiAvailable) await initAI();
+    window._aiStatus = { available: aiAvailable, signedIn: !!user };
+    window.dispatchEvent(new Event('ai-status-changed'));
+});
+
+window.checkWithAI = async function(question, expectedAnswer, studentAnswer) {
+    if (!aiAvailable || !aiModel) return { success: false, message: "בדיקת AI לא זמינה." };
+    try {
+        const result = await aiModel.generateContent(
+            `השאלה: ${question}\nהתשובה המצופה (אל תחשפי!): ${expectedAnswer}\nתשובת התלמידה: ${studentAnswer}\nבדקי ותני משוב.`
+        );
+        const text = result.response.text();
+        const m = text.match(/\[ציון:\s*(\d)\/3\]/);
+        return { success: true, feedback: text.replace(/\[ציון:\s*\d\/3\]/, '').trim(), score: m ? parseInt(m[1]) : null };
+    } catch (err) { return { success: false, message: "שגיאה. נסי שוב." }; }
+};
+
+window.signInForAI = async function() {
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e) {}
+};
+
+initAI();
+</script>
+
+<script>
+// =================== DATA ===================
+
+const learnData = [
+  {
+    title: '🌍 הים התיכון – ים בין יבשות',
+    text: 'הים התיכון הוא <span class="highlight">הים הסגור הגדול בעולם</span> – שטחו כ-2.5 מיליון קמ"ר. הוא נמצא בין שלוש יבשות: <span class="highlight">אירופה</span> (בצפון), <span class="highlight">אפריקה</span> (בדרום) ו<span class="highlight">אסיה</span> (במזרח). סביב הים התיכון שוכנות כ-20 מדינות.'
+  },
+  {
+    title: '🌉 הים התיכון – גשר בין יבשות',
+    text: 'הים התיכון שימש מאז ומעולם כ<span class="highlight">"גשר" המחבר בין שלוש היבשות</span>. דרכו עברו סוחרים, צבאות, תרבויות ורעיונות. הים לא מפריד – הוא מחבר! בזכותו התפתח מסחר, התפשטו דתות ושפות, ונוצרה תרבות ים-תיכונית משותפת.'
+  },
+  {
+    title: '🏝️ מה זה מיצר?',
+    text: '<span class="highlight">מֵיצָר</span> הוא מעבר מים צר בין שני שטחי יבשה. המילה באה מ"מים" + "צרים".<br><br><b>מיצרים חשובים:</b><br>• <span class="highlight">מיצר גיברלטר</span> – מחבר את הים התיכון לאוקיינוס האטלנטי (במערב)<br>• <span class="highlight">מיצרי הבוספורוס והדרדנלים</span> – מחברים לים השחור (בצפון-מזרח)'
+  },
+  {
+    title: '🏖️ מה זה חצי-אי?',
+    text: '<span class="highlight">חֲצִי-אִי</span> הוא שטח יבשה שמוקף מים משלושה כיוונים, ומחובר ליבשה מכיוון אחד.<br><br><b>חצאי-אי מפורסמים:</b><br>• חצי-האי האיטלקי (צורת מגף!)<br>• חצי-האי האיברי (ספרד ופורטוגל)<br>• חצי-האי הבלקני (יוון ושכנותיה)'
+  },
+  {
+    title: '🏝️ מה זה אי?',
+    text: '<span class="highlight">אִי</span> הוא שטח יבשה המוקף מים <b>מכל עבריו</b>.<br><br><b>איים חשובים בים התיכון:</b><br>• <span class="highlight">סיציליה</span> – האי הגדול ביותר (איטליה)<br>• <span class="highlight">סרדיניה</span> (איטליה), <span class="highlight">קורסיקה</span> (צרפת)<br>• <span class="highlight">כרתים</span> (יוון), <span class="highlight">קפריסין</span>'
+  },
+  {
+    title: '🏖️ מה זו הריביירה?',
+    text: '<span class="highlight">הריביירה</span> היא רצועת חוף מפורסמת בדרום צרפת ובצפון-מערב איטליה. היא ידועה בחופים היפים, באקלים הנעים ובתיירות יוקרתית. הריביירה הפכה לשם נרדף ל<span class="highlight">חוף מושלם ויוקרתי</span>.'
+  },
+  {
+    title: '🏭 מדינות מפותחות',
+    text: '<span class="highlight">מדינות מפותחות</span> נמצאות בעיקר <b>בצפון</b> הים התיכון (באירופה):<br>• רמת חיים גבוהה, תשתיות מתקדמות<br>• מערכות חינוך ובריאות מפותחות<br>• כלכלה המבוססת על תעשייה ושירותים<br>• <b>דוגמאות:</b> צרפת, איטליה, ספרד, יוון, ישראל'
+  },
+  {
+    title: '🌱 מדינות מתפתחות',
+    text: '<span class="highlight">מדינות מתפתחות</span> נמצאות בעיקר <b>בדרום ובמזרח</b> הים התיכון:<br>• רמת חיים נמוכה יותר, תשתיות חלקיות<br>• לא בכל הבתים חשמל, מים זורמים או ביוב<br>• כלכלה המבוססת בעיקר על חקלאות<br>• <b>דוגמאות:</b> מרוקו, לוב, מצרים, סוריה'
+  },
+  {
+    title: '🗺️ 20 מדינות סביב הים התיכון',
+    text: '<b>באירופה (צפון):</b> ספרד, צרפת, מונקו, איטליה, סלובניה, קרואטיה, מונטנגרו, אלבניה, יוון<br><b>באסיה (מזרח):</b> טורקיה, סוריה, לבנון, ישראל<br><b>באפריקה (דרום):</b> מצרים, לוב, תוניסיה, אלג\'יריה, מרוקו'
+  }
+];
+
+// ============ EXPANDED QUIZ ============
+const quizQuestions = [
+  { q: 'כמה יבשות גובלות בים התיכון?', options: ['2','3','4','5'], correct: 1, explanation: 'הים התיכון נמצא בין שלוש יבשות: אירופה, אפריקה ואסיה.' },
+  { q: 'מהו מיצר?', options: ['אי גדול','מעבר מים צר בין שני שטחי יבשה','נהר גדול','מפרץ עמוק'], correct: 1, explanation: 'מיצר (מים + צרים) הוא מעבר מים צר בין שני שטחי יבשה.' },
+  { q: 'איזה מיצר מחבר את הים התיכון לאוקיינוס האטלנטי?', options: ['הבוספורוס','גיברלטר','הורמוז','מסינה'], correct: 1, explanation: 'מיצר גיברלטר נמצא במערב הים התיכון ומחבר אותו לאוקיינוס האטלנטי.' },
+  { q: 'מה מאפיין חצי-אי?', options: ['מוקף מים מכל הכיוונים','מוקף מים משלושה כיוונים','שטח יבשה יבש','הר ליד הים'], correct: 1, explanation: 'חצי-אי מוקף מים משלושה כיוונים ומחובר ליבשה מכיוון אחד.' },
+  { q: 'מהו האי הגדול ביותר בים התיכון?', options: ['כרתים','קפריסין','סיציליה','קורסיקה'], correct: 2, explanation: 'סיציליה (של איטליה) היא האי הגדול ביותר בים התיכון.' },
+  { q: 'המדינות המפותחות סביב הים התיכון נמצאות בעיקר ב...', options: ['דרום (אפריקה)','מזרח (אסיה)','צפון (אירופה)','כל הצדדים'], correct: 2, explanation: 'רוב המדינות המפותחות נמצאות בצפון – ביבשת אירופה.' },
+  { q: 'מה מאפיין מדינה מתפתחת?', options: ['כלכלה חזקה','רמת חיים גבוהה','תשתיות חלקיות ורמת חיים נמוכה','תיירות רבה'], correct: 2, explanation: 'במדינות מתפתחות רמת החיים נמוכה יותר והתשתיות חלקיות.' },
+  { q: 'מהי הריביירה?', options: ['עיר באיטליה','רצועת חוף מפורסמת בדרום צרפת','מיצר בים התיכון','אי ביוון'], correct: 1, explanation: 'הריביירה היא רצועת חוף יפה ומפורסמת בדרום צרפת ובצפון-מערב איטליה.' },
+  { q: 'כמה מדינות שוכנות לחופי הים התיכון (בערך)?', options: ['10','15','20','30'], correct: 2, explanation: 'כ-20 מדינות שוכנות לחופי הים התיכון.' },
+  { q: 'למה קוראים לים התיכון "גשר בין יבשות"?', options: ['כי בנו עליו גשרים','כי הוא מחבר בין עמים, תרבויות ומסחר','כי הוא צר מאוד','כי יש בו איים רבים'], correct: 1, explanation: 'הים התיכון שימש כ"גשר" שדרכו עברו סוחרים, תרבויות ורעיונות.' },
+  { q: 'מיצרי הבוספורוס והדרדנלים מחברים את הים התיכון ל...', options: ['הים האדום','האוקיינוס ההודי','הים השחור','האוקיינוס האטלנטי'], correct: 2, explanation: 'מיצרי הבוספורוס והדרדנלים מחברים את הים התיכון (דרך ים מרמרה) לים השחור.' },
+  { q: 'איזו יבשת נמצאת בצפון הים התיכון?', options: ['אפריקה','אסיה','אירופה','אמריקה'], correct: 2, explanation: 'יבשת אירופה נמצאת בצפון הים התיכון.' },
+  { q: 'איזו יבשת נמצאת בדרום הים התיכון?', options: ['אירופה','אסיה','אוסטרליה','אפריקה'], correct: 3, explanation: 'יבשת אפריקה נמצאת בדרום הים התיכון.' },
+  { q: 'מה המשותף לצרפת, איטליה וספרד?', options: ['מתפתחות','באסיה','מפותחות בצפון הים התיכון','באפריקה'], correct: 2, explanation: 'שלושתן מדינות מפותחות באירופה, בצפון הים התיכון.' },
+  { q: 'מה המשותף ללוב, תוניסיה ומרוקו?', options: ['מדינות באירופה','מדינות מפותחות','מדינות מתפתחות באפריקה','מדינות באסיה'], correct: 2, explanation: 'שלושתן מדינות מתפתחות ביבשת אפריקה, בדרום הים התיכון.' },
+  { q: 'על מה מבוססת הכלכלה במדינות מפותחות?', options: ['חקלאות בלבד','תעשייה ושירותים','דיג בלבד','כריית מחצבים'], correct: 1, explanation: 'במדינות מפותחות הכלכלה מבוססת על תעשייה ושירותים מגוונים.' },
+  { q: 'איזה חצי-אי נראה כמו מגף?', options: ['האיברי','הבלקני','האיטלקי','הסקנדינבי'], correct: 2, explanation: 'חצי-האי האיטלקי (איטליה) מפורסם בצורתו שנראית כמו מגף!' },
+  { q: 'מהי תעלת סואץ?', options: ['נהר במצרים','תעלה מלאכותית שמחברת לים סוף','מיצר טבעי','אגם גדול'], correct: 1, explanation: 'תעלת סואץ היא תעלה מלאכותית שנחפרה במצרים ומחברת בין הים התיכון לים סוף.' },
+  { q: 'ישראל נמצאת ב... של הים התיכון', options: ['צפון','דרום','מזרח','מערב'], correct: 2, explanation: 'ישראל נמצאת בחוף המזרחי של הים התיכון, ביבשת אסיה.' },
+  { q: 'הים התיכון הוא ים:', options: ['פתוח','כמעט סגור','סגור לחלוטין','מלאכותי'], correct: 1, explanation: 'הים התיכון הוא ים כמעט סגור – יש לו רק כמה פתחים צרים (מיצרים).' },
+  { q: 'באיזו יבשת נמצאת סוריה?', options: ['אפריקה','אירופה','אסיה','אמריקה'], correct: 2, explanation: 'סוריה נמצאת ביבשת אסיה, במזרח הים התיכון.' },
+  { q: 'באיזו יבשת נמצאת מצרים?', options: ['אירופה','אסיה','אפריקה','אמריקה'], correct: 2, explanation: 'מצרים נמצאת ביבשת אפריקה (בצפון-מזרח היבשת).' },
+];
+
+const sortCountries = [
+  { name: 'צרפת', flag: '🇫🇷', type: 'developed', continent: 'אירופה' },
+  { name: 'איטליה', flag: '🇮🇹', type: 'developed', continent: 'אירופה' },
+  { name: 'ספרד', flag: '🇪🇸', type: 'developed', continent: 'אירופה' },
+  { name: 'יוון', flag: '🇬🇷', type: 'developed', continent: 'אירופה' },
+  { name: 'ישראל', flag: '🇮🇱', type: 'developed', continent: 'אסיה' },
+  { name: 'קרואטיה', flag: '🇭🇷', type: 'developed', continent: 'אירופה' },
+  { name: 'מרוקו', flag: '🇲🇦', type: 'developing', continent: 'אפריקה' },
+  { name: 'מצרים', flag: '🇪🇬', type: 'developing', continent: 'אפריקה' },
+  { name: 'לוב', flag: '🇱🇾', type: 'developing', continent: 'אפריקה' },
+  { name: 'תוניסיה', flag: '🇹🇳', type: 'developing', continent: 'אפריקה' },
+  { name: 'סוריה', flag: '🇸🇾', type: 'developing', continent: 'אסיה' },
+  { name: 'אלג\'יריה', flag: '🇩🇿', type: 'developing', continent: 'אפריקה' },
+  { name: 'לבנון', flag: '🇱🇧', type: 'developing', continent: 'אסיה' },
+  { name: 'טורקיה', flag: '🇹🇷', type: 'developing', continent: 'אסיה/אירופה' },
+  { name: 'אלבניה', flag: '🇦🇱', type: 'developing', continent: 'אירופה' },
+];
+
+const matchPairs = [
+  { term: 'מיצר', def: 'מעבר מים צר בין שני שטחי יבשה' },
+  { term: 'חצי-אי', def: 'יבשה מוקפת מים משלושה צדדים' },
+  { term: 'אי', def: 'יבשה מוקפת מים מכל עבריה' },
+  { term: 'הריביירה', def: 'רצועת חוף מפורסמת בדרום צרפת' },
+  { term: 'מדינה מפותחת', def: 'רמת חיים גבוהה ותשתיות מתקדמות' },
+  { term: 'מדינה מתפתחת', def: 'רמת חיים נמוכה ותשתיות חלקיות' },
+  { term: 'מיצר גיברלטר', def: 'מחבר את הים התיכון לאוקיינוס האטלנטי' },
+  { term: 'תעלת סואץ', def: 'תעלה מלאכותית המחברת לים סוף' },
+  { term: 'ים בין-יבשתי', def: 'ים הנמצא בין כמה יבשות' },
+  { term: 'מיצר הבוספורוס', def: 'מחבר את הים התיכון לים השחור' },
+];
+
+// ============ MAP COUNTRIES with positions ============
+// Positions as % of the map image — ADJUST THESE to match the actual map image!
+const mapCountries = [
+  { id: 'spain',    name: 'ספרד',     top: 30, left: 14 },
+  { id: 'france',   name: 'צרפת',     top: 13, left: 24 },
+  { id: 'italy',    name: 'איטליה',   top: 27, left: 38 },
+  { id: 'croatia',  name: 'קרואטיה',  top: 17, left: 44 },
+  { id: 'albania',  name: 'אלבניה',   top: 29, left: 51 },
+  { id: 'greece',   name: 'יוון',     top: 37, left: 55 },
+  { id: 'turkey',   name: 'טורקיה',   top: 23, left: 69 },
+  { id: 'syria',    name: 'סוריה',    top: 33, left: 89 },
+  { id: 'lebanon',  name: 'לבנון',    top: 40, left: 88 },
+  { id: 'israel',   name: 'ישראל',    top: 48, left: 88 },
+  { id: 'egypt',    name: 'מצרים',    top: 62, left: 78 },
+  { id: 'libya',    name: 'לוב',      top: 58, left: 46 },
+  { id: 'tunisia',  name: 'תוניסיה',  top: 48, left: 33 },
+  { id: 'algeria',  name: "אלג'יריה", top: 50, left: 21 },
+  { id: 'morocco',  name: 'מרוקו',    top: 44, left: 6 },
+];
+
+
+// =================== STATE ===================
+let currentQuiz = [];
+let quizIndex = 0;
+let quizCorrect = 0;
+let sortItems = [];
+let sortIndex = 0;
+let sortCorrect = 0;
+let matchSelected = null;
+let matchPairsLeft = 0;
+let matchCorrectCount = 0;
+let matchTotalPairs = 0;
+let mapPlacedCount = 0;
+let mapTotalCountries = 0;
+let mapSelectedLabel = null;
+
+// =================== NAVIGATION ===================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'learnScreen') renderLearnCards();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =================== LEARN ===================
+function renderLearnCards() {
+  document.getElementById('learnCards').innerHTML = learnData.map(c =>
+    '<div class="learn-card"><h3>' + c.title + '</h3><p>' + c.text + '</p></div>'
+  ).join('');
+}
+
+// =================== QUIZ ===================
+function startQuiz() {
+  currentQuiz = shuffle([...quizQuestions]).slice(0, 10);
+  quizIndex = 0; quizCorrect = 0;
+  showScreen('quizScreen');
+  renderQuizQ('quiz');
+}
+
+function renderQuizQ(prefix) {
+  const screenId = prefix + 'Screen';
+  const list = currentQuiz;
+  if (quizIndex >= list.length) {
+    const badgeId = prefix + 'Badge';
+    showResults(screenId, quizCorrect, list.length, badgeId);
+    return;
+  }
+  const q = list[quizIndex];
+  const pct = (quizIndex / list.length * 100).toFixed(0);
+  const progEl = document.getElementById(prefix + 'Progress');
+  if (progEl) progEl.style.width = pct + '%';
+  document.getElementById(prefix + 'Score').textContent = quizCorrect + ' / ' + quizIndex;
+
+  document.getElementById(prefix + 'Content').innerHTML =
+    '<div class="quiz-question">' +
+      '<div class="q-num">שאלה ' + (quizIndex+1) + ' מתוך ' + list.length + '</div>' +
+      '<div class="q-text">' + q.q + '</div>' +
+      '<div class="options-grid">' +
+        q.options.map(function(opt, i) {
+          return '<button class="option-btn" onclick="answerQ(\'' + prefix + '\',' + i + ')">' + opt + '</button>';
+        }).join('') +
+      '</div>' +
+      '<div class="explanation-box" id="' + prefix + 'Explanation">💡 ' + q.explanation + '</div>' +
+      '<button class="next-btn" id="' + prefix + 'Next" onclick="quizIndex++;renderQuizQ(\'' + prefix + '\')">הבא →</button>' +
+    '</div>';
+}
+
+function answerQ(prefix, idx) {
+  var q = currentQuiz[quizIndex];
+  var btns = document.querySelectorAll('#' + prefix + 'Content .option-btn');
+  btns.forEach(function(b, i) {
+    b.onclick = null; b.style.pointerEvents = 'none';
+    if (i === q.correct) b.classList.add('correct');
+    if (i === idx && idx !== q.correct) b.classList.add('wrong');
+  });
+  if (idx === q.correct) quizCorrect++;
+  document.getElementById(prefix + 'Explanation').classList.add('show');
+  document.getElementById(prefix + 'Next').classList.add('show');
+}
+
+// =================== MIX QUIZ ===================
+function startMixQuiz() {
+  // Mix questions from quiz + extra
+  var allQ = [...quizQuestions, ...quizQuestions.slice(10)];
+  currentQuiz = shuffle(allQ).slice(0, 12);
+  quizIndex = 0; quizCorrect = 0;
+  showScreen('mixScreen');
+  renderQuizQ('mix');
+}
+
+// =================== SORT ===================
+function startSort() {
+  sortItems = shuffle([...sortCountries]).slice(0, 10);
+  sortIndex = 0; sortCorrect = 0;
+  showScreen('sortScreen');
+  renderSortItem();
+}
+
+function renderSortItem() {
+  if (sortIndex >= sortItems.length) {
+    showResults('sortScreen', sortCorrect, sortItems.length, 'sortBadge');
+    return;
+  }
+  var item = sortItems[sortIndex];
+  var pct = (sortIndex / sortItems.length * 100).toFixed(0);
+  document.getElementById('sortProgress').style.width = pct + '%';
+  document.getElementById('sortScore').textContent = sortCorrect + ' / ' + sortIndex;
+
+  document.getElementById('sortContent').innerHTML =
+    '<div class="sort-instruction">לאיזו קבוצה שייכת המדינה? 👇</div>' +
+    '<div class="current-sort-item">' +
+      '<span class="country-flag">' + item.flag + '</span>' +
+      '<div class="country-name">' + item.name + '</div>' +
+      '<div class="country-continent">' + item.continent + '</div>' +
+    '</div>' +
+    '<button class="sort-zone-btn developed-btn" onclick="answerSort(\'developed\')">🏭 מדינה מפותחת</button>' +
+    '<button class="sort-zone-btn developing-btn" onclick="answerSort(\'developing\')">🌱 מדינה מתפתחת</button>' +
+    '<div class="explanation-box" id="sortExplanation"></div>' +
+    '<button class="next-btn" id="sortNext" onclick="sortIndex++;renderSortItem()">הבא →</button>';
+}
+
+function answerSort(answer) {
+  var item = sortItems[sortIndex];
+  var correct = answer === item.type;
+  if (correct) sortCorrect++;
+  var btns = document.querySelectorAll('.sort-zone-btn');
+  btns.forEach(function(b) {
+    b.onclick = null; b.style.pointerEvents = 'none';
+    if (b.classList.contains(item.type === 'developed' ? 'developed-btn' : 'developing-btn')) b.classList.add('correct-choice');
+    if (!correct && b.classList.contains(answer === 'developed' ? 'developed-btn' : 'developing-btn')) b.classList.add('wrong-choice');
+  });
+  var typeHeb = item.type === 'developed' ? 'מפותחת' : 'מתפתחת';
+  document.getElementById('sortExplanation').innerHTML = '💡 ' + item.name + ' היא מדינה <b>' + typeHeb + '</b>.';
+  document.getElementById('sortExplanation').classList.add('show');
+  document.getElementById('sortNext').classList.add('show');
+}
+
+// =================== MATCH GAME (terms right, defs left) ===================
+function startMatch() {
+  var pairs = shuffle([...matchPairs]).slice(0, 6);
+  matchCorrectCount = 0;
+  matchTotalPairs = pairs.length;
+  matchPairsLeft = pairs.length;
+  matchSelected = null;
+  showScreen('matchScreen');
+  document.getElementById('matchScore').textContent = '0 / ' + pairs.length;
+
+  var shuffledTerms = shuffle(pairs.map(function(p, i) { return { text: p.term, pairId: i, type: 'term' }; }));
+  var shuffledDefs = shuffle(pairs.map(function(p, i) { return { text: p.def, pairId: i, type: 'def' }; }));
+
+  var html = '<div class="match-instruction">חברו כל <b>מושג</b> (מימין) ל<b>הגדרה</b> שלו (משמאל) 🧩</div>' +
+    '<div class="match-columns" style="position:relative;">' +
+      '<div class="match-column">' +
+        '<div class="match-col-header terms-header">📘 מושגים</div>' +
+        shuffledTerms.map(function(t) {
+          return '<div class="match-item term-item" data-pair="' + t.pairId + '" data-type="term" onclick="selectMatchItem(this)">' + t.text + '</div>';
+        }).join('') +
+      '</div>' +
+      '<div class="match-column">' +
+        '<div class="match-col-header defs-header">📖 הגדרות</div>' +
+        shuffledDefs.map(function(d) {
+          return '<div class="match-item def-item" data-pair="' + d.pairId + '" data-type="def" onclick="selectMatchItem(this)">' + d.text + '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('matchContent').innerHTML = html;
+}
+
+function selectMatchItem(el) {
+  if (el.classList.contains('matched')) return;
+
+  if (!matchSelected) {
+    el.classList.add('selected');
+    matchSelected = el;
+    return;
+  }
+
+  if (matchSelected === el) {
+    el.classList.remove('selected');
+    matchSelected = null;
+    return;
+  }
+
+  // Must pick one from each column
+  if (matchSelected.dataset.type === el.dataset.type) {
+    matchSelected.classList.remove('selected');
+    el.classList.add('selected');
+    matchSelected = el;
+    return;
+  }
+
+  // Check match
+  if (matchSelected.dataset.pair === el.dataset.pair) {
+    matchSelected.classList.remove('selected');
+    matchSelected.classList.add('matched');
+    el.classList.add('matched');
+    matchCorrectCount++;
+    matchPairsLeft--;
+    document.getElementById('matchScore').textContent = matchCorrectCount + ' / ' + matchTotalPairs;
+    if (matchPairsLeft === 0) {
+      setTimeout(function() { showResults('matchScreen', matchCorrectCount, matchTotalPairs, 'matchBadge'); }, 600);
+    }
+  } else {
+    el.classList.add('wrong-flash');
+    matchSelected.classList.add('wrong-flash');
+    var prev = matchSelected;
+    setTimeout(function() {
+      el.classList.remove('wrong-flash');
+      prev.classList.remove('wrong-flash', 'selected');
+    }, 500);
+  }
+  matchSelected = null;
+}
+
+// =================== MAP DRAG GAME ===================
+function startMapGame() {
+  mapPlacedCount = 0;
+  mapSelectedLabel = null;
+  var countries = shuffle([...mapCountries]);
+  mapTotalCountries = countries.length;
+  showScreen('mapScreen');
+  document.getElementById('mapScore').textContent = '0 / ' + mapTotalCountries;
+
+  var html =
+    '<div class="map-game-wrapper">' +
+      '<div class="map-tap-hint">💡 <b>במחשב:</b> גררו שם מדינה לנקודה על המפה &nbsp;|&nbsp; <b>בנייד:</b> הקישו על שם ואז על נקודה</div>' +
+      '<div class="map-layout">' +
+        '<div class="map-image-wrapper" id="mapImageWrapper">' +
+          '<img src="../../assets/images/mediterranian.gif" alt="מפת הים התיכון" draggable="false">' +
+          mapCountries.map(function(c, i) {
+            return '<div class="map-drop-dot" id="drop-' + c.id + '" data-target="' + c.id + '" ' +
+                   'style="top:' + c.top + '%;left:' + c.left + '%;" ' +
+                   'onclick="tapDropOnDot(this)">' +
+                   '<span class="dot-num">' + (i+1) + '</span></div>';
+          }).join('') +
+        '</div>' +
+        '<div class="map-countries-sidebar" id="mapPool">' +
+          countries.map(function(c) {
+            return '<div class="map-country-label" data-id="' + c.id + '" draggable="true" onclick="tapSelectCountry(this)">' + c.name + '</div>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="map-success" id="mapSuccess">🎉 כל הכבוד! השלמת את כל המדינות!</div>' +
+      '<button class="map-reset-btn" onclick="startMapGame()">🔄 התחל מחדש</button>' +
+    '</div>';
+
+  document.getElementById('mapContent').innerHTML = html;
+  initMapDragDrop();
+}
+
+function initMapDragDrop() {
+  // Desktop drag events
+  var labels = document.querySelectorAll('.map-country-label');
+  labels.forEach(function(label) {
+    label.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('text/plain', label.dataset.id);
+      label.classList.add('dragging');
+    });
+    label.addEventListener('dragend', function() {
+      label.classList.remove('dragging');
+    });
+  });
+
+  var dots = document.querySelectorAll('.map-drop-dot');
+  dots.forEach(function(dot) {
+    dot.addEventListener('dragover', function(e) { e.preventDefault(); });
+    dot.addEventListener('drop', function(e) {
+      e.preventDefault();
+      var draggedId = e.dataTransfer.getData('text/plain');
+      tryPlaceCountry(draggedId, dot);
+    });
+  });
+}
+
+// Tap-based flow for mobile
+function tapSelectCountry(el) {
+  if (el.classList.contains('placed')) return;
+  // Deselect previous
+  var prev = document.querySelector('.map-country-label.selected-for-tap');
+  if (prev) prev.classList.remove('selected-for-tap');
+  el.classList.add('selected-for-tap');
+  mapSelectedLabel = el;
+}
+
+function tapDropOnDot(dot) {
+  if (dot.classList.contains('correct')) return;
+  if (!mapSelectedLabel) return;
+  tryPlaceCountry(mapSelectedLabel.dataset.id, dot);
+}
+
+function tryPlaceCountry(countryId, dot) {
+  var targetId = dot.dataset.target;
+  if (dot.classList.contains('correct')) return;
+
+  if (countryId === targetId) {
+    // Correct!
+    var label = document.querySelector('.map-country-label[data-id="' + countryId + '"]');
+    var countryData = mapCountries.find(function(c) { return c.id === countryId; });
+    dot.classList.add('correct');
+    dot.innerHTML = countryData ? countryData.name : countryId;
+    if (label) { label.classList.add('placed'); label.classList.remove('selected-for-tap'); }
+    mapSelectedLabel = null;
+    mapPlacedCount++;
+    document.getElementById('mapScore').textContent = mapPlacedCount + ' / ' + mapTotalCountries;
+
+    if (mapPlacedCount === mapTotalCountries) {
+      document.getElementById('mapSuccess').classList.add('show');
+      launchConfetti();
+      var badge = document.getElementById('mapBadge');
+      badge.textContent = '⭐⭐⭐';
+      badge.classList.add('show');
+    }
+  } else {
+    // Wrong — shake the dot
+    dot.style.animation = 'none';
+    dot.offsetHeight; // force reflow
+    dot.style.animation = 'shake 0.4s ease';
+    setTimeout(function() { dot.style.animation = ''; }, 500);
+  }
+}
+
+// =================== RESULTS ===================
+function showResults(screenId, correct, total, badgeId) {
+  var pct = correct / total;
+  var stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
+  var emoji = stars === 3 ? '🏆' : stars === 2 ? '🌟' : stars === 1 ? '👍' : '💪';
+  var msg = stars === 3 ? 'מדהים! שליטה מלאה!' : stars === 2 ? 'כל הכבוד!' : stars === 1 ? 'לא רע! נסי שוב' : 'כדאי לחזור על החומר';
+
+  if (stars > 0) {
+    var badge = document.getElementById(badgeId);
+    if (badge) { badge.textContent = '⭐'.repeat(stars); badge.classList.add('show'); }
+  }
+
+  var startFn =
+    screenId === 'quizScreen' ? 'startQuiz' :
+    screenId === 'sortScreen' ? 'startSort' :
+    screenId === 'matchScreen' ? 'startMatch' :
+    screenId === 'mapScreen' ? 'startMapGame' :
+    screenId === 'openScreen' ? 'startOpenQ' : 'startMixQuiz';
+
+  var contentId = screenId.replace('Screen', 'Content');
+  var contentEl = document.getElementById(contentId);
+  var resultsHTML =
+    '<div class="results-screen">' +
+      '<span class="big-emoji">' + emoji + '</span>' +
+      '<h2>' + msg + '</h2>' +
+      '<div class="score-text">' + correct + ' מתוך ' + total + ' תשובות נכונות</div>' +
+      '<div class="stars">' +
+        '<span class="star ' + (stars >= 1 ? 'earned' : '') + '">⭐</span>' +
+        '<span class="star ' + (stars >= 2 ? 'earned' : '') + '">⭐</span>' +
+        '<span class="star ' + (stars >= 3 ? 'earned' : '') + '">⭐</span>' +
+      '</div>' +
+      '<button class="retry-btn" onclick="' + startFn + '()">🔄 שחקו שוב</button>' +
+      '<button class="retry-btn secondary" onclick="showScreen(\'menuScreen\')">→ תפריט ראשי</button>' +
+    '</div>';
+
+  if (contentEl) { contentEl.innerHTML = resultsHTML; }
+
+  var progressId = screenId.replace('Screen', 'Progress');
+  var progEl = document.getElementById(progressId);
+  if (progEl) progEl.style.width = '100%';
+
+  if (stars === 3) launchConfetti();
+}
+
+// =================== OPEN QUESTIONS ===================
+const openQuestions = [
+  { q: 'כמה יבשות גובלות בים התיכון?', answers: ['3','שלוש','שלושה'], expectedAnswer: '3 יבשות: אירופה, אפריקה ואסיה.', hint: '3 (אירופה, אפריקה ואסיה).' },
+  { q: 'באיזו יבשת נמצאת ספרד?', answers: ['אירופה'], expectedAnswer: 'ספרד נמצאת ביבשת אירופה, בדרום-מערב היבשת.', hint: 'ספרד נמצאת ביבשת אירופה.' },
+  { q: 'באיזו יבשת נמצאת מצרים?', answers: ['אפריקה'], expectedAnswer: 'מצרים נמצאת ביבשת אפריקה, בצפון-מזרח היבשת.', hint: 'מצרים נמצאת ביבשת אפריקה.' },
+  { q: 'מהו שם המיצר שמחבר את הים התיכון לאוקיינוס האטלנטי?', answers: ['גיברלטר'], expectedAnswer: 'מיצר גיברלטר, הנמצא במערב הים התיכון בין ספרד למרוקו.', hint: 'מיצר גיברלטר.' },
+  { q: 'מהו שם המיצר שמחבר את הים התיכון לים השחור?', answers: ['בוספורוס','דרדנלים','הבוספורוס','הדרדנלים'], expectedAnswer: 'מיצר הבוספורוס (ומיצר הדרדנלים) שנמצאים בטורקיה ומחברים דרך ים מרמרה לים השחור.', hint: 'מיצר הבוספורוס (או הדרדנלים).' },
+  { q: 'חצי-אי מוקף מים מכמה כיוונים?', answers: ['3','שלוש','שלושה'], expectedAnswer: 'חצי-אי מוקף מים משלושה כיוונים ומחובר ליבשה מכיוון אחד.', hint: 'משלושה כיוונים.' },
+  { q: 'מהו האי הגדול ביותר בים התיכון?', answers: ['סיציליה'], expectedAnswer: 'סיציליה, האי הגדול ביותר בים התיכון, שייך לאיטליה.', hint: 'סיציליה (של איטליה).' },
+  { q: 'באיזה צד של הים התיכון נמצאות רוב המדינות המפותחות?', answers: ['צפון','צפוני','הצפוני','בצפון'], expectedAnswer: 'בצד הצפוני, ביבשת אירופה — מדינות כמו צרפת, איטליה, ספרד ויוון.', hint: 'בצד הצפוני (באירופה).' },
+  { q: 'באיזו יבשת נמצאת ישראל?', answers: ['אסיה'], expectedAnswer: 'ישראל נמצאת ביבשת אסיה, בחוף המזרחי של הים התיכון.', hint: 'ישראל נמצאת ביבשת אסיה.' },
+  { q: 'כמה מדינות (בערך) שוכנות סביב הים התיכון?', answers: ['20','עשרים'], expectedAnswer: 'כ-20 מדינות שוכנות סביב הים התיכון.', hint: 'כ-20 מדינות.' },
+  { q: 'מהו שם התעלה המלאכותית שמחברת את הים התיכון לים סוף?', answers: ['סואץ','תעלת סואץ'], expectedAnswer: 'תעלת סואץ, תעלה מלאכותית שנחפרה במצרים ומחברת את הים התיכון לים סוף.', hint: 'תעלת סואץ (במצרים).' },
+  { q: 'איזה חצי-אי נראה כמו מגף?', answers: ['איטלקי','איטליה','האיטלקי'], expectedAnswer: 'חצי-האי האיטלקי, שבו נמצאת איטליה, צורתו מזכירה מגף.', hint: 'חצי-האי האיטלקי.' },
+  { q: 'באיזו יבשת נמצאת סוריה?', answers: ['אסיה'], expectedAnswer: 'סוריה נמצאת ביבשת אסיה, במזרח הים התיכון.', hint: 'סוריה נמצאת ביבשת אסיה.' },
+  { q: 'באיזו יבשת נמצאת יוון?', answers: ['אירופה'], expectedAnswer: 'יוון נמצאת ביבשת אירופה, בדרום-מזרח היבשת.', hint: 'יוון נמצאת ביבשת אירופה.' },
+  { q: 'מהי הריביירה?', answers: ['רצועת חוף','חוף','חוף בצרפת','רצועת חוף בצרפת'], expectedAnswer: 'הריביירה היא רצועת חוף מפורסמת ויוקרתית בדרום צרפת ובצפון-מערב איטליה.', hint: 'רצועת חוף מפורסמת בדרום צרפת.' },
+  { q: 'על מה מבוססת הכלכלה במדינות מתפתחות סביב הים התיכון?', answers: ['חקלאות'], expectedAnswer: 'הכלכלה במדינות מתפתחות סביב הים התיכון מבוססת בעיקר על חקלאות.', hint: 'בעיקר על חקלאות.' },
+];
+
+var openQList = [];
+var openQIndex = 0;
+var openQCorrect = 0;
+var openQAttempts = 0;
+
+function startOpenQ() {
+  openQList = shuffle([...openQuestions]).slice(0, 10);
+  openQIndex = 0;
+  openQCorrect = 0;
+  showScreen('openScreen');
+  renderOpenQ();
+}
+
+function renderOpenQ() {
+  if (openQIndex >= openQList.length) {
+    showResults('openScreen', openQCorrect, openQList.length, 'openBadge');
+    return;
+  }
+  openQAttempts = 0;
+  var q = openQList[openQIndex];
+  var pct = (openQIndex / openQList.length * 100).toFixed(0);
+  document.getElementById('openProgress').style.width = pct + '%';
+  document.getElementById('openScore').textContent = openQCorrect + ' / ' + openQIndex;
+
+  var aiStatus = window._aiStatus || { available: false, signedIn: false };
+  var noticeHtml = '';
+  if (!aiStatus.signedIn) {
+    noticeHtml = '<div class="ai-setup-notice">' +
+      '<strong>🔑 כדי לקבל בדיקה חכמה מ-AI:</strong>' +
+      '<button class="ai-signin-btn" onclick="window.signInForAI()">🔐 התחברות עם Google</button>' +
+      '<div style="margin-top:6px;font-size:0.8rem;color:#888;">גם בלי — אפשר לכתוב ולראות את התשובה הנכונה</div>' +
+    '</div>';
+  }
+
+  document.getElementById('openContent').innerHTML =
+    '<div class="open-q-card">' +
+      noticeHtml +
+      '<div class="q-num">שאלה ' + (openQIndex+1) + ' מתוך ' + openQList.length + '</div>' +
+      '<div class="q-text">' + q.q + '</div>' +
+      '<div class="open-q-input-row">' +
+        '<input class="open-q-input" id="openInput" type="text" placeholder="כתבו את התשובה..." autocomplete="off">' +
+        '<button class="open-q-check-btn" id="openCheckBtn" onclick="checkOpenQ()">🤖 בדיקה</button>' +
+      '</div>' +
+      '<div id="openFeedback"></div>' +
+      '<div id="openHintArea"></div>' +
+      '<button class="next-btn" id="openNext" onclick="openQIndex++;renderOpenQ()">הבא →</button>' +
+    '</div>';
+
+  document.getElementById('openInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') checkOpenQ(); });
+  document.getElementById('openInput').focus();
+}
+
+async function checkOpenQ() {
+  var input = document.getElementById('openInput');
+  var btn = document.getElementById('openCheckBtn');
+  var feedbackEl = document.getElementById('openFeedback');
+  var answer = input.value.trim();
+  if (!answer) return;
+
+  openQAttempts++;
+  btn.disabled = true;
+  input.disabled = true;
+
+  var q = openQList[openQIndex];
+  var aiStatus = window._aiStatus || { available: false, signedIn: false };
+
+  if (aiStatus.available && typeof window.checkWithAI === 'function') {
+    // AI available — use Gemini
+    feedbackEl.innerHTML = '<div class="ai-loading">🤖 הבודק החכם קורא את התשובה שלך<div class="dots"><span></span><span></span><span></span></div></div>';
+
+    var result = await window.checkWithAI(q.q, q.expectedAnswer, answer);
+
+    if (result.success) {
+      var scoreEmoji = result.score >= 3 ? '🌟' : result.score >= 2 ? '👍' : '💪';
+      feedbackEl.innerHTML = '<div class="ai-feedback-box"><b>' + scoreEmoji + ' משוב:</b><br>' + result.feedback + '</div>';
+
+      if (result.score >= 3) {
+        openQCorrect++;
+        document.getElementById('openNext').classList.add('show');
+      } else if (openQAttempts < 2) {
+        showOpenRetryBtns(q);
+      } else {
+        showOpenCorrectAnswer(q);
+      }
+    } else {
+      // AI failed — fallback
+      feedbackEl.innerHTML = '<div class="open-q-feedback show wrong-fb">⚠️ ' + (result.message || 'שגיאה') + '</div>';
+      doKeywordFallback(q, answer);
+    }
+  } else {
+    // No AI — keyword matching fallback
+    doKeywordFallback(q, answer);
+  }
+}
+
+function doKeywordFallback(q, answer) {
+  var feedbackEl = document.getElementById('openFeedback');
+  var isCorrect = checkAnswerKeywords(answer, q.answers);
+
+  if (isCorrect) {
+    openQCorrect++;
+    feedbackEl.innerHTML = '<div class="open-q-feedback show correct-fb">✅ נכון! ' + q.hint + '</div>';
+    document.getElementById('openNext').classList.add('show');
+  } else if (openQAttempts < 2) {
+    feedbackEl.innerHTML = '<div class="open-q-feedback show wrong-fb">❌ לא בדיוק...</div>';
+    showOpenRetryBtns(q);
+  } else {
+    feedbackEl.innerHTML = '<div class="open-q-feedback show wrong-fb">❌ לא בדיוק.</div>';
+    showOpenCorrectAnswer(q);
+  }
+}
+
+function showOpenRetryBtns(q) {
+  var input = document.getElementById('openInput');
+  var btn = document.getElementById('openCheckBtn');
+  document.getElementById('openHintArea').innerHTML =
+    '<div class="open-retry-btns">' +
+      '<button class="open-retry-btn" onclick="retryOpenQ()">✏️ לנסות שוב</button>' +
+      '<button class="open-retry-btn" onclick="showOpenHint()">💡 רמז</button>' +
+      '<button class="open-retry-btn continue-btn" onclick="showOpenCorrectAndContinue()">← המשך</button>' +
+    '</div>';
+}
+
+function retryOpenQ() {
+  document.getElementById('openInput').disabled = false;
+  document.getElementById('openCheckBtn').disabled = false;
+  document.getElementById('openInput').focus();
+  document.getElementById('openHintArea').innerHTML = '';
+}
+
+function showOpenHint() {
+  var q = openQList[openQIndex];
+  document.getElementById('openHintArea').innerHTML =
+    '<div class="open-q-feedback show" style="background:#fff8e1;border:1px solid #ffcc02;color:#6d4c00;border-right:4px solid #ffcc02;margin-top:10px;">' +
+      '💡 <b>רמז:</b> ' + q.hint +
+    '</div>' +
+    '<div class="open-retry-btns">' +
+      '<button class="open-retry-btn" onclick="retryOpenQ()">✏️ לנסות שוב</button>' +
+      '<button class="open-retry-btn continue-btn" onclick="showOpenCorrectAndContinue()">← המשך</button>' +
+    '</div>';
+  document.getElementById('openInput').disabled = false;
+  document.getElementById('openCheckBtn').disabled = false;
+}
+
+function showOpenCorrectAnswer(q) {
+  document.getElementById('openHintArea').innerHTML =
+    '<div class="open-q-feedback show correct-fb" style="margin-top:10px;">' +
+      '<b>✅ התשובה:</b> ' + q.expectedAnswer +
+    '</div>';
+  document.getElementById('openNext').classList.add('show');
+}
+
+function showOpenCorrectAndContinue() {
+  showOpenCorrectAnswer(openQList[openQIndex]);
+}
+
+function checkAnswerKeywords(userAnswer, acceptedAnswers) {
+  var normalized = userAnswer.trim().replace(/[.,;:!?"']/g, '').replace(/\s+/g, ' ');
+  for (var i = 0; i < acceptedAnswers.length; i++) {
+    var accepted = acceptedAnswers[i].trim();
+    if (normalized === accepted) return true;
+    if (normalized.indexOf(accepted) !== -1) return true;
+  }
+  return false;
+}
+
+// =================== UTILS ===================
+function shuffle(arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  }
+  return arr;
+}
+
+function launchConfetti() {
+  var container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+  var colors = ['#EF476F','#FFD166','#06D6A0','#118AB2','#7B2FF7','#FF6B35'];
+  for (var i = 0; i < 60; i++) {
+    var piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 1.5 + 's';
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    container.appendChild(piece);
+  }
+  setTimeout(function() { container.remove(); }, 4000);
+}
+</script>
+</body>
+</html>

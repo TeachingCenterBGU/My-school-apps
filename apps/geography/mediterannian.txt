@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מדינות הים התיכון</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .countries-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .country-label {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: grab;
+            font-weight: bold;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .country-label:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+
+        .map-wrapper {
+            position: relative;
+            display: inline-block;
+            border: 3px solid #bdc3c7;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            max-width: 100%;
+            overflow: auto;
+        }
+
+        .map-wrapper img {
+            display: block;
+            max-width: 1000px; /* ניתן להתאים לפי גודל המסך */
+            height: auto;
+        }
+
+        .drop-zone {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(231, 76, 60, 0.6);
+            border: 2px solid #c0392b;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .drop-zone.correct {
+            background-color: rgba(46, 204, 113, 0.8);
+            border-color: #27ae60;
+            width: auto;
+            height: auto;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* מיקומי המדינות באחוזים ביחס לתמונה - תוכלי לשחק עם המספרים כדי לדייק */
+        #drop-israel { top: 72%; left: 91%; }
+        #drop-italy { top: 38%; left: 47%; }
+        #drop-greece { top: 52%; left: 63%; }
+        #drop-spain { top: 45%; left: 13%; }
+        #drop-egypt { top: 85%; left: 75%; }
+
+        .success-message {
+            display: none;
+            color: #27ae60;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>התאימו את המדינות למפה!</h1>
+    <p>גררו כל מדינה למיקום הנכון שלה על מפת הים התיכון.</p>
+
+    <div class="game-container">
+        <div class="countries-container" id="draggable-container">
+            <div class="country-label" draggable="true" data-id="israel">ישראל</div>
+            <div class="country-label" draggable="true" data-id="italy">איטליה</div>
+            <div class="country-label" draggable="true" data-id="greece">יוון</div>
+            <div class="country-label" draggable="true" data-id="spain">ספרד</div>
+            <div class="country-label" draggable="true" data-id="egypt">מצרים</div>
+        </div>
+
+        <div class="map-wrapper">
+            <img src="../../assets/images/mediterranian.gif" alt="מפת הים התיכון" draggable="false">
+            
+            <div class="drop-zone" id="drop-israel" data-target="israel"></div>
+            <div class="drop-zone" id="drop-italy" data-target="italy"></div>
+            <div class="drop-zone" id="drop-greece" data-target="greece"></div>
+            <div class="drop-zone" id="drop-spain" data-target="spain"></div>
+            <div class="drop-zone" id="drop-egypt" data-target="egypt"></div>
+        </div>
+        
+        <div class="success-message" id="success-msg">כל הכבוד! השלמת את המפה בהצלחה! 🎉</div>
+    </div>
+
+    <script>
+        const draggables = document.querySelectorAll('.country-label');
+        const dropZones = document.querySelectorAll('.drop-zone');
+        let correctCount = 0;
+        const totalCountries = draggables.length;
+
+        // אירועי גרירה עבור התוויות
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', draggable.dataset.id);
+                draggable.style.opacity = '0.5';
+            });
+
+            draggable.addEventListener('dragend', () => {
+                draggable.style.opacity = '1';
+            });
+        });
+
+        // אירועי שחרור עבור נקודות על המפה
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault(); // מאפשר את השחרור
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const draggedId = e.dataTransfer.getData('text/plain');
+                const targetId = zone.dataset.target;
+
+                // בדיקה האם המדינה נגררה למקום הנכון
+                if (draggedId === targetId && !zone.classList.contains('correct')) {
+                    const draggedElement = document.querySelector(`.country-label[data-id="${draggedId}"]`);
+                    
+                    // שינוי עיצוב הנקודה לשם המדינה
+                    zone.classList.add('correct');
+                    zone.textContent = draggedElement.textContent;
+                    
+                    // העלמת התווית המקורית
+                    draggedElement.style.display = 'none';
+                    correctCount++;
+
+                    // בדיקת ניצחון
+                    if (correctCount === totalCountries) {
+                        document.getElementById('success-msg').style.display = 'block';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
