@@ -56,13 +56,6 @@ const homeworkData = [
         "date": "19/05"
     },
     {
-        "id": "10182",
-        "grade": 3,
-        "subject": "לשון",
-        "task": "לסיים עמ' 155-159",
-        "date": "20/04"
-    },
-    {
         "id": "11349",
         "grade": 3,
         "subject": "לשון",
