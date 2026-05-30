@@ -77,13 +77,6 @@ const homeworkData = [
         "date": "26/05"
     },
     {
-        "id": "custom-tree-20260529",
-        "grade": 3,
-        "subject": "משימה ביתית",
-        "task": "🪴 להשקות את העץ במרפסת",
-        "date": "29/05"
-    },
-    {
         "id": "11557",
         "grade": 3,
         "subject": "רוחב/פיצול שפה",
