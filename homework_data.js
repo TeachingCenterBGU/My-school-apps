@@ -161,13 +161,6 @@ const homeworkData = [
         "date": "14/05"
     },
     {
-        "id": "10728",
-        "grade": 5,
-        "subject": "מתמטיקה",
-        "task": "בחוברת עד עמוד 150",
-        "date": "01/05"
-    },
-    {
         "id": "10916",
         "grade": 5,
         "subject": "מתמטיקה",
