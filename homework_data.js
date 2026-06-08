@@ -201,12 +201,5 @@ const homeworkData = [
         "subject": "שפה",
         "task": "עמוד 230",
         "date": "31/05"
-    },
-    {
-        "id": "11032",
-        "grade": 5,
-        "subject": "תרבות ישראל",
-        "task": "208-211",
-        "date": "08/05"
     }
 ];
