@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>חופרים צורות 🪏</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<style>
+  :root{
+    --soil-1:#7a4a28; --soil-2:#5e3619; --soil-edge:#3f2410;
+    --rock-1:#8a8d93; --rock-2:#5f636b;
+    --sky-1:#ffe3a3; --sky-2:#ffc46b;
+    --grass:#5dc264; --grass-d:#36a045;
+    --panel:#fff7ec; --ink:#3b2415; --ink-soft:#7a5b44;
+    --gold:#ffce3d;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; height:100%;}
+  body{
+    font-family:'Rubik',sans-serif; color:var(--ink);
+    background:linear-gradient(180deg,#ffd98a 0%, #ffb24d 28%, #c97d3a 60%, #7a4a28 100%);
+    min-height:100%; overflow-x:hidden;
+    display:flex; flex-direction:column; align-items:center;
+    user-select:none;
+  }
+
+  /* ===== top bar ===== */
+  .topbar{
+    width:100%; max-width:760px; display:flex; align-items:center; gap:10px;
+    padding:12px 14px 6px; flex-wrap:wrap;
+  }
+  .logo{font-weight:900; font-size:1.45rem; letter-spacing:-.5px; display:flex; align-items:center; gap:8px;
+    color:#5e3619; text-shadow:0 2px 0 #ffe7b0;}
+  .logo .pick{font-size:1.55rem;}
+  .stat{
+    background:var(--panel); border-radius:16px; padding:6px 12px; font-weight:800;
+    display:flex; align-items:center; gap:6px; box-shadow:0 3px 0 rgba(0,0,0,.12);
+    font-size:1rem; direction:ltr;
+  }
+  .stat .lbl{font-size:.72rem; color:var(--ink-soft); font-weight:700;}
+  .spacer{flex:1;}
+  .iconbtn{
+    background:var(--panel); border:none; border-radius:14px; width:42px; height:42px;
+    font-size:1.2rem; cursor:pointer; box-shadow:0 3px 0 rgba(0,0,0,.12); color:var(--ink);
+  }
+  .iconbtn:active{transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.12);}
+
+  /* ===== stage ===== */
+  .stage{width:100%; max-width:760px; padding:4px 14px 26px; display:flex; flex-direction:column; gap:12px;}
+
+  .mission{
+    background:var(--panel); border-radius:20px; padding:12px 16px;
+    box-shadow:0 4px 0 rgba(0,0,0,.12); display:flex; align-items:center; gap:12px;
+  }
+  .mission .lvlchip{
+    background:var(--ink); color:#fff; border-radius:12px; font-weight:900; font-size:.95rem;
+    padding:6px 11px; white-space:nowrap; direction:ltr;
+  }
+  .mission .mtxt{flex:1; line-height:1.25;}
+  .mission .mname{font-weight:900; font-size:1.15rem;}
+  .mission .mhint{font-size:.85rem; color:var(--ink-soft); font-weight:600;}
+
+  /* dig scene */
+  .scene-wrap{
+    position:relative; width:100%; border-radius:20px; overflow:hidden;
+    box-shadow:0 8px 0 rgba(0,0,0,.18), inset 0 0 0 4px #4a2c16;
+    background:#4a2c16; touch-action:none;
+  }
+  .scene{position:relative; width:100%; aspect-ratio:14/10;}
+
+  .sky{position:absolute; inset:0; background:linear-gradient(180deg,var(--sky-1),var(--sky-2)); }
+  .blueprint{position:absolute; inset:0; pointer-events:none; z-index:3;}
+  .reveal-svg{position:absolute; inset:0; pointer-events:none; z-index:5; opacity:0; transition:opacity .5s;}
+
+  .grid{
+    position:absolute; inset:0; z-index:4; direction:ltr;
+    display:grid; grid-template-columns:repeat(14,1fr); grid-template-rows:repeat(10,1fr);
+  }
+  .tile{position:relative; overflow:hidden;}
+  .tile .dirt{
+    position:absolute; inset:0; transition:transform .16s ease, opacity .16s ease;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,210,120,.20), transparent 42%),
+      radial-gradient(circle at 70% 75%, rgba(0,0,0,.20), transparent 45%),
+      linear-gradient(135deg,var(--soil-1),var(--soil-2));
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.18), inset 1px 1px 0 rgba(255,255,255,.07);
+  }
+  .tile .gembed{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-size:min(3.2vw,18px); opacity:0;}
+  .tile.dug .dirt{transform:scale(.2) rotate(12deg); opacity:0;}
+  .tile.dug .gembed{opacity:1; transition:opacity .25s .05s;}
+  .tile.bonk .dirt{animation:bonk .24s;}
+  @keyframes bonk{0%,100%{transform:none}25%{transform:translateX(-3px) scale(1.03)}50%{transform:translate(3px,-2px)}75%{transform:translateX(-2px)}}
+
+  .mole{position:absolute; z-index:6; width:13%; pointer-events:none; transition:left .1s, top .1s; transform:translate(-50%,-60%); font-size:min(7vw,40px); filter:drop-shadow(0 2px 1px rgba(0,0,0,.4)); opacity:0;}
+
+  .progress{
+    background:var(--panel); border-radius:16px; padding:10px 14px; display:flex; align-items:center; gap:10px;
+    box-shadow:0 4px 0 rgba(0,0,0,.12); font-weight:800;
+  }
+  .bar{flex:1; height:16px; background:#e7d8c4; border-radius:10px; overflow:hidden;}
+  .bar > i{display:block; height:100%; width:0%; border-radius:10px;
+    background:linear-gradient(90deg,#ffd24a,#ff9b3d); transition:width .2s;}
+  .progress .cnt{direction:ltr; min-width:48px; text-align:left;}
+
+  /* ===== D-pad ===== */
+  .dpad-wrap{display:flex; align-items:center; justify-content:center; gap:18px; margin-top:2px;}
+  .dpad{
+    display:grid; grid-template-columns:repeat(3,52px); grid-template-rows:repeat(3,52px);
+    gap:6px; direction:ltr;
+  }
+  .dbtn{
+    background:var(--panel); border:none; border-radius:14px; font-size:1.5rem; font-weight:900;
+    color:#5e3619; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.18); display:flex;
+    align-items:center; justify-content:center; touch-action:none;
+  }
+  .dbtn:active{transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.18);}
+  .d-up{grid-column:2; grid-row:1;} .d-left{grid-column:1; grid-row:2;}
+  .d-right{grid-column:3; grid-row:2;} .d-down{grid-column:2; grid-row:3;}
+  .d-mid{grid-column:2; grid-row:2; background:transparent; box-shadow:none; font-size:1.3rem; color:#a9805e;}
+  .keyhint{font-size:.82rem; font-weight:700; color:#6b4226; max-width:150px; line-height:1.3; text-align:center;}
+  .keyhint b{color:#3b2415;}
+
+  /* ===== overlays ===== */
+  .overlay{
+    position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center;
+    padding:18px; background:rgba(40,22,10,.55); backdrop-filter:blur(3px);
+  }
+  .overlay.show{display:flex;}
+  .card{
+    background:var(--panel); border-radius:26px; padding:20px; width:100%; max-width:440px;
+    box-shadow:0 14px 0 rgba(0,0,0,.22); text-align:center; max-height:92vh; overflow:auto;
+    animation:pop .3s cubic-bezier(.2,1.4,.5,1);
+  }
+  @keyframes pop{from{transform:scale(.8); opacity:0} to{transform:scale(1); opacity:1}}
+  .card h1{margin:.1em 0 .15em; font-size:1.7rem; font-weight:900;}
+  .card .shape-name{font-size:1.5rem; font-weight:900; margin:.1em 0;}
+  .reveal-box{width:78%; max-width:280px; margin:6px auto 4px; aspect-ratio:14/10;}
+  .fact{
+    background:#fff; border-radius:16px; padding:11px 13px; margin:8px 0 6px; font-weight:600;
+    line-height:1.35; box-shadow:inset 0 0 0 2px rgba(0,0,0,.06); font-size:.97rem;
+  }
+  .fact .ft{font-weight:900; display:block; margin-bottom:2px;}
+  .qtext{font-weight:800; font-size:1.08rem; margin:10px 4px 8px;}
+  .opts{display:grid; gap:9px;}
+  .opt{
+    background:#fff; border:3px solid #e7d8c4; border-radius:16px; padding:12px 14px;
+    font-family:inherit; font-size:1.02rem; font-weight:700; cursor:pointer; color:var(--ink);
+    transition:transform .08s, border-color .15s, background .15s;
+  }
+  .opt:active{transform:scale(.98);}
+  .opt.correct{border-color:#37b24d; background:#e8fbe9;}
+  .opt.wrong{border-color:#e03131; background:#ffeaea;}
+  .opt:disabled{cursor:default;}
+  .explain{margin-top:10px; font-weight:700; line-height:1.35; display:none;}
+  .explain.show{display:block;}
+  .bigbtn{
+    margin-top:14px; background:linear-gradient(180deg,#ffd24a,#ff9b2f);
+    border:none; border-radius:18px; padding:13px 22px; font-family:inherit;
+    font-size:1.12rem; font-weight:900; color:#5e3619; cursor:pointer;
+    box-shadow:0 5px 0 #c9741f; display:none;
+  }
+  .bigbtn.show{display:inline-block;}
+  .bigbtn:active{transform:translateY(3px); box-shadow:0 2px 0 #c9741f;}
+  .bigbtn.secondary{background:var(--panel); color:var(--ink); box-shadow:0 5px 0 rgba(0,0,0,.18);}
+  .bigbtn.secondary:active{box-shadow:0 2px 0 rgba(0,0,0,.18);}
+
+  .intro p{line-height:1.5; font-weight:600; font-size:1.02rem;}
+  .how{display:flex; gap:14px; justify-content:center; margin:14px 0; flex-wrap:wrap;}
+  .how div{font-size:.85rem; font-weight:700; max-width:130px;}
+  .how .e{font-size:1.9rem; display:block;}
+
+  .stars-row{font-size:2rem; letter-spacing:4px; margin:8px 0; direction:ltr;}
+
+  .toast{
+    position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:30px; font-weight:800;
+    z-index:60; opacity:0; transition:transform .3s, opacity .3s; pointer-events:none;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0); opacity:1;}
+
+  /* svg mark styles */
+  .mk{stroke:#1f2937; stroke-width:.09; fill:none; stroke-linecap:round; stroke-linejoin:round;}
+  .mk-soft{stroke:#1f2937; stroke-width:.07; fill:none; stroke-dasharray:.35 .3; stroke-linecap:round;}
+  .mk-lbl{font-family:'Rubik'; font-weight:900; font-size:.85px; fill:#1f2937;
+    paint-order:stroke; stroke:#fff; stroke-width:.3px; stroke-linejoin:round; text-anchor:middle; dominant-baseline:central;}
+  .mk-len{font-family:'Rubik'; font-weight:900; font-size:.7px; fill:#1f2937;
+    paint-order:stroke; stroke:#fff; stroke-width:.34px; stroke-linejoin:round; text-anchor:middle; dominant-baseline:central;}
+  .sidenum-c{fill:#fff; stroke:#1f2937; stroke-width:.08;}
+  .sidenum-t{font-family:'Rubik'; font-weight:900; font-size:.62px; fill:#1f2937; text-anchor:middle; dominant-baseline:central;}
+
+  @media (max-width:430px){
+    .logo{font-size:1.25rem;} .stat{padding:5px 9px; font-size:.92rem;}
+    .card{padding:16px;}
+    .dpad{grid-template-columns:repeat(3,46px); grid-template-rows:repeat(3,46px);}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><span class="pick">🪏</span> חופרים צורות</div>
+  <div class="spacer"></div>
+  <div class="stat"><span class="lbl">שלב</span><span id="lvlStat">1/10</span></div>
+  <div class="stat">⭐ <span id="starStat">0</span></div>
+  <div class="stat">💎 <span id="coinStat">0</span></div>
+  <button class="iconbtn" id="soundBtn" title="צליל">🔊</button>
+</div>
+
+<div class="stage">
+  <div class="mission">
+    <div class="lvlchip" id="lvlChip">שלב 1</div>
+    <div class="mtxt">
+      <div class="mname" id="missionName">ריבוע</div>
+      <div class="mhint" id="missionHint">נווטי את החפרן וחפרי את כל הצורה</div>
+    </div>
+  </div>
+
+  <div class="scene-wrap">
+    <div class="scene" id="scene">
+      <div class="sky"></div>
+      <svg class="blueprint" id="blueprint" viewBox="0 0 14 10" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="grid" id="grid"></div>
+      <svg class="reveal-svg" id="revealSvg" viewBox="0 0 14 10" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="mole" id="mole">🐹</div>
+    </div>
+  </div>
+
+  <div class="progress">
+    <span>💎</span>
+    <div class="bar"><i id="barFill"></i></div>
+    <span class="cnt" id="digCnt">0/0</span>
+  </div>
+
+  <div class="dpad-wrap">
+    <div class="dpad">
+      <button class="dbtn d-up"    id="dUp">▲</button>
+      <button class="dbtn d-left"  id="dLeft">◀</button>
+      <button class="dbtn d-mid">🪏</button>
+      <button class="dbtn d-right" id="dRight">▶</button>
+      <button class="dbtn d-down"  id="dDown">▼</button>
+    </div>
+    <div class="keyhint">זיזי את החפרן עם <b>החיצים</b> במקלדת או עם הכפתורים. אפשר להחזיק כפתור לחיפה רצופה.</div>
+  </div>
+</div>
+
+<!-- intro -->
+<div class="overlay show" id="introOv">
+  <div class="card intro">
+    <h1>🪏 חופרים צורות 💎</h1>
+    <p>הרפתקה תת־קרקעית! נווטים חפרן קטן באדמה וחושפים צורות הנדסיות — ולומדים את הסודות שלהן.</p>
+    <div class="how">
+      <div><span class="e">🎮</span> זזים עם <b>חיצים</b> (או הכפתורים) וחופרים תוך כדי תנועה</div>
+      <div><span class="e">📐</span> הקו המקווקו מראה <b>איפה הצורה</b> — חופרים בתוכו</div>
+      <div><span class="e">🧱</span> מסביב יש <b>סלע קשה</b> שאי אפשר לעבור — זה הקצה של הצורה</div>
+      <div><span class="e">⭐</span> חושפים את כל הצורה ועונים על שאלה כדי לזכות בכוכב</div>
+    </div>
+    <button class="bigbtn show" id="startBtn">מתחילים לחפור! ⛏️</button>
+  </div>
+</div>
+
+<!-- level complete / question -->
+<div class="overlay" id="lvlOv">
+  <div class="card" id="lvlCard">
+    <div style="font-size:1.6rem;font-weight:900" id="revealTitle">חשפת צורה! 🎉</div>
+    <svg class="reveal-box" id="cardSvg" viewBox="0 0 14 10" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="shape-name" id="cardName">ריבוע</div>
+    <div class="fact" id="cardFact"></div>
+    <div class="qtext" id="qText"></div>
+    <div class="opts" id="qOpts"></div>
+    <div class="explain" id="qExplain"></div>
+    <button class="bigbtn" id="nextBtn">השלב הבא ➡️</button>
+  </div>
+</div>
+
+<!-- end -->
+<div class="overlay" id="endOv">
+  <div class="card">
+    <h1>🏆 כל הכבוד!</h1>
+    <p style="font-weight:700">חפרת את כל 10 הצורות וגילית את הסודות ההנדסיים שלהן!</p>
+    <div class="stars-row" id="endStars">⭐</div>
+    <p style="font-weight:800;font-size:1.1rem" id="endLine"></p>
+    <button class="bigbtn show" id="againBtn">לשחק שוב 🔁</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================ AUDIO ============================ */
+const Sound = (()=>{
+  let ctx=null, on=true;
+  function ac(){ if(!ctx) ctx=new (window.AudioContext||window.webkitAudioContext)(); return ctx; }
+  function tone(f,t,type='sine',v=.2,slide=0){
+    if(!on) return;
+    try{
+      const c=ac(), o=c.createOscillator(), g=c.createGain();
+      o.type=type; o.frequency.setValueAtTime(f,c.currentTime);
+      if(slide) o.frequency.exponentialRampToValueAtTime(Math.max(40,f+slide),c.currentTime+t);
+      g.gain.setValueAtTime(v,c.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+t);
+      o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+t);
+    }catch(e){}
+  }
+  return {
+    dig(){ tone(180+Math.random()*60,.09,'triangle',.18,60); },
+    gem(){ tone(880,.08,'sine',.12); tone(1320,.12,'sine',.08); },
+    bonk(){ tone(120,.12,'square',.12,-40); },
+    good(){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.14,'sine',.18),i*80)); },
+    bad(){ tone(300,.18,'sawtooth',.12,-120); },
+    win(){ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,.18,'triangle',.16),i*110)); },
+    toggle(){ on=!on; return on; },
+    resume(){ try{ac().resume();}catch(e){} }
+  };
+})();
+
+/* ============================ LEVELS (grade 3) ============================ */
+// shapes in grid units: x∈[0..14], y∈[0..10]  (y grows downward)
+const LEVELS = [
+  /* 1 — ריבוע: היקף */
+  { name:'ריבוע', gem:'#a855f7',
+    hint:'חפרי ריבוע — ושימי לב לאורך הצלעות',
+    shape:{type:'poly', v:[[4,2],[10,2],[10,8],[4,8]]},
+    marks:[{t:'right',v:0},{t:'right',v:1},{t:'right',v:2},{t:'right',v:3},
+           {t:'edgelen',e:0,label:'6'},{t:'edgelen',e:1,label:'6'},
+           {t:'edgelen',e:2,label:'6'},{t:'edgelen',e:3,label:'6'}],
+    fact:['ריבוע','לריבוע 4 צלעות שוות ו-4 זויות ישרות. <b>היקף</b> = אורך כל הצלעות ביחד. בריבוע אפשר פשוט להכפיל את הצלע ב-4.'],
+    q:{ q:'כל צלע בריבוע היא 6 ס״מ. מה ההיקף שלו?',
+        options:['12 ס״מ','18 ס״מ','24 ס״מ','36 ס״מ'], correct:2,
+        ok:'מצוין! 6+6+6+6 = 24, או 6×4 = 24 ס״מ.',
+        no:'היקף = כל הצלעות יחד: 6+6+6+6 = 24 ס״מ (או 6×4).' } },
+
+  /* 2 — מלבן: היקף עם שני אורכים */
+  { name:'מלבן', gem:'#ec4899',
+    hint:'חפרי מלבן — לאורך ולרוחב יש מספרים שונים',
+    shape:{type:'poly', v:[[3,3],[11,3],[11,7],[3,7]]},
+    marks:[{t:'right',v:0},{t:'right',v:1},{t:'right',v:2},{t:'right',v:3},
+           {t:'edgelen',e:0,label:'8'},{t:'edgelen',e:2,label:'8'},
+           {t:'edgelen',e:1,label:'4'},{t:'edgelen',e:3,label:'4'}],
+    fact:['מלבן','במלבן הצלעות הנגדיות שוות ומקבילות, וכל הזויות ישרות. כדי למצוא היקף מחברים את כל ארבע הצלעות: אורך + רוחב + אורך + רוחב.'],
+    q:{ q:'במלבן הזה האורך 8 ס״מ והרוחב 4 ס״מ. מה ההיקף?',
+        options:['12 ס״מ','16 ס״מ','24 ס״מ','32 ס״מ'], correct:2,
+        ok:'בול! 8+4+8+4 = 24 ס״מ.',
+        no:'מחברים את כל הצלעות: 8+4+8+4 = 24 ס״מ.' } },
+
+  /* 3 — משולש ישר־זוית: סכום הזויות */
+  { name:'משולש ישר־זוית', gem:'#0ea5e9',
+    hint:'חפרי משולש שיש לו פינה ישרה',
+    shape:{type:'poly', v:[[3,8],[3,2],[11,8]]},
+    marks:[{t:'right',v:0},{t:'lbl',v:0,label:'90°'}],
+    fact:['משולש ישר־זוית','למשולש הזה יש זוית אחת ישרה (90°). סוד חשוב לכל משולש בעולם: <b>סכום שלוש הזויות תמיד 180°</b>. אז אם זוית אחת היא 90°, שתי האחרות יחד שוות עוד 90°.'],
+    q:{ q:'מה סכום שלוש הזויות בכל משולש?',
+        options:['90°','180°','270°','360°'], correct:1,
+        ok:'נכון מאוד! בכל משולש סכום הזויות הוא תמיד 180°.',
+        no:'בכל משולש סכום שלוש הזויות הוא תמיד 180°.' } },
+
+  /* 4 — משולש קהה־זוית: סיווג זוית */
+  { name:'משולש קהה־זוית', gem:'#f97316',
+    hint:'חפרי משולש "שמן" עם פינה רחבה',
+    shape:{type:'poly', v:[[3,8.2],[12.5,8.2],[2,2.5]]},
+    marks:[{t:'arc',v:0,label:'קהה'}],
+    fact:['משולש קהה־זוית','הזוית המסומנת גדולה מ-90° — קוראים לה זוית <b>קהה</b>. זוית קטנה מ-90° נקראת חדה, וזוית של בדיוק 90° נקראת ישרה.'],
+    q:{ q:'הזוית המסומנת גדולה מ-90°. איך קוראים לזוית כזו?',
+        options:['זוית חדה','זוית ישרה','זוית קהה','זוית שטוחה'], correct:2,
+        ok:'מדויק! זוית גדולה מ-90° נקראת זוית קהה.',
+        no:'זוית גדולה מ-90° נקראת זוית קהה (חדה=קטנה, ישרה=90°).' } },
+
+  /* 5 — מקבילית: זוגות צלעות מקבילות */
+  { name:'מקבילית', gem:'#14b8a6',
+    hint:'חפרי מקבילית — חפשי צלעות מקבילות',
+    shape:{type:'poly', v:[[3,7.5],[9,7.5],[11,2.5],[5,2.5]]},
+    marks:[{t:'para',e:0,n:1},{t:'para',e:2,n:1},{t:'para',e:1,n:2},{t:'para',e:3,n:2},
+           {t:'tick',e:0,n:1},{t:'tick',e:2,n:1},{t:'tick',e:1,n:2},{t:'tick',e:3,n:2}],
+    fact:['מקבילית','במקבילית יש <b>שני זוגות</b> של צלעות מקבילות (החצים מראים אילו). כל זוג צלעות נגדיות גם שוות באורכן.'],
+    q:{ q:'כמה זוגות של צלעות מקבילות יש למקבילית?',
+        options:['אף זוג','זוג אחד','2 זוגות','3 זוגות'], correct:2,
+        ok:'יפה! למקבילית 2 זוגות צלעות מקבילות.',
+        no:'למקבילית יש 2 זוגות של צלעות מקבילות.' } },
+
+  /* 6 — טרפז: זוג מקביל אחד */
+  { name:'טרפז', gem:'#eab308',
+    hint:'חפרי טרפז — רק זוג אחד של צלעות מקבילות',
+    shape:{type:'poly', v:[[3,7.5],[11,7.5],[9,3],[5,3]]},
+    marks:[{t:'para',e:0,n:1},{t:'para',e:2,n:1}],
+    fact:['טרפז','בטרפז יש בדיוק <b>זוג אחד</b> של צלעות מקבילות (כאן הצלע העליונה והתחתונה). שתי הצלעות האחרות לא מקבילות — וזה ההבדל מהמקבילית.'],
+    q:{ q:'כמה זוגות צלעות מקבילות יש לטרפז?',
+        options:['אף זוג','זוג אחד','2 זוגות','4 זוגות'], correct:1,
+        ok:'נכון! לטרפז יש בדיוק זוג אחד של צלעות מקבילות.',
+        no:'לטרפז יש זוג אחד בלבד של צלעות מקבילות (למקבילית יש 2).' } },
+
+  /* 7 — מעוין: אלכסונים מאונכים */
+  { name:'מעוין', gem:'#8b5cf6',
+    hint:'חפרי מעוין — והסתכלי איך נפגשים האלכסונים',
+    shape:{type:'poly', v:[[7,1.5],[11,5],[7,8.5],[3,5]]},
+    marks:[{t:'tick',e:0,n:1},{t:'tick',e:1,n:1},{t:'tick',e:2,n:1},{t:'tick',e:3,n:1},
+           {t:'diag',a:0,b:2},{t:'diag',a:1,b:3},{t:'rightpt',x:7,y:5}],
+    fact:['מעוין','למעוין 4 צלעות שוות (כמו ריבוע משופע). הדבר המיוחד: שני האלכסונים שלו <b>מאונכים</b> זה לזה — הם נפגשים בדיוק בזוית ישרה (90°). קווים שנפגשים בזוית ישרה נקראים אנכים.'],
+    q:{ q:'מה נכון על שני האלכסונים של המעוין?',
+        options:['הם מקבילים','הם מאונכים (זוית ישרה)','הם באורך שונה תמיד','אין לו אלכסונים'], correct:1,
+        ok:'מעולה! האלכסונים של המעוין מאונכים — נפגשים בזוית של 90°.',
+        no:'האלכסונים של המעוין מאונכים זה לזה — נפגשים בזוית ישרה.' } },
+
+  /* 8 — צורת מדרגה (L): היקף של מצולע לא רגיל */
+  { name:'צורת מדרגה', gem:'#ef4444',
+    hint:'חפרי את הצורה המדורגת — וחברי את כל הצלעות',
+    shape:{type:'poly', v:[[3,3],[8,3],[8,5],[11,5],[11,8],[3,8]]},
+    start:[5,6.5],
+    marks:[{t:'edgelen',e:0,label:'5'},{t:'edgelen',e:1,label:'2'},{t:'edgelen',e:2,label:'3'},
+           {t:'edgelen',e:3,label:'3'},{t:'edgelen',e:4,label:'8'},{t:'edgelen',e:5,label:'5'}],
+    fact:['מצולע מדורג','גם צורה "לא רגילה" היא מצולע — פשוט יש לה יותר צלעות (כאן 6). כדי למצוא היקף לא צריך נוסחה: <b>פשוט מחברים את כל הצלעות לפי הסדר</b>.'],
+    q:{ q:'חברי את כל הצלעות (5+2+3+3+8+5). מה היקף הצורה?',
+        options:['22 ס״מ','24 ס״מ','26 ס״מ','30 ס״מ'], correct:2,
+        ok:'איזה כוח! 5+2+3+3+8+5 = 26 ס״מ.',
+        no:'מחברים את כל הצלעות: 5+2+3+3+8+5 = 26 ס״מ.' } },
+
+  /* 9 — מחומש */
+  { name:'מחומש', gem:'#3b82f6',
+    hint:'חפרי מצולע עם 5 צלעות',
+    shape:{type:'poly', v:[[7,1.4],[10.42,3.89],[9.12,7.91],[4.88,7.91],[3.58,3.89]]},
+    marks:[{t:'sidenum'}],
+    fact:['מחומש','מחומש הוא מצולע עם <b>5 צלעות</b> ו-5 קודקודים (פינות). ספרי את המספרים על הצלעות! עובדה: סכום כל הזויות במחומש הוא 540°.'],
+    q:{ q:'כמה צלעות יש למחומש?',
+        options:['4 צלעות','5 צלעות','6 צלעות','7 צלעות'], correct:1,
+        ok:'בדיוק! "מחומש" מהמילה חמש — 5 צלעות ו-5 פינות.',
+        no:'למחומש יש 5 צלעות (מהמילה "חמש").' } },
+
+  /* 10 — משושה */
+  { name:'משושה', gem:'#f43f5e',
+    hint:'חפרי מצולע עם 6 צלעות — כמו תא של דבורים',
+    shape:{type:'poly', v:[[7,1.4],[10.12,3.2],[10.12,6.8],[7,8.6],[3.88,6.8],[3.88,3.2]]},
+    marks:[{t:'sidenum'}],
+    fact:['משושה','משושה הוא מצולע עם <b>6 צלעות</b> ו-6 פינות. עובדה מגניבה: דבורים בונות את חלת הדבש מתאים בצורת משושה, כי כך אין בכלל מקום מבוזבז! 🐝'],
+    q:{ q:'כמה צלעות יש למשושה?',
+        options:['5 צלעות','6 צלעות','7 צלעות','8 צלעות'], correct:1,
+        ok:'יששש! "משושה" מהמילה שש — 6 צלעות, בדיוק כמו תא של דבורים.',
+        no:'למשושה יש 6 צלעות (מהמילה "שש").' } },
+];
+
+/* ============================ GEOMETRY ============================ */
+const COLS=14, ROWS=10;
+function inCircle(x,y,c){ return (x-c.cx)**2+(y-c.cy)**2 <= c.r*c.r; }
+function inPoly(x,y,v){
+  let inside=false;
+  for(let i=0,j=v.length-1;i<v.length;j=i++){
+    const xi=v[i][0],yi=v[i][1],xj=v[j][0],yj=v[j][1];
+    const hit=((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi);
+    if(hit) inside=!inside;
+  }
+  return inside;
+}
+function cellsFor(shape){
+  const out=[];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const x=c+0.5, y=r+0.5;
+    const inside = shape.type==='circle' ? inCircle(x,y,shape) : inPoly(x,y,shape.v);
+    out.push(inside);
+  }
+  return out;
+}
+
+/* ---- small vector helpers (grid units) ---- */
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1]];
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1]];
+const mul=(a,s)=>[a[0]*s,a[1]*s];
+const len=a=>Math.hypot(a[0],a[1]);
+const norm=a=>{const l=len(a)||1;return [a[0]/l,a[1]/l];};
+const perp=a=>[-a[1],a[0]];
+const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1];
+function centroid(v){let x=0,y=0;v.forEach(p=>{x+=p[0];y+=p[1];});return [x/v.length,y/v.length];}
+function normAngle(a){while(a>Math.PI)a-=2*Math.PI;while(a<=-Math.PI)a+=2*Math.PI;return a;}
+
+/* ---- build SVG marks for a shape ---- */
+function buildMarks(L){
+  const s=L.shape; let g='';
+  if(s.type==='circle'){
+    g+=`<circle cx="${s.cx}" cy="${s.cy}" r="${s.r}" fill="${L.gem}" stroke="${shade(L.gem,-30)}" stroke-width="0.14"/>`;
+  }else{
+    const pts=s.v.map(p=>p.join(',')).join(' ');
+    g+=`<polygon points="${pts}" fill="${L.gem}" stroke="${shade(L.gem,-30)}" stroke-width="0.14" stroke-linejoin="round"/>`;
+  }
+  const v = s.v || [];
+  const ct = s.type==='circle' ? [s.cx,s.cy] : centroid(v);
+
+  (L.marks||[]).forEach(m=>{
+    if(m.t==='radius'){
+      g+=`<circle cx="${s.cx}" cy="${s.cy}" r="0.16" fill="#fff" stroke="#1f2937" stroke-width="0.06"/>`;
+      g+=`<line class="mk-soft" x1="${s.cx}" y1="${s.cy}" x2="${s.cx+s.r}" y2="${s.cy}"/>`;
+      g+=`<text class="mk-lbl" x="${s.cx+s.r/2}" y="${s.cy-0.5}">רדיוס</text>`;
+    }
+    else if(m.t==='right'){ g+=rightAngle(v,m.v); }
+    else if(m.t==='rightpt'){ g+=rightPoint(m.x,m.y); }
+    else if(m.t==='tick'){ g+=ticks(v,m.e,m.n||1); }
+    else if(m.t==='para'){ g+=chevrons(v,m.e,m.n||1); }
+    else if(m.t==='arc'){ g+=arc(v,m.v,m.label); }
+    else if(m.t==='lbl'){ g+=angleLabel(v,m.v,m.label); }
+    else if(m.t==='edgelen'){ g+=edgeLen(v,m.e,m.label); }
+    else if(m.t==='diag'){
+      g+=`<line class="mk-soft" x1="${v[m.a][0]}" y1="${v[m.a][1]}" x2="${v[m.b][0]}" y2="${v[m.b][1]}"/>`;
+    }
+    else if(m.t==='sidenum'){
+      for(let i=0;i<v.length;i++){
+        const a=v[i], b=v[(i+1)%v.length], M=mid(a,b);
+        const out=norm(sub(M,ct)); const p=add(M,mul(out,0.62));
+        g+=`<circle class="sidenum-c" cx="${p[0]}" cy="${p[1]}" r="0.46"/>`;
+        g+=`<text class="sidenum-t" x="${p[0]}" y="${p[1]}">${i+1}</text>`;
+      }
+    }
+  });
+  return g;
+}
+function rightAngle(v,i){
+  const n=v.length, cur=v[i], a=v[(i-1+n)%n], b=v[(i+1)%n];
+  const d1=norm(sub(a,cur)), d2=norm(sub(b,cur)), s=0.5;
+  const p1=add(cur,mul(d1,s)), p3=add(add(cur,mul(d1,s)),mul(d2,s)), p2=add(cur,mul(d2,s));
+  return `<polyline class="mk" points="${p1[0]},${p1[1]} ${p3[0]},${p3[1]} ${p2[0]},${p2[1]}"/>`;
+}
+function rightPoint(x,y){
+  const s=0.5;
+  return `<polyline class="mk" points="${x},${y-s} ${x+s},${y-s} ${x+s},${y}"/>`;
+}
+function ticks(v,e,n){
+  const a=v[e], b=v[(e+1)%v.length], d=norm(sub(b,a)), p=perp(d), M=mid(a,b);
+  let g=''; const gap=0.3, half=0.3;
+  for(let k=0;k<n;k++){
+    const off=(k-(n-1)/2)*gap, c=add(M,mul(d,off));
+    const s1=add(c,mul(p,-half)), s2=add(c,mul(p,half));
+    g+=`<line class="mk" x1="${s1[0]}" y1="${s1[1]}" x2="${s2[0]}" y2="${s2[1]}"/>`;
+  }
+  return g;
+}
+function chevrons(v,e,n){
+  const a=v[e], b=v[(e+1)%v.length], d=norm(sub(b,a)), p=perp(d), M=mid(a,b);
+  let g=''; const gap=0.42;
+  for(let k=0;k<n;k++){
+    const base=add(M,mul(d,(k-(n-1)/2)*gap));
+    const tip=add(base,mul(d,0.26));
+    const a1=add(add(base,mul(d,-0.05)),mul(p,0.3));
+    const a2=add(add(base,mul(d,-0.05)),mul(p,-0.3));
+    g+=`<polyline class="mk" points="${a1[0]},${a1[1]} ${tip[0]},${tip[1]} ${a2[0]},${a2[1]}"/>`;
+  }
+  return g;
+}
+function arc(v,i,label){
+  const n=v.length, cur=v[i], a=v[(i-1+n)%n], b=v[(i+1)%n];
+  const d1=norm(sub(a,cur)), d2=norm(sub(b,cur));
+  let a1=Math.atan2(d1[1],d1[0]), a2=Math.atan2(d2[1],d2[0]);
+  let delta=normAngle(a2-a1);
+  const r=0.85; let pts=[];
+  const steps=14;
+  for(let k=0;k<=steps;k++){
+    const ang=a1+delta*(k/steps);
+    pts.push((cur[0]+r*Math.cos(ang)).toFixed(3)+','+(cur[1]+r*Math.sin(ang)).toFixed(3));
+  }
+  let g=`<polyline class="mk" points="${pts.join(' ')}"/>`;
+  if(label){
+    const mang=a1+delta/2, lr=r+0.75;
+    const lx=cur[0]+lr*Math.cos(mang), ly=cur[1]+lr*Math.sin(mang);
+    g+=`<text class="mk-lbl" x="${lx.toFixed(3)}" y="${ly.toFixed(3)}">${label}</text>`;
+  }
+  return g;
+}
+function angleLabel(v,i,label){
+  const n=v.length, cur=v[i], a=v[(i-1+n)%n], b=v[(i+1)%n];
+  const d1=norm(sub(a,cur)), d2=norm(sub(b,cur));
+  let a1=Math.atan2(d1[1],d1[0]); let delta=normAngle(Math.atan2(d2[1],d2[0])-a1);
+  const mang=a1+delta/2, lr=1.55;
+  const lx=cur[0]+lr*Math.cos(mang), ly=cur[1]+lr*Math.sin(mang);
+  return `<text class="mk-lbl" x="${lx.toFixed(3)}" y="${ly.toFixed(3)}">${label}</text>`;
+}
+/* length label placed just outside an edge midpoint */
+function edgeLen(v,e,label){
+  const a=v[e], b=v[(e+1)%v.length], M=mid(a,b), ct=centroid(v);
+  let nrm=perp(norm(sub(b,a)));
+  if(dot(nrm,sub(ct,M))>0) nrm=mul(nrm,-1); // point away from centroid
+  const p=add(M,mul(nrm,0.62));
+  return `<text class="mk-len" x="${p[0].toFixed(3)}" y="${p[1].toFixed(3)}">${label}</text>`;
+}
+/* lighten/darken a hex color */
+function shade(hex,amt){
+  let c=hex.replace('#',''); if(c.length===3)c=c.split('').map(x=>x+x).join('');
+  let r=parseInt(c.substr(0,2),16), g=parseInt(c.substr(2,2),16), b=parseInt(c.substr(4,2),16);
+  r=Math.max(0,Math.min(255,r+amt)); g=Math.max(0,Math.min(255,g+amt)); b=Math.max(0,Math.min(255,b+amt));
+  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+/* ============================ GAME STATE ============================ */
+let state={ lvl:0, coins:0, stars:0, totalInside:0, dug:0, cells:[], done:false, digger:{c:0,r:0,idx:0} };
+
+const $=id=>document.getElementById(id);
+const grid=$('grid'), scene=$('scene'), mole=$('mole');
+
+function setStats(){
+  $('lvlStat').textContent=(state.lvl+1)+'/10';
+  $('starStat').textContent=state.stars;
+  $('coinStat').textContent=state.coins;
+}
+
+function pickSpawn(L){
+  const cells=state.cells;
+  const target = L.start ? L.start : (L.shape.type==='circle'?[L.shape.cx,L.shape.cy]:centroid(L.shape.v));
+  let best=-1, bd=1e9;
+  for(let idx=0;idx<COLS*ROWS;idx++){
+    if(!cells[idx]) continue;
+    const c=idx%COLS, r=Math.floor(idx/COLS);
+    const d=(c+0.5-target[0])**2+(r+0.5-target[1])**2;
+    if(d<bd){ bd=d; best=idx; }
+  }
+  return best;
+}
+
+function loadLevel(i){
+  state.lvl=i; state.done=false; state.dug=0;
+  const L=LEVELS[i];
+  $('lvlChip').textContent='שלב '+(i+1);
+  $('missionName').textContent=L.name;
+  $('missionHint').textContent=L.hint;
+  setStats();
+
+  // membership
+  state.cells=cellsFor(L.shape);
+  state.totalInside=state.cells.filter(Boolean).length;
+
+  // blueprint (faint target outline)
+  const bp=$('blueprint');
+  if(L.shape.type==='circle'){
+    bp.innerHTML=`<circle cx="${L.shape.cx}" cy="${L.shape.cy}" r="${L.shape.r}" fill="${L.gem}" fill-opacity="0.10" stroke="${L.gem}" stroke-opacity="0.6" stroke-width="0.2" stroke-dasharray="0.5 0.4"/>`;
+  }else{
+    const pts=L.shape.v.map(p=>p.join(',')).join(' ');
+    bp.innerHTML=`<polygon points="${pts}" fill="${L.gem}" fill-opacity="0.10" stroke="${L.gem}" stroke-opacity="0.6" stroke-width="0.2" stroke-dasharray="0.5 0.4" stroke-linejoin="round"/>`;
+  }
+
+  // tiles — uniform earth; inside vs outside is logic-only (no pre-reveal)
+  grid.innerHTML='';
+  for(let idx=0; idx<COLS*ROWS; idx++){
+    const t=document.createElement('div');
+    t.className='tile';
+    t.dataset.idx=idx;
+    const gchar = state.cells[idx] ? gemChar() : '';
+    t.innerHTML=`<div class="gembed" style="color:${L.gem}">${gchar}</div><div class="dirt"></div>`;
+    grid.appendChild(t);
+  }
+
+  // reveal svg cleared
+  $('revealSvg').style.opacity=0; $('revealSvg').innerHTML='';
+
+  // spawn the digger inside, reveal its starting cell
+  const sp=pickSpawn(L);
+  const c=sp%COLS, r=Math.floor(sp/COLS);
+  state.digger={c,r,idx:sp};
+  grid.children[sp].classList.add('dug');
+  state.dug=1;
+  moveMole(sp);
+  mole.style.opacity=1;
+  updateProgress();
+}
+function gemChar(){ const a=['💎','✨','🔶','🔷','⭐']; return a[Math.floor(Math.random()*a.length)]; }
+
+function updateProgress(){
+  const pct = state.totalInside ? Math.round(state.dug/state.totalInside*100) : 0;
+  $('barFill').style.width=pct+'%';
+  $('digCnt').textContent=state.dug+'/'+state.totalInside;
+}
+
+function moveMole(idx){
+  const c=idx%COLS, r=Math.floor(idx/COLS);
+  mole.style.left=((c+0.5)/COLS*100)+'%';
+  mole.style.top=((r+0.5)/ROWS*100)+'%';
+}
+
+/* ---- digger movement ---- */
+function overlayOpen(){
+  return $('lvlOv').classList.contains('show')
+      || $('introOv').classList.contains('show')
+      || $('endOv').classList.contains('show');
+}
+function move(dc,dr){
+  if(state.done || overlayOpen()) return;
+  const c=state.digger.c+dc, r=state.digger.r+dr;
+  if(c<0||c>=COLS||r<0||r>=ROWS) return;
+  const idx=r*COLS+c;
+  if(state.cells[idx]){            // soft earth → move & dig
+    state.digger={c,r,idx};
+    moveMole(idx);
+    const tile=grid.children[idx];
+    if(tile && !tile.classList.contains('dug')){
+      tile.classList.add('dug');
+      state.dug++;
+      Sound.dig(); Sound.gem();
+      state.coins++; setStats();
+      updateProgress();
+      if(state.dug>=state.totalInside) finishLevel();
+    }
+  }else{                          // hard rock wall → bonk, stay put
+    const tile=grid.children[idx];
+    if(tile && !tile.classList.contains('bonk')){
+      tile.classList.add('bonk'); Sound.bonk();
+      setTimeout(()=>tile.classList.remove('bonk'),240);
+    }
+  }
+}
+
+/* keyboard */
+const KEYMAP={
+  ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0],
+  w:[0,-1], s:[0,1], a:[-1,0], d:[1,0], W:[0,-1], S:[0,1], A:[-1,0], D:[1,0]
+};
+let lastMv=0;
+window.addEventListener('keydown',e=>{
+  const m=KEYMAP[e.key];
+  if(!m) return;
+  e.preventDefault();
+  const now=performance.now();
+  if(now-lastMv<70) return;       // throttle key-repeat
+  lastMv=now;
+  Sound.resume();
+  move(m[0],m[1]);
+});
+
+/* D-pad (tap + press-and-hold) */
+function bindHold(btn,dc,dr){
+  if(!btn) return;
+  let iv=null;
+  const start=e=>{ e.preventDefault(); Sound.resume(); move(dc,dr);
+    iv=setInterval(()=>move(dc,dr),120); };
+  const stop=()=>{ if(iv){clearInterval(iv); iv=null;} };
+  btn.addEventListener('pointerdown',start);
+  btn.addEventListener('pointerup',stop);
+  btn.addEventListener('pointerleave',stop);
+  btn.addEventListener('pointercancel',stop);
+}
+bindHold($('dUp'),0,-1);
+bindHold($('dDown'),0,1);
+bindHold($('dLeft'),-1,0);
+bindHold($('dRight'),1,0);
+
+/* ---- finish level → reveal + question ---- */
+function finishLevel(){
+  if(state.done) return;
+  state.done=true;
+  const L=LEVELS[state.lvl];
+  Sound.good();
+  burst(L.gem);
+
+  const rsvg=$('revealSvg');
+  rsvg.innerHTML=buildMarks(L);
+  rsvg.style.opacity=1;
+
+  setTimeout(()=>openQuestion(L), 900);
+}
+
+function openQuestion(L){
+  $('cardSvg').innerHTML=buildMarks(L);
+  $('cardName').textContent=L.name;
+  $('cardName').style.color=shade(L.gem,-40);
+  $('cardFact').innerHTML='<span class="ft">'+L.fact[0]+'</span>'+L.fact[1];
+  $('qText').textContent=L.q.q;
+  const opts=$('qOpts'); opts.innerHTML='';
+  $('qExplain').className='explain'; $('qExplain').innerHTML='';
+  $('nextBtn').className='bigbtn';
+  L.q.options.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=opt;
+    b.onclick=()=>answer(i,b,L);
+    opts.appendChild(b);
+  });
+  $('lvlOv').classList.add('show');
+}
+
+function answer(i,btn,L){
+  const correct=L.q.correct;
+  [...$('qOpts').children].forEach((b,k)=>{
+    b.disabled=true;
+    if(k===correct) b.classList.add('correct');
+  });
+  const ex=$('qExplain');
+  if(i===correct){
+    Sound.win(); burst(L.gem);
+    state.stars++; state.coins+=5; setStats();
+    ex.innerHTML='✅ '+L.q.ok+'  <b>+⭐ +5💎</b>';
+  }else{
+    Sound.bad();
+    btn.classList.add('wrong');
+    state.coins+=1; setStats();
+    ex.innerHTML='💡 '+L.q.no;
+  }
+  ex.classList.add('show');
+  $('nextBtn').classList.add('show');
+}
+
+$('nextBtn').onclick=()=>{
+  $('lvlOv').classList.remove('show');
+  if(state.lvl+1 < LEVELS.length){
+    loadLevel(state.lvl+1);
+  }else{
+    endGame();
+  }
+};
+
+function endGame(){
+  setStats();
+  const s=state.stars;
+  let row=''; for(let k=0;k<10;k++) row+= k<s?'⭐':'☆';
+  $('endStars').textContent=row;
+  $('endLine').textContent=`אספת ${s} מתוך 10 כוכבים ו-${state.coins} יהלומים!`;
+  $('endOv').classList.add('show');
+  Sound.win();
+  if(window.confetti){ confetti({particleCount:160,spread:100,origin:{y:.6}}); }
+  // report to site star tracker if embedded
+  try{ if(typeof saveAppScore==='function') saveAppScore('shape_digger', s, 10); }catch(e){}
+}
+
+/* ---- confetti / particle burst ---- */
+function burst(color){
+  if(window.confetti){
+    confetti({particleCount:50,spread:70,startVelocity:32,origin:{y:.5},
+      colors:[color,'#ffd24a','#ffffff']});
+  }
+}
+
+/* ---- buttons ---- */
+$('startBtn').onclick=()=>{ Sound.resume(); $('introOv').classList.remove('show'); loadLevel(0); };
+$('againBtn').onclick=()=>{ state={lvl:0,coins:0,stars:0,totalInside:0,dug:0,cells:[],done:false,digger:{c:0,r:0,idx:0}}; $('endOv').classList.remove('show'); loadLevel(0); };
+$('soundBtn').onclick=()=>{ const on=Sound.toggle(); $('soundBtn').textContent=on?'🔊':'🔇'; };
+
+// pre-render level 1 behind intro for a nice peek
+loadLevel(0);
+setStats();
+</script>
+</body>
+</html>
