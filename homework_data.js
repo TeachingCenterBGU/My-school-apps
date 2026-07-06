@@ -63,13 +63,6 @@ const homeworkData = [
         "date": "24/06"
     },
     {
-        "id": "12291",
-        "grade": 3,
-        "subject": "מדעים",
-        "task": "מי שלא הגיע מתבקש להשלים.",
-        "date": "05/06"
-    },
-    {
         "id": "12630",
         "grade": 3,
         "subject": "מדעים",
