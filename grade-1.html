@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-W58S98V8J0');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כיתה א' - כאן לומדות ולומדים</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .section-divider { padding: 0 14px; margin-bottom: 12px; }
+        .section-divider-line { border: 0; border-top: 1px dashed #ddd; margin: 0; }
+        .section-divider-label { font-size: 0.8em; color: #aaa; text-align: center; margin-top: 6px; }
+        .card-actions { display: none !important; }
+
+        /* באנר הכנה לשנה הבאה */
+        .summer-banner {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            border: 2px solid #43a047;
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .summer-banner .icon { font-size: 2em; flex-shrink: 0; }
+        .summer-banner .title { font-weight: bold; color: #2e7d32; font-size: 1.05em; }
+        .summer-banner .desc { color: #555; font-size: 0.9em; margin-top: 2px; }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <header class="main-header" style="padding: 15px; margin-bottom: 25px;">
+        <h1 style="font-size: 1.8em;">כאן לומדות ולומדים בכיף 🎓</h1>
+    </header>
+
+    <main class="grades-container">
+        <section class="grade-col grade-1">
+            <div class="grade-header">
+                <h2 class="grade-title">כיתה א' 🌱</h2>
+                <a href="index.html" class="back-btn">🏠 חזרה לראשי</a>
+            </div>
+
+            <div class="summer-banner">
+                <span class="icon">🎒</span>
+                <div>
+                    <div class="title">מתכוננות לכיתה א'!</div>
+                    <div class="desc">כאן נאסוף בקיץ משחקים ותרגולים שיעזרו להתכונן לשנה הבאה</div>
+                </div>
+            </div>
+
+            <!-- קופסת שיעורי בית — מוסתרת עד שהמשו"ב יופעל מחדש -->
+            <div id="hw-container-1" class="homework-box" style="display:none;">
+                <p style="text-align:center; color:#888;">אין שיעורי בית 🎉</p>
+            </div>
+
+            <!-- ===== עברית: קריאה וכתיבה ===== -->
+            <details class="subject-box" open>
+                <summary class="subject-title">📖 עברית — קריאה וכתיבה</summary>
+                <div class="apps-grid">
+                    <!-- כרטיסיות של משחקי אותיות מהגן יכולות לעבור לכאן,
+                         למשל בועות הקסם וחנות האותיות: -->
+                    <div class="card" data-app-id="magic_bubbles">
+                        <a class="card-main" href="apps/hebrew/magic_bubbles.html">
+                            <span class="icon">🫧</span>
+                            <span class="card-title">בועות הקסם</span>
+                            <span class="card-desc">זיהוי אותיות בשלושה עולמות קסומים</span>
+                        </a>
+                    </div>
+                    <div class="card" data-app-id="letter_shop">
+                        <a class="card-main" href="apps/hebrew/letter_shop.html">
+                            <span class="icon">🏪</span>
+                            <span class="card-title">חנות האותיות</span>
+                            <span class="card-desc">קניות עם אותיות ומילים</span>
+                        </a>
+                    </div>
+                    <!-- כרטיסיות חדשות נוספות כאן -->
+                </div>
+            </details>
+
+            <!-- ===== חשבון ===== -->
+            <details class="subject-box" open>
+                <summary class="subject-title">🔢 חשבון</summary>
+                <div class="apps-grid">
+                    <!-- כרטיסיות של משחקי מספרים וספירה נוספות כאן -->
+                </div>
+            </details>
+
+            <!-- ===== הכנה לכיתה א' ===== -->
+            <details class="subject-box" open>
+                <summary class="subject-title">🎒 הכנה לכיתה א'</summary>
+                <div class="apps-grid">
+                    <!-- אפליקציות הכנה: היכרות עם בית הספר, סדר יום, ארגון ילקוט -->
+                </div>
+            </details>
+
+        </section>
+    </main>
+
+    <footer>
+        <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px auto; max-width: 200px;">
+        נבנה באהבה ללמידה ע"י ענבל צרפתי-ברעד &copy; 2026
+    </footer>
+</div>
+
+<script src="remember-name.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+<script src="homework_data.js"></script>
+<script src="homework_manual.js"></script>
+<script src="app-tracker.js"></script>
+<script src="exam-manager.js"></script>
+<script src="notification-manager.js"></script>
+<script src="firebase-homework.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+</script>
+</body>
+
+</html>

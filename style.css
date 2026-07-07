@@ -551,3 +551,13 @@ footer {
     color: #888;
     padding-bottom: 20px;
 }
+
+/* --- צבעים לכיתות החדשות (תשפ"ז) --- */
+.grade-col.grade-1 h2.grade-title { background: #43a047; box-shadow: 0 4px 10px rgba(67, 160, 71, 0.3); }
+.grade-col.grade-1 .homework-box { border-color: #43a047; background: #e8f5e9; }
+
+.grade-col.grade-4 h2.grade-title { background: #00897b; box-shadow: 0 4px 10px rgba(0, 137, 123, 0.3); }
+.grade-col.grade-4 .homework-box { border-color: #00897b; background: #e0f2f1; }
+
+.grade-col.grade-6 h2.grade-title { background: #8e24aa; box-shadow: 0 4px 10px rgba(142, 36, 170, 0.3); }
+.grade-col.grade-6 .homework-box { border-color: #8e24aa; background: #f3e5f5; }

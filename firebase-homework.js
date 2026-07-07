@@ -39,10 +39,14 @@ let isGuest = false;
 // --- זיהוי עמוד נוכחי ---
 function detectPageGrade() {
     const path = window.location.pathname;
+    if (path.includes('grade-1')) return 1;
     if (path.includes('grade-3')) return 3;
+    if (path.includes('grade-4')) return 4;
     if (path.includes('grade-5')) return 5;
+    if (path.includes('grade-6')) return 6;
     if (path.includes('kindergarten')) return 0;
     return null;
+}
 }
 
 // --- מצב אורח ---
