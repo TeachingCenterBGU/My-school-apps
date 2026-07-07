@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>⚔️ לוחמת המילים</title>
+<link href="https://fonts.googleapis.com/css2?family=Secular+One&family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Heebo', sans-serif;
+  background: #0a0a2e;
+  color: #fff;
+  overflow: hidden;
+  height: 100dvh;
+  width: 100vw;
+}
+:root {
+  --gold: #ffd700;
+  --panel: rgba(255,255,255,0.08);
+  --hero-color: #4fc3f7;
+  --monster-color: #ff6b6b;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  height: 100dvh;
+  width: 100%;
+  overflow-y: auto;
+}
+.screen.active { display: flex; }
+
+/* TITLE */
+#titleScreen {
+  background: linear-gradient(180deg, #1a1a4e 0%, #0d1b2a 100%);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+  padding: 20px;
+}
+.title-emoji { font-size: 4em; }
+.title-name {
+  font-family: 'Secular One', sans-serif;
+  font-size: 2.2em;
+  color: var(--gold);
+  text-shadow: 0 2px 20px rgba(255,215,0,0.3);
+}
+.title-sub { color: #aaa; font-size: 1em; }
+.start-btn {
+  margin-top: 20px;
+  padding: 14px 40px;
+  font-size: 1.2em;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.2s;
+}
+.start-btn:hover { transform: scale(1.05); }
+.start-btn:active { transform: scale(0.97); }
+
+/* MAP */
+#mapScreen {
+  background: linear-gradient(180deg, #1a1a4e, #16213e);
+  padding: 20px;
+}
+.map-title {
+  font-family: 'Secular One', sans-serif;
+  font-size: 1.6em;
+  text-align: center;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+.map-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.map-stat {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 1em;
+}
+/* 2x2 grid for regular levels */
+.levels-grid {
+  max-width: 500px;
+  margin: 0 auto 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.level-card {
+  background: var(--panel);
+  border: 2px solid #333;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.level-card:hover { border-color: var(--gold); transform: scale(1.03); }
+.level-card.locked { opacity: 0.45; pointer-events: none; }
+.level-card.cleared { border-color: #44cc44; }
+.level-card.cleared::after {
+  content: '✅';
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  font-size: 1em;
+}
+.level-emoji { font-size: 2.2em; }
+.level-info { flex: 1; }
+.level-name { font-weight: 800; font-size: 1.05em; margin-bottom: 2px; }
+.level-desc { color: #aaa; font-size: 0.8em; }
+.level-badge {
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 0.75em;
+  color: #ccc;
+}
+
+/* Boss card */
+.boss-wrapper {
+  max-width: 500px;
+  margin: 0 auto;
+}
+.level-card.boss {
+  border-color: #ff2e63;
+  flex-direction: row;
+  text-align: right;
+  gap: 14px;
+}
+.level-card.boss .level-emoji { font-size: 2.5em; }
+.level-card.boss .level-name { color: #ff6b6b; font-size: 1.15em; }
+
+/* BATTLE */
+#battleScreen {
+  background: linear-gradient(180deg, #1a0a2e 0%, #16213e 50%, #0a3d0a 100%);
+  position: relative;
+}
+.battle-top {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.battle-level-name {
+  font-family: 'Secular One', sans-serif;
+  font-size: 1em;
+  color: var(--gold);
+}
+.battle-progress { font-size: 0.85em; color: #aaa; direction: ltr; unicode-bidi: embed; }
+
+.arena {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 20px;
+  min-height: 180px;
+}
+.fighter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+.fighter-sprite {
+  font-size: 3.5em;
+  transition: transform 0.3s;
+}
+.fighter-name { font-weight: 700; font-size: 0.85em; }
+.hp-container {
+  width: 100px;
+  height: 10px;
+  background: #333;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.hp-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #44cc44, #66ff66);
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+.hp-bar.low { background: linear-gradient(90deg, #ff4444, #ff6666); }
+.hp-text { font-size: 0.7em; color: #aaa; direction: ltr; unicode-bidi: embed; }
+
+.vs-flash {
+  font-family: 'Secular One', sans-serif;
+  font-size: 2em;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.vs-flash.show { opacity: 1; animation: vsPulse 0.6s ease; }
+@keyframes vsPulse {
+  0% { transform: scale(0.5); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.attack-right { animation: atkRight 0.4s ease; }
+@keyframes atkRight {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(-60px) scale(1.2); }
+  100% { transform: translateX(0); }
+}
+.attack-left { animation: atkLeft 0.4s ease; }
+@keyframes atkLeft {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(60px) scale(1.2); }
+  100% { transform: translateX(0); }
+}
+.hurt { animation: hurtShake 0.4s ease; }
+@keyframes hurtShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px) rotate(-5deg); }
+  75% { transform: translateX(8px) rotate(5deg); }
+}
+.defeat { animation: defeatFall 0.8s ease forwards; }
+@keyframes defeatFall {
+  0% { transform: rotate(0) scale(1); opacity: 1; }
+  100% { transform: rotate(90deg) scale(0.3) translateY(40px); opacity: 0; }
+}
+
+.damage-popup {
+  position: absolute;
+  font-weight: 900;
+  font-size: 1.3em;
+  animation: dmgFloat 1s ease forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+.damage-popup.hit { color: #ff4444; }
+@keyframes dmgFloat {
+  0% { opacity: 1; transform: translateX(50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(50%) translateY(-40px); }
+}
+
+/* Regular question */
+.question-area {
+  background: rgba(0,0,0,0.5);
+  border-top: 2px solid #333;
+  padding: 20px;
+  text-align: center;
+}
+.q-category { font-size: 0.8em; color: var(--gold); margin-bottom: 6px; }
+.q-word {
+  font-family: 'Secular One', sans-serif;
+  font-size: 1.8em;
+  margin-bottom: 4px;
+}
+.q-prompt { font-size: 0.85em; color: #aaa; margin-bottom: 14px; }
+.q-options { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.q-btn {
+  padding: 12px 28px;
+  font-size: 1.1em;
+  font-weight: 700;
+  border: 2px solid #555;
+  border-radius: 14px;
+  background: var(--panel);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  min-width: 100px;
+}
+.q-btn:hover { border-color: var(--gold); background: rgba(255,215,0,0.1); }
+.q-btn:active { transform: scale(0.95); }
+.correct-btn { border-color: #44cc44 !important; background: rgba(68,204,68,0.2) !important; }
+.wrong-btn { border-color: #ff4444 !important; background: rgba(255,68,68,0.2) !important; }
+
+/* Boss question */
+.boss-question-area {
+  background: rgba(0,0,0,0.6);
+  border-top: 2px solid #ff2e63;
+  padding: 16px 12px;
+  text-align: center;
+}
+.boss-q-word {
+  font-family: 'Secular One', sans-serif;
+  font-size: 1.6em;
+  margin-bottom: 4px;
+  color: #ff6b6b;
+}
+.boss-q-prompt { font-size: 0.8em; color: #ccc; margin-bottom: 12px; }
+.boss-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 360px;
+  margin: 0 auto 12px;
+}
+.boss-cat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+.boss-cat-label {
+  font-size: 0.75em;
+  color: #aaa;
+  min-width: 80px;
+  text-align: right;
+}
+.boss-cat-options { display: flex; gap: 6px; flex: 1; }
+.boss-opt-btn {
+  flex: 1;
+  padding: 8px 4px;
+  font-size: 0.9em;
+  font-weight: 700;
+  border: 2px solid #444;
+  border-radius: 10px;
+  background: transparent;
+  color: #ccc;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.boss-opt-btn:hover { border-color: #888; }
+.boss-opt-btn.selected {
+  border-color: var(--gold);
+  background: rgba(255,215,0,0.15);
+  color: #fff;
+}
+.boss-opt-btn.correct-pick {
+  border-color: #44cc44 !important;
+  background: rgba(68,204,68,0.25) !important;
+  color: #fff !important;
+}
+.boss-opt-btn.wrong-pick {
+  border-color: #ff4444 !important;
+  background: rgba(255,68,68,0.25) !important;
+  color: #fff !important;
+}
+.boss-submit-btn {
+  padding: 10px 36px;
+  font-size: 1.1em;
+  font-weight: 900;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  opacity: 0.4;
+  pointer-events: none;
+}
+.boss-submit-btn.ready { opacity: 1; pointer-events: auto; }
+.boss-submit-btn.ready:hover { transform: scale(1.05); }
+.boss-submit-btn.ready:active { transform: scale(0.95); }
+
+/* Victory / GameOver */
+#victoryScreen, #gameoverScreen {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px;
+  gap: 12px;
+}
+#victoryScreen { background: linear-gradient(180deg, #0d2818, #1a4a1a); }
+#gameoverScreen { background: linear-gradient(180deg, #2a0a0a, #1a0a2e); }
+.victory-emoji { font-size: 4em; }
+.victory-title {
+  font-family: 'Secular One', sans-serif;
+  font-size: 2em;
+  color: var(--gold);
+}
+.victory-sub { color: #aaa; font-size: 1em; }
+.victory-stars { font-size: 2.5em; margin: 10px 0; }
+.loot-box {
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 14px 24px;
+  display: flex;
+  gap: 24px;
+  font-weight: 700;
+  direction: ltr;
+  unicode-bidi: embed;
+}
+.victory-btn {
+  padding: 12px 30px;
+  font-size: 1em;
+  font-weight: 700;
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.victory-btn:hover { background: rgba(255,215,0,0.1); }
+.gameover-text {
+  font-family: 'Secular One', sans-serif;
+  font-size: 2em;
+  color: #ff4444;
+}
+</style>
+</head>
+<body>
+
+<div id="titleScreen" class="screen active">
+  <div class="title-emoji">⚔️</div>
+  <div class="title-name">לוחמת המילים</div>
+  <div class="title-sub">הביסו מפלצות עם כוח הכתיב הנכון!</div>
+  <button class="start-btn" onclick="showMap()">🗺️ התחילו הרפתקה!</button>
+</div>
+
+<div id="mapScreen" class="screen">
+  <div class="map-title">🗺️ מפת ההרפתקה</div>
+  <div class="map-stats">
+    <div class="map-stat">💰 <span id="mapCoins">0</span></div>
+    <div class="map-stat">⭐ <span id="mapStars">0</span></div>
+  </div>
+  <div class="levels-grid" id="levelsGrid"></div>
+  <div class="boss-wrapper" id="bossWrapper"></div>
+</div>
+
+<div id="battleScreen" class="screen">
+  <div class="battle-top">
+    <div class="battle-level-name" id="battleLevelName"></div>
+    <div class="battle-progress" id="battleProgress"></div>
+  </div>
+  <div class="arena">
+    <div class="fighter" id="heroFighter">
+      <div class="fighter-sprite" id="heroSprite">🧝‍♀️</div>
+      <div class="fighter-name" style="color:var(--hero-color)">הגיבורה</div>
+      <div class="hp-container"><div class="hp-bar" id="heroHpBar" style="width:100%"></div></div>
+      <div class="hp-text" id="heroHpText">100 / 100</div>
+    </div>
+    <div class="vs-flash" id="vsFlash">⚔️</div>
+    <div class="fighter" id="monsterFighter">
+      <div class="fighter-sprite" id="monsterSprite">👺</div>
+      <div class="fighter-name" style="color:var(--monster-color)" id="monsterName">גובלין</div>
+      <div class="hp-container"><div class="hp-bar" id="monsterHpBar" style="width:100%"></div></div>
+      <div class="hp-text" id="monsterHpText">30 / 30</div>
+    </div>
+  </div>
+
+  <div class="question-area" id="regularQuestionArea">
+    <div class="q-category" id="qCategory"></div>
+    <div class="q-word" id="qWord"></div>
+    <div class="q-prompt" id="qPrompt"></div>
+    <div class="q-options" id="qOptions"></div>
+  </div>
+
+  <div class="boss-question-area" id="bossQuestionArea" style="display:none;">
+    <div class="boss-q-word" id="bossQWord"></div>
+    <div class="boss-q-prompt">השלימו את האותיות וסווגו את המילה:</div>
+    <div class="boss-categories" id="bossCategories"></div>
+    <button class="boss-submit-btn" id="bossSubmitBtn" onclick="handleBossSubmit()">⚔️ תקיפה!</button>
+  </div>
+</div>
+
+<div id="victoryScreen" class="screen">
+  <div class="victory-emoji" id="victoryEmoji">🎉</div>
+  <div class="victory-title" id="victoryTitle">ניצחון!</div>
+  <div class="victory-sub" id="victorySub"></div>
+  <div class="victory-stars" id="victoryStars"></div>
+  <div class="loot-box">
+    <div>💰 +<span id="lootCoins">10</span></div>
+    <div>📊 <span id="lootScore">0</span></div>
+  </div>
+  <button class="start-btn" onclick="showMap()" style="margin-top: 14px;">🗺️ חזרה למפה</button>
+</div>
+
+<div id="gameoverScreen" class="screen">
+  <div class="victory-emoji">💀</div>
+  <div class="gameover-text" id="gameoverTitle">הפסד!</div>
+  <div class="victory-sub" id="gameoverSub">אל דאגה, נסו שוב! 💪</div>
+  <button class="start-btn" onclick="retryLevel()" style="margin-top: 14px;">🔄 נסו שוב!</button>
+  <button class="victory-btn" onclick="showMap()" style="margin-top: 8px;">🗺️ חזרה למפה</button>
+</div>
+
+<script>
+// ==================== GAME DATA ====================
+const levels = [
+  {
+    id: 0, name: 'יער האלף-עין 🌲', emoji: '🌲',
+    desc: 'השלמת מילים עם א / ע',
+    monsters: [
+      { name: 'גובלין ירוק', emoji: '👺', hp: 30 },
+      { name: 'עכביש ענק', emoji: '🕷️', hp: 35 },
+      { name: 'זאב אפל', emoji: '🐺', hp: 40 },
+    ],
+    questions: [
+      { word: 'קרי_ה (שם פעולה)', answer: 'א', options: ['א','ע'], fullWord: 'קריאה' },
+      { word: 'שומ_ת (פועל)', answer: 'ע', options: ['א','ע'], fullWord: 'שומעת' },
+      { word: 'ט_ות (שם עצם)', answer: 'ע', options: ['א','ע'], fullWord: 'טעות' },
+      { word: 'הופ_ה (שם פעולה)', answer: 'ע', options: ['א','ע'], fullWord: 'הופעה' },
+      { word: 'קור_ (פועל)', answer: 'א', options: ['א','ע'], fullWord: 'קורא' },
+      { word: '_וזר (פועל)', answer: 'ע', options: ['א','ע'], fullWord: 'עוזר' },
+      { word: 'צב_ים (שם עצם)', answer: 'ע', options: ['א','ע'], fullWord: 'צבעים' },
+      { word: 'המצ_ה (שם פעולה)', answer: 'א', options: ['א','ע'], fullWord: 'המצאה' },
+      { word: 'מפתי_ (פועל)', answer: 'ע', options: ['א','ע'], fullWord: 'מפתיע' },
+      { word: 'פ_ם (שם עצם)', answer: 'ע', options: ['א','ע'], fullWord: 'פעם' },
+    ],
+    prompt: 'איזו אות חסרה במילה?'
+  },
+  {
+    id: 1, name: 'מערת הטית-תיו 🦇', emoji: '🦇',
+    desc: 'השלמת מילים עם ט / ת',
+    monsters: [
+      { name: 'עטלף חושך', emoji: '🦇', hp: 35 },
+      { name: 'שלד עתיק', emoji: '💀', hp: 40 },
+      { name: 'גולם אבן', emoji: '🗿', hp: 45 },
+    ],
+    questions: [
+      { word: 'החל_ה (שם פעולה)', answer: 'ט', options: ['ט','ת'], fullWord: 'החלטה' },
+      { word: 'כותב_ (פועל)', answer: 'ת', options: ['ט','ת'], fullWord: 'כותבת' },
+      { word: 'התרגשו_ (שם פעולה)', answer: 'ת', options: ['ט','ת'], fullWord: 'התרגשות' },
+      { word: 'להחלי_ (פועל)', answer: 'ט', options: ['ט','ת'], fullWord: 'להחליט' },
+      { word: 'חר_ה (שם עצם)', answer: 'ט', options: ['ט','ת'], fullWord: 'חרטה' },
+      { word: 'מ_נה (שם עצם)', answer: 'ת', options: ['ט','ת'], fullWord: 'מתנה' },
+      { word: 'שול_ (פועל)', answer: 'ט', options: ['ט','ת'], fullWord: 'שולט' },
+      { word: 'הב_חה (שם פעולה)', answer: 'ט', options: ['ט','ת'], fullWord: 'הבטחה' },
+      { word: 'מפר_ (שם עצם)', answer: 'ט', options: ['ט','ת'], fullWord: 'מפרט' },
+      { word: 'התחייבו_ (שם פעולה)', answer: 'ת', options: ['ט','ת'], fullWord: 'התחייבות' },
+    ],
+    prompt: 'איזו אות חסרה במילה?'
+  },
+  {
+    id: 2, name: 'טירת הכף-קוף 🏰', emoji: '🏰',
+    desc: 'השלמת מילים עם כ / ק',
+    monsters: [
+      { name: 'אביר אפל', emoji: '🤺', hp: 40 },
+      { name: 'מכשפה', emoji: '🧙‍♀️', hp: 45 },
+      { name: 'שריון חי', emoji: '⚔️', hp: 50 },
+    ],
+    questions: [
+      { word: 'הלי_ה (שם פעולה)', answer: 'כ', options: ['כ','ק'], fullWord: 'הליכה' },
+      { word: 'מ_בל (פועל)', answer: 'ק', options: ['כ','ק'], fullWord: 'מקבל' },
+      { word: 'הס_מה (שם פעולה)', answer: 'כ', options: ['כ','ק'], fullWord: 'הסכמה' },
+      { word: 'מ_תב (שם עצם)', answer: 'כ', options: ['כ','ק'], fullWord: 'מכתב' },
+      { word: 'ב_שה (שם פעולה)', answer: 'ק', options: ['כ','ק'], fullWord: 'בקשה' },
+      { word: 'צחו_ (שם עצם)', answer: 'ק', options: ['כ','ק'], fullWord: 'צחוק' },
+      { word: '_דור (שם עצם)', answer: 'כ', options: ['כ','ק'], fullWord: 'כדור' },
+      { word: 'ל_פוץ (פועל)', answer: 'ק', options: ['כ','ק'], fullWord: 'לקפוץ' },
+      { word: 'מ_ר [מוכר] (פועל)', answer: 'כ', options: ['כ','ק'], fullWord: 'מוכר' },
+      { word: 'תינו_ (שם עצם)', answer: 'ק', options: ['כ','ק'], fullWord: 'תינוק' },
+    ],
+    prompt: 'איזו אות חסרה במילה?'
+  },
+  {
+    id: 3, name: 'דרקון השגיאות 🔥', emoji: '🐉',
+    desc: 'קרב בוס! השלמת שתי אותיות וסיווג',
+    boss: true,
+    monsters: [
+      { name: 'דרקון הלשון', emoji: '🐉', hp: 120 },
+    ],
+    bossQuestions: [
+      { word: 'ה _ ל _ ה (החלטה)', fullWord: 'החלטה', cats: [
+        { cat: 'אות חסרה 1', answer: 'ח', options: ['ח','כ'] },
+        { cat: 'אות חסרה 2', answer: 'ט', options: ['ט','ת'] },
+        { cat: 'סוג מילה', answer: 'שם פעולה', options: ['פועל','שם פעולה','שם עצם'] },
+      ]},
+      { word: '_ ו _ ב ת (כותבת)', fullWord: 'כותבת', cats: [
+        { cat: 'אות חסרה 1', answer: 'כ', options: ['כ','ק'] },
+        { cat: 'אות חסרה 2', answer: 'ת', options: ['ט','ת'] },
+        { cat: 'סוג מילה', answer: 'פועל', options: ['פועל','שם פעולה','שם עצם'] },
+      ]},
+      { word: 'ה פ ת _ _ (הפתעה)', fullWord: 'הפתעה', cats: [
+        { cat: 'אות חסרה 1', answer: 'ע', options: ['א','ע'] },
+        { cat: 'אות חסרה 2', answer: 'ה', options: ['ה','א'] },
+        { cat: 'סוג מילה', answer: 'שם פעולה', options: ['פועל','שם פעולה','שם עצם'] },
+      ]},
+      { word: 'מ _ ל _ ת (מקלחת)', fullWord: 'מקלחת', cats: [
+        { cat: 'אות חסרה 1', answer: 'ק', options: ['ק','כ'] },
+        { cat: 'אות חסרה 2', answer: 'ח', options: ['ח','כ'] },
+        { cat: 'סוג מילה', answer: 'שם עצם', options: ['פועל','שם פעולה','שם עצם'] },
+      ]},
+      { word: '_ ו מ _ ת (שומעת)', fullWord: 'שומעת', cats: [
+        { cat: 'אות חסרה 1', answer: 'ש', options: ['ש','ס'] },
+        { cat: 'אות חסרה 2', answer: 'ע', options: ['א','ע'] },
+        { cat: 'סוג מילה', answer: 'פועל', options: ['פועל','שם פעולה','שם עצם'] },
+      ]},
+      { word: 'ק ר י _ _ (קריאה)', fullWord: 'קריאה', cats: [
+        { cat: 'אות חסרה 1', answer: 'א', options: ['א','ע'] },
+        { cat: 'אות חסרה 2', answer: 'ה', options: ['ה','ע'] },
+        { cat: 'סוג מילה', answer: 'שם פעולה', options: ['פועל','שם פעולה','שם עצם'] },
+      ]}
+    ],
+    prompt: 'סווגו והשלימו את המילה!'
+  },
+];
+
+// ==================== STATE ====================
+let coins = 0, totalStars = 0;
+let clearedLevels = new Set();
+let currentLevel = null, currentLevelId = 0;
+let battleQuestions = [], bqIndex = 0, battleScore = 0;
+let currentMonsterIdx = 0;
+let heroHp = 100, heroMaxHp = 100;
+let monsterHp = 0, monsterMaxHp = 0;
+let questionsPerMonster = 0, isAnswering = false;
+let bossSelections = {};
+
+// ==================== NAVIGATION ====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function showMap() { renderMap(); showScreen('mapScreen'); }
+
+function renderMap() {
+  document.getElementById('mapCoins').textContent = coins;
+  document.getElementById('mapStars').textContent = totalStars;
+  const grid = document.getElementById('levelsGrid');
+  const bossWrap = document.getElementById('bossWrapper');
+  grid.innerHTML = '';
+  bossWrap.innerHTML = '';
+
+  const nonBossIndices = levels.map((l,i) => l.boss ? null : i).filter(x => x !== null);
+  const allNonBossCleared = nonBossIndices.every(i => clearedLevels.has(i));
+
+  levels.forEach((lv, i) => {
+    const unlocked = lv.boss ? allNonBossCleared : true;
+    const cleared = clearedLevels.has(i);
+    const card = document.createElement('div');
+
+    if (lv.boss) {
+      card.className = `level-card boss ${!unlocked ? 'locked' : ''} ${cleared ? 'cleared' : ''}`;
+      card.innerHTML = `
+        <div class="level-emoji">${lv.emoji}</div>
+        <div class="level-info">
+          <div class="level-name">${lv.name}</div>
+          <div class="level-desc">${lv.desc}</div>
+        </div>
+        ${!unlocked ? '<div class="level-badge">🔒 סיימו את כל השלבים</div>' : cleared ? '' : '<div class="level-badge">▶️ שחקו</div>'}
+      `;
+      if (unlocked) card.onclick = () => startBattle(i);
+      bossWrap.appendChild(card);
+    } else {
+      card.className = `level-card ${cleared ? 'cleared' : ''}`;
+      card.innerHTML = `
+        <div class="level-emoji">${lv.emoji}</div>
+        <div class="level-info">
+          <div class="level-name">${lv.name}</div>
+          <div class="level-desc">${lv.desc}</div>
+        </div>
+        ${cleared ? '' : '<div class="level-badge">▶️ שחקו</div>'}
+      `;
+      card.onclick = () => startBattle(i);
+      grid.appendChild(card);
+    }
+  });
+}
+
+// ==================== BATTLE ====================
+function startBattle(levelId) {
+  currentLevelId = levelId;
+  currentLevel = levels[levelId];
+  battleQuestions = currentLevel.boss
+    ? shuffle([...currentLevel.bossQuestions])
+    : shuffle([...currentLevel.questions]);
+  bqIndex = 0; battleScore = 0; currentMonsterIdx = 0;
+  heroHp = heroMaxHp; isAnswering = false;
+  questionsPerMonster = Math.ceil(battleQuestions.length / currentLevel.monsters.length);
+
+  document.getElementById('battleLevelName').textContent = currentLevel.name;
+  document.getElementById('regularQuestionArea').style.display = currentLevel.boss ? 'none' : 'block';
+  document.getElementById('bossQuestionArea').style.display = currentLevel.boss ? 'block' : 'none';
+
+  showScreen('battleScreen');
+  spawnMonster();
+}
+function retryLevel() { startBattle(currentLevelId); }
+
+function spawnMonster() {
+  const m = currentLevel.monsters[currentMonsterIdx];
+  monsterHp = m.hp; monsterMaxHp = m.hp;
+  document.getElementById('monsterSprite').textContent = m.emoji;
+  document.getElementById('monsterSprite').className = 'fighter-sprite';
+  document.getElementById('monsterName').textContent = m.name;
+  updateHpBars(); updateBattleProgress();
+  const vs = document.getElementById('vsFlash');
+  vs.className = 'vs-flash show';
+  setTimeout(() => vs.className = 'vs-flash', 1000);
+  setTimeout(() => showQuestion(), 800);
+}
+
+function updateHpBars() {
+  const heroPct = Math.max(0, (heroHp / heroMaxHp) * 100);
+  const monPct = Math.max(0, (monsterHp / monsterMaxHp) * 100);
+  const heroBar = document.getElementById('heroHpBar');
+  const monBar = document.getElementById('monsterHpBar');
+  heroBar.style.width = heroPct + '%';
+  monBar.style.width = monPct + '%';
+  heroBar.className = `hp-bar ${heroPct <= 30 ? 'low' : ''}`;
+  monBar.className = `hp-bar ${monPct <= 30 ? 'low' : ''}`;
+  document.getElementById('heroHpText').textContent = Math.max(0,heroHp) + ' / ' + heroMaxHp;
+  document.getElementById('monsterHpText').textContent = Math.max(0,monsterHp) + ' / ' + monsterMaxHp;
+}
+
+function updateBattleProgress() {
+  document.getElementById('battleProgress').textContent = (bqIndex + 1) + ' / ' + battleQuestions.length;
+}
+
+function showQuestion() {
+  if (bqIndex >= battleQuestions.length) {
+    if (currentLevel.boss) {
+      bossEndCheck();
+    } else {
+      monsterHp = 0; monsterDefeated();
+    }
+    return;
+  }
+  isAnswering = false; updateBattleProgress();
+  currentLevel.boss ? showBossQuestion() : showRegularQuestion();
+}
+
+// ===== REGULAR =====
+function showRegularQuestion() {
+  const q = battleQuestions[bqIndex];
+  document.getElementById('qCategory').textContent = q.cat || currentLevel.desc;
+  
+  // הוספת כפתור השמעה ליד המילה
+  document.getElementById('qWord').innerHTML = `
+    ${q.word} <span style="cursor:pointer; font-size: 0.8em; user-select: none;" onclick="speakText('${q.fullWord}')">🔊</span>
+  `;
+  
+  document.getElementById('qPrompt').textContent = currentLevel.prompt;
+  const optDiv = document.getElementById('qOptions');
+  optDiv.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'q-btn'; btn.textContent = opt;
+    btn.onclick = () => handleAnswer(opt, q.answer, btn);
+    optDiv.appendChild(btn);
+  });
+
+  // הקראה אוטומטית ברגע שהשאלה עולה
+  speakText(q.fullWord);
+}
+
+function handleAnswer(choice, correct, btnEl) {
+  if (isAnswering) return;
+  isAnswering = true;
+  const allBtns = document.querySelectorAll('.q-btn');
+
+  if (choice === correct) {
+    btnEl.classList.add('correct-btn');
+    battleScore++;
+    const damage = Math.ceil(monsterMaxHp / questionsPerMonster) + 2;
+    monsterHp = Math.max(0, monsterHp - damage);
+    const heroSprite = document.getElementById('heroSprite');
+    heroSprite.classList.add('attack-right');
+    setTimeout(() => {
+      heroSprite.classList.remove('attack-right');
+      document.getElementById('monsterSprite').classList.add('hurt');
+      showDamage('monsterFighter', '-' + damage, 'hit');
+      updateHpBars();
+      setTimeout(() => {
+        document.getElementById('monsterSprite').classList.remove('hurt');
+        bqIndex++;
+        if (monsterHp <= 0) { monsterDefeated(); }
+        else { showQuestion(); }
+      }, 500);
+    }, 400);
+  } else {
+    btnEl.classList.add('wrong-btn');
+    allBtns.forEach(b => { if (b.textContent === correct) b.classList.add('correct-btn'); });
+    const damage = 15;
+    heroHp = Math.max(0, heroHp - damage);
+    setTimeout(() => {
+      const monSprite = document.getElementById('monsterSprite');
+      monSprite.classList.add('attack-left');
+      setTimeout(() => {
+        monSprite.classList.remove('attack-left');
+        document.getElementById('heroSprite').classList.add('hurt');
+        showDamage('heroFighter', '-' + damage, 'hit');
+        updateHpBars();
+        setTimeout(() => {
+          document.getElementById('heroSprite').classList.remove('hurt');
+          if (heroHp <= 0) { showScreen('gameoverScreen'); }
+          else { bqIndex++; showQuestion(); }
+        }, 500);
+      }, 400);
+    }, 300);
+  }
+}
+
+// ===== BOSS =====
+function showBossQuestion() {
+  const q = battleQuestions[bqIndex];
+  
+  // הוספת כפתור השמעה ליד מילת הבוס
+  document.getElementById('bossQWord').innerHTML = `
+    ${q.word} <span style="cursor:pointer; font-size: 0.8em; user-select: none;" onclick="speakText('${q.fullWord}')">🔊</span>
+  `;
+  
+  bossSelections = {};
+  const catsDiv = document.getElementById('bossCategories');
+  catsDiv.innerHTML = '';
+
+  q.cats.forEach((catInfo, catIdx) => {
+    const row = document.createElement('div');
+    row.className = 'boss-cat-row';
+    const label = document.createElement('div');
+    label.className = 'boss-cat-label';
+    label.textContent = catInfo.cat;
+    row.appendChild(label);
+    const optionsDiv = document.createElement('div');
+    optionsDiv.className = 'boss-cat-options';
+    catInfo.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'boss-opt-btn';
+      btn.textContent = opt;
+      btn.dataset.catIdx = catIdx;
+      btn.onclick = () => selectBossOption(catIdx, opt, btn);
+      optionsDiv.appendChild(btn);
+    });
+    row.appendChild(optionsDiv);
+    catsDiv.appendChild(row);
+  });
+  document.getElementById('bossSubmitBtn').classList.remove('ready');
+
+  // הקראה אוטומטית ברגע שהבוס עולה
+  speakText(q.fullWord);
+}
+
+function selectBossOption(catIdx, value, btnEl) {
+  if (isAnswering) return;
+  document.querySelectorAll('.boss-opt-btn[data-cat-idx="' + catIdx + '"]').forEach(b => b.classList.remove('selected'));
+  btnEl.classList.add('selected');
+  bossSelections[catIdx] = value;
+  const q = battleQuestions[bqIndex];
+  if (Object.keys(bossSelections).length === q.cats.length) {
+    document.getElementById('bossSubmitBtn').classList.add('ready');
+  }
+}
+
+function handleBossSubmit() {
+  if (isAnswering) return;
+  const q = battleQuestions[bqIndex];
+  if (Object.keys(bossSelections).length < q.cats.length) return;
+  isAnswering = true;
+
+  let allCorrect = true;
+  q.cats.forEach((catInfo, catIdx) => {
+    if (bossSelections[catIdx] !== catInfo.answer) allCorrect = false;
+    document.querySelectorAll('.boss-opt-btn[data-cat-idx="' + catIdx + '"]').forEach(btn => {
+      if (btn.textContent === catInfo.answer) btn.classList.add('correct-pick');
+      if (btn.classList.contains('selected') && btn.textContent !== catInfo.answer) btn.classList.add('wrong-pick');
+    });
+  });
+  document.getElementById('bossSubmitBtn').classList.remove('ready');
+
+  if (allCorrect) {
+    battleScore++;
+    const damage = 20;
+    monsterHp = Math.max(0, monsterHp - damage);
+    setTimeout(() => {
+      const heroSprite = document.getElementById('heroSprite');
+      heroSprite.classList.add('attack-right');
+      setTimeout(() => {
+        heroSprite.classList.remove('attack-right');
+        document.getElementById('monsterSprite').classList.add('hurt');
+        showDamage('monsterFighter', '-' + damage, 'hit');
+        updateHpBars();
+        setTimeout(() => {
+          document.getElementById('monsterSprite').classList.remove('hurt');
+          bqIndex++;
+          showQuestion();
+        }, 600);
+      }, 400);
+    }, 500);
+  } else {
+    const damage = 20;
+    heroHp = Math.max(0, heroHp - damage);
+    setTimeout(() => {
+      const monSprite = document.getElementById('monsterSprite');
+      monSprite.classList.add('attack-left');
+      setTimeout(() => {
+        monSprite.classList.remove('attack-left');
+        document.getElementById('heroSprite').classList.add('hurt');
+        showDamage('heroFighter', '-' + damage, 'hit');
+        updateHpBars();
+        setTimeout(() => {
+          document.getElementById('heroSprite').classList.remove('hurt');
+          if (heroHp <= 0) { showScreen('gameoverScreen'); }
+          else { bqIndex++; showQuestion(); }
+        }, 600);
+      }, 400);
+    }, 600);
+  }
+}
+
+function bossEndCheck() {
+  if (monsterHp <= 0) {
+    document.getElementById('monsterSprite').classList.add('defeat');
+    coins += 25;
+    setTimeout(() => levelComplete(), 800);
+  } else {
+    document.getElementById('gameoverTitle').textContent = 'הדרקון שרד!';
+    document.getElementById('gameoverSub').textContent = 'לא הספקתם להביס אותו. נסו שוב! 💪';
+    showScreen('gameoverScreen');
+  }
+}
+
+// ===== SHARED =====
+function showDamage(fighterId, text, type) {
+  const el = document.getElementById(fighterId);
+  const popup = document.createElement('div');
+  popup.className = 'damage-popup ' + type;
+  popup.textContent = text;
+  popup.style.cssText = 'top:20px;right:50%;transform:translateX(50%)';
+  el.style.position = 'relative';
+  el.appendChild(popup);
+  setTimeout(() => popup.remove(), 1000);
+}
+
+function monsterDefeated() {
+  document.getElementById('monsterSprite').classList.add('defeat');
+  coins += currentLevel.boss ? 25 : 10;
+  setTimeout(() => {
+    currentMonsterIdx++;
+    if (currentMonsterIdx >= currentLevel.monsters.length) { levelComplete(); }
+    else { spawnMonster(); }
+  }, 800);
+}
+
+function levelComplete() {
+  const total = battleQuestions.length;
+  const pct = battleScore / total;
+  let stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
+  if (!clearedLevels.has(currentLevelId)) {
+    totalStars += stars;
+    clearedLevels.add(currentLevelId);
+  }
+  document.getElementById('victoryEmoji').textContent = currentLevel.boss ? '🐉' : '🎉';
+  document.getElementById('victoryTitle').textContent = currentLevel.boss ? 'הדרקון הובס!' : 'ניצחון!';
+  document.getElementById('victorySub').textContent = 'סיימתם את ' + currentLevel.name;
+  document.getElementById('victoryStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+  document.getElementById('lootCoins').textContent = currentLevel.boss ? 25 : 10;
+  document.getElementById('lootScore').textContent = battleScore + ' / ' + total;
+  showScreen('victoryScreen');
+  document.getElementById('gameoverTitle').textContent = 'הפסד!';
+  document.getElementById('gameoverSub').textContent = 'אל דאגה, נסו שוב! 💪';
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// פונקציית הקראת מילים בעברית
+function speakText(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel(); // עוצר השמעות קודמות
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'he-IL';
+    utterance.rate = 0.85; // קצב קריאה מעט מואט לבהירות
+    window.speechSynthesis.speak(utterance);
+  }
+}
+</script>
+</body>
+</html>

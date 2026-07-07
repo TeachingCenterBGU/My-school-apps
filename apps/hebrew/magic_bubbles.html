@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>בועות הקסם ✨</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            height: 100dvh;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: background 1.2s ease;
+        }
+
+        /* ===== רקעים לפי שלב ===== */
+        body.stage-1 { background: linear-gradient(180deg, #29b6f6 0%, #0277bd 45%, #01579b 100%); }
+        body.stage-2 { background: linear-gradient(180deg, #3b2a5c 0%, #1e4d3a 55%, #10331f 100%); }
+        body.stage-3 { background: linear-gradient(180deg, #0b0221 0%, #1a0533 55%, #2d1b69 100%); }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+        /* ===== שכבת תפאורה ===== */
+        #scenery {
+            position: absolute; inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* --- שלב 1: מתחת למים --- */
+        .light-ray {
+            position: absolute;
+            top: -10%;
+            width: 90px; height: 70%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0));
+            transform: skewX(-12deg);
+            animation: raySway 6s ease-in-out infinite alternate;
+        }
+        @keyframes raySway {
+            from { transform: skewX(-16deg); opacity: 0.6; }
+            to   { transform: skewX(-6deg);  opacity: 1; }
+        }
+        .fish {
+            position: absolute;
+            font-size: 2em;
+            animation: fishSwim linear infinite;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+        }
+        @keyframes fishSwim {
+            from { transform: translateX(-15vw) scaleX(1); }
+            to   { transform: translateX(115vw) scaleX(1); }
+        }
+        .fish.flip { animation-name: fishSwimBack; }
+        @keyframes fishSwimBack {
+            from { transform: translateX(115vw) scaleX(-1); }
+            to   { transform: translateX(-15vw) scaleX(-1); }
+        }
+        .seaweed {
+            position: absolute;
+            bottom: -6px;
+            width: 36px; height: 110px;
+            transform-origin: bottom center;
+            animation: sway 3.5s ease-in-out infinite alternate;
+        }
+        @keyframes sway {
+            from { transform: rotate(-7deg); }
+            to   { transform: rotate(7deg); }
+        }
+        .tiny-bubble {
+            position: absolute;
+            bottom: -20px;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.45);
+            animation: tinyRise linear infinite;
+        }
+        @keyframes tinyRise {
+            from { transform: translateY(0); opacity: 0.8; }
+            to   { transform: translateY(-105vh); opacity: 0; }
+        }
+
+        /* --- שלב 2: היער הקסום --- */
+        .tree {
+            position: absolute;
+            bottom: 0;
+            width: 130px; height: 210px;
+            opacity: 0.85;
+        }
+        .firefly {
+            position: absolute;
+            width: 7px; height: 7px;
+            background: #ffe066;
+            border-radius: 50%;
+            box-shadow: 0 0 12px 4px rgba(255, 224, 102, 0.65);
+            animation: flyFloat 5s ease-in-out infinite alternate, flyBlink 2.2s ease-in-out infinite;
+        }
+        @keyframes flyFloat {
+            from { transform: translate(0, 0); }
+            to   { transform: translate(35px, -45px); }
+        }
+        @keyframes flyBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.15; }
+        }
+        .forest-moon {
+            position: absolute;
+            top: 6%; left: 10%;
+            font-size: 3.2em;
+            filter: drop-shadow(0 0 18px rgba(255,255,220,0.5));
+        }
+
+        /* --- שלב 3: החלל --- */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            from { opacity: 0.15; transform: scale(0.7); }
+            to   { opacity: 1;    transform: scale(1.15); }
+        }
+        .planet {
+            position: absolute;
+            font-size: 3em;
+            animation: planetDrift 14s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 14px rgba(199,125,255,0.4));
+        }
+        @keyframes planetDrift {
+            from { transform: translateY(0) rotate(-6deg); }
+            to   { transform: translateY(22px) rotate(6deg); }
+        }
+        .shooting-star {
+            position: absolute;
+            width: 90px; height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
+            animation: shoot 5s ease-in infinite;
+            opacity: 0;
+        }
+        @keyframes shoot {
+            0%   { transform: translate(0,0) rotate(20deg); opacity: 0; }
+            5%   { opacity: 1; }
+            15%  { transform: translate(-190px, 80px) rotate(20deg); opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* ===== סרגל עליון ===== */
+        #hud {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            z-index: 20;
+            padding: 10px 12px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        #back-btn {
+            background: rgba(255,255,255,0.22);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            font-family: inherit;
+            font-size: 1.15em;
+            font-weight: 700;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            flex-shrink: 0;
+            backdrop-filter: blur(4px);
+        }
+        #score-box {
+            background: rgba(255,255,255,0.22);
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 22px;
+            padding: 6px 14px;
+            color: white;
+            font-weight: 900;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ===== כרטיס המילה ===== */
+        #word-card {
+            position: absolute;
+            top: 62px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            background: rgba(255,255,255,0.95);
+            border-radius: 22px;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            animation: cardPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes cardPop {
+            from { transform: translateX(-50%) scale(0.4); opacity: 0; }
+            to   { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+        #word-pic { width: 72px; height: 72px; }
+        #word-pic svg { width: 100%; height: 100%; }
+        #word-text {
+            font-size: 1.9em;
+            font-weight: 900;
+            color: #333;
+            line-height: 1.1;
+        }
+        #speak-btn {
+            background: #ffe066;
+            border: none;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            font-size: 1.3em;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #e6b800;
+            transition: transform 0.12s;
+        }
+        #speak-btn:active { transform: scale(0.9); }
+
+        /* ===== סרגל התקדמות ===== */
+        #progress-wrap {
+            position: absolute;
+            top: 168px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            width: min(320px, 78vw);
+            text-align: center;
+        }
+        #progress-label {
+            color: rgba(255,255,255,0.92);
+            font-size: 0.85em;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+        }
+        #progress-bar {
+            height: 12px;
+            background: rgba(0,0,0,0.28);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1.5px solid rgba(255,255,255,0.35);
+        }
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 8px;
+            transition: width 0.5s cubic-bezier(0.34, 1.3, 0.64, 1);
+        }
+        body.stage-1 #progress-fill { background: linear-gradient(90deg, #00d4ff, #7cf5ff); }
+        body.stage-2 #progress-fill { background: linear-gradient(90deg, #7cff6b, #d0ff8a); }
+        body.stage-3 #progress-fill { background: linear-gradient(90deg, #c77dff, #ff9ef0); }
+
+        /* ===== שכבת הבועות (LTR פנימי!) ===== */
+        #bubble-layer {
+            position: absolute; inset: 0;
+            z-index: 10;
+            direction: ltr;
+        }
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background:
+                radial-gradient(circle at 30% 26%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.12) 24%, rgba(255,255,255,0.05) 60%),
+                radial-gradient(circle at 70% 75%, var(--bub-tint) 0%, transparent 65%);
+            border: 2.5px solid rgba(255,255,255,0.55);
+            box-shadow:
+                inset 0 -8px 16px rgba(255,255,255,0.18),
+                0 6px 18px rgba(0,0,0,0.18);
+            will-change: transform;
+        }
+        .bubble .letter {
+            font-size: 1.7em;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.45);
+            pointer-events: none;
+        }
+        .bubble.shake { animation: bubbleShake 0.4s ease; }
+        @keyframes bubbleShake {
+            0%, 100% { margin-left: 0; }
+            25% { margin-left: -8px; }
+            50% { margin-left: 8px; }
+            75% { margin-left: -5px; }
+        }
+
+        /* ===== אפקט פיצוץ ===== */
+        .pop-ring {
+            position: absolute;
+            border: 4px solid rgba(255,255,255,0.9);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+            animation: ringGrow 0.5s ease-out forwards;
+        }
+        @keyframes ringGrow {
+            from { transform: scale(0.4); opacity: 1; }
+            to   { transform: scale(1.9); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+        }
+        .pop-star {
+            position: absolute;
+            pointer-events: none;
+            z-index: 15;
+            font-size: 1.2em;
+        }
+
+        /* ===== הודעת קומבו ===== */
+        #combo-msg {
+            position: absolute;
+            top: 42%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 25;
+            font-size: 2.4em;
+            font-weight: 900;
+            color: #ffe066;
+            text-shadow: 0 3px 0 #cc8800, 0 6px 20px rgba(0,0,0,0.4);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #combo-msg.show { animation: comboPop 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes comboPop {
+            0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            20%  { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+            70%  { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -70%) scale(0.9); opacity: 0; }
+        }
+
+        /* ===== מסכי פתיחה / שלב / סיום ===== */
+        .overlay {
+            position: absolute; inset: 0;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+            background: rgba(10, 5, 40, 0.72);
+            backdrop-filter: blur(6px);
+            color: white;
+        }
+        .overlay.hidden { display: none; }
+        .overlay .big-emoji {
+            font-size: 4.5em;
+            margin-bottom: 12px;
+            animation: floaty 2.4s ease-in-out infinite alternate;
+        }
+        @keyframes floaty {
+            from { transform: translateY(0) rotate(-4deg); }
+            to   { transform: translateY(-14px) rotate(4deg); }
+        }
+        .overlay h1 { font-size: 2.4em; font-weight: 900; text-shadow: 0 3px 12px rgba(0,0,0,0.5); }
+        .overlay h2 { font-size: 1.9em; font-weight: 900; }
+        .overlay p  { font-size: 1.15em; margin: 12px 0 22px; opacity: 0.92; max-width: 420px; line-height: 1.5; }
+        .stage-badge {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 20px;
+            padding: 4px 18px;
+            font-weight: 700;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        .play-btn {
+            font-family: inherit;
+            font-size: 1.5em;
+            font-weight: 900;
+            color: #4a2600;
+            background: linear-gradient(180deg, #ffe066, #ffb347);
+            border: none;
+            border-radius: 40px;
+            padding: 16px 46px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #cc8800, 0 12px 24px rgba(0,0,0,0.35);
+            transition: transform 0.12s;
+        }
+        .play-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #cc8800; }
+
+        /* ===== מסך ניצחון ===== */
+        #win-stars { font-size: 3.4em; letter-spacing: 6px; margin: 8px 0; }
+        #win-stars .dim { opacity: 0.25; }
+        .win-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+        .secondary-btn {
+            font-family: inherit;
+            font-size: 1.15em;
+            font-weight: 700;
+            color: white;
+            background: rgba(255,255,255,0.16);
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 40px;
+            padding: 14px 30px;
+            cursor: pointer;
+        }
+        .confetti {
+            position: absolute;
+            top: -20px;
+            width: 11px; height: 16px;
+            border-radius: 3px;
+            z-index: 45;
+            pointer-events: none;
+            animation: confFall linear forwards;
+        }
+        @keyframes confFall {
+            from { transform: translateY(0) rotate(0deg); }
+            to   { transform: translateY(110vh) rotate(720deg); }
+        }
+
+        @media (max-width: 420px) {
+            #word-text { font-size: 1.5em; }
+            #word-pic { width: 58px; height: 58px; }
+            .bubble .letter { font-size: 1.45em; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .fish, .light-ray, .seaweed, .firefly, .planet, .shooting-star,
+            .overlay .big-emoji { animation: none !important; }
+        }
+    </style>
+</head>
+<body class="stage-1">
+
+<div id="game-container">
+    <div id="scenery"></div>
+
+    <div id="hud">
+        <button id="back-btn" title="חזרה" onclick="goBack()">→</button>
+        <div id="score-box">⭐ <span id="score">0</span></div>
+    </div>
+
+    <div id="word-card" style="display:none;">
+        <div id="word-pic"></div>
+        <div id="word-text"></div>
+        <button id="speak-btn" title="שמעי שוב" onclick="speakWord()">🔊</button>
+    </div>
+
+    <div id="progress-wrap" style="display:none;">
+        <div id="progress-label"></div>
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+
+    <div id="bubble-layer"></div>
+
+    <div id="combo-msg"></div>
+
+    <!-- מסך פתיחה -->
+    <div id="start-screen" class="overlay">
+        <div class="big-emoji">🫧</div>
+        <h1>בועות הקסם ✨</h1>
+        <p>מסתכלות על התמונה, מקשיבות למילה —<br>ומפוצצות את הבועה עם האות שהמילה מתחילה בה!</p>
+        <p style="font-size:0.95em; opacity:0.8; margin-top:-8px;">
+            🌊 מתחת למים &nbsp;·&nbsp; 🌲 היער הקסום &nbsp;·&nbsp; 🚀 החלל
+        </p>
+        <button class="play-btn" onclick="startGame()">בואו נשחק! 🎈</button>
+    </div>
+
+    <!-- מסך מעבר שלב -->
+    <div id="stage-screen" class="overlay hidden">
+        <div class="stage-badge" id="stage-badge"></div>
+        <div class="big-emoji" id="stage-emoji"></div>
+        <h2 id="stage-name"></h2>
+        <p id="stage-desc"></p>
+        <button class="play-btn" onclick="beginStage()">יאללה! 🎈</button>
+    </div>
+
+    <!-- מסך ניצחון -->
+    <div id="win-screen" class="overlay hidden">
+        <div class="big-emoji">🏆</div>
+        <h2>כל הכבוד! סיימת את כל השלבים!</h2>
+        <div id="win-stars"></div>
+        <p id="win-text"></p>
+        <div class="win-actions">
+            <button class="play-btn" onclick="location.reload()">עוד פעם! 🔁</button>
+            <button class="secondary-btn" onclick="goBack()">חזרה לעמוד הכיתה 🏠</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ================= בועות הקסם =================
+// משחק זיהוי אות פותחת — 3 שלבים, 10 מילים בכל שלב
+// ==============================================
+
+const AUDIO_PATH = '../../letters/';
+
+// --- שמות קבצי השמע של האותיות ---
+const LETTER_AUDIO = {
+    'א': 'Aleph1',  'ב': 'beit',     'ג': 'gimel_1',  'ד': 'dalet_1',
+    'ה': 'hei_1',   'ו': 'vav_1',    'ז': 'zain_1',   'ח': 'chet_1',
+    'ט': 'tet',     'י': 'yud',      'כ': 'chaf_1',   'ל': 'lamed',
+    'מ': 'mem_1',   'נ': 'nun',      'ס': 'samech',   'ע': 'ain',
+    'פ': 'peh_1',   'צ': 'tzadik_1', 'ר': 'reish',    'ש': 'shin',
+    'ת': 'taf_1'
+};
+const ALL_LETTERS = Object.keys(LETTER_AUDIO);
+</script>
+<script id="words-script">
+// --- בנק המילים: מילה, אות פותחת, קובץ שמע, ואיור SVG חמוד ---
+const S = 'xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"';
+const FACE = (x, y) => `<circle cx="${x-8}" cy="${y}" r="3.2" fill="#2d2d2d"/><circle cx="${x-9}" cy="${y-1}" r="1" fill="#fff"/><circle cx="${x+8}" cy="${y}" r="3.2" fill="#2d2d2d"/><circle cx="${x+7}" cy="${y-1}" r="1" fill="#fff"/>`;
+
+const WORDS = [
+{ word: 'אַרְיֵה', letter: 'א', audio: 'aryeh', svg: `<svg ${S}>
+  <circle cx="50" cy="50" r="34" fill="#e8912d"/>
+  <g fill="#c76f14">${[0,45,90,135,180,225,270,315].map(a=>`<circle cx="${50+34*Math.cos(a*Math.PI/180)}" cy="${50+34*Math.sin(a*Math.PI/180)}" r="9"/>`).join('')}</g>
+  <circle cx="50" cy="50" r="26" fill="#f7b955"/>
+  ${FACE(50,46)}
+  <ellipse cx="50" cy="58" rx="9" ry="7" fill="#ffe0b3"/>
+  <path d="M46 56 Q50 60 54 56" stroke="#8a5a1f" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="50" cy="54" rx="3" ry="2.2" fill="#7a4a12"/>
+</svg>` },
+{ word: 'בַּרְוָז', letter: 'ב', audio: 'barvaz', svg: `<svg ${S}>
+  <ellipse cx="52" cy="64" rx="28" ry="20" fill="#ffd94d"/>
+  <path d="M40 62 Q28 70 34 76 Q44 76 48 68 Z" fill="#f0c02e"/>
+  <circle cx="70" cy="42" r="15" fill="#ffd94d"/>
+  <path d="M83 42 Q95 44 84 49 Q80 47 82 42 Z" fill="#ff8c42"/>
+  <circle cx="72" cy="38" r="2.8" fill="#2d2d2d"/><circle cx="71" cy="37" r="0.9" fill="#fff"/>
+  <path d="M20 80 Q50 88 84 80" stroke="#6ec6ff" stroke-width="5" fill="none" stroke-linecap="round"/>
+</svg>` },
+{ word: 'גָּמָל', letter: 'ג', audio: 'gamal', svg: `<svg ${S}>
+  <path d="M18 74 Q22 50 34 54 Q40 40 50 54 Q58 44 66 58 L70 74 Z" fill="#d9a05b"/>
+  <rect x="24" y="72" width="6" height="16" rx="3" fill="#d9a05b"/>
+  <rect x="40" y="72" width="6" height="16" rx="3" fill="#d9a05b"/>
+  <rect x="56" y="72" width="6" height="16" rx="3" fill="#d9a05b"/>
+  <path d="M66 60 Q76 52 76 40" stroke="#d9a05b" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <circle cx="78" cy="34" r="9" fill="#d9a05b"/>
+  <circle cx="80" cy="32" r="2.4" fill="#2d2d2d"/>
+  <ellipse cx="83" cy="38" rx="4" ry="3" fill="#c08a45"/>
+  <ellipse cx="50" cy="90" rx="34" ry="4" fill="#f2d59a"/>
+</svg>` },
+{ word: 'דֹּב', letter: 'ד', audio: 'dov', svg: `<svg ${S}>
+  <circle cx="30" cy="30" r="12" fill="#a5672c"/><circle cx="30" cy="30" r="6" fill="#d9a468"/>
+  <circle cx="70" cy="30" r="12" fill="#a5672c"/><circle cx="70" cy="30" r="6" fill="#d9a468"/>
+  <circle cx="50" cy="54" r="30" fill="#b5793a"/>
+  ${FACE(50,48)}
+  <ellipse cx="50" cy="62" rx="11" ry="9" fill="#e8c391"/>
+  <ellipse cx="50" cy="58" rx="4" ry="3" fill="#4a2f14"/>
+  <path d="M45 65 Q50 69 55 65" stroke="#4a2f14" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>` },
+{ word: 'הַר', letter: 'ה', audio: 'har', svg: `<svg ${S}>
+  <circle cx="78" cy="22" r="10" fill="#ffd94d"/>
+  <path d="M8 84 L38 30 L62 84 Z" fill="#6b8f5a"/>
+  <path d="M38 30 L48 48 L42 46 L36 52 L30 46 Z" fill="#fff"/>
+  <path d="M42 84 L68 42 L92 84 Z" fill="#8a8f98"/>
+  <path d="M68 42 L76 56 L70 54 L64 58 Z" fill="#fff"/>
+  <ellipse cx="50" cy="88" rx="42" ry="4" fill="#a7c58f"/>
+</svg>` },
+{ word: 'וֶרֶד', letter: 'ו', audio: 'vered', svg: `<svg ${S}>
+  <path d="M50 52 L50 88" stroke="#4e9445" stroke-width="5" stroke-linecap="round"/>
+  <path d="M50 72 Q36 66 34 56 Q48 58 50 72" fill="#5fae54"/>
+  <circle cx="50" cy="36" r="19" fill="#e84d7a"/>
+  <circle cx="50" cy="36" r="12" fill="#f27ba0"/>
+  <circle cx="50" cy="36" r="6" fill="#e84d7a"/>
+  <circle cx="38" cy="28" r="7" fill="#f27ba0"/>
+  <circle cx="62" cy="28" r="7" fill="#f27ba0"/>
+  <circle cx="50" cy="20" r="7" fill="#f27ba0"/>
+</svg>` },
+{ word: 'זֶבְּרָה', letter: 'ז', audio: 'zebra', svg: `<svg ${S}>
+  <ellipse cx="30" cy="22" rx="7" ry="11" fill="#eee" transform="rotate(-18 30 22)"/>
+  <ellipse cx="70" cy="22" rx="7" ry="11" fill="#eee" transform="rotate(18 70 22)"/>
+  <ellipse cx="30" cy="24" rx="3.5" ry="6" fill="#f5a9c0" transform="rotate(-18 30 24)"/>
+  <ellipse cx="70" cy="24" rx="3.5" ry="6" fill="#f5a9c0" transform="rotate(18 70 24)"/>
+  <ellipse cx="50" cy="52" rx="27" ry="31" fill="#f5f5f5"/>
+  <path d="M30 36 Q50 30 70 36 L70 42 Q50 36 30 42 Z" fill="#2d2d2d"/>
+  <path d="M27 50 Q50 44 73 50 L73 55 Q50 49 27 55 Z" fill="#2d2d2d"/>
+  ${FACE(50,58)}
+  <ellipse cx="50" cy="74" rx="13" ry="9" fill="#c9c9c9"/>
+  <circle cx="45" cy="73" r="2" fill="#2d2d2d"/><circle cx="55" cy="73" r="2" fill="#2d2d2d"/>
+</svg>` },
+{ word: 'חָתוּל', letter: 'ח', audio: 'chatul', svg: `<svg ${S}>
+  <path d="M24 34 L20 12 L40 24 Z" fill="#8d8d94"/>
+  <path d="M76 34 L80 12 L60 24 Z" fill="#8d8d94"/>
+  <path d="M26 32 L24 20 L36 27 Z" fill="#f5a9c0"/>
+  <path d="M74 32 L76 20 L64 27 Z" fill="#f5a9c0"/>
+  <circle cx="50" cy="52" r="30" fill="#a0a0a8"/>
+  ${FACE(50,46)}
+  <path d="M50 56 L46 60 Q50 64 54 60 Z" fill="#f58bab"/>
+  <path d="M46 60 Q50 66 54 60" stroke="#4a4a4a" stroke-width="2" fill="none"/>
+  <g stroke="#4a4a4a" stroke-width="1.6" stroke-linecap="round">
+    <path d="M26 52 L40 55"/><path d="M26 60 L40 59"/>
+    <path d="M74 52 L60 55"/><path d="M74 60 L60 59"/>
+  </g>
+</svg>` },
+{ word: 'טְרַקְטוֹר', letter: 'ט', audio: 'traktor', svg: `<svg ${S}>
+  <rect x="20" y="44" width="42" height="22" rx="5" fill="#e05252"/>
+  <rect x="52" y="26" width="24" height="26" rx="4" fill="#e05252"/>
+  <rect x="57" y="31" width="14" height="13" rx="2" fill="#bfe8ff"/>
+  <rect x="26" y="34" width="6" height="12" rx="2" fill="#666"/>
+  <circle cx="34" cy="72" r="15" fill="#3a3a3a"/><circle cx="34" cy="72" r="7" fill="#e0c341"/>
+  <circle cx="72" cy="76" r="10" fill="#3a3a3a"/><circle cx="72" cy="76" r="4.5" fill="#e0c341"/>
+  <ellipse cx="50" cy="90" rx="40" ry="3.5" fill="#c8e6a0"/>
+</svg>` },
+{ word: 'יַנְשׁוּף', letter: 'י', audio: 'yanshuf', svg: `<svg ${S}>
+  <path d="M30 26 L24 12 L40 20 Z" fill="#8a5a2e"/>
+  <path d="M70 26 L76 12 L60 20 Z" fill="#8a5a2e"/>
+  <ellipse cx="50" cy="54" rx="28" ry="33" fill="#a5713c"/>
+  <ellipse cx="50" cy="64" rx="17" ry="19" fill="#e3c294"/>
+  <circle cx="38" cy="42" r="11" fill="#fff"/><circle cx="38" cy="42" r="5.5" fill="#2d2d2d"/><circle cx="36" cy="40" r="1.6" fill="#fff"/>
+  <circle cx="62" cy="42" r="11" fill="#fff"/><circle cx="62" cy="42" r="5.5" fill="#2d2d2d"/><circle cx="60" cy="40" r="1.6" fill="#fff"/>
+  <path d="M50 50 L45 58 L55 58 Z" fill="#f0a03c"/>
+</svg>` },
+{ word: 'כֶּלֶב', letter: 'כ', audio: 'kelev', svg: `<svg ${S}>
+  <ellipse cx="26" cy="42" rx="9" ry="17" fill="#8a5a2e" transform="rotate(14 26 42)"/>
+  <ellipse cx="74" cy="42" rx="9" ry="17" fill="#8a5a2e" transform="rotate(-14 74 42)"/>
+  <circle cx="50" cy="52" r="29" fill="#c48a4a"/>
+  <circle cx="62" cy="46" r="10" fill="#8a5a2e" opacity="0.55"/>
+  ${FACE(50,46)}
+  <ellipse cx="50" cy="60" rx="11" ry="9" fill="#f0dcc0"/>
+  <ellipse cx="50" cy="56" rx="4.5" ry="3.5" fill="#3a2a18"/>
+  <path d="M50 60 L50 64 Q46 68 43 64" stroke="#3a2a18" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M50 64 Q54 72 58 66 Q56 74 50 70 Z" fill="#f58bab"/>
+</svg>` },
+{ word: 'לֵיצָן', letter: 'ל', audio: 'leitzan', svg: `<svg ${S}>
+  <path d="M50 8 L62 28 L38 28 Z" fill="#6c5ce7"/>
+  <circle cx="50" cy="8" r="5" fill="#ffd94d"/>
+  <circle cx="28" cy="42" r="10" fill="#e05252"/>
+  <circle cx="72" cy="42" r="10" fill="#4dabf7"/>
+  <circle cx="30" cy="54" r="9" fill="#f0a03c"/>
+  <circle cx="70" cy="54" r="9" fill="#51cf66"/>
+  <circle cx="50" cy="50" r="24" fill="#ffe3c9"/>
+  ${FACE(50,44)}
+  <circle cx="50" cy="53" r="6" fill="#e03131"/>
+  <path d="M40 60 Q50 68 60 60" stroke="#c0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>` },
+{ word: 'מְכוֹנִית', letter: 'מ', audio: 'mechonit', svg: `<svg ${S}>
+  <path d="M14 64 Q14 50 26 50 L32 38 Q34 34 40 34 L64 34 Q70 34 72 38 L78 50 Q88 50 88 62 L88 68 Q88 72 84 72 L18 72 Q14 72 14 68 Z" fill="#4dabf7"/>
+  <path d="M38 38 L36 50 L50 50 L50 38 Z" fill="#d6f0ff"/>
+  <path d="M54 38 L54 50 L68 50 L64 38 Z" fill="#d6f0ff"/>
+  <circle cx="30" cy="72" r="9" fill="#2d2d2d"/><circle cx="30" cy="72" r="4" fill="#bbb"/>
+  <circle cx="70" cy="72" r="9" fill="#2d2d2d"/><circle cx="70" cy="72" r="4" fill="#bbb"/>
+  <ellipse cx="50" cy="86" rx="40" ry="3" fill="#c8c8c8" opacity="0.5"/>
+</svg>` },
+{ word: 'נָחָשׁ', letter: 'נ', audio: 'nachash', svg: `<svg ${S}>
+  <path d="M18 76 Q30 60 44 72 Q58 84 70 70 Q80 58 72 46" stroke="#51a352" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <circle cx="70" cy="40" r="11" fill="#63b864"/>
+  <circle cx="66" cy="38" r="2.4" fill="#2d2d2d"/><circle cx="74" cy="38" r="2.4" fill="#2d2d2d"/>
+  <path d="M70 50 L70 58 M70 58 L66 62 M70 58 L74 62" stroke="#e03131" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <g fill="#3d7a3e"><circle cx="30" cy="69" r="2.4"/><circle cx="46" cy="74" r="2.4"/><circle cx="62" cy="72" r="2.4"/></g>
+</svg>` },
+{ word: 'סוּס', letter: 'ס', audio: 'sus', svg: `<svg ${S}>
+  <path d="M34 30 Q30 14 42 18 L46 26 Z" fill="#7a4a26"/>
+  <path d="M62 30 Q66 14 54 18 L50 26 Z" fill="#7a4a26"/>
+  <path d="M48 22 Q34 24 32 44 Q30 60 40 62 L48 40 Z" fill="#5c3a1e"/>
+  <ellipse cx="50" cy="46" rx="22" ry="25" fill="#a5713c"/>
+  ${FACE(50,42)}
+  <ellipse cx="50" cy="64" rx="15" ry="13" fill="#d9b284"/>
+  <circle cx="44" cy="62" r="2.6" fill="#4a2f14"/><circle cx="56" cy="62" r="2.6" fill="#4a2f14"/>
+  <path d="M44 70 Q50 74 56 70" stroke="#4a2f14" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>` },
+{ word: 'עַכְבָּר', letter: 'ע', audio: 'achbar', svg: `<svg ${S}>
+  <circle cx="28" cy="28" r="16" fill="#9e9eae"/><circle cx="28" cy="28" r="9" fill="#f5b8c8"/>
+  <circle cx="72" cy="28" r="16" fill="#9e9eae"/><circle cx="72" cy="28" r="9" fill="#f5b8c8"/>
+  <circle cx="50" cy="58" r="27" fill="#b8b8c8"/>
+  ${FACE(50,52)}
+  <circle cx="50" cy="64" r="4.5" fill="#f06292"/>
+  <path d="M44 70 Q50 74 56 70" stroke="#5a5a6a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <g stroke="#7a7a8a" stroke-width="1.4" stroke-linecap="round">
+    <path d="M28 60 L42 63"/><path d="M28 68 L42 67"/>
+    <path d="M72 60 L58 63"/><path d="M72 68 L58 67"/>
+  </g>
+</svg>` },
+{ word: 'פִּיל', letter: 'פ', audio: 'pil', svg: `<svg ${S}>
+  <circle cx="24" cy="48" r="17" fill="#8fa8c8"/><circle cx="24" cy="48" r="10" fill="#b8cbe3"/>
+  <circle cx="76" cy="48" r="17" fill="#8fa8c8"/><circle cx="76" cy="48" r="10" fill="#b8cbe3"/>
+  <circle cx="50" cy="50" r="26" fill="#a3b9d6"/>
+  ${FACE(50,44)}
+  <path d="M50 54 Q52 68 62 74 Q66 76 66 70 Q60 66 58 56" fill="#a3b9d6" stroke="#8fa8c8" stroke-width="1.5"/>
+  <path d="M44 56 Q47 59 50 57" stroke="#5a6a80" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>` },
+{ word: 'צָב', letter: 'צ', audio: 'tzav', svg: `<svg ${S}>
+  <path d="M20 64 Q20 34 50 34 Q80 34 80 64 Z" fill="#51a352"/>
+  <g fill="#3d7a3e"><circle cx="40" cy="50" r="6"/><circle cx="58" cy="50" r="6"/><circle cx="49" cy="60" r="6"/></g>
+  <rect x="16" y="60" width="68" height="9" rx="4.5" fill="#8a6a3a"/>
+  <circle cx="86" cy="58" r="9" fill="#7fc97f"/>
+  <circle cx="88" cy="56" r="2.2" fill="#2d2d2d"/>
+  <path d="M85 62 Q88 64 91 62" stroke="#3d7a3e" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <ellipse cx="30" cy="74" rx="6" ry="5" fill="#7fc97f"/>
+  <ellipse cx="62" cy="74" rx="6" ry="5" fill="#7fc97f"/>
+</svg>` },
+{ word: 'רַכֶּבֶת', letter: 'ר', audio: 'rakevet', svg: `<svg ${S}>
+  <circle cx="72" cy="18" r="5" fill="#ddd" opacity="0.8"/>
+  <circle cx="80" cy="10" r="4" fill="#ddd" opacity="0.6"/>
+  <rect x="18" y="36" width="38" height="30" rx="6" fill="#3f74c9"/>
+  <rect x="24" y="42" width="11" height="10" rx="2" fill="#cfe8ff"/>
+  <rect x="40" y="42" width="11" height="10" rx="2" fill="#cfe8ff"/>
+  <rect x="56" y="44" width="26" height="22" rx="4" fill="#e05252"/>
+  <rect x="66" y="26" width="9" height="18" rx="2" fill="#3a3a3a"/>
+  <circle cx="30" cy="72" r="8" fill="#2d2d2d"/><circle cx="30" cy="72" r="3.5" fill="#bbb"/>
+  <circle cx="48" cy="72" r="8" fill="#2d2d2d"/><circle cx="48" cy="72" r="3.5" fill="#bbb"/>
+  <circle cx="69" cy="72" r="8" fill="#2d2d2d"/><circle cx="69" cy="72" r="3.5" fill="#bbb"/>
+  <path d="M10 84 L92 84" stroke="#8a6a3a" stroke-width="4" stroke-linecap="round"/>
+</svg>` },
+{ word: 'שֶׁמֶשׁ', letter: 'ש', audio: 'shemesh', svg: `<svg ${S}>
+  <g stroke="#f0a03c" stroke-width="5" stroke-linecap="round">
+    ${[0,30,60,90,120,150,180,210,240,270,300,330].map(a=>{const r1=34,r2=45,x=50,y=50;return `<path d="M${x+r1*Math.cos(a*Math.PI/180)} ${y+r1*Math.sin(a*Math.PI/180)} L${x+r2*Math.cos(a*Math.PI/180)} ${y+r2*Math.sin(a*Math.PI/180)}"/>`}).join('')}
+  </g>
+  <circle cx="50" cy="50" r="28" fill="#ffd94d"/>
+  ${FACE(50,46)}
+  <path d="M42 58 Q50 66 58 58" stroke="#c98a1e" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="36" cy="54" r="4" fill="#ffb347" opacity="0.7"/>
+  <circle cx="64" cy="54" r="4" fill="#ffb347" opacity="0.7"/>
+</svg>` },
+{ word: 'תַּפּוּחַ', letter: 'ת', audio: 'tapuach', svg: `<svg ${S}>
+  <path d="M50 30 Q48 18 54 12" stroke="#7a4a26" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M54 20 Q70 10 72 24 Q60 30 54 20" fill="#51a352"/>
+  <path d="M50 32 Q28 24 22 46 Q18 66 34 78 Q44 84 50 78 Q56 84 66 78 Q82 66 78 46 Q72 24 50 32" fill="#e05252"/>
+  <path d="M34 40 Q30 46 32 54" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.5"/>
+</svg>` }
+];
+</script>
+<script id="game-script">
+// ================= הגדרות שלבים =================
+const STAGES = [
+    { name: 'מתחת למים',  emoji: '🌊', desc: 'דגים שוחים סביבנו! מצאי את האות שהמילה מתחילה בה', bubbles: 6, speed: [0.35, 0.7] },
+    { name: 'היער הקסום', emoji: '🌲', desc: 'גחליליות מאירות את הדרך... הבועות קצת יותר מהירות!', bubbles: 7, speed: [0.55, 1.0] },
+    { name: 'החלל',       emoji: '🚀', desc: 'בין הכוכבים! הבועות הכי מהירות — את מוכנה?', bubbles: 8, speed: [0.8, 1.4] }
+];
+const ROUNDS_PER_STAGE = 10;
+const COMBO_MSGS = ['וואו! 🌟', 'מדהים! 🔥', 'אלופה! 👑', 'לא ייאמן! 🚀', 'קסם אמיתי! ✨'];
+
+// ================= מצב המשחק =================
+let stage = 0;          // 0..2
+let round = 0;          // 0..9 בתוך שלב
+let score = 0;
+let combo = 0;
+let wrongCount = 0;
+let currentWord = null;
+let stageWords = [];
+let bubbles = [];
+let rafId = null;
+let acceptingTaps = false;
+
+const layer = document.getElementById('bubble-layer');
+const scenery = document.getElementById('scenery');
+
+// ================= עזרי שמע =================
+let audioCtx = null;
+function ensureAudioCtx() {
+    if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    }
+}
+function playMp3(name) {
+    try {
+        const a = new Audio(AUDIO_PATH + name + '.mp3');
+        a.play().catch(() => {});
+    } catch (e) {}
+}
+function popSound() {
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(520, audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1040, audioCtx.currentTime + 0.09);
+    g.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.2);
+}
+function wrongSound() {
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(220, audioCtx.currentTime);
+    o.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + 0.2);
+    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 0.26);
+}
+function speakWord() {
+    if (currentWord) playMp3(currentWord.audio);
+}
+
+// ================= עזרים כלליים =================
+function rnd(min, max) { return Math.random() * (max - min) + min; }
+function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+function goBack() { window.location.href = '../../grade-1.html'; }
+
+// ================= תפאורה לפי שלב =================
+function buildScenery(stageIdx) {
+    scenery.innerHTML = '';
+    const W = window.innerWidth;
+    if (stageIdx === 0) {
+        // מתחת למים: קרני אור, דגים, אצות, בועות קטנות
+        for (let i = 0; i < 3; i++) {
+            const r = document.createElement('div');
+            r.className = 'light-ray';
+            r.style.left = (12 + i * 30) + '%';
+            r.style.animationDelay = (i * 1.4) + 's';
+            scenery.appendChild(r);
+        }
+        const fishes = ['🐠', '🐟', '🐡', '🐙', '🐢'];
+        for (let i = 0; i < 5; i++) {
+            const f = document.createElement('div');
+            f.className = 'fish' + (i % 2 ? ' flip' : '');
+            f.textContent = fishes[i];
+            f.style.top = rnd(18, 75) + '%';
+            f.style.animationDuration = rnd(14, 26) + 's';
+            f.style.animationDelay = (-rnd(0, 20)) + 's';
+            scenery.appendChild(f);
+        }
+        for (let i = 0; i < 6; i++) {
+            const s = document.createElement('div');
+            s.className = 'seaweed';
+            s.style.left = rnd(2, 94) + '%';
+            s.style.height = rnd(70, 130) + 'px';
+            s.style.animationDelay = rnd(0, 3) + 's';
+            s.innerHTML = `<svg viewBox="0 0 36 110" width="100%" height="100%"><path d="M18 110 Q6 80 18 55 Q30 30 18 0" stroke="#2e7d52" stroke-width="9" fill="none" stroke-linecap="round"/></svg>`;
+            scenery.appendChild(s);
+        }
+        for (let i = 0; i < 8; i++) {
+            const b = document.createElement('div');
+            b.className = 'tiny-bubble';
+            b.style.left = rnd(2, 96) + '%';
+            b.style.animationDuration = rnd(6, 12) + 's';
+            b.style.animationDelay = rnd(0, 8) + 's';
+            scenery.appendChild(b);
+        }
+    } else if (stageIdx === 1) {
+        // היער הקסום: ירח, עצים, גחליליות
+        const moon = document.createElement('div');
+        moon.className = 'forest-moon';
+        moon.textContent = '🌕';
+        scenery.appendChild(moon);
+        const treeXs = [-20, W * 0.22, W * 0.55, W - 90];
+        treeXs.forEach((x, i) => {
+            const t = document.createElement('div');
+            t.className = 'tree';
+            t.style.left = x + 'px';
+            t.style.height = rnd(160, 230) + 'px';
+            t.innerHTML = `<svg viewBox="0 0 130 210" width="100%" height="100%" preserveAspectRatio="none">
+                <rect x="57" y="140" width="16" height="70" rx="4" fill="#0d2417"/>
+                <path d="M65 6 L112 92 L18 92 Z" fill="#123a26"/>
+                <path d="M65 52 L122 158 L8 158 Z" fill="#0d2e1d"/>
+            </svg>`;
+            scenery.appendChild(t);
+        });
+        for (let i = 0; i < 9; i++) {
+            const f = document.createElement('div');
+            f.className = 'firefly';
+            f.style.left = rnd(4, 92) + '%';
+            f.style.top = rnd(20, 85) + '%';
+            f.style.animationDelay = rnd(0, 4) + 's, ' + rnd(0, 2) + 's';
+            scenery.appendChild(f);
+        }
+    } else {
+        // החלל: כוכבים, כוכבי לכת, כוכב נופל
+        for (let i = 0; i < 45; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            const size = rnd(1.5, 3.5);
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            s.style.left = rnd(0, 100) + '%';
+            s.style.top = rnd(0, 100) + '%';
+            s.style.animationDelay = rnd(0, 2) + 's';
+            s.style.animationDuration = rnd(1.4, 3) + 's';
+            scenery.appendChild(s);
+        }
+        [['🪐', '78%', '12%'], ['🌙', '8%', '18%'], ['🛸', '14%', '68%']].forEach(([e, l, t], i) => {
+            const p = document.createElement('div');
+            p.className = 'planet';
+            p.textContent = e;
+            p.style.left = l; p.style.top = t;
+            p.style.animationDelay = (i * 2) + 's';
+            scenery.appendChild(p);
+        });
+        const sh = document.createElement('div');
+        sh.className = 'shooting-star';
+        sh.style.left = '70%'; sh.style.top = '10%';
+        scenery.appendChild(sh);
+    }
+}
+
+// ================= זרימת המשחק =================
+function startGame() {
+    ensureAudioCtx();
+    document.getElementById('start-screen').classList.add('hidden');
+    stage = 0; score = 0; wrongCount = 0;
+    updateScore();
+    showStageScreen();
+}
+
+function showStageScreen() {
+    const st = STAGES[stage];
+    document.body.className = 'stage-' + (stage + 1);
+    buildScenery(stage);
+    document.getElementById('stage-badge').textContent = 'שלב ' + (stage + 1) + ' מתוך 3';
+    document.getElementById('stage-emoji').textContent = st.emoji;
+    document.getElementById('stage-name').textContent = st.name;
+    document.getElementById('stage-desc').textContent = st.desc;
+    document.getElementById('stage-screen').classList.remove('hidden');
+}
+
+function beginStage() {
+    document.getElementById('stage-screen').classList.add('hidden');
+    document.getElementById('word-card').style.display = 'flex';
+    document.getElementById('progress-wrap').style.display = 'block';
+    round = 0;
+    combo = 0;
+    stageWords = shuffle(WORDS).slice(0, ROUNDS_PER_STAGE);
+    startLoop();
+    nextRound();
+}
+
+function nextRound() {
+    if (round >= ROUNDS_PER_STAGE) {
+        endStage();
+        return;
+    }
+    currentWord = stageWords[round];
+    round++;
+    updateProgress();
+
+    document.getElementById('word-pic').innerHTML = currentWord.svg;
+    document.getElementById('word-text').textContent = currentWord.word;
+    const card = document.getElementById('word-card');
+    card.style.animation = 'none';
+    void card.offsetWidth; // אתחול האנימציה
+    card.style.animation = '';
+
+    playMp3(currentWord.audio);
+    spawnBubbles();
+    acceptingTaps = true;
+}
+
+function endStage() {
+    acceptingTaps = false;
+    clearBubbles();
+    stage++;
+    if (stage >= STAGES.length) {
+        showWinScreen();
+    } else {
+        stopLoop();
+        showStageScreen();
+    }
+}
+
+function updateProgress() {
+    document.getElementById('progress-label').textContent =
+        STAGES[stage].emoji + ' ' + STAGES[stage].name + ' · מילה ' + round + ' מתוך ' + ROUNDS_PER_STAGE;
+    document.getElementById('progress-fill').style.width = ((round - 1) / ROUNDS_PER_STAGE * 100) + '%';
+}
+
+function updateScore() {
+    document.getElementById('score').textContent = score;
+}
+
+// ================= בועות =================
+function clearBubbles() {
+    bubbles.forEach(b => b.el.remove());
+    bubbles = [];
+}
+
+function bubbleTints() {
+    return ['rgba(255,107,157,0.5)', 'rgba(0,212,255,0.5)', 'rgba(124,255,107,0.5)',
+            'rgba(199,125,255,0.5)', 'rgba(255,179,71,0.5)', 'rgba(255,224,102,0.5)'];
+}
+
+function pickDistractors(n, correct) {
+    const pool = shuffle(ALL_LETTERS.filter(l => l !== correct));
+    return pool.slice(0, n);
+}
+
+function spawnBubbles() {
+    clearBubbles();
+    const st = STAGES[stage];
+    const n = st.bubbles;
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    const correctIdx = Math.floor(Math.random() * n);
+    const distractors = pickDistractors(n - 1, currentWord.letter);
+    const tints = bubbleTints();
+    let d = 0;
+
+    for (let i = 0; i < n; i++) {
+        const isCorrect = (i === correctIdx);
+        const letter = isCorrect ? currentWord.letter : distractors[d++];
+        const size = rnd(68, 92);
+        const el = document.createElement('div');
+        el.className = 'bubble';
+        el.style.width = size + 'px';
+        el.style.height = size + 'px';
+        el.style.setProperty('--bub-tint', tints[i % tints.length]);
+        el.innerHTML = '<span class="letter">' + letter + '</span>';
+
+        const b = {
+            el, letter, isCorrect, size,
+            x: rnd(6, W - size - 6),
+            y: H + rnd(20, 320) + i * (H * 0.12),
+            speed: rnd(st.speed[0], st.speed[1]),
+            wobbleAmp: rnd(10, 26),
+            wobbleFreq: rnd(0.0012, 0.0026),
+            wobblePhase: rnd(0, Math.PI * 2)
+        };
+        el.addEventListener('pointerdown', (ev) => onBubbleTap(b, ev));
+        layer.appendChild(el);
+        bubbles.push(b);
+    }
+}
+
+function startLoop() {
+    if (rafId) return;
+    let last = performance.now();
+    function frame(now) {
+        const dt = Math.min(now - last, 50);
+        last = now;
+        const W = window.innerWidth;
+        bubbles.forEach(b => {
+            b.y -= b.speed * dt * 0.1;
+            if (b.y < -b.size - 20) {
+                // הבועה יצאה למעלה — חוזרת מלמטה
+                b.y = window.innerHeight + rnd(20, 140);
+                b.x = rnd(6, W - b.size - 6);
+                if (!b.isCorrect) {
+                    b.letter = pickDistractors(1, currentWord ? currentWord.letter : '')[0];
+                    b.el.querySelector('.letter').textContent = b.letter;
+                }
+            }
+            const wob = Math.sin(now * b.wobbleFreq + b.wobblePhase) * b.wobbleAmp;
+            b.el.style.transform = 'translate(' + (b.x + wob) + 'px,' + b.y + 'px)';
+        });
+        rafId = requestAnimationFrame(frame);
+    }
+    rafId = requestAnimationFrame(frame);
+}
+
+function stopLoop() {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+}
+
+// ================= מגע בבועה =================
+function onBubbleTap(b, ev) {
+    if (!acceptingTaps) return;
+    ensureAudioCtx();
+    if (b.isCorrect) {
+        acceptingTaps = false;
+        popSound();
+        popEffect(b, true);
+        score += 10;
+        combo++;
+        if (combo >= 3) {
+            const msg = document.getElementById('combo-msg');
+            msg.textContent = COMBO_MSGS[Math.min(combo - 3, COMBO_MSGS.length - 1)] + ' ' + combo + ' ברצף!';
+            msg.classList.remove('show');
+            void msg.offsetWidth;
+            msg.classList.add('show');
+            score += 5; // בונוס קומבו
+        }
+        updateScore();
+        setTimeout(() => playMp3(LETTER_AUDIO[b.letter]), 250);
+        clearBubbles();
+        setTimeout(nextRound, 1100);
+    } else {
+        wrongSound();
+        wrongCount++;
+        combo = 0;
+        b.el.classList.remove('shake');
+        void b.el.offsetWidth;
+        b.el.classList.add('shake');
+        popEffect(b, false);
+        // הבועה השגויה מתפוצצת וחוזרת מלמטה עם אות חדשה
+        b.y = window.innerHeight + rnd(40, 160);
+        b.letter = pickDistractors(1, currentWord.letter)[0];
+        b.el.querySelector('.letter').textContent = b.letter;
+    }
+}
+
+function popEffect(b, success) {
+    const cx = b.x + b.size / 2;
+    const cy = b.y + b.size / 2;
+
+    const ring = document.createElement('div');
+    ring.className = 'pop-ring';
+    ring.style.left = (cx - b.size / 2) + 'px';
+    ring.style.top = (cy - b.size / 2) + 'px';
+    ring.style.width = b.size + 'px';
+    ring.style.height = b.size + 'px';
+    if (!success) ring.style.borderColor = 'rgba(255,120,120,0.9)';
+    layer.appendChild(ring);
+    setTimeout(() => ring.remove(), 520);
+
+    const colors = success
+        ? ['#ffe066', '#7cff6b', '#00d4ff', '#ff6b9d', '#c77dff']
+        : ['#ff8a80', '#ffb3ab'];
+    const count = success ? 14 : 7;
+    for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const s = rnd(5, 11);
+        p.style.width = s + 'px'; p.style.height = s + 'px';
+        p.style.background = colors[i % colors.length];
+        p.style.left = cx + 'px'; p.style.top = cy + 'px';
+        const ang = rnd(0, Math.PI * 2);
+        const dist = rnd(40, 110);
+        p.animate([
+            { transform: 'translate(0,0) scale(1)', opacity: 1 },
+            { transform: 'translate(' + (Math.cos(ang) * dist) + 'px,' + (Math.sin(ang) * dist) + 'px) scale(0.2)', opacity: 0 }
+        ], { duration: rnd(400, 700), easing: 'cubic-bezier(0.2, 0.8, 0.4, 1)' });
+        layer.appendChild(p);
+        setTimeout(() => p.remove(), 720);
+    }
+    if (success) {
+        for (let i = 0; i < 4; i++) {
+            const st = document.createElement('div');
+            st.className = 'pop-star';
+            st.textContent = '⭐';
+            st.style.left = cx + 'px'; st.style.top = cy + 'px';
+            const ang = rnd(0, Math.PI * 2);
+            const dist = rnd(50, 100);
+            st.animate([
+                { transform: 'translate(0,0) rotate(0deg) scale(0.6)', opacity: 1 },
+                { transform: 'translate(' + (Math.cos(ang) * dist) + 'px,' + (Math.sin(ang) * dist - 30) + 'px) rotate(200deg) scale(1.1)', opacity: 0 }
+            ], { duration: 750, easing: 'ease-out' });
+            layer.appendChild(st);
+            setTimeout(() => st.remove(), 780);
+        }
+    }
+}
+
+// ================= מסך ניצחון =================
+function showWinScreen() {
+    stopLoop();
+    document.getElementById('word-card').style.display = 'none';
+    document.getElementById('progress-wrap').style.display = 'none';
+
+    const totalRounds = STAGES.length * ROUNDS_PER_STAGE;
+    const accuracy = totalRounds / (totalRounds + wrongCount);
+    const stars = wrongCount <= 3 ? 3 : (wrongCount <= 9 ? 2 : 1);
+
+    const starsEl = document.getElementById('win-stars');
+    starsEl.innerHTML = '⭐'.repeat(stars) + '<span class="dim">' + '⭐'.repeat(3 - stars) + '</span>';
+    document.getElementById('win-text').textContent =
+        'צברת ' + score + ' נקודות! ' +
+        (stars === 3 ? 'קוסמת אותיות אמיתית! 🧙‍♀️' : stars === 2 ? 'כמעט מושלם — נסי שוב לשלושה כוכבים!' : 'כל התחלה היא קסם — שווה עוד סיבוב!');
+
+    document.getElementById('win-screen').classList.remove('hidden');
+    launchConfetti();
+
+    // דיווח ציון (אם המשחק משובץ בעמוד עם app-tracker)
+    try {
+        const score10 = Math.max(1, Math.round(accuracy * 10));
+        if (typeof saveAppScore === 'function') {
+            saveAppScore('magic_bubbles', score10, 10);
+        } else if (window.parent && typeof window.parent.saveAppScore === 'function') {
+            window.parent.saveAppScore('magic_bubbles', score10, 10);
+        }
+    } catch (e) {}
+}
+
+function launchConfetti() {
+    const colors = ['#ffe066', '#ff6b9d', '#00d4ff', '#7cff6b', '#c77dff', '#ffb347'];
+    for (let i = 0; i < 80; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = rnd(0, 100) + '%';
+        c.style.background = colors[i % colors.length];
+        c.style.animationDuration = rnd(2.2, 4.5) + 's';
+        c.style.animationDelay = rnd(0, 1.6) + 's';
+        document.getElementById('game-container').appendChild(c);
+        setTimeout(() => c.remove(), 6500);
+    }
+}
+
+// שמירה על בועות בתוך המסך בשינוי גודל חלון
+window.addEventListener('resize', () => {
+    const W = window.innerWidth;
+    bubbles.forEach(b => { b.x = Math.min(b.x, W - b.size - 6); });
+});
+
+buildScenery(0);
+</script>
+</body>
+</html>
