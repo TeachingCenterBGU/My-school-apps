@@ -558,45 +558,67 @@ const levels = [
       { word: 'צחו_ (שם עצם)', answer: 'ק', options: ['כ','ק'], fullWord: 'צחוק' },
       { word: '_דור (שם עצם)', answer: 'כ', options: ['כ','ק'], fullWord: 'כדור' },
       { word: 'ל_פוץ (פועל)', answer: 'ק', options: ['כ','ק'], fullWord: 'לקפוץ' },
-      { word: 'מ_ר [מוכר] (פועל)', answer: 'כ', options: ['כ','ק'], fullWord: 'מוכר' },
+      { word: 'מ_ר (פועל)', answer: 'כ', options: ['כ','ק'], fullWord: 'מוכר' },
       { word: 'תינו_ (שם עצם)', answer: 'ק', options: ['כ','ק'], fullWord: 'תינוק' },
     ],
     prompt: 'איזו אות חסרה במילה?'
   },
   {
-    id: 3, name: 'דרקון השגיאות 🔥', emoji: '🐉',
+    id: 3, name: 'הר הכף-חית ⛰️', emoji: '⛰️',
+    desc: 'השלמת מילים עם כ / ח',
+    monsters: [
+      { name: 'נשר קרח', emoji: '🦅', hp: 40 },
+      { name: 'ייטי', emoji: '🧌', hp: 50 },
+      { name: 'ענק שלג', emoji: '❄️', hp: 55 },
+    ],
+    questions: [
+      { word: 'שמ_ה (שם עצם)', answer: 'ח', options: ['כ','ח'], fullWord: 'שמחה' },
+      { word: 'לש_וח (פועל)', answer: 'כ', options: ['כ','ח'], fullWord: 'לשכוח' },
+      { word: 'הצל_ה (שם פעולה)', answer: 'ח', options: ['כ','ח'], fullWord: 'הצלחה' },
+      { word: 'ל_תוב (פועל)', answer: 'כ', options: ['כ','ח'], fullWord: 'לכתוב' },
+      { word: '_לום (שם עצם)', answer: 'ח', options: ['כ','ח'], fullWord: 'חלום' },
+      { word: 'ס_נה (שם עצם)', answer: 'כ', options: ['כ','ח'], fullWord: 'סכנה' },
+      { word: 'ל_תוך (פועל)', answer: 'ח', options: ['כ','ח'], fullWord: 'לחתוך' },
+      { word: '_דור (שם עצם)', answer: 'כ', options: ['כ','ח'], fullWord: 'כדור' },
+      { word: 'משפ_ה (שם עצם)', answer: 'ח', options: ['כ','ח'], fullWord: 'משפחה' },
+      { word: 'לחיי_ (פועל)', answer: 'כ', options: ['כ','ח'], fullWord: 'לחייך' },
+    ],
+    prompt: 'איזו אות חסרה במילה?'
+  },
+  {
+    id: 4, name: 'דרקון השגיאות 🔥', emoji: '🐉',
     desc: 'קרב בוס! השלמת שתי אותיות וסיווג',
     boss: true,
     monsters: [
       { name: 'דרקון הלשון', emoji: '🐉', hp: 120 },
     ],
     bossQuestions: [
-      { word: 'ה _ ל _ ה (החלטה)', fullWord: 'החלטה', cats: [
+      { word: 'ה _ ל _ ה', fullWord: 'החלטה', cats: [
         { cat: 'אות חסרה 1', answer: 'ח', options: ['ח','כ'] },
         { cat: 'אות חסרה 2', answer: 'ט', options: ['ט','ת'] },
         { cat: 'סוג מילה', answer: 'שם פעולה', options: ['פועל','שם פעולה','שם עצם'] },
       ]},
-      { word: '_ ו _ ב ת (כותבת)', fullWord: 'כותבת', cats: [
+      { word: '_ ו _ ב ת', fullWord: 'כותבת', cats: [
         { cat: 'אות חסרה 1', answer: 'כ', options: ['כ','ק'] },
         { cat: 'אות חסרה 2', answer: 'ת', options: ['ט','ת'] },
         { cat: 'סוג מילה', answer: 'פועל', options: ['פועל','שם פעולה','שם עצם'] },
       ]},
-      { word: 'ה פ ת _ _ (הפתעה)', fullWord: 'הפתעה', cats: [
+      { word: 'ה פ ת _ _', fullWord: 'הפתעה', cats: [
         { cat: 'אות חסרה 1', answer: 'ע', options: ['א','ע'] },
         { cat: 'אות חסרה 2', answer: 'ה', options: ['ה','א'] },
         { cat: 'סוג מילה', answer: 'שם פעולה', options: ['פועל','שם פעולה','שם עצם'] },
       ]},
-      { word: 'מ _ ל _ ת (מקלחת)', fullWord: 'מקלחת', cats: [
+      { word: 'מ _ ל _ ת', fullWord: 'מקלחת', cats: [
         { cat: 'אות חסרה 1', answer: 'ק', options: ['ק','כ'] },
         { cat: 'אות חסרה 2', answer: 'ח', options: ['ח','כ'] },
         { cat: 'סוג מילה', answer: 'שם עצם', options: ['פועל','שם פעולה','שם עצם'] },
       ]},
-      { word: '_ ו מ _ ת (שומעת)', fullWord: 'שומעת', cats: [
+      { word: '_ ו מ _ ת', fullWord: 'שומעת', cats: [
         { cat: 'אות חסרה 1', answer: 'ש', options: ['ש','ס'] },
         { cat: 'אות חסרה 2', answer: 'ע', options: ['א','ע'] },
         { cat: 'סוג מילה', answer: 'פועל', options: ['פועל','שם פעולה','שם עצם'] },
       ]},
-      { word: 'ק ר י _ _ (קריאה)', fullWord: 'קריאה', cats: [
+      { word: 'ק ר י _ _', fullWord: 'קריאה', cats: [
         { cat: 'אות חסרה 1', answer: 'א', options: ['א','ע'] },
         { cat: 'אות חסרה 2', answer: 'ה', options: ['ה','ע'] },
         { cat: 'סוג מילה', answer: 'שם פעולה', options: ['פועל','שם פעולה','שם עצם'] },
@@ -736,7 +758,6 @@ function showRegularQuestion() {
   const q = battleQuestions[bqIndex];
   document.getElementById('qCategory').textContent = q.cat || currentLevel.desc;
   
-  // הוספת כפתור השמעה ליד המילה
   document.getElementById('qWord').innerHTML = `
     ${q.word} <span style="cursor:pointer; font-size: 0.8em; user-select: none;" onclick="speakText('${q.fullWord}')">🔊</span>
   `;
@@ -751,7 +772,6 @@ function showRegularQuestion() {
     optDiv.appendChild(btn);
   });
 
-  // הקראה אוטומטית ברגע שהשאלה עולה
   speakText(q.fullWord);
 }
 
@@ -806,7 +826,6 @@ function handleAnswer(choice, correct, btnEl) {
 function showBossQuestion() {
   const q = battleQuestions[bqIndex];
   
-  // הוספת כפתור השמעה ליד מילת הבוס
   document.getElementById('bossQWord').innerHTML = `
     ${q.word} <span style="cursor:pointer; font-size: 0.8em; user-select: none;" onclick="speakText('${q.fullWord}')">🔊</span>
   `;
@@ -837,7 +856,6 @@ function showBossQuestion() {
   });
   document.getElementById('bossSubmitBtn').classList.remove('ready');
 
-  // הקראה אוטומטית ברגע שהבוס עולה
   speakText(q.fullWord);
 }
 
@@ -973,10 +991,10 @@ function shuffle(arr) {
 // פונקציית הקראת מילים בעברית
 function speakText(text) {
   if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel(); // עוצר השמעות קודמות
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'he-IL';
-    utterance.rate = 0.85; // קצב קריאה מעט מואט לבהירות
+    utterance.rate = 0.85; 
     window.speechSynthesis.speak(utterance);
   }
 }
