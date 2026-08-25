@@ -8,107 +8,169 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;font-family:'Heebo',system-ui,sans-serif;background:#ede7f6;color:#311b52;
-       min-height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;}
-  .stage{width:100%;max-width:460px;padding:16px;flex:1;display:flex;flex-direction:column;
-         align-items:center;gap:16px;justify-content:center;}
-  .prompt{font-size:1.35em;font-weight:800;color:#5e35b1;}
-  .ear{width:120px;height:120px;border-radius:50%;background:#fff;border:5px solid #b39ddb;
-       font-size:4rem;display:flex;align-items:center;justify-content:center;cursor:pointer;
-       box-shadow:0 8px 20px rgba(94,53,177,.18);transition:transform .12s;}
-  .ear:active{transform:scale(.92);}
-  .ear.playing{animation:pulse 1s infinite;}
-  @keyframes pulse{0%,100%{box-shadow:0 8px 20px rgba(94,53,177,.18)}50%{box-shadow:0 8px 34px rgba(94,53,177,.45)}}
-  .options{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;}
-  .options.three{grid-template-columns:repeat(3,1fr);}
-  .opt{background:#fff;border:4px solid #9575cd;border-radius:20px;font-size:3.4rem;font-weight:800;
-       color:#4527a0;padding:18px 0;cursor:pointer;box-shadow:0 5px 0 #7e57c2;transition:transform .1s;}
-  .opt:active{transform:translateY(4px);box-shadow:none;}
-  .opt.correct{background:#c8e6c9;border-color:#4caf50;box-shadow:0 5px 0 #388e3c;color:#1b5e20;animation:bp .5s;}
-  .opt.wrong{background:#ffcdd2;border-color:#ef5350;color:#b71c1c;animation:sh .4s;}
-  @keyframes bp{40%{transform:translateY(-10px)}}
-  @keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-  .progress-dots{display:flex;gap:8px;justify-content:center;}
-  .dot{width:12px;height:12px;border-radius:50%;background:#d1c4e9;}
-  .dot.on{background:#7e57c2;}
-  .hint{color:#9e9e9e;font-size:.95em;}
+  html,body{margin:0;height:100%;}
+  body{font-family:'Heebo',system-ui,sans-serif;color:#0d3b52;min-height:100vh;
+       display:flex;flex-direction:column;}
+  .hud{text-align:center;font-weight:800;font-size:1.2em;color:#075e7a;padding:8px;
+       background:rgba(255,255,255,.8);}
+  .hud .ear{cursor:pointer;font-size:1.1em;}
+  .dots{display:flex;gap:7px;justify-content:center;margin-top:4px;}
+  .dot{width:12px;height:12px;border-radius:50%;background:#b3e5fc;}
+  .dot.on{background:#0288d1;}
+
+  .sea{position:relative;flex:1;width:100%;overflow:hidden;touch-action:manipulation;
+       background:linear-gradient(180deg,#7fd3f0 0%,#4bb4e0 40%,#1c7fb6 100%);}
+  .deco{position:absolute;pointer-events:none;user-select:none;z-index:0;bottom:-4px;}
+  .bubble{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;
+          font-weight:800;color:#075e7a;cursor:pointer;z-index:2;
+          background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.95),rgba(255,255,255,.35) 45%,rgba(160,220,255,.35));
+          border:3px solid rgba(255,255,255,.8);box-shadow:0 4px 12px rgba(0,0,0,.15);
+          text-shadow:0 1px 0 rgba(255,255,255,.7);}
+  .bubble.pop{animation:pop .4s forwards;pointer-events:none;}
+  @keyframes pop{50%{transform:scale(1.35)}100%{transform:scale(0);opacity:0}}
+  .bubble.miss{animation:miss .35s;}
+  @keyframes miss{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .mascot{position:absolute;bottom:2px;left:6px;z-index:1;pointer-events:none;
+          animation:cheer 1.2s ease-in-out infinite;}
+  @keyframes cheer{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-7px) rotate(4deg)}}
+  .spark{position:absolute;z-index:3;font-size:1.6rem;pointer-events:none;animation:sp .6s forwards;}
+  @keyframes sp{to{transform:translateY(-30px) scale(1.4);opacity:0}}
 </style>
 </head>
 <body>
-  <div class="stage" id="stage"></div>
+  <div class="hud" id="hud"></div>
+  <div class="sea" id="sea"></div>
 
-  <script src="../reading-data.js"></script>
-  <script src="../reading-progress.js"></script>
-  <script src="../reading-engine.js"></script>
+  <script src="../reading-data.js?v=6"></script>
+  <script src="../reading-progress.js?v=6"></script>
+  <script src="../reading-engine.js?v=6"></script>
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
-    const stage = document.getElementById('stage');
 
     if (!station || station.type !== 'hear') {
-      stage.innerHTML = '<p>לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
+      document.getElementById('sea').innerHTML =
+        '<p style="padding:20px">לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
     } else {
-      RG.mountTopBar('איזו אות שמעת?');
+      RG.mountTopBar('איזו אות שמעת?', { bg: false });
+      const sea = document.getElementById('sea');
       const letters = station.letters;
       const ROUNDS = 6;
       let round = 0, correct = 0, target = null, locked = false;
+      let bubbles = [], raf = null, lastT = 0;
 
-      nextRound();
+      buildDeco();
+      // בועה לכל אות, פעמיים — כך שהיעד תמיד קיים על המסך
+      requestAnimationFrame(() => { spawnBubbles(); newRound(); raf = requestAnimationFrame(loop); });
 
-      function nextRound() {
-        RG.stopAudio();
-        if (round >= ROUNDS) {
-          RG.finish({ stationId: station.id, correct, total: ROUNDS, replay: restart });
-          return;
-        }
-        locked = false;
-        target = letters[Math.floor(Math.random() * letters.length)];
-        const opts = RG.shuffle(letters);
-        stage.innerHTML =
-          `<div class="prompt">איזו אות שמעת?</div>
-           <div class="ear" id="ear">👂</div>
-           <div class="progress-dots">${dotsHTML()}</div>
-           <div class="options ${opts.length === 3 ? 'three' : ''}" id="opts"></div>
-           <div class="hint">לחצי על האוזן לשמוע שוב 🔊</div>`;
-        document.getElementById('ear').onclick = playTarget;
-        const grid = document.getElementById('opts');
-        opts.forEach(l => {
-          const b = document.createElement('div');
-          b.className = 'opt'; b.textContent = l;
-          b.onclick = () => choose(l, b);
-          grid.appendChild(b);
+      function buildDeco() {
+        ['🌿','🪸','🐚','🌿','🐠','🐟'].forEach((e, i) => {
+          const d = document.createElement('div');
+          d.className = 'deco'; d.textContent = e;
+          d.style.fontSize = (26 + Math.random() * 26) + 'px';
+          d.style.left = (i * 16 + Math.random() * 6) + '%';
+          d.style.bottom = (Math.random() * 40) + 'px';
+          sea.appendChild(d);
         });
-        setTimeout(playTarget, 450);
+        const m = document.createElement('div');
+        m.className = 'mascot'; m.innerHTML = RG.unicorn(62);
+        sea.appendChild(m);
       }
 
-      function playTarget() {
-        const ear = document.getElementById('ear');
-        if (ear) { ear.classList.add('playing'); setTimeout(() => ear.classList.remove('playing'), 900); }
-        RG.playLetter(target);
+      function spawnBubbles() {
+        const W = sea.clientWidth, H = sea.clientHeight;
+        const list = letters.concat(letters); // פעמיים כל אות
+        list.forEach(ch => {
+          const size = 58 + Math.random() * 16;
+          const el = document.createElement('div');
+          el.className = 'bubble';
+          el.textContent = ch;
+          el.style.width = el.style.height = size + 'px';
+          el.style.fontSize = Math.round(size * 0.5) + 'px';
+          const b = {
+            ch, size, el,
+            x: Math.random() * (W - size),
+            y: Math.random() * (H * 1.35),      // חלק כבר על המסך, חלק עולות מלמטה
+            vy: 20 + Math.random() * 20,
+            phase: Math.random() * 6.28,
+          };
+          el.style.left = b.x + 'px';
+          el.style.top = b.y + 'px';
+          el.onclick = () => tap(b);
+          sea.appendChild(el);
+          bubbles.push(b);
+        });
       }
 
+      function loop(t) {
+        if (!lastT) lastT = t;
+        const dt = Math.min(50, t - lastT) / 1000; lastT = t;
+        const W = sea.clientWidth, H = sea.clientHeight;
+        for (const b of bubbles) {
+          b.y -= b.vy * dt;
+          b.phase += dt * 1.5;
+          if (b.y < -b.size) { b.y = H + 20; b.x = Math.random() * (W - b.size); }
+          const sway = Math.sin(b.phase) * 10;
+          b.el.style.top = b.y + 'px';
+          b.el.style.left = (b.x + sway) + 'px';
+        }
+        raf = requestAnimationFrame(loop);
+      }
+
+      function newRound() {
+        RG.stopAudio();
+        locked = false;
+        if (round >= ROUNDS) return finishGame();
+        target = letters[Math.floor(Math.random() * letters.length)];
+        updateHud();
+        setTimeout(() => RG.playLetter(target), 350);
+      }
+
+      function tap(b) {
+        if (locked || b.el.classList.contains('pop')) return;
+        if (b.ch === target) {
+          locked = true;
+          correct++; round++;
+          RG.ding();
+          sparkle(b);
+          b.el.classList.add('pop');
+          setTimeout(() => {           // מחזירים את הבועה למטה עם אותה אות
+            b.el.classList.remove('pop');
+            b.y = sea.clientHeight + 20;
+            b.x = Math.random() * (sea.clientWidth - b.size);
+          }, 420);
+          setTimeout(newRound, 750);
+        } else {
+          RG.buzz();
+          b.el.classList.add('miss');
+          setTimeout(() => b.el.classList.remove('miss'), 350);
+        }
+      }
+
+      function sparkle(b) {
+        const s = document.createElement('div');
+        s.className = 'spark'; s.textContent = '⭐';
+        s.style.left = b.x + 'px'; s.style.top = b.y + 'px';
+        sea.appendChild(s);
+        setTimeout(() => s.remove(), 600);
+      }
+
+      function updateHud() {
+        document.getElementById('hud').innerHTML =
+          `איזו אות שמעת? <span class="ear" id="ear">👂🔊</span>
+           <div class="dots">${dotsHTML()}</div>`;
+        document.getElementById('ear').onclick = () => RG.playLetter(target);
+      }
       function dotsHTML() {
         let h = '';
         for (let i = 0; i < ROUNDS; i++) h += `<span class="dot ${i < round ? 'on' : ''}"></span>`;
         return h;
       }
 
-      function choose(l, el) {
-        if (locked) return;
-        if (l === target) {
-          locked = true;
-          el.classList.add('correct');
-          correct++; round++;
-          RG.ding();
-          setTimeout(nextRound, 800);
-        } else {
-          el.classList.add('wrong');
-          RG.buzz();
-          setTimeout(() => el.classList.remove('wrong'), 450);
-        }
+      function finishGame() {
+        if (raf) cancelAnimationFrame(raf);
+        RG.finish({ stationId: station.id, correct, total: ROUNDS, replay: () => location.reload() });
       }
-
-      function restart() { round = 0; correct = 0; nextRound(); }
     }
   </script>
 </body>
