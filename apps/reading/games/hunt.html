@@ -53,6 +53,7 @@
       nextWave();
 
       function nextWave() {
+        RG.stopAudio();
         if (waveIdx >= waves.length) {
           const correct = Math.max(0, totalTargets - wrongTaps);
           RG.finish({ stationId: station.id, correct, total: totalTargets, replay: restart });

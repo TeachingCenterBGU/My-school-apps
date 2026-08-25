@@ -56,6 +56,7 @@
       nextRound();
 
       function nextRound() {
+        RG.stopAudio();
         if (round >= ROUNDS) {
           RG.finish({ stationId: station.id, correct, total: ROUNDS, replay: restart });
           return;
@@ -66,7 +67,7 @@
         const kind = Math.random() < 0.5 ? 'hear' : 'word';
         const opts = RG.shuffle(letters);
         const optsClass = opts.length === 3 ? 'three' : '';
-        const data = READING_LETTERS[target];
+        const w = pickWord(target);   // מילה אקראית מבנק המילים של האות
 
         let showHTML, promptText, onShowClick, autoPlay;
         if (kind === 'hear') {
@@ -77,11 +78,11 @@
         } else {
           promptText = 'באיזו אות מתחילה המילה?';
           showHTML = `<div class="show" id="show">
-                        <span class="emo">${data.emoji}</span>
-                        <span class="word">${data.word}</span>
+                        <span class="emo">${w.emoji}</span>
+                        <span class="word">${w.word}</span>
                       </div>`;
-          onShowClick = () => RG.playWord(target);
-          autoPlay = () => RG.playWord(target);
+          onShowClick = () => RG.playWord(target, w);
+          autoPlay = () => RG.playWord(target, w);
         }
 
         stage.innerHTML =
@@ -107,8 +108,8 @@
           locked = true;
           el.classList.add('correct');
           correct++; round++;
-          RG.ding(); RG.playLetter(target);
-          setTimeout(nextRound, 900);
+          RG.ding();
+          setTimeout(nextRound, 800);
         } else {
           el.classList.add('wrong');
           RG.buzz();
