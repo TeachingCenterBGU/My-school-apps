@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>צליל פותח</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{font-family:'Heebo',system-ui,sans-serif;color:#3a2a12;min-height:100vh;
+       display:flex;flex-direction:column;
+       background:linear-gradient(180deg,#bfe9ff 0%,#e6f7ff 34%,#c8efa0 60%,#a5df78 100%);}
+  .hud{text-align:center;font-weight:800;font-size:1.15em;color:#2e7d32;padding:8px;
+       background:rgba(255,255,255,.8);}
+  .dots{display:flex;gap:7px;justify-content:center;margin-top:4px;}
+  .dot{width:12px;height:12px;border-radius:50%;background:#c8e6c9;}
+  .dot.on{background:#43a047;}
+
+  .stage{position:relative;flex:1;width:100%;display:flex;flex-direction:column;
+         align-items:center;justify-content:space-between;padding:14px 10px 20px;overflow:hidden;}
+
+  /* כרטיס התמונה */
+  .pic{background:#fff;border:5px solid #ffd54f;border-radius:26px;padding:14px 22px;text-align:center;
+       box-shadow:0 10px 24px rgba(0,0,0,.12);cursor:pointer;margin-top:6px;transition:transform .2s;z-index:2;}
+  .pic .emo{font-size:4.6rem;display:block;line-height:1;}
+  .pic .word{font-size:1.7rem;font-weight:800;color:#555;margin-top:4px;}
+  .pic .say{font-size:.95rem;color:#999;margin-top:2px;}
+  .pic.won{animation:won .6s forwards;}
+  @keyframes won{60%{transform:scale(1.12)}100%{transform:scale(.2);opacity:0}}
+
+  .instruction{font-weight:800;color:#5a3d1e;background:rgba(255,255,255,.7);
+       border-radius:40px;padding:5px 16px;margin-top:8px;}
+
+  /* שורת הבתים */
+  .houses{display:flex;gap:12px;justify-content:center;align-items:flex-end;width:100%;
+          flex-wrap:wrap;padding-bottom:6px;z-index:2;}
+  .house{display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform .1s;}
+  .house:active{transform:translateY(3px);}
+  .roof{width:0;height:0;border-left:44px solid transparent;border-right:44px solid transparent;
+        border-bottom:30px solid var(--roof);filter:drop-shadow(0 -2px 0 rgba(0,0,0,.06));}
+  .body{width:72px;height:70px;background:var(--wall);border-radius:0 0 10px 10px;
+        display:flex;align-items:center;justify-content:center;font-size:2.8rem;font-weight:800;
+        color:#fff;text-shadow:0 2px 3px rgba(0,0,0,.25);box-shadow:0 6px 0 rgba(0,0,0,.12);}
+  .house.correct .body{animation:hop .6s;}
+  .house.wrong .body{animation:shake .4s;}
+  @keyframes hop{40%{transform:translateY(-16px)}}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  .spark{position:absolute;z-index:4;font-size:1.8rem;pointer-events:none;animation:sp .7s forwards;}
+  @keyframes sp{to{transform:translateY(-34px) scale(1.5);opacity:0}}
+  .mascot{position:absolute;bottom:4px;left:6px;z-index:1;pointer-events:none;
+          animation:cheer 1.2s ease-in-out infinite;}
+  @keyframes cheer{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-7px) rotate(4deg)}}
+  .deco{position:absolute;pointer-events:none;user-select:none;z-index:0;}
+</style>
+</head>
+<body>
+  <div class="hud" id="hud"></div>
+  <div class="stage" id="stage">
+    <div class="pic" id="pic" onclick="playWordAgain()">
+      <span class="emo" id="emo">❓</span>
+      <span class="word" id="word"></span>
+      <span class="say">לחצי לשמוע שוב 🔊</span>
+    </div>
+    <div class="instruction">לאיזה בית שייכת המילה? 🏠 (לפי הצליל הראשון)</div>
+    <div class="houses" id="houses"></div>
+  </div>
+
+  <script src="../reading-data.js?v=7"></script>
+  <script src="../reading-progress.js?v=7"></script>
+  <script src="../reading-engine.js?v=7"></script>
+  <script>
+    RG.audioBase = '../../../letters/';
+    const station = RG.currentStation();
+    const stage = document.getElementById('stage');
+
+    if (!station || station.type !== 'sound') {
+      stage.innerHTML = '<p style="padding:20px">לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
+    } else {
+      RG.mountTopBar('צליל פותח', { bg: false });
+      const letters = station.letters;
+      const ROOFS = { wall: ['#ef9a9a','#90caf9','#a5d6a7','#ffcc80','#ce93d8','#80deea'],
+                      roof: ['#c62828','#1565c0','#2e7d32','#e65100','#6a1b9a','#00838f'] };
+      const ROUNDS = 6;
+      let round = 0, correct = 0, target = null, curWord = null, locked = false;
+
+      buildScene();
+      buildHouses();
+      nextRound();
+
+      function buildScene() {
+        [['☀️','8px','6%','54px'],['☁️','30px','70%','40px'],['🌳','auto','2%','60px'],['🌷','auto','40%','30px'],['🌼','auto','86%','30px']]
+          .forEach(([e, top, left, size]) => {
+            const d = document.createElement('div');
+            d.className = 'deco'; d.textContent = e; d.style.fontSize = size;
+            if (top === 'auto') { d.style.bottom = '2px'; } else { d.style.top = top; }
+            d.style.left = left;
+            stage.appendChild(d);
+          });
+        const m = document.createElement('div');
+        m.className = 'mascot'; m.innerHTML = RG.unicorn(58);
+        stage.appendChild(m);
+      }
+
+      function buildHouses() {
+        const wrap = document.getElementById('houses');
+        wrap.innerHTML = '';
+        letters.forEach((l, i) => {
+          const h = document.createElement('div');
+          h.className = 'house';
+          h.style.setProperty('--wall', ROOFS.wall[i % ROOFS.wall.length]);
+          h.innerHTML = `<div class="roof" style="border-bottom-color:${ROOFS.roof[i % ROOFS.roof.length]}"></div>
+                         <div class="body">${l}</div>`;
+          h.onclick = () => choose(l, h);
+          wrap.appendChild(h);
+        });
+      }
+
+      function nextRound() {
+        RG.stopAudio();
+        locked = false;
+        if (round >= ROUNDS) {
+          RG.finish({ stationId: station.id, correct, total: ROUNDS, replay: () => location.reload() });
+          return;
+        }
+        target = letters[Math.floor(Math.random() * letters.length)];
+        curWord = pickWord(target);
+        const pic = document.getElementById('pic');
+        pic.className = 'pic';
+        document.getElementById('emo').textContent = curWord.emoji;
+        document.getElementById('word').textContent = curWord.word;
+        updateHud();
+        setTimeout(() => RG.playWord(target, curWord), 400);
+      }
+
+      window.playWordAgain = () => { if (curWord) RG.playWord(target, curWord); };
+
+      function choose(letter, houseEl) {
+        if (locked) return;
+        if (letter === target) {
+          locked = true;
+          correct++; round++;
+          RG.ding();
+          houseEl.classList.add('correct');
+          sparkle(houseEl);
+          document.getElementById('pic').classList.add('won');
+          setTimeout(() => RG.playLetter(target), 250); // חיזוק: הצליל של האות
+          setTimeout(() => { houseEl.classList.remove('correct'); nextRound(); }, 1250);
+        } else {
+          RG.buzz();
+          houseEl.classList.add('wrong');
+          setTimeout(() => houseEl.classList.remove('wrong'), 400);
+        }
+      }
+
+      function sparkle(houseEl) {
+        const r = houseEl.getBoundingClientRect(), s = stage.getBoundingClientRect();
+        const sp = document.createElement('div');
+        sp.className = 'spark'; sp.textContent = '⭐';
+        sp.style.left = (r.left - s.left + r.width / 2 - 12) + 'px';
+        sp.style.top = (r.top - s.top - 10) + 'px';
+        stage.appendChild(sp);
+        setTimeout(() => sp.remove(), 700);
+      }
+
+      function updateHud() {
+        let dots = '';
+        for (let i = 0; i < ROUNDS; i++) dots += `<span class="dot ${i < round ? 'on' : ''}"></span>`;
+        document.getElementById('hud').innerHTML =
+          `באיזה צליל מתחילה המילה?<div class="dots">${dots}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

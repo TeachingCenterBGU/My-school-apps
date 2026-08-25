@@ -178,6 +178,7 @@ function pickWord(char) {
 function buildReadingStations() {
   const TYPE_META = {
     meet: { title: 'הכרת האות', emoji: '👋' },
+    sound: { title: 'צליל פותח', emoji: '🔤' },
     hunt: { title: 'ציד האותיות', emoji: '🔍' },
     hear: { title: 'איזו אות שמעת?', emoji: '👂' },
     quiz: { title: 'אתגר הסיכום', emoji: '🏆' },
@@ -192,6 +193,8 @@ function buildReadingStations() {
         letter: letter, letters: [letter],
       });
     });
+    stations.push({ id: `${group.id}_sound`, type: 'sound', groupId: group.id, groupName: group.name,
+      title: TYPE_META.sound.title, emoji: TYPE_META.sound.emoji, letters: group.letters.slice() });
     stations.push({ id: `${group.id}_hunt`, type: 'hunt', groupId: group.id, groupName: group.name,
       title: TYPE_META.hunt.title, emoji: TYPE_META.hunt.emoji, letters: group.letters.slice() });
     stations.push({ id: `${group.id}_hear`, type: 'hear', groupId: group.id, groupName: group.name,
