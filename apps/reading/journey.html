@@ -9,8 +9,15 @@
 <style>
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#3a2a12;
-       background:linear-gradient(180deg,#c7ecff 0%,#eaf7f6 30%,#fff3e0 100%);
+       background:linear-gradient(180deg,#bfe9ff 0%,#d6f5ee 28%,#fff0d8 65%,#ffe1c2 100%);
        min-height:100vh;padding-bottom:60px;}
+
+  /* רקע שמיים מונפש */
+  .sky{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+  .sky .floaty{position:absolute;opacity:.7;animation:drift linear infinite;}
+  @keyframes drift{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-22px) rotate(10deg)}100%{transform:translateY(0) rotate(0)}}
+  .sky .hill{position:absolute;bottom:0;width:60vw;height:26vh;border-radius:50% 50% 0 0;opacity:.35;}
+  .map,header{position:relative;z-index:2;}
 
   /* סרגל עליון */
   header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
@@ -34,7 +41,7 @@
   .group-banner .letters{color:#ef6c00;letter-spacing:4px;font-size:1.15em;}
 
   .row{display:flex;justify-content:center;margin:6px 0;}
-  .node-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;
+  .node-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;
        text-decoration:none;color:#5a3d1e;transition:transform .15s;}
   .node-wrap:active{transform:scale(.94);}
 
@@ -56,7 +63,11 @@
   .node.locked::after{content:"🔒";position:absolute;font-size:1.6rem;}
   .node.locked .glyph{visibility:hidden;}
 
+  .node{animation:nodepop .4s backwards;}
+  @keyframes nodepop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
   .node.current{animation:bob 1.2s ease-in-out infinite;}
+  .node-wrap.current-wrap::before{content:"🐥";position:absolute;top:-32px;left:0;right:0;
+       text-align:center;font-size:1.8rem;animation:bob 1s ease-in-out infinite;}
   .node.current::before{content:"";position:absolute;inset:-8px;border-radius:50%;
        border:4px solid #ff9800;animation:ring 1.4s ease-out infinite;}
   @keyframes ring{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.35);opacity:0}}
@@ -72,6 +83,7 @@
 </style>
 </head>
 <body>
+  <div class="sky" id="sky"></div>
   <header>
     <a class="home" href="../../kindergarten.html" title="חזרה לגן">🏠</a>
     <span class="title">מסע הקריאה 🗺️</span>
@@ -134,7 +146,8 @@
 
       const node = document.createElement('div');
       node.className = 'node ' + st.type + (done ? ' done' : '') + (!unlocked ? ' locked' : '');
-      if (i === currentIdx) node.classList.add('current');
+      node.style.animationDelay = Math.min(i * 0.03, 1.2) + 's';
+      if (i === currentIdx) { node.classList.add('current'); wrap.classList.add('current-wrap'); }
 
       const glyph = document.createElement('span');
       glyph.className = 'glyph';
@@ -185,6 +198,28 @@
     if (currentEl) {
       setTimeout(() => currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
     }
+
+    // רקע שמיים מונפש
+    (function fillSky() {
+      const sky = document.getElementById('sky');
+      const emojis = ['☁️', '⭐', '🎈', '🌈', '🦋', '🌤️', '✨', '☁️'];
+      for (let i = 0; i < 12; i++) {
+        const f = document.createElement('div');
+        f.className = 'floaty';
+        f.textContent = emojis[i % emojis.length];
+        f.style.top = Math.random() * 95 + 'vh';
+        f.style.left = Math.random() * 92 + 'vw';
+        f.style.fontSize = (1.4 + Math.random() * 2.2) + 'rem';
+        f.style.animationDuration = (5 + Math.random() * 6) + 's';
+        f.style.animationDelay = (-Math.random() * 6) + 's';
+        sky.appendChild(f);
+      }
+      [['#8fd694', '-10vw'], ['#7ec8e3', '55vw']].forEach(([c, left]) => {
+        const h = document.createElement('div');
+        h.className = 'hill'; h.style.background = c; h.style.left = left;
+        sky.appendChild(h);
+      });
+    })();
 
     // התחלה מחדש
     document.getElementById('reset').onclick = () => {

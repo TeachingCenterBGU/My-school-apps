@@ -15,6 +15,7 @@ const RG = (function () {
   let audioBase = '../../../letters/';   // מ-apps/reading/games/ אל letters/
   let soundOn = true;
   let audioCtx = null;
+  let currentAudio = null;               // ההקלטה שמתנגנת כרגע (כדי לעצור לפני מעבר)
   const audioCache = {};
 
   // --- הזרקת סגנון משותף (מסך סיום, כוכבים, סרגל, קונפטי) ---
@@ -57,6 +58,20 @@ const RG = (function () {
     .rg-confetti{position:fixed;top:-20px;width:12px;height:12px;z-index:120;
       pointer-events:none;border-radius:2px;animation:rg-fall linear forwards;}
     @keyframes rg-fall{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
+
+    /* רקע משחקי מונפש (שכבה מאחורי הכל) */
+    .rg-bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+    .rg-bg .blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.5;
+      animation:rg-float linear infinite;}
+    @keyframes rg-float{0%{transform:translateY(0) translateX(0)}
+      50%{transform:translateY(-24px) translateX(14px)}100%{transform:translateY(0) translateX(0)}}
+    .rg-bg .floaty{position:absolute;font-size:2rem;opacity:.65;animation:rg-drift linear infinite;}
+    @keyframes rg-drift{0%{transform:translateY(0) rotate(0)}
+      50%{transform:translateY(-18px) rotate(12deg)}100%{transform:translateY(0) rotate(0)}}
+
+    /* דמות מעודדת במסך הסיום */
+    .rg-mascot{font-size:3.4rem;animation:rg-cheer .8s ease-in-out infinite;display:inline-block;}
+    @keyframes rg-cheer{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-10px) rotate(6deg)}}
     `;
     const st = document.createElement('style');
     st.id = 'rg-style';
@@ -71,6 +86,8 @@ const RG = (function () {
       try {
         let a = audioCache[file];
         if (!a) { a = new Audio(encodeURI(audioBase + file)); audioCache[file] = a; }
+        stopAudio();               // עוצרים כל אודיו קודם — לא ייגרר לשאלה הבאה
+        currentAudio = a;
         a.currentTime = 0;
         a.onended = () => resolve(true);
         a.onerror = () => resolve(false);
@@ -78,6 +95,13 @@ const RG = (function () {
         if (p && p.catch) p.catch(() => resolve(false));
       } catch (e) { resolve(false); }
     });
+  }
+
+  // עצירת כל אודיו שמתנגן (הקלטה + קול סינתטי)
+  function stopAudio() {
+    try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {}
+    try { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; } } catch (e) {}
+    currentAudio = null;
   }
 
   function letterData(char) { return (window.READING_LETTERS || {})[char] || null; }
@@ -90,12 +114,13 @@ const RG = (function () {
     if (!ok && soundOn) speak(d.name || char);
   }
 
-  // השמעת מילת הדוגמה
-  async function playWord(char) {
-    const d = letterData(char);
-    if (!d) return;
-    const ok = await playFile(d.wordAudio);
-    if (!ok && soundOn) speak((d.word || '').replace(/[֑-ׇ]/g, '') || char);
+  // השמעת מילת דוגמה.  אפשר להעביר אובייקט מילה ({word,emoji,audio});
+  // אם לא — נבחרת המילה הראשונה של האות.
+  async function playWord(char, wordObj) {
+    const w = wordObj || (window.primaryWord ? window.primaryWord(char) : null);
+    if (!w) return;
+    const ok = await playFile(w.audio);
+    if (!ok && soundOn) speak((w.word || '').replace(/[֑-ׇ]/g, '') || char);
   }
 
   function speak(text) {
@@ -151,9 +176,44 @@ const RG = (function () {
     }
   }
 
+  // --- רקע משחקי מונפש ---
+  function mountBackground(theme) {
+    injectStyle();
+    if (document.querySelector('.rg-bg')) return;
+    const bg = document.createElement('div');
+    bg.className = 'rg-bg';
+    const blobColors = ['#ffd59e', '#b9f0c0', '#d8c9ff', '#ffe082', '#a8e6ff', '#ffc1e3'];
+    for (let i = 0; i < 6; i++) {
+      const b = document.createElement('div');
+      b.className = 'blob';
+      const s = 90 + Math.random() * 140;
+      b.style.width = b.style.height = s + 'px';
+      b.style.background = blobColors[i % blobColors.length];
+      b.style.top = Math.random() * 90 + 'vh';
+      b.style.left = Math.random() * 90 + 'vw';
+      b.style.animationDuration = (6 + Math.random() * 6) + 's';
+      b.style.animationDelay = (-Math.random() * 6) + 's';
+      bg.appendChild(b);
+    }
+    const emojis = theme || ['⭐', '☁️', '🎈', '🌈', '🦋', '🌸', '✨'];
+    for (let i = 0; i < 7; i++) {
+      const f = document.createElement('div');
+      f.className = 'floaty';
+      f.textContent = emojis[i % emojis.length];
+      f.style.top = Math.random() * 88 + 'vh';
+      f.style.left = Math.random() * 90 + 'vw';
+      f.style.fontSize = (1.4 + Math.random() * 1.8) + 'rem';
+      f.style.animationDuration = (5 + Math.random() * 5) + 's';
+      f.style.animationDelay = (-Math.random() * 5) + 's';
+      bg.appendChild(f);
+    }
+    document.body.appendChild(bg);
+  }
+
   // --- סרגל עליון ---
   function mountTopBar(title) {
     injectStyle();
+    mountBackground();
     document.body.classList.add('rg-has-topbar');
     const bar = document.createElement('div');
     bar.className = 'rg-topbar';
@@ -208,10 +268,12 @@ const RG = (function () {
     if (stars >= 2) { confetti(); fanfare(); } else { ding(); }
 
     const msg = stars === 3 ? 'מושלם! 🌟' : stars === 2 ? 'כל הכבוד!' : 'יופי, סיימת!';
+    const mascot = stars === 3 ? '🦸' : stars === 2 ? '🐣' : '🐥';
     const overlay = document.createElement('div');
     overlay.className = 'rg-overlay';
     overlay.innerHTML =
       `<div class="rg-card">
+         <div class="rg-mascot">${mascot}</div>
          <div class="rg-stars">
            <span class="s ${stars >= 1 ? 'on' : ''}">⭐</span>
            <span class="s ${stars >= 2 ? 'on' : ''}">⭐</span>
@@ -254,9 +316,9 @@ const RG = (function () {
   return {
     get soundOn() { return soundOn; },
     set audioBase(v) { audioBase = v; },
-    injectStyle, playLetter, playWord, speak,
+    injectStyle, playLetter, playWord, speak, stopAudio,
     ding, buzz, fanfare, confetti,
-    mountTopBar, starsForAccuracy, finish,
+    mountTopBar, mountBackground, starsForAccuracy, finish,
     currentStation, shuffle, pickDistractors,
   };
 })();
