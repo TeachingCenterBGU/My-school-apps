@@ -211,9 +211,10 @@ const RG = (function () {
   }
 
   // --- סרגל עליון ---
-  function mountTopBar(title) {
+  // opts.bg === false ← בלי הרקע הכללי (למשחק שיש לו רקע משלו)
+  function mountTopBar(title, opts) {
     injectStyle();
-    mountBackground();
+    if (!opts || opts.bg !== false) mountBackground();
     document.body.classList.add('rg-has-topbar');
     const bar = document.createElement('div');
     bar.className = 'rg-topbar';

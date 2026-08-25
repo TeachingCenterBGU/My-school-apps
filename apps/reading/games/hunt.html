@@ -3,35 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ציד האותיות</title>
+<title>ציד האותיות ביער</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;font-family:'Heebo',system-ui,sans-serif;background:#e8f5e9;color:#2a3b2a;
-       min-height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;}
-  .stage{width:100%;max-width:480px;padding:14px;flex:1;display:flex;flex-direction:column;
-         align-items:center;gap:12px;justify-content:center;}
-  .prompt{font-size:1.35em;font-weight:800;color:#2e7d32;}
-  .prompt b{color:#ef6c00;font-size:1.3em;}
-  .target-btn{background:#fff;border:3px solid #66bb6a;border-radius:16px;padding:6px 14px;
-              font-size:1em;cursor:pointer;color:#2e7d32;font-family:inherit;}
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;}
-  .tile{background:#fff;border:3px solid #a5d6a7;border-radius:16px;aspect-ratio:1;
-        display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:800;
-        color:#33691e;cursor:pointer;box-shadow:0 4px 0 #81c784;transition:transform .1s;user-select:none;}
-  .tile:active{transform:translateY(3px);box-shadow:none;}
-  .tile.found{background:#c8e6c9;border-color:#4caf50;color:#1b5e20;
-              box-shadow:0 4px 0 #388e3c;animation:pp .4s;cursor:default;}
-  .tile.miss{animation:sh .35s;border-color:#ef5350;}
-  @keyframes pp{40%{transform:scale(1.15)}}
-  @keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-  .counter{font-weight:700;color:#2e7d32;}
-  .waves{color:#7cb342;font-size:.95em;}
+  html,body{margin:0;height:100%;}
+  body{font-family:'Heebo',system-ui,sans-serif;color:#2a3b2a;min-height:100vh;
+       display:flex;flex-direction:column;}
+  .hud{text-align:center;font-weight:800;font-size:1.2em;color:#1b5e20;padding:8px;
+       background:rgba(255,255,255,.75);}
+  .hud b{color:#ef6c00;font-size:1.35em;}
+  .hud .sfx{cursor:pointer;}
+  .hud .sc{background:#2e7d32;color:#fff;border-radius:50px;padding:2px 12px;margin-inline-start:6px;font-size:.85em;}
+  .waves{font-size:.8em;color:#33691e;}
+
+  .scene{position:relative;flex:1;width:100%;overflow:hidden;touch-action:manipulation;
+         background:linear-gradient(180deg,#aee3ff 0%,#cdeffb 22%,#bfe89a 52%,#8ccf63 100%);}
+  .deco{position:absolute;pointer-events:none;user-select:none;z-index:0;
+        filter:drop-shadow(0 3px 3px rgba(0,0,0,.12));}
+  .letter{position:absolute;z-index:2;font-weight:800;cursor:pointer;user-select:none;
+          text-shadow:0 2px 0 rgba(255,255,255,.7),0 3px 6px rgba(0,0,0,.25);
+          transition:transform .1s;}
+  .letter:active{transform:scale(.85);}
+  .letter.found{animation:found .5s forwards;pointer-events:none;}
+  @keyframes found{60%{transform:scale(1.5)}100%{transform:scale(0);opacity:0}}
+  .letter.miss{animation:miss .35s;}
+  @keyframes miss{25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+  .spark{position:absolute;z-index:3;font-size:1.6rem;pointer-events:none;animation:sp .6s forwards;}
+  @keyframes sp{to{transform:translateY(-30px) scale(1.4);opacity:0}}
 </style>
 </head>
 <body>
-  <div class="stage" id="stage"></div>
+  <div class="hud" id="hud"></div>
+  <div class="scene" id="scene"></div>
 
   <script src="../reading-data.js"></script>
   <script src="../reading-progress.js"></script>
@@ -39,18 +44,50 @@
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
-    const stage = document.getElementById('stage');
 
     if (!station || station.type !== 'hunt') {
-      stage.innerHTML = '<p>לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
+      document.getElementById('scene').innerHTML =
+        '<p style="padding:20px">לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
     } else {
-      RG.mountTopBar('ציד האותיות');
+      RG.mountTopBar('ציד האותיות', { bg: false });
+      const scene = document.getElementById('scene');
       const groupLetters = station.letters;
+      const allLetters = Object.keys(READING_LETTERS);
+      const COLORS = ['#e53935','#fb8c00','#fdd835','#43a047','#1e88e5','#8e24aa','#d81b60','#00897b','#6d4c41'];
       const waves = RG.shuffle(groupLetters).slice(0, 4);
-      const TILES = 12;
       let waveIdx = 0, totalTargets = 0, wrongTaps = 0;
 
+      buildDeco();
       nextWave();
+
+      // עצים/פרחים/פטריות ברקע (לא נלחצים)
+      function buildDeco() {
+        const trees = ['🌳','🌲','🌳','🌲','🌳'];
+        trees.forEach((t, i) => {
+          const d = document.createElement('div');
+          d.className = 'deco'; d.textContent = t;
+          d.style.fontSize = (70 + Math.random() * 40) + 'px';
+          d.style.bottom = '-6px';
+          d.style.left = (i * 21 + Math.random() * 6) + '%';
+          scene.appendChild(d);
+        });
+        ['🌿','🍄','🌸','🌼','🌿','🐞','🦋'].forEach(e => {
+          const d = document.createElement('div');
+          d.className = 'deco'; d.textContent = e;
+          d.style.fontSize = (22 + Math.random() * 22) + 'px';
+          d.style.top = (30 + Math.random() * 60) + '%';
+          d.style.left = (Math.random() * 92) + '%';
+          scene.appendChild(d);
+        });
+        const sun = document.createElement('div');
+        sun.className = 'deco'; sun.textContent = '☀️';
+        sun.style.fontSize = '54px'; sun.style.top = '6px'; sun.style.left = '6%';
+        scene.appendChild(sun);
+      }
+
+      function clearLetters() {
+        scene.querySelectorAll('.letter,.spark').forEach(el => el.remove());
+      }
 
       function nextWave() {
         RG.stopAudio();
@@ -59,50 +96,66 @@
           RG.finish({ stationId: station.id, correct, total: totalTargets, replay: restart });
           return;
         }
+        clearLetters();
         const target = waves[waveIdx];
-        const nTargets = 2 + Math.floor(Math.random() * 2); // 2-3 מופעים
+        const nTargets = 2 + Math.floor(Math.random() * 2); // 2-3
         totalTargets += nTargets;
-
-        // מסיחים: קודם מהקבוצה, ואז אותיות אחרות
-        const others = RG.pickDistractors(TILES, [target],
-          groupLetters.concat(Object.keys(READING_LETTERS)));
-        const tiles = [];
-        for (let i = 0; i < nTargets; i++) tiles.push(target);
-        for (let i = 0; tiles.length < TILES; i++) tiles.push(others[i % others.length]);
-        const shuffled = RG.shuffle(tiles);
-
         let found = 0;
-        stage.innerHTML =
-          `<div class="prompt">מצאי את כל האותיות <b>${target}</b>
-             <button class="target-btn" id="hear">🔊</button></div>
-           <div class="waves">גל ${waveIdx + 1} מתוך ${waves.length}</div>
-           <div class="grid" id="grid"></div>
-           <div class="counter" id="cnt">מצאת 0 מתוך ${nTargets}</div>`;
-        document.getElementById('hear').onclick = () => RG.playLetter(target);
-        const grid = document.getElementById('grid');
-        shuffled.forEach(l => {
-          const t = document.createElement('div');
-          t.className = 'tile'; t.textContent = l;
-          t.onclick = () => {
-            if (t.classList.contains('found')) return;
-            if (l === target) {
-              t.classList.add('found'); found++;
+
+        // רשימת אותיות: יעדים + מסיחים
+        const items = [];
+        for (let i = 0; i < nTargets; i++) items.push(target);
+        const distractors = allLetters.filter(l => l !== target);
+        const nDistract = 11 + Math.floor(Math.random() * 4);
+        for (let i = 0; i < nDistract; i++)
+          items.push(distractors[Math.floor(Math.random() * distractors.length)]);
+
+        updateHud(target, found, nTargets);
+
+        RG.shuffle(items).forEach(ch => {
+          const el = document.createElement('div');
+          el.className = 'letter';
+          el.textContent = ch;
+          el.style.fontSize = (30 + Math.random() * 44) + 'px';
+          el.style.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+          el.style.left = (4 + Math.random() * 86) + '%';
+          el.style.top = (6 + Math.random() * 78) + '%';
+          el.style.transform = 'rotate(' + (Math.random() * 40 - 20) + 'deg)';
+          el.onclick = () => {
+            if (el.classList.contains('found')) return;
+            if (ch === target) {
+              el.classList.add('found');
+              sparkle(el);
               RG.ding();
-              document.getElementById('cnt').textContent = `מצאת ${found} מתוך ${nTargets}`;
-              if (found === nTargets) {
-                waveIdx++;
-                setTimeout(nextWave, 800);
-              }
+              found++;
+              updateHud(target, found, nTargets);
+              if (found >= nTargets) { waveIdx++; setTimeout(nextWave, 800); }
             } else {
               wrongTaps++;
               RG.buzz();
-              t.classList.add('miss');
-              setTimeout(() => t.classList.remove('miss'), 350);
+              el.classList.add('miss');
+              setTimeout(() => el.classList.remove('miss'), 350);
             }
           };
-          grid.appendChild(t);
+          scene.appendChild(el);
         });
         setTimeout(() => RG.playLetter(target), 400);
+      }
+
+      function sparkle(el) {
+        const s = document.createElement('div');
+        s.className = 'spark'; s.textContent = '⭐';
+        s.style.left = el.style.left; s.style.top = el.style.top;
+        scene.appendChild(s);
+        setTimeout(() => s.remove(), 600);
+      }
+
+      function updateHud(target, found, nTargets) {
+        document.getElementById('hud').innerHTML =
+          `מצאי את כל האותיות <b>${target}</b> <span class="sfx" id="sfx">🔊</span>
+           <span class="sc">${found}/${nTargets}</span>
+           <div class="waves">גל ${Math.min(waveIdx + 1, waves.length)} מתוך ${waves.length}</div>`;
+        document.getElementById('sfx').onclick = () => RG.playLetter(target);
       }
 
       function restart() { waveIdx = 0; totalTargets = 0; wrongTaps = 0; nextWave(); }
