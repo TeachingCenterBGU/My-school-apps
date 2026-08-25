@@ -186,14 +186,9 @@ function buildReadingStations() {
   };
   const stations = [];
   READING_GROUPS.forEach(group => {
-    group.letters.forEach((letter, i) => {
-      stations.push({
-        id: `${group.id}_meet_${i}`, type: 'meet',
-        groupId: group.id, groupName: group.name,
-        title: `${TYPE_META.meet.title} ${letter}`, emoji: TYPE_META.meet.emoji,
-        letter: letter, letters: [letter],
-      });
-    });
+    // תחנה אחת של "הכרת האות" לכל קבוצה — המשחק רץ בסיבובים על כל אותיות הקבוצה
+    stations.push({ id: `${group.id}_meet`, type: 'meet', groupId: group.id, groupName: group.name,
+      title: TYPE_META.meet.title, emoji: TYPE_META.meet.emoji, letters: group.letters.slice() });
     stations.push({ id: `${group.id}_write`, type: 'write', groupId: group.id, groupName: group.name,
       title: TYPE_META.write.title, emoji: TYPE_META.write.emoji, letters: group.letters.slice() });
     stations.push({ id: `${group.id}_sound`, type: 'sound', groupId: group.id, groupName: group.name,
