@@ -59,8 +59,9 @@
   @keyframes pop{to{transform:scale(1.8);opacity:0}}
   .faller.bad{animation:bad .35s;}
   @keyframes bad{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-  .ship{position:absolute;bottom:10px;font-size:3.4rem;filter:drop-shadow(0 0 10px #7ee0ff);
+  .ship{position:absolute;bottom:10px;filter:drop-shadow(0 0 10px #7ee0ff);
         pointer-events:none;transition:transform .05s;}
+  .ship svg{display:block;}
   .beam{position:absolute;bottom:56px;width:60px;height:40vh;
         background:linear-gradient(180deg,rgba(126,224,255,.35),transparent);
         transform:translateX(-50%);pointer-events:none;border-radius:50% 50% 0 0;opacity:.5;}
@@ -72,7 +73,7 @@
     <div class="hud" id="hud"></div>
     <div class="play" id="play">
       <div class="beam" id="beam"></div>
-      <div class="ship" id="ship">🛸</div>
+      <div class="ship" id="ship"></div>
     </div>
   </div>
 
@@ -125,6 +126,7 @@
       let correct = 0, wrong = 0, shipX = 0;
       const play = document.getElementById('play');
       const ship = document.getElementById('ship');
+      ship.innerHTML = RG.unicorn(72);
       const beam = document.getElementById('beam');
 
       function updateHud() {
