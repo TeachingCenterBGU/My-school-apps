@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>מסע הקריאה 🗺️</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#3a2a12;
+       background:linear-gradient(180deg,#c7ecff 0%,#eaf7f6 30%,#fff3e0 100%);
+       min-height:100vh;padding-bottom:60px;}
+
+  /* סרגל עליון */
+  header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+         padding:10px 14px;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+         box-shadow:0 2px 12px rgba(0,0,0,.08);}
+  header .home{width:44px;height:44px;border-radius:50%;border:2px solid #ffb74d;background:#fff;
+       font-size:1.3em;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#e65100;}
+  header .title{font-weight:800;font-size:1.25em;color:#5a3d1e;}
+  header .stars{font-weight:800;color:#f9a825;background:#fff;border-radius:50px;padding:6px 14px;
+       box-shadow:0 2px 6px rgba(0,0,0,.08);font-size:1.05em;}
+  .reset{position:fixed;bottom:14px;left:14px;z-index:30;background:rgba(255,255,255,.9);
+       border:2px solid #ffcc80;border-radius:50px;padding:8px 14px;font-family:inherit;
+       font-size:.9em;color:#a1887f;cursor:pointer;}
+
+  /* המפה */
+  .map{max-width:520px;margin:0 auto;padding:24px 12px 40px;position:relative;}
+
+  .group-banner{display:flex;align-items:center;justify-content:center;gap:10px;margin:26px auto 14px;
+       background:#fff;border-radius:50px;padding:8px 18px;box-shadow:0 4px 12px rgba(0,0,0,.10);
+       font-weight:800;color:#5a3d1e;max-width:320px;}
+  .group-banner .letters{color:#ef6c00;letter-spacing:4px;font-size:1.15em;}
+
+  .row{display:flex;justify-content:center;margin:6px 0;}
+  .node-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;
+       text-decoration:none;color:#5a3d1e;transition:transform .15s;}
+  .node-wrap:active{transform:scale(.94);}
+
+  .node{width:92px;height:92px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+       font-size:2.6rem;font-weight:800;position:relative;
+       box-shadow:0 8px 0 rgba(0,0,0,.12),0 10px 22px rgba(0,0,0,.14);}
+  /* צבע לפי סוג */
+  .node.meet{background:#ffd59e;color:#e65100;}
+  .node.hunt{background:#b9f0c0;color:#2e7d32;}
+  .node.hear{background:#d8c9ff;color:#5e35b1;}
+  .node.quiz{background:#ffe082;color:#ef6c00;border:4px solid #ffb300;}
+
+  .node.done{filter:none;}
+  .node.done::after{content:"✓";position:absolute;top:-6px;right:-6px;background:#4caf50;color:#fff;
+       width:26px;height:26px;border-radius:50%;font-size:1rem;display:flex;align-items:center;
+       justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+
+  .node.locked{background:#e0e0e0;color:#bdbdbd;box-shadow:0 8px 0 rgba(0,0,0,.06);}
+  .node.locked::after{content:"🔒";position:absolute;font-size:1.6rem;}
+  .node.locked .glyph{visibility:hidden;}
+
+  .node.current{animation:bob 1.2s ease-in-out infinite;}
+  .node.current::before{content:"";position:absolute;inset:-8px;border-radius:50%;
+       border:4px solid #ff9800;animation:ring 1.4s ease-out infinite;}
+  @keyframes ring{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.35);opacity:0}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+  .caption{font-size:.85em;font-weight:700;text-align:center;max-width:110px;line-height:1.15;}
+  .ministars{font-size:.8em;letter-spacing:1px;height:1em;}
+  .ministars .f{color:#ffb300;}
+  .ministars .e{color:#cfcfcf;}
+
+  .start-hint{text-align:center;color:#8d6e63;margin:0 auto 8px;max-width:300px;font-size:.95em;}
+  .finale{text-align:center;margin:20px auto;font-size:2.4rem;}
+</style>
+</head>
+<body>
+  <header>
+    <a class="home" href="../../kindergarten.html" title="חזרה לגן">🏠</a>
+    <span class="title">מסע הקריאה 🗺️</span>
+    <span class="stars" id="totalStars">⭐ 0</span>
+  </header>
+
+  <p class="start-hint" id="startHint"></p>
+  <div class="map" id="map"></div>
+  <button class="reset" id="reset">🔄 להתחיל מחדש</button>
+
+  <div class="finale">🏁</div>
+
+  <script src="reading-data.js"></script>
+  <script src="reading-progress.js"></script>
+  <script>
+    const GAME_FILE = { meet: 'games/meet.html', hunt: 'games/hunt.html',
+                        hear: 'games/hear.html', quiz: 'games/quiz.html' };
+    const AMP = 78; // משרעת הנחש
+    const map = document.getElementById('map');
+    const stations = READING_STATIONS;
+
+    // מציאת התחנה ה"נוכחית" (הראשונה שפתוחה ולא הושלמה)
+    let currentIdx = stations.findIndex((s, i) =>
+      ReadingProgress.isUnlocked(s.id, stations) && !ReadingProgress.isDone(s.id));
+    if (currentIdx === -1) currentIdx = stations.length; // הכל הושלם
+
+    let lastGroup = null;
+    let nodeIndex = 0;      // אינדקס רציף לצורך הנחש
+    let currentEl = null;
+
+    stations.forEach((st, i) => {
+      // באנר קבוצה
+      if (st.groupId !== lastGroup) {
+        lastGroup = st.groupId;
+        const g = READING_GROUPS.find(x => x.id === st.groupId);
+        const banner = document.createElement('div');
+        banner.className = 'group-banner';
+        banner.innerHTML = `<span>${g.emoji} ${g.name}</span>
+                            <span class="letters">${g.letters.join(' ')}</span>`;
+        map.appendChild(banner);
+        nodeIndex = 0; // מתחילים נחש חדש בכל קבוצה
+      }
+
+      const unlocked = ReadingProgress.isUnlocked(st.id, stations);
+      const done = ReadingProgress.isDone(st.id);
+      const stars = ReadingProgress.starsOf(st.id);
+
+      const row = document.createElement('div');
+      row.className = 'row';
+
+      const wrap = document.createElement(unlocked ? 'a' : 'div');
+      wrap.className = 'node-wrap';
+      const offset = Math.round(Math.sin(nodeIndex * 0.9) * AMP);
+      wrap.style.transform = `translateX(${offset}px)`;
+      nodeIndex++;
+
+      if (unlocked) {
+        wrap.href = GAME_FILE[st.type] + '?station=' + encodeURIComponent(st.id);
+      }
+
+      const node = document.createElement('div');
+      node.className = 'node ' + st.type + (done ? ' done' : '') + (!unlocked ? ' locked' : '');
+      if (i === currentIdx) node.classList.add('current');
+
+      const glyph = document.createElement('span');
+      glyph.className = 'glyph';
+      glyph.textContent = st.type === 'meet' ? st.letter : st.emoji;
+      node.appendChild(glyph);
+
+      const caption = document.createElement('div');
+      caption.className = 'caption';
+      caption.textContent = shortTitle(st);
+
+      const ms = document.createElement('div');
+      ms.className = 'ministars';
+      if (done) {
+        let h = '';
+        for (let k = 1; k <= 3; k++) h += `<span class="${k <= stars ? 'f' : 'e'}">${k <= stars ? '★' : '☆'}</span>`;
+        ms.innerHTML = h;
+      }
+
+      wrap.appendChild(node);
+      wrap.appendChild(caption);
+      wrap.appendChild(ms);
+      row.appendChild(wrap);
+      map.appendChild(row);
+
+      if (i === currentIdx) currentEl = wrap;
+    });
+
+    function shortTitle(st) {
+      if (st.type === 'meet') return 'האות ' + st.letter;
+      if (st.type === 'hunt') return 'ציד';
+      if (st.type === 'hear') return 'מה שמעת?';
+      if (st.type === 'quiz') return 'סיכום';
+      return st.title;
+    }
+
+    // סך הכוכבים
+    document.getElementById('totalStars').textContent = '⭐ ' + ReadingProgress.totalStars();
+
+    // רמז התחלה + גלילה לתחנה הנוכחית
+    const hint = document.getElementById('startHint');
+    if (currentIdx >= stations.length) {
+      hint.textContent = 'סיימת את כל המסע! אפשר לחזור ולשחק שוב כדי לאסוף עוד כוכבים ⭐';
+    } else if (ReadingProgress.totalStars() === 0) {
+      hint.textContent = 'לחצי על התחנה הזוהרת כדי להתחיל ✨';
+    } else {
+      hint.textContent = 'ממשיכים מכאן! 👇';
+    }
+    if (currentEl) {
+      setTimeout(() => currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    }
+
+    // התחלה מחדש
+    document.getElementById('reset').onclick = () => {
+      if (confirm('להתחיל את כל המסע מחדש? כל הכוכבים יימחקו.')) {
+        ReadingProgress.reset();
+        location.reload();
+      }
+    };
+  </script>
+</body>
+</html>
