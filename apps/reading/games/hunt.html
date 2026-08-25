@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ציד האותיות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;background:#e8f5e9;color:#2a3b2a;
+       min-height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;}
+  .stage{width:100%;max-width:480px;padding:14px;flex:1;display:flex;flex-direction:column;
+         align-items:center;gap:12px;justify-content:center;}
+  .prompt{font-size:1.35em;font-weight:800;color:#2e7d32;}
+  .prompt b{color:#ef6c00;font-size:1.3em;}
+  .target-btn{background:#fff;border:3px solid #66bb6a;border-radius:16px;padding:6px 14px;
+              font-size:1em;cursor:pointer;color:#2e7d32;font-family:inherit;}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;}
+  .tile{background:#fff;border:3px solid #a5d6a7;border-radius:16px;aspect-ratio:1;
+        display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:800;
+        color:#33691e;cursor:pointer;box-shadow:0 4px 0 #81c784;transition:transform .1s;user-select:none;}
+  .tile:active{transform:translateY(3px);box-shadow:none;}
+  .tile.found{background:#c8e6c9;border-color:#4caf50;color:#1b5e20;
+              box-shadow:0 4px 0 #388e3c;animation:pp .4s;cursor:default;}
+  .tile.miss{animation:sh .35s;border-color:#ef5350;}
+  @keyframes pp{40%{transform:scale(1.15)}}
+  @keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .counter{font-weight:700;color:#2e7d32;}
+  .waves{color:#7cb342;font-size:.95em;}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+
+  <script src="../reading-data.js"></script>
+  <script src="../reading-progress.js"></script>
+  <script src="../reading-engine.js"></script>
+  <script>
+    RG.audioBase = '../../../letters/';
+    const station = RG.currentStation();
+    const stage = document.getElementById('stage');
+
+    if (!station || station.type !== 'hunt') {
+      stage.innerHTML = '<p>לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
+    } else {
+      RG.mountTopBar('ציד האותיות');
+      const groupLetters = station.letters;
+      const waves = RG.shuffle(groupLetters).slice(0, 4);
+      const TILES = 12;
+      let waveIdx = 0, totalTargets = 0, wrongTaps = 0;
+
+      nextWave();
+
+      function nextWave() {
+        if (waveIdx >= waves.length) {
+          const correct = Math.max(0, totalTargets - wrongTaps);
+          RG.finish({ stationId: station.id, correct, total: totalTargets, replay: restart });
+          return;
+        }
+        const target = waves[waveIdx];
+        const nTargets = 2 + Math.floor(Math.random() * 2); // 2-3 מופעים
+        totalTargets += nTargets;
+
+        // מסיחים: קודם מהקבוצה, ואז אותיות אחרות
+        const others = RG.pickDistractors(TILES, [target],
+          groupLetters.concat(Object.keys(READING_LETTERS)));
+        const tiles = [];
+        for (let i = 0; i < nTargets; i++) tiles.push(target);
+        for (let i = 0; tiles.length < TILES; i++) tiles.push(others[i % others.length]);
+        const shuffled = RG.shuffle(tiles);
+
+        let found = 0;
+        stage.innerHTML =
+          `<div class="prompt">מצאי את כל האותיות <b>${target}</b>
+             <button class="target-btn" id="hear">🔊</button></div>
+           <div class="waves">גל ${waveIdx + 1} מתוך ${waves.length}</div>
+           <div class="grid" id="grid"></div>
+           <div class="counter" id="cnt">מצאת 0 מתוך ${nTargets}</div>`;
+        document.getElementById('hear').onclick = () => RG.playLetter(target);
+        const grid = document.getElementById('grid');
+        shuffled.forEach(l => {
+          const t = document.createElement('div');
+          t.className = 'tile'; t.textContent = l;
+          t.onclick = () => {
+            if (t.classList.contains('found')) return;
+            if (l === target) {
+              t.classList.add('found'); found++;
+              RG.ding();
+              document.getElementById('cnt').textContent = `מצאת ${found} מתוך ${nTargets}`;
+              if (found === nTargets) {
+                waveIdx++;
+                setTimeout(nextWave, 800);
+              }
+            } else {
+              wrongTaps++;
+              RG.buzz();
+              t.classList.add('miss');
+              setTimeout(() => t.classList.remove('miss'), 350);
+            }
+          };
+          grid.appendChild(t);
+        });
+        setTimeout(() => RG.playLetter(target), 400);
+      }
+
+      function restart() { waveIdx = 0; totalTargets = 0; wrongTaps = 0; nextWave(); }
+    }
+  </script>
+</body>
+</html>

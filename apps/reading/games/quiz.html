@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>אתגר הסיכום</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;
+       background:linear-gradient(160deg,#fff8e1,#ffe0b2);color:#4a2e05;
+       min-height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;}
+  .stage{width:100%;max-width:460px;padding:16px;flex:1;display:flex;flex-direction:column;
+         align-items:center;gap:14px;justify-content:center;}
+  .banner{font-size:1.5em;font-weight:800;color:#ef6c00;}
+  .prompt{font-size:1.3em;font-weight:800;color:#bf360c;min-height:1.3em;}
+  .show{background:#fff;border:5px solid #ffb300;border-radius:24px;padding:18px 22px;
+        box-shadow:0 8px 20px rgba(0,0,0,.12);cursor:pointer;min-width:180px;}
+  .show .emo{font-size:4.4rem;display:block;}
+  .show .word{font-size:1.9rem;font-weight:700;color:#666;margin-top:4px;}
+  .show .letter{font-size:6rem;font-weight:800;color:#e65100;line-height:1.1;}
+  .options{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;}
+  .options.three{grid-template-columns:repeat(3,1fr);}
+  .opt{background:#fff;border:4px solid #ffa726;border-radius:20px;font-size:3.2rem;font-weight:800;
+       color:#e65100;padding:16px 0;cursor:pointer;box-shadow:0 5px 0 #fb8c00;transition:transform .1s;}
+  .opt:active{transform:translateY(4px);box-shadow:none;}
+  .opt.correct{background:#c8e6c9;border-color:#4caf50;box-shadow:0 5px 0 #388e3c;color:#1b5e20;animation:bp .5s;}
+  .opt.wrong{background:#ffcdd2;border-color:#ef5350;color:#b71c1c;animation:sh .4s;}
+  @keyframes bp{40%{transform:translateY(-10px)}}
+  @keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .bar{width:100%;height:14px;background:#ffe0b2;border-radius:10px;overflow:hidden;}
+  .bar>i{display:block;height:100%;background:#ff9800;width:0;transition:width .3s;}
+  .hint{color:#a1887f;font-size:.95em;}
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+
+  <script src="../reading-data.js"></script>
+  <script src="../reading-progress.js"></script>
+  <script src="../reading-engine.js"></script>
+  <script>
+    RG.audioBase = '../../../letters/';
+    const station = RG.currentStation();
+    const stage = document.getElementById('stage');
+
+    if (!station || station.type !== 'quiz') {
+      stage.innerHTML = '<p>לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
+    } else {
+      RG.mountTopBar('אתגר הסיכום ' + (station.groupName || ''));
+      const letters = station.letters;
+      const ROUNDS = 8;
+      let round = 0, correct = 0, target = null, locked = false;
+
+      nextRound();
+
+      function nextRound() {
+        if (round >= ROUNDS) {
+          RG.finish({ stationId: station.id, correct, total: ROUNDS, replay: restart });
+          return;
+        }
+        locked = false;
+        target = letters[Math.floor(Math.random() * letters.length)];
+        // סוג שאלה: חצי "מה שמעת", חצי "באיזו אות מתחיל"
+        const kind = Math.random() < 0.5 ? 'hear' : 'word';
+        const opts = RG.shuffle(letters);
+        const optsClass = opts.length === 3 ? 'three' : '';
+        const data = READING_LETTERS[target];
+
+        let showHTML, promptText, onShowClick, autoPlay;
+        if (kind === 'hear') {
+          promptText = 'איזו אות שמעת?';
+          showHTML = `<div class="show" id="show"><span class="emo">👂</span></div>`;
+          onShowClick = () => RG.playLetter(target);
+          autoPlay = () => RG.playLetter(target);
+        } else {
+          promptText = 'באיזו אות מתחילה המילה?';
+          showHTML = `<div class="show" id="show">
+                        <span class="emo">${data.emoji}</span>
+                        <span class="word">${data.word}</span>
+                      </div>`;
+          onShowClick = () => RG.playWord(target);
+          autoPlay = () => RG.playWord(target);
+        }
+
+        stage.innerHTML =
+          `<div class="prompt">${promptText}</div>
+           ${showHTML}
+           <div class="bar"><i style="width:${(round / ROUNDS) * 100}%"></i></div>
+           <div class="options ${optsClass}" id="opts"></div>
+           <div class="hint">לחצי כאן לשמוע שוב 🔊</div>`;
+        document.getElementById('show').onclick = onShowClick;
+        const grid = document.getElementById('opts');
+        opts.forEach(l => {
+          const b = document.createElement('div');
+          b.className = 'opt'; b.textContent = l;
+          b.onclick = () => choose(l, b);
+          grid.appendChild(b);
+        });
+        setTimeout(autoPlay, 450);
+      }
+
+      function choose(l, el) {
+        if (locked) return;
+        if (l === target) {
+          locked = true;
+          el.classList.add('correct');
+          correct++; round++;
+          RG.ding(); RG.playLetter(target);
+          setTimeout(nextRound, 900);
+        } else {
+          el.classList.add('wrong');
+          RG.buzz();
+          setTimeout(() => el.classList.remove('wrong'), 450);
+        }
+      }
+
+      function restart() { round = 0; correct = 0; nextRound(); }
+    }
+  </script>
+</body>
+</html>
