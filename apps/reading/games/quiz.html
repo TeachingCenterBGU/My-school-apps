@@ -8,34 +8,70 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;font-family:'Heebo',system-ui,sans-serif;
-       background:linear-gradient(160deg,#fff8e1,#ffe0b2);color:#4a2e05;
-       min-height:100vh;text-align:center;display:flex;flex-direction:column;align-items:center;}
-  .stage{width:100%;max-width:460px;padding:16px;flex:1;display:flex;flex-direction:column;
-         align-items:center;gap:14px;justify-content:center;}
-  .banner{font-size:1.5em;font-weight:800;color:#ef6c00;}
-  .prompt{font-size:1.3em;font-weight:800;color:#bf360c;min-height:1.3em;}
-  .show{background:#fff;border:5px solid #ffb300;border-radius:24px;padding:18px 22px;
-        box-shadow:0 8px 20px rgba(0,0,0,.12);cursor:pointer;min-width:180px;}
-  .show .emo{font-size:4.4rem;display:block;}
-  .show .word{font-size:1.9rem;font-weight:700;color:#666;margin-top:4px;}
-  .show .letter{font-size:6rem;font-weight:800;color:#e65100;line-height:1.1;}
-  .options{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;}
-  .options.three{grid-template-columns:repeat(3,1fr);}
-  .opt{background:#fff;border:4px solid #ffa726;border-radius:20px;font-size:3.2rem;font-weight:800;
-       color:#e65100;padding:16px 0;cursor:pointer;box-shadow:0 5px 0 #fb8c00;transition:transform .1s;}
-  .opt:active{transform:translateY(4px);box-shadow:none;}
-  .opt.correct{background:#c8e6c9;border-color:#4caf50;box-shadow:0 5px 0 #388e3c;color:#1b5e20;animation:bp .5s;}
-  .opt.wrong{background:#ffcdd2;border-color:#ef5350;color:#b71c1c;animation:sh .4s;}
-  @keyframes bp{40%{transform:translateY(-10px)}}
-  @keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-  .bar{width:100%;height:14px;background:#ffe0b2;border-radius:10px;overflow:hidden;}
-  .bar>i{display:block;height:100%;background:#ff9800;width:0;transition:width .3s;}
-  .hint{color:#a1887f;font-size:.95em;}
+  html,body{margin:0;height:100%;}
+  body{font-family:'Heebo',system-ui,sans-serif;color:#fff;min-height:100vh;
+       display:flex;flex-direction:column;
+       background:radial-gradient(1px 1px at 20% 20%,#fff,transparent),
+                  radial-gradient(1px 1px at 70% 30%,#fff,transparent),
+                  radial-gradient(2px 2px at 40% 70%,#fff,transparent),
+                  radial-gradient(1px 1px at 85% 60%,#fff,transparent),
+                  linear-gradient(180deg,#1a1140,#3a1c6e 55%,#5b2a86);}
+  .arena{position:relative;flex:1;width:100%;display:flex;flex-direction:column;
+         align-items:center;justify-content:space-between;padding:12px 12px 18px;overflow:hidden;}
+
+  /* מד הקסם */
+  .meter{width:100%;max-width:420px;display:flex;align-items:center;gap:10px;z-index:2;padding:0 4px;}
+  .meter .crystal{font-size:2.2rem;transition:transform .2s;}
+  .meter .crystal.pulse{animation:cryPulse .4s;}
+  @keyframes cryPulse{50%{transform:scale(1.4) rotate(8deg)}}
+  .bar{flex:1;height:20px;background:rgba(255,255,255,.15);border-radius:20px;overflow:hidden;
+       border:2px solid rgba(255,255,255,.3);}
+  .bar>i{display:block;height:100%;width:0;border-radius:20px;transition:width .5s cubic-bezier(.2,.8,.2,1);
+         background:linear-gradient(90deg,#ff8a5c,#ffd166,#43e0c0,#8f6ed5,#ff5ca8);}
+  .combo{min-width:64px;text-align:center;font-weight:800;color:#ffd166;font-size:1.05rem;height:1.3em;}
+
+  /* קלף השאלה */
+  .qcard{background:rgba(255,255,255,.96);color:#3a2a12;border-radius:26px;padding:16px 22px;text-align:center;
+         box-shadow:0 12px 30px rgba(0,0,0,.4),0 0 0 4px rgba(255,255,255,.15);cursor:pointer;
+         min-width:190px;z-index:2;position:relative;transition:transform .15s;}
+  .qcard.flash{animation:cardFlash .4s;}
+  @keyframes cardFlash{50%{transform:scale(1.06)}}
+  .qcard .ptitle{font-weight:800;color:#7e57c2;font-size:1.05rem;}
+  .qcard .emo{font-size:4.4rem;display:block;line-height:1;margin-top:4px;}
+  .qcard .word{font-size:1.7rem;font-weight:800;color:#555;}
+  .qcard .earbig{font-size:4.4rem;}
+  .qcard .say{font-size:.9rem;color:#999;margin-top:2px;}
+
+  /* רוּנוֹת (אותיות) */
+  .runes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;width:100%;max-width:440px;z-index:2;}
+  .rune{width:74px;height:74px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+        font-size:2.8rem;font-weight:800;color:#fff;cursor:pointer;
+        background:linear-gradient(160deg,#7e57c2,#5e35b1);
+        box-shadow:0 6px 0 #4527a0,0 0 18px rgba(155,120,255,.5);transition:transform .1s;}
+  .rune:active{transform:translateY(5px);box-shadow:0 1px 0 #4527a0;}
+  .rune.correct{background:linear-gradient(160deg,#66bb6a,#43a047);box-shadow:0 6px 0 #2e7d32,0 0 26px #7bed9f;animation:cardFlash .4s;}
+  .rune.wrong{background:linear-gradient(160deg,#ef5350,#c62828);box-shadow:0 6px 0 #8e0000;animation:shake .4s;}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  .spark{position:absolute;z-index:5;font-size:1.6rem;pointer-events:none;animation:rise .8s forwards;}
+  @keyframes rise{to{transform:translateY(-120px) scale(1.5);opacity:0}}
+  .mascot{position:absolute;bottom:6px;left:8px;z-index:1;pointer-events:none;
+          animation:cheer 1.2s ease-in-out infinite;}
+  @keyframes cheer{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
+  .title-tag{position:absolute;top:8px;right:12px;font-weight:800;color:#ffd166;z-index:1;opacity:.9;}
 </style>
 </head>
 <body>
-  <div class="stage" id="stage"></div>
+  <div class="arena" id="arena">
+    <div class="meter">
+      <span class="crystal" id="crystal">🔮</span>
+      <div class="bar"><i id="fill"></i></div>
+      <span class="combo" id="combo"></span>
+    </div>
+    <div class="qcard" id="qcard" onclick="replay()"></div>
+    <div class="runes" id="runes"></div>
+    <div class="mascot" id="mascot"></div>
+  </div>
 
   <script src="../reading-data.js?v=7"></script>
   <script src="../reading-progress.js?v=7"></script>
@@ -43,81 +79,110 @@
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
-    const stage = document.getElementById('stage');
+    const arena = document.getElementById('arena');
 
     if (!station || station.type !== 'quiz') {
-      stage.innerHTML = '<p>לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
+      arena.innerHTML = '<p style="padding:20px">לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
     } else {
-      RG.mountTopBar('אתגר הסיכום ' + (station.groupName || ''));
+      RG.mountTopBar('אתגר הסיכום ' + (station.groupName || ''), { bg: false });
+      document.getElementById('mascot').innerHTML = RG.unicorn(58);
       const letters = station.letters;
       const ROUNDS = 8;
-      let round = 0, correct = 0, target = null, locked = false;
+      let correct = 0, wrong = 0, combo = 0, bestCombo = 0;
+      let target = null, curWord = null, kind = null, locked = false;
 
-      nextRound();
+      newRound();
 
-      function nextRound() {
+      function newRound() {
         RG.stopAudio();
-        if (round >= ROUNDS) {
-          RG.finish({ stationId: station.id, correct, total: ROUNDS, replay: restart });
-          return;
-        }
         locked = false;
+        if (correct >= ROUNDS) return win();
         target = letters[Math.floor(Math.random() * letters.length)];
-        // סוג שאלה: חצי "מה שמעת", חצי "באיזו אות מתחיל"
-        const kind = Math.random() < 0.5 ? 'hear' : 'word';
-        const opts = RG.shuffle(letters);
-        const optsClass = opts.length === 3 ? 'three' : '';
-        const w = pickWord(target);   // מילה אקראית מבנק המילים של האות
+        kind = Math.random() < 0.5 ? 'hear' : 'word';
+        curWord = pickWord(target);
 
-        let showHTML, promptText, onShowClick, autoPlay;
+        const qcard = document.getElementById('qcard');
         if (kind === 'hear') {
-          promptText = 'איזו אות שמעת?';
-          showHTML = `<div class="show" id="show"><span class="emo">👂</span></div>`;
-          onShowClick = () => RG.playLetter(target);
-          autoPlay = () => RG.playLetter(target);
+          qcard.innerHTML = `<div class="ptitle">איזו אות שמעת?</div>
+                             <span class="earbig">🎧</span>
+                             <div class="say">לחצי לשמוע שוב 🔊</div>`;
         } else {
-          promptText = 'באיזו אות מתחילה המילה?';
-          showHTML = `<div class="show" id="show">
-                        <span class="emo">${w.emoji}</span>
-                        <span class="word">${w.word}</span>
-                      </div>`;
-          onShowClick = () => RG.playWord(target, w);
-          autoPlay = () => RG.playWord(target, w);
+          qcard.innerHTML = `<div class="ptitle">באיזה צליל מתחילה המילה?</div>
+                             <span class="emo">${curWord.emoji}</span>
+                             <span class="word">${curWord.word}</span>
+                             <div class="say">לחצי לשמוע שוב 🔊</div>`;
         }
 
-        stage.innerHTML =
-          `<div class="prompt">${promptText}</div>
-           ${showHTML}
-           <div class="bar"><i style="width:${(round / ROUNDS) * 100}%"></i></div>
-           <div class="options ${optsClass}" id="opts"></div>
-           <div class="hint">לחצי כאן לשמוע שוב 🔊</div>`;
-        document.getElementById('show').onclick = onShowClick;
-        const grid = document.getElementById('opts');
-        opts.forEach(l => {
+        const runes = document.getElementById('runes');
+        runes.innerHTML = '';
+        RG.shuffle(letters).forEach(l => {
           const b = document.createElement('div');
-          b.className = 'opt'; b.textContent = l;
+          b.className = 'rune';
+          b.textContent = l;
           b.onclick = () => choose(l, b);
-          grid.appendChild(b);
+          runes.appendChild(b);
         });
-        setTimeout(autoPlay, 450);
+        updateHud();
+        setTimeout(playPrompt, 400);
       }
+
+      function playPrompt() {
+        if (kind === 'hear') RG.playLetter(target);
+        else RG.playWord(target, curWord);
+      }
+      window.replay = playPrompt;
 
       function choose(l, el) {
         if (locked) return;
         if (l === target) {
           locked = true;
+          correct++; combo++; bestCombo = Math.max(bestCombo, combo);
           el.classList.add('correct');
-          correct++; round++;
+          document.getElementById('qcard').classList.add('flash');
+          burst(el);
+          fillMeter();
+          if (combo >= 2) RG.ding();
           RG.ding();
-          setTimeout(nextRound, 800);
+          setTimeout(() => RG.playLetter(target), 220);
+          setTimeout(newRound, 1050);
         } else {
+          wrong++; combo = 0;
           el.classList.add('wrong');
           RG.buzz();
-          setTimeout(() => el.classList.remove('wrong'), 450);
+          updateHud();
+          setTimeout(() => el.classList.remove('wrong'), 420);
         }
       }
 
-      function restart() { round = 0; correct = 0; nextRound(); }
+      function fillMeter() {
+        document.getElementById('fill').style.width = Math.round(correct / ROUNDS * 100) + '%';
+        const c = document.getElementById('crystal');
+        c.classList.remove('pulse'); void c.offsetWidth; c.classList.add('pulse');
+        updateHud();
+      }
+
+      function updateHud() {
+        document.getElementById('combo').textContent = combo >= 2 ? '🔥 x' + combo : '';
+      }
+
+      function burst(el) {
+        const a = arena.getBoundingClientRect(), r = el.getBoundingClientRect();
+        for (let i = 0; i < 5; i++) {
+          const s = document.createElement('div');
+          s.className = 'spark';
+          s.textContent = ['⭐', '✨', '🌟'][i % 3];
+          s.style.left = (r.left - a.left + r.width / 2 - 12 + (Math.random() * 40 - 20)) + 'px';
+          s.style.top = (r.top - a.top - 6) + 'px';
+          s.style.animationDelay = (i * 0.05) + 's';
+          arena.appendChild(s);
+          setTimeout(() => s.remove(), 850);
+        }
+      }
+
+      function win() {
+        RG.finish({ stationId: station.id, correct: ROUNDS, total: ROUNDS + wrong,
+                    replay: () => location.reload() });
+      }
     }
   </script>
 </body>
