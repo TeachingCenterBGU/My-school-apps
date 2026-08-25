@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>אולפן ההקלטות · מסע הקריאה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#2a2140;background:#f4f1fb;padding-bottom:80px;}
+  header{position:sticky;top:0;z-index:10;background:#6a3fb5;color:#fff;padding:12px 16px;
+         box-shadow:0 2px 12px rgba(0,0,0,.15);}
+  header h1{margin:0 0 4px;font-size:1.35em;}
+  header .status{font-size:.9em;opacity:.95;}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;}
+  .toolbar button,.toolbar label{font-family:inherit;font-weight:700;border:none;border-radius:40px;
+       padding:8px 14px;cursor:pointer;font-size:.95em;}
+  .btn-export{background:#ffd166;color:#5a3d00;}
+  .btn-help{background:rgba(255,255,255,.2);color:#fff;}
+  .chk{background:rgba(255,255,255,.15);color:#fff;display:inline-flex;align-items:center;gap:6px;}
+  .prog{background:rgba(255,255,255,.15);border-radius:40px;padding:6px 14px;font-weight:800;}
+
+  .wrap{max-width:760px;margin:0 auto;padding:14px;}
+  .note{background:#fff;border-rad:14px;border-radius:14px;padding:12px 14px;margin-bottom:14px;
+        border:2px dashed #c9b6ef;font-size:.92em;line-height:1.5;color:#4a3a70;}
+  h2{margin:18px 6px 8px;color:#6a3fb5;}
+  .row{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:8px 12px;
+       margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,.05);}
+  .row.done{background:#eefaf0;}
+  .disp{min-width:66px;display:flex;flex-direction:column;align-items:center;}
+  .disp .big{font-size:2rem;font-weight:800;line-height:1;color:#e65100;}
+  .disp .sub{font-size:.85em;color:#777;margin-top:2px;white-space:nowrap;}
+  .dot{width:12px;height:12px;border-radius:50%;background:#ddd;flex:none;}
+  .dot.on{background:#43a047;}
+  .row .btns{margin-inline-start:auto;display:flex;gap:6px;}
+  .row button{font-family:inherit;font-weight:700;border:none;border-radius:40px;padding:8px 12px;
+       cursor:pointer;font-size:.95em;background:#ede7f6;color:#4527a0;}
+  .row button.rec{background:#ef5350;color:#fff;}
+  .row button.rec.active{background:#b71c1c;animation:blink 1s infinite;}
+  @keyframes blink{50%{opacity:.55}}
+  .row button.mini{background:#f0f0f5;color:#555;padding:8px 10px;}
+  .hidden{display:none!important;}
+  #overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  #overlay.show{display:flex;}
+  .modal{background:#fff;border-radius:20px;padding:22px;max-width:460px;line-height:1.6;}
+  .modal h3{margin-top:0;color:#6a3fb5;}
+  .modal code{background:#f0ecfa;padding:1px 6px;border-radius:6px;}
+  .modal button{margin-top:12px;background:#6a3fb5;color:#fff;border:none;border-radius:40px;padding:10px 20px;font-weight:700;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body>
+  <header>
+    <h1>🎙️ אולפן ההקלטות — מסע הקריאה של ענת</h1>
+    <div class="status" id="micStatus">מכינים מיקרופון…</div>
+    <div class="toolbar">
+      <span class="prog" id="prog">0 / 0</span>
+      <button class="btn-export" id="btnExport">⬇️ ייצוא חבילת קול</button>
+      <label class="chk"><input type="checkbox" id="onlyMissing"> רק מה שחסר</label>
+      <button class="btn-help" id="btnHelp">❔ הסבר</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="note">
+      מקליטים בלחיצה על 🎙️ (לחיצה שנייה עוצרת). ▶️ להאזנה, 🔊 להקלטה המקורית לדוגמה, 🗑️ למחיקה.
+      בסיום לוחצים <b>ייצוא חבילת קול</b> — יורד קובץ <code>reading-voices.js</code>. שומרים אותו
+      בתיקייה <code>apps/reading/</code> (מחליף את הקיים) וממזגים — וזהו, הקול שלכם יופיע במשחקים.
+      ההקלטות נשמרות בדפדפן הזה עד לייצוא.
+    </div>
+    <h2>אותיות (שם/צליל האות)</h2>
+    <div id="lettersList"></div>
+    <h2>מילים</h2>
+    <div id="wordsList"></div>
+  </div>
+
+  <div id="overlay">
+    <div class="modal">
+      <h3>איך זה עובד?</h3>
+      <p>1. לחצו 🎙️ ליד פריט כדי להקליט (לחיצה שנייה עוצרת). אפשר להקליט מחדש בכל רגע.</p>
+      <p>2. 🔊 משמיע את ההקלטה המקורית (אם יש) כדוגמה; ▶️ משמיע את מה שהקלטתם.</p>
+      <p>3. בסיום לחצו <b>ייצוא חבילת קול</b> — יורד <code>reading-voices.js</code>.</p>
+      <p>4. העלו את הקובץ ל-<code>apps/reading/</code> (במקום הקובץ הריק) ומזגו. רענון קשיח, והקול שלכם במשחקים.</p>
+      <p style="color:#a1887f">טיפ: הקליטו במכשיר/דפדפן מאותו סוג שבו הילדים משחקים, לתאימות מיטבית.</p>
+      <button id="btnCloseHelp">הבנתי</button>
+    </div>
+  </div>
+
+  <script src="reading-data.js?v=10"></script>
+  <script>
+    const EXAMPLE_BASE = '../../letters/';
+    let db = null, mem = null, mediaStream = null, rec = null, activeBtn = null, total = 0;
+
+    // ---- אחסון: IndexedDB אם אפשר, אחרת זיכרון (fallback) ----
+    function openDB() {
+      return new Promise((res, rej) => {
+        try {
+          const r = indexedDB.open('reading-voices-studio', 1);
+          r.onupgradeneeded = () => r.result.createObjectStore('clips');
+          r.onsuccess = () => res(r.result);
+          r.onerror = () => rej(r.error);
+        } catch (e) { rej(e); }
+      });
+    }
+    async function initStore() {
+      try {
+        db = await Promise.race([openDB(),
+          new Promise((_, rej) => setTimeout(() => rej('timeout'), 1500))]);
+      } catch (e) { mem = new Map(); } // אחסון בזיכרון אם IndexedDB חסום/איטי
+    }
+    const tx = mode => db.transaction('clips', mode).objectStore('clips');
+    const idbPut = (k, v) => mem ? Promise.resolve(mem.set(k, v))
+      : new Promise((res, rej) => { const t = tx('readwrite').put(v, k); t.onsuccess = res; t.onerror = () => rej(); });
+    const idbGet = k => mem ? Promise.resolve(mem.get(k) || null)
+      : new Promise(res => { const r = tx('readonly').get(k); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); });
+    const idbDel = k => mem ? Promise.resolve(mem.delete(k))
+      : new Promise(res => { const r = tx('readwrite').delete(k); r.onsuccess = res; r.onerror = res; });
+    const idbKeys = () => mem ? Promise.resolve([...mem.keys()])
+      : new Promise(res => { const r = tx('readonly').getAllKeys(); r.onsuccess = () => res(r.result || []); r.onerror = () => res([]); });
+
+    // ---- items ----
+    function buildItems() {
+      const letters = [], words = [];
+      Object.keys(READING_LETTERS).forEach(ch => {
+        const d = READING_LETTERS[ch];
+        letters.push({ key: 'letter:' + ch, big: ch, sub: d.name, example: d.letterAudio });
+        d.words.forEach(w => words.push({ key: 'word:' + w.word, big: w.emoji, sub: w.word, example: w.audio }));
+      });
+      return { letters, words };
+    }
+
+    function rowEl(item) {
+      const row = document.createElement('div');
+      row.className = 'row'; row.dataset.key = item.key;
+      row.innerHTML =
+        `<span class="dot"></span>
+         <span class="disp"><span class="big">${item.big}</span><span class="sub">${item.sub}</span></span>
+         <span class="btns">
+           <button class="rec">🎙️ הקלט</button>
+           <button class="mini play hidden">▶️</button>
+           ${item.example ? '<button class="mini ex">🔊</button>' : ''}
+           <button class="mini del hidden">🗑️</button>
+         </span>`;
+      row.querySelector('.rec').onclick = () => toggleRec(item.key, row);
+      row.querySelector('.play').onclick = () => playClip(item.key);
+      const ex = row.querySelector('.ex'); if (ex) ex.onclick = () => playExample(item.example);
+      row.querySelector('.del').onclick = () => delClip(item.key, row);
+      return row;
+    }
+
+    function markRow(row, hasClip) {
+      row.classList.toggle('done', hasClip);
+      row.querySelector('.dot').classList.toggle('on', hasClip);
+      row.querySelector('.play').classList.toggle('hidden', !hasClip);
+      row.querySelector('.del').classList.toggle('hidden', !hasClip);
+    }
+
+    // ---- recording ----
+    async function ensureMic() {
+      if (mediaStream) return mediaStream;
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      document.getElementById('micStatus').textContent = '🎤 מיקרופון מוכן — אפשר להקליט!';
+      return mediaStream;
+    }
+    async function toggleRec(key, row) {
+      const btn = row.querySelector('.rec');
+      if (rec && activeBtn === btn) { rec.stop(); return; } // עצירה
+      if (rec) { rec.stop(); }                              // עצירת הקלטה אחרת
+      try { await ensureMic(); } catch (e) {
+        document.getElementById('micStatus').textContent = '⚠️ אין גישה למיקרופון. אשרו הרשאה ונסו שוב.';
+        return;
+      }
+      const chunks = [];
+      rec = new MediaRecorder(mediaStream);
+      activeBtn = btn;
+      rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      rec.onstop = async () => {
+        const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
+        await idbPut(key, blob);
+        markRow(row, true);
+        btn.textContent = '🎙️ הקלט שוב'; btn.classList.remove('active');
+        rec = null; activeBtn = null; updateProgress();
+      };
+      rec.start();
+      btn.textContent = '⏹️ עצור'; btn.classList.add('active');
+    }
+    async function playClip(key) {
+      const blob = await idbGet(key); if (!blob) return;
+      const a = new Audio(URL.createObjectURL(blob)); a.play();
+    }
+    function playExample(file) { if (file) new Audio(encodeURI(EXAMPLE_BASE + file)).play(); }
+    async function delClip(key, row) {
+      await idbDel(key); markRow(row, false); updateProgress();
+    }
+
+    // ---- progress + export ----
+    async function updateProgress() {
+      const keys = await idbKeys();
+      document.getElementById('prog').textContent = keys.length + ' / ' + total;
+    }
+    function blobToDataURL(blob) {
+      return new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(blob); });
+    }
+    async function exportVoices() {
+      const keys = await idbKeys();
+      if (!keys.length) { alert('עדיין לא הוקלט כלום 🙂'); return; }
+      const obj = {};
+      for (const k of keys) { const b = await idbGet(k); if (b) obj[k] = await blobToDataURL(b); }
+      const content = '// reading-voices.js — נוצר על ידי אולפן ההקלטות\n' +
+                      '// ' + keys.length + ' הקלטות · ' + new Date().toLocaleString('he-IL') + '\n' +
+                      'window.READING_VOICES = ' + JSON.stringify(obj) + ';\n';
+      const blob = new Blob([content], { type: 'application/javascript' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'reading-voices.js';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }
+
+    // ---- init ----
+    (async function init() {
+      await initStore();
+      const { letters, words } = buildItems();
+      total = letters.length + words.length;
+      const ll = document.getElementById('lettersList'), wl = document.getElementById('wordsList');
+      const existing = new Set(await idbKeys());
+      [...letters].forEach(it => { const r = rowEl(it); ll.appendChild(r); markRow(r, existing.has(it.key)); });
+      [...words].forEach(it => { const r = rowEl(it); wl.appendChild(r); markRow(r, existing.has(it.key)); });
+      updateProgress();
+      document.getElementById('micStatus').textContent = 'לחצו 🎙️ ליד פריט כדי להתחיל (יתבקש אישור מיקרופון).';
+
+      document.getElementById('btnExport').onclick = exportVoices;
+      document.getElementById('btnHelp').onclick = () => document.getElementById('overlay').classList.add('show');
+      document.getElementById('btnCloseHelp').onclick = () => document.getElementById('overlay').classList.remove('show');
+      document.getElementById('onlyMissing').onchange = e => {
+        const only = e.target.checked;
+        document.querySelectorAll('.row').forEach(r => {
+          r.classList.toggle('hidden', only && r.classList.contains('done'));
+        });
+      };
+    })();
+  </script>
+</body>
+</html>

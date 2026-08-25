@@ -80,13 +80,13 @@ const RG = (function () {
     document.head.appendChild(st);
   }
 
-  // --- אודיו: השמעת קובץ הקלטה ---
-  function playFile(file) {
+  // --- אודיו: השמעת מקור (src מלא — קובץ או dataURL) ---
+  function playSrc(src) {
     return new Promise(resolve => {
-      if (!soundOn || !file) return resolve(false);
+      if (!soundOn || !src) return resolve(false);
       try {
-        let a = audioCache[file];
-        if (!a) { a = new Audio(encodeURI(audioBase + file)); audioCache[file] = a; }
+        let a = audioCache[src];
+        if (!a) { a = new Audio(src); audioCache[src] = a; }
         stopAudio();               // עוצרים כל אודיו קודם — לא ייגרר לשאלה הבאה
         currentAudio = a;
         a.currentTime = 0;
@@ -96,6 +96,13 @@ const RG = (function () {
         if (p && p.catch) p.catch(() => resolve(false));
       } catch (e) { resolve(false); }
     });
+  }
+  function playFile(file) { return playSrc(file ? encodeURI(audioBase + file) : null); }
+
+  // הקלטת קול של ההורה/הילדה (מ-reading-voices.js), אם קיימת
+  function voiceSrc(key) {
+    const v = window.READING_VOICES;
+    return (v && v[key]) || null;
   }
 
   // עצירת כל אודיו שמתנגן (הקלטה + קול סינתטי)
@@ -107,20 +114,22 @@ const RG = (function () {
 
   function letterData(char) { return (window.READING_LETTERS || {})[char] || null; }
 
-  // השמעת שם האות (הקלטה; אם נכשל — קול סינתטי עם שם האות)
+  // השמעת שם/צליל האות.  סדר עדיפות: הקלטת המשפחה → הקלטה קיימת → קול סינתטי
   async function playLetter(char) {
     const d = letterData(char);
     if (!d) return;
-    const ok = await playFile(d.letterAudio);
+    const vs = voiceSrc('letter:' + char);
+    const ok = vs ? await playSrc(vs) : await playFile(d.letterAudio);
     if (!ok && soundOn) speak(d.name || char);
   }
 
   // השמעת מילת דוגמה.  אפשר להעביר אובייקט מילה ({word,emoji,audio});
-  // אם לא — נבחרת המילה הראשונה של האות.
+  // אם לא — נבחרת המילה הראשונה של האות.  סדר עדיפות כמו באות.
   async function playWord(char, wordObj) {
     const w = wordObj || (window.primaryWord ? window.primaryWord(char) : null);
     if (!w) return;
-    const ok = await playFile(w.audio);
+    const vs = voiceSrc('word:' + w.word);
+    const ok = vs ? await playSrc(vs) : await playFile(w.audio);
     if (!ok && soundOn) speak((w.word || '').replace(/[֑-ׇ]/g, '') || char);
   }
 
