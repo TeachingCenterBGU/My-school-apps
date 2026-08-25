@@ -29,7 +29,8 @@ const RG = (function () {
     .rg-topbar .rg-home,.rg-topbar .rg-sound{width:42px;height:42px;border-radius:50%;
       border:2px solid #ffb74d;background:#fff;font-size:1.3em;cursor:pointer;
       display:flex;align-items:center;justify-content:center;text-decoration:none;color:#e65100;}
-    .rg-topbar .rg-title{font-weight:800;color:#5a3d1e;font-size:1.1em;}
+    .rg-topbar .rg-title{font-weight:800;color:#5a3d1e;font-size:1.1em;display:flex;align-items:center;gap:6px;}
+    .rg-topbar .rg-logo{display:inline-flex;}
     body.rg-has-topbar{padding-top:64px;}
 
     .rg-overlay{position:fixed;inset:0;background:rgba(30,20,10,.55);
@@ -176,6 +177,56 @@ const RG = (function () {
     }
   }
 
+  // --- דמות המסע: חד-קרן (SVG חמוד, נשאר חד בכל גודל) ---
+  function unicorn(size) {
+    size = size || 64;
+    const id = 'u' + Math.random().toString(36).slice(2, 7);
+    return `
+    <svg viewBox="0 0 128 124" width="${size}" height="${size}" style="display:block;overflow:visible" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ff9f45"/>
+        </linearGradient>
+      </defs>
+      <g stroke="#4a2c5a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+        <!-- זנב -->
+        <path d="M40,74 C14,66 10,94 22,106 C29,113 38,108 42,98 Z" fill="#6fe0d0"/>
+        <path d="M44,80 C24,74 22,98 32,108 C38,113 45,108 48,99 Z" fill="#ffd35c"/>
+        <path d="M48,85 C32,81 32,100 40,108 C44,112 51,108 53,100 Z" fill="#ff8fb1"/>
+        <!-- רגליים -->
+        <g fill="#fff">
+          <path d="M46,84 h11 v22 h-11 Z"/><path d="M62,90 h11 v18 h-11 Z"/>
+          <path d="M80,90 h11 v18 h-11 Z"/><path d="M94,84 h11 v22 h-11 Z"/>
+        </g>
+        <g fill="#ff8fb1" stroke="none">
+          <rect x="47" y="99" width="9" height="6" rx="2"/><rect x="63" y="101" width="9" height="6" rx="2"/>
+          <rect x="81" y="101" width="9" height="6" rx="2"/><rect x="95" y="99" width="9" height="6" rx="2"/>
+        </g>
+        <!-- גוף -->
+        <path d="M40,74 C40,52 60,44 76,46 C98,48 106,66 101,84 C96,100 74,104 58,99 C46,95 40,88 40,74 Z" fill="#fff"/>
+        <!-- אוזניים -->
+        <path d="M72,28 l4,-14 10,10 Z" fill="#fff"/>
+        <path d="M104,22 l3,-14 8,12 Z" fill="#fff"/>
+        <!-- ראש -->
+        <circle cx="92" cy="46" r="27" fill="#fff"/>
+        <!-- רעמה -->
+        <path d="M70,26 C56,32 55,50 63,64 C66,52 71,45 76,41 Z" fill="#6fe0d0"/>
+        <path d="M78,20 C66,26 64,44 72,58 C76,46 80,38 85,34 Z" fill="#ffd35c"/>
+        <path d="M86,16 C77,20 75,36 82,50 C86,40 90,32 95,30 Z" fill="#ff8fb1"/>
+        <!-- קרן -->
+        <path d="M98,2 l9,24 -18,0 Z" fill="url(#${id}h)"/>
+        <!-- עיניים עצומות שמחות -->
+        <path d="M80,48 q4.5,-7 9,0" fill="none"/>
+        <path d="M97,48 q4.5,-7 9,0" fill="none"/>
+        <!-- לחיים -->
+        <circle cx="80" cy="57" r="3.6" fill="#ff9ecb" stroke="none"/>
+        <circle cx="107" cy="57" r="3.6" fill="#ff9ecb" stroke="none"/>
+        <!-- חיוך -->
+        <path d="M89,56 q5,8 11,2" fill="none"/>
+      </g>
+    </svg>`;
+  }
+
   // --- רקע משחקי מונפש ---
   function mountBackground(theme) {
     injectStyle();
@@ -220,7 +271,7 @@ const RG = (function () {
     bar.className = 'rg-topbar';
     bar.innerHTML =
       `<a class="rg-home" href="../journey.html" title="חזרה למפה">🏠</a>` +
-      `<span class="rg-title">${title || ''}</span>` +
+      `<span class="rg-title"><span class="rg-logo">${unicorn(30)}</span>${title || ''}</span>` +
       `<button class="rg-sound" title="סאונד">🔊</button>`;
     document.body.appendChild(bar);
     bar.querySelector('.rg-sound').addEventListener('click', function () {
@@ -269,12 +320,11 @@ const RG = (function () {
     if (stars >= 2) { confetti(); fanfare(); } else { ding(); }
 
     const msg = stars === 3 ? 'מושלם! 🌟' : stars === 2 ? 'כל הכבוד!' : 'יופי, סיימת!';
-    const mascot = stars === 3 ? '🦸' : stars === 2 ? '🐣' : '🐥';
     const overlay = document.createElement('div');
     overlay.className = 'rg-overlay';
     overlay.innerHTML =
       `<div class="rg-card">
-         <div class="rg-mascot">${mascot}</div>
+         <div class="rg-mascot" style="display:flex;justify-content:center">${unicorn(90)}</div>
          <div class="rg-stars">
            <span class="s ${stars >= 1 ? 'on' : ''}">⭐</span>
            <span class="s ${stars >= 2 ? 'on' : ''}">⭐</span>
@@ -318,7 +368,7 @@ const RG = (function () {
     get soundOn() { return soundOn; },
     set audioBase(v) { audioBase = v; },
     injectStyle, playLetter, playWord, speak, stopAudio,
-    ding, buzz, fanfare, confetti,
+    ding, buzz, fanfare, confetti, unicorn,
     mountTopBar, mountBackground, starsForAccuracy, finish,
     currentStation, shuffle, pickDistractors,
   };

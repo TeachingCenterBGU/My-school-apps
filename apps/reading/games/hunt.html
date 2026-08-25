@@ -32,6 +32,9 @@
   @keyframes miss{25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
   .spark{position:absolute;z-index:3;font-size:1.6rem;pointer-events:none;animation:sp .6s forwards;}
   @keyframes sp{to{transform:translateY(-30px) scale(1.4);opacity:0}}
+  .mascot{position:absolute;bottom:2px;left:6px;z-index:1;pointer-events:none;
+          animation:cheer 1.1s ease-in-out infinite;}
+  @keyframes cheer{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
 </style>
 </head>
 <body>
@@ -58,7 +61,7 @@
       let waveIdx = 0, totalTargets = 0, wrongTaps = 0;
 
       buildDeco();
-      nextWave();
+      requestAnimationFrame(nextWave); // כדי שגודל הסצנה יהיה ידוע לפיזור
 
       // עצים/פרחים/פטריות ברקע (לא נלחצים)
       function buildDeco() {
@@ -83,6 +86,11 @@
         sun.className = 'deco'; sun.textContent = '☀️';
         sun.style.fontSize = '54px'; sun.style.top = '6px'; sun.style.left = '6%';
         scene.appendChild(sun);
+        // חד-הקרן מעודד בפינה
+        const mascot = document.createElement('div');
+        mascot.className = 'mascot';
+        mascot.innerHTML = RG.unicorn(66);
+        scene.appendChild(mascot);
       }
 
       function clearLetters() {
@@ -112,15 +120,29 @@
 
         updateHud(target, found, nTargets);
 
+        // פיזור בלי חפיפה: לכל אות בוחרים מיקום שרחוק מספיק מהאחרות
+        const W = scene.clientWidth || window.innerWidth;
+        const H = scene.clientHeight || (window.innerHeight - 120);
+        const placed = [];
+        const M = 6, TOP = 8, BOT = H - 92; // שומרים את פס העצים בתחתית
         RG.shuffle(items).forEach(ch => {
+          const fs = 30 + Math.random() * 40;
+          const r = fs * 0.62;
+          let cx = W / 2, cy = H / 2, ok = false;
+          for (let t = 0; t < 60 && !ok; t++) {
+            cx = M + r + Math.random() * Math.max(1, W - 2 * (M + r));
+            cy = TOP + r + Math.random() * Math.max(1, (BOT - r) - (TOP + r));
+            ok = placed.every(p => Math.hypot(p.x - cx, p.y - cy) > r + p.r + 8);
+          }
+          placed.push({ x: cx, y: cy, r });
           const el = document.createElement('div');
           el.className = 'letter';
           el.textContent = ch;
-          el.style.fontSize = (30 + Math.random() * 44) + 'px';
+          el.style.fontSize = fs + 'px';
           el.style.color = COLORS[Math.floor(Math.random() * COLORS.length)];
-          el.style.left = (4 + Math.random() * 86) + '%';
-          el.style.top = (6 + Math.random() * 78) + '%';
-          el.style.transform = 'rotate(' + (Math.random() * 40 - 20) + 'deg)';
+          el.style.left = (cx - r) + 'px';
+          el.style.top = (cy - r) + 'px';
+          el.style.transform = 'rotate(' + (Math.random() * 36 - 18) + 'deg)';
           el.onclick = () => {
             if (el.classList.contains('found')) return;
             if (ch === target) {
