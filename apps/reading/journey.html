@@ -67,6 +67,7 @@
        box-shadow:0 8px 0 rgba(0,0,0,.12),0 10px 22px rgba(0,0,0,.14);}
   /* צבע לפי סוג */
   .node.meet{background:#ffd59e;color:#e65100;}
+  .node.write{background:#bfe3ff;color:#1565c0;}
   .node.sound{background:#ffc1e3;color:#ad1457;}
   .node.hunt{background:#b9f0c0;color:#2e7d32;}
   .node.hear{background:#d8c9ff;color:#5e35b1;}
@@ -120,15 +121,15 @@
 
   <div class="finale">🏁</div>
 
-  <script src="reading-data.js?v=8"></script>
-  <script src="reading-progress.js?v=8"></script>
-  <script src="reading-voices.js?v=8"></script>
-  <script src="reading-engine.js?v=8"></script>
+  <script src="reading-data.js?v=9"></script>
+  <script src="reading-progress.js?v=9"></script>
+  <script src="reading-voices.js?v=9"></script>
+  <script src="reading-engine.js?v=9"></script>
   <script>
     document.getElementById('logo').innerHTML = RG.unicorn(34);
     document.getElementById('heroUni').innerHTML = RG.unicorn(84);
-    const GAME_FILE = { meet: 'games/meet.html', sound: 'games/sound.html', hunt: 'games/hunt.html',
-                        hear: 'games/hear.html', quiz: 'games/quiz.html' };
+    const GAME_FILE = { meet: 'games/meet.html', write: 'games/write.html', sound: 'games/sound.html',
+                        hunt: 'games/hunt.html', hear: 'games/hear.html', quiz: 'games/quiz.html' };
     const map = document.getElementById('map');
     const AMP = Math.max(70, map.clientWidth / 2 - 104); // משרעת הנחש — כמעט כל רוחב המסך
     const stations = READING_STATIONS;
@@ -249,6 +250,7 @@
 
     function shortTitle(st) {
       if (st.type === 'meet') return 'האות ' + st.letter;
+      if (st.type === 'write') return 'כתיבה';
       if (st.type === 'sound') return 'צליל פותח';
       if (st.type === 'hunt') return 'ציד';
       if (st.type === 'hear') return 'מה שמעת?';
