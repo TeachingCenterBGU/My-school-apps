@@ -33,14 +33,17 @@
        font-size:.9em;color:#a1887f;cursor:pointer;}
 
   /* המפה */
-  .map{max-width:520px;margin:0 auto;padding:24px 12px 40px;position:relative;}
+  .map{max-width:720px;margin:0 auto;padding:24px 12px 60px;position:relative;}
+  body{overflow-x:hidden;}
+  /* דרך עקלקלה מצוירת מאחורי התחנות */
+  .road{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:visible;}
 
   .group-banner{display:flex;align-items:center;justify-content:center;gap:10px;margin:26px auto 14px;
        background:#fff;border-radius:50px;padding:8px 18px;box-shadow:0 4px 12px rgba(0,0,0,.10);
-       font-weight:800;color:#5a3d1e;max-width:320px;}
+       font-weight:800;color:#5a3d1e;max-width:320px;position:relative;z-index:1;}
   .group-banner .letters{color:#ef6c00;letter-spacing:4px;font-size:1.15em;}
 
-  .row{display:flex;justify-content:center;margin:6px 0;}
+  .row{display:flex;justify-content:center;margin:14px 0;position:relative;z-index:1;}
   .node-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;
        text-decoration:none;color:#5a3d1e;transition:transform .15s;}
   .node-wrap:active{transform:scale(.94);}
@@ -101,8 +104,8 @@
   <script>
     const GAME_FILE = { meet: 'games/meet.html', hunt: 'games/hunt.html',
                         hear: 'games/hear.html', quiz: 'games/quiz.html' };
-    const AMP = 78; // משרעת הנחש
     const map = document.getElementById('map');
+    const AMP = Math.max(70, map.clientWidth / 2 - 104); // משרעת הנחש — כמעט כל רוחב המסך
     const stations = READING_STATIONS;
 
     // מציאת התחנה ה"נוכחית" (הראשונה שפתוחה ולא הושלמה)
@@ -124,7 +127,6 @@
         banner.innerHTML = `<span>${g.emoji} ${g.name}</span>
                             <span class="letters">${g.letters.join(' ')}</span>`;
         map.appendChild(banner);
-        nodeIndex = 0; // מתחילים נחש חדש בכל קבוצה
       }
 
       const unlocked = ReadingProgress.isUnlocked(st.id, stations);
@@ -136,7 +138,7 @@
 
       const wrap = document.createElement(unlocked ? 'a' : 'div');
       wrap.className = 'node-wrap';
-      const offset = Math.round(Math.sin(nodeIndex * 0.9) * AMP);
+      const offset = Math.round(Math.sin(nodeIndex * 0.8) * AMP);
       wrap.style.transform = `translateX(${offset}px)`;
       nodeIndex++;
 
@@ -174,6 +176,45 @@
 
       if (i === currentIdx) currentEl = wrap;
     });
+
+    // ציור הדרך העקלקלה מאחורי התחנות
+    function drawRoad() {
+      const old = map.querySelector('.road'); if (old) old.remove();
+      const nodes = [...map.querySelectorAll('.node')];
+      if (nodes.length < 2) return;
+      const mrect = map.getBoundingClientRect();
+      const pts = nodes.map(n => {
+        const r = n.getBoundingClientRect();
+        return { x: r.left - mrect.left + r.width / 2, y: r.top - mrect.top + r.height / 2 };
+      });
+      let d = `M ${pts[0].x} ${pts[0].y}`;
+      for (let i = 1; i < pts.length; i++) {
+        const xc = (pts[i - 1].x + pts[i].x) / 2, yc = (pts[i - 1].y + pts[i].y) / 2;
+        d += ` Q ${pts[i - 1].x} ${pts[i - 1].y} ${xc} ${yc}`;
+      }
+      d += ` L ${pts[pts.length - 1].x} ${pts[pts.length - 1].y}`;
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('class', 'road');
+      const w = map.clientWidth, h = map.scrollHeight;
+      svg.setAttribute('width', w); svg.setAttribute('height', h);
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      const mk = (width, color, dash) => {
+        const p = document.createElementNS(ns, 'path');
+        p.setAttribute('d', d); p.setAttribute('fill', 'none');
+        p.setAttribute('stroke', color); p.setAttribute('stroke-width', width);
+        p.setAttribute('stroke-linecap', 'round'); p.setAttribute('stroke-linejoin', 'round');
+        if (dash) p.setAttribute('stroke-dasharray', dash);
+        return p;
+      };
+      svg.appendChild(mk(34, 'rgba(255,255,255,.6)'));      // מדרכה
+      svg.appendChild(mk(22, '#ffd18a'));                   // הכביש
+      svg.appendChild(mk(3, 'rgba(255,255,255,.95)', '2 18')); // קו אמצע מקווקו
+      map.insertBefore(svg, map.firstChild);
+    }
+    requestAnimationFrame(drawRoad);
+    window.addEventListener('load', () => setTimeout(drawRoad, 120));
+    window.addEventListener('resize', () => setTimeout(drawRoad, 150));
 
     function shortTitle(st) {
       if (st.type === 'meet') return 'האות ' + st.letter;

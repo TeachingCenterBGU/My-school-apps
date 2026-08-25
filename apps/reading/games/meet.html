@@ -8,48 +8,73 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#3a2a12;min-height:100vh;
-       text-align:center;display:flex;flex-direction:column;align-items:center;
+  html,body{margin:0;height:100%;}
+  body{font-family:'Heebo',system-ui,sans-serif;color:#3a2a12;min-height:100vh;
+       display:flex;flex-direction:column;align-items:center;
        background:linear-gradient(180deg,#fff6d5,#ffe0b2);}
-  .stage{width:100%;max-width:480px;padding:16px;flex:1;display:flex;flex-direction:column;
-         align-items:center;justify-content:center;gap:10px;}
-  .prompt{font-size:1.4em;font-weight:800;color:#e65100;min-height:1.4em;}
+
+  /* ---- מסך פתיחה ---- */
+  .intro{width:100%;max-width:480px;padding:16px;flex:1;display:flex;flex-direction:column;
+         align-items:center;justify-content:center;gap:10px;text-align:center;}
+  .prompt{font-size:1.4em;font-weight:800;color:#e65100;}
   .card{background:#fff;border:5px solid #ffb74d;border-radius:28px;padding:20px;width:100%;
         box-shadow:0 10px 24px rgba(0,0,0,.10);}
-  .big-letter{font-size:8.5rem;line-height:1;font-weight:800;color:#ef6c00;cursor:pointer;
-              transition:transform .15s;user-select:none;display:inline-block;}
-  .big-letter:hover{transform:scale(1.04) rotate(-3deg);}
+  .big-letter{font-size:8rem;line-height:1;font-weight:800;color:#ef6c00;cursor:pointer;
+              display:inline-block;transition:transform .15s;user-select:none;}
   .big-letter:active{transform:scale(.9);}
   .gallery{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px;}
   .wcard{background:#fff7e6;border:3px solid #ffcc80;border-radius:18px;padding:8px 10px;
-         display:flex;flex-direction:column;align-items:center;min-width:78px;cursor:pointer;
-         transition:transform .12s;}
-  .wcard:hover{transform:translateY(-4px);}
+         display:flex;flex-direction:column;align-items:center;min-width:78px;cursor:pointer;}
   .wcard:active{transform:scale(.92);}
-  .wcard .we{font-size:2.6rem;line-height:1;}
+  .wcard .we{font-size:2.5rem;line-height:1;}
   .wcard .ww{font-size:1rem;font-weight:700;color:#8d6e63;margin-top:2px;}
   .hint{color:#b08968;font-size:.95em;margin-top:8px;}
-  .go-btn{margin-top:16px;background:#ff9800;color:#fff;border:none;border-radius:50px;
-          padding:14px 40px;font-size:1.35em;font-weight:800;font-family:inherit;cursor:pointer;
-          box-shadow:0 5px 0 #e67e00;animation:wob 2s ease-in-out infinite;}
+  .go-btn{margin-top:16px;background:#7e57c2;color:#fff;border:none;border-radius:50px;
+          padding:15px 42px;font-size:1.4em;font-weight:800;font-family:inherit;cursor:pointer;
+          box-shadow:0 5px 0 #5e35b1;animation:wob 2s ease-in-out infinite;}
   .go-btn:active{transform:translateY(4px);box-shadow:none;}
   @keyframes wob{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
-  .options{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;margin-top:6px;}
-  .opt{background:#e0f7fa;border:4px solid #4dd0e1;border-radius:20px;font-size:3.4rem;
-       font-weight:800;color:#006064;padding:16px 0;cursor:pointer;box-shadow:0 6px 0 #00acc1;
-       transition:transform .1s;}
-  .opt:active{transform:translateY(5px);box-shadow:none;}
-  .opt.correct{background:#c8e6c9;border-color:#4caf50;box-shadow:0 6px 0 #388e3c;color:#1b5e20;animation:bp .6s;}
-  .opt.wrong{background:#ffcdd2;border-color:#ef5350;color:#b71c1c;animation:sh .4s;}
-  @keyframes bp{0%,100%{transform:translateY(0)}30%{transform:translateY(-14px) scale(1.06)}60%{transform:translateY(-4px)}}
-  @keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-  .progress-dots{display:flex;gap:8px;justify-content:center;margin-top:4px;}
-  .dot{width:13px;height:13px;border-radius:50%;background:#ffe0b2;}
-  .dot.on{background:#ff9800;}
+
+  /* ---- מסך המשחק (חלל) ---- */
+  .game{display:none;width:100%;flex:1;flex-direction:column;}
+  body.playing{background:#0b1026;}
+  body.playing .intro{display:none;}
+  body.playing .game{display:flex;}
+  .hud{color:#fff;text-align:center;font-weight:800;font-size:1.15em;padding:8px;}
+  .hud b{color:#ffd54f;font-size:1.3em;}
+  .hud .sfx{cursor:pointer;}
+  .hud .sc{background:rgba(255,255,255,.15);border-radius:50px;padding:3px 12px;margin-inline-start:6px;}
+  .play{position:relative;flex:1;width:100%;overflow:hidden;touch-action:none;
+        background:radial-gradient(1px 1px at 20% 30%,#fff,transparent),
+                   radial-gradient(1px 1px at 70% 60%,#fff,transparent),
+                   radial-gradient(2px 2px at 40% 80%,#fff,transparent),
+                   radial-gradient(1px 1px at 85% 20%,#fff,transparent),
+                   radial-gradient(1.5px 1.5px at 55% 15%,#fff,transparent),
+                   linear-gradient(180deg,#0b1026,#1b2350 70%,#2a1a4a);
+        background-repeat:repeat;}
+  .faller{position:absolute;display:flex;align-items:center;justify-content:center;
+          border-radius:50%;font-weight:800;color:#fff;box-shadow:0 0 14px rgba(255,255,255,.25);
+          will-change:transform;}
+  .faller.pop{animation:pop .35s forwards;}
+  @keyframes pop{to{transform:scale(1.8);opacity:0}}
+  .faller.bad{animation:bad .35s;}
+  @keyframes bad{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .ship{position:absolute;bottom:10px;font-size:3.4rem;filter:drop-shadow(0 0 10px #7ee0ff);
+        pointer-events:none;transition:transform .05s;}
+  .beam{position:absolute;bottom:56px;width:60px;height:40vh;
+        background:linear-gradient(180deg,rgba(126,224,255,.35),transparent);
+        transform:translateX(-50%);pointer-events:none;border-radius:50% 50% 0 0;opacity:.5;}
 </style>
 </head>
 <body>
-  <div class="stage" id="stage"></div>
+  <div class="intro" id="intro"></div>
+  <div class="game" id="game">
+    <div class="hud" id="hud"></div>
+    <div class="play" id="play">
+      <div class="beam" id="beam"></div>
+      <div class="ship" id="ship">🛸</div>
+    </div>
+  </div>
 
   <script src="../reading-data.js"></script>
   <script src="../reading-progress.js"></script>
@@ -57,88 +82,165 @@
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
-    const stage = document.getElementById('stage');
 
     if (!station || station.type !== 'meet') {
-      stage.innerHTML = '<p>לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
+      document.getElementById('intro').innerHTML =
+        '<p>לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
     } else {
-      RG.mountTopBar('הכרת האות ' + station.letter);
+      RG.mountTopBar('הכרת האות ' + station.letter, { bg: false });
       const letter = station.letter;
       const words = letterWords(letter);
-      const ROUNDS = 4;
-      let round = 0, correct = 0, locked = false;
+      const allLetters = Object.keys(READING_LETTERS);
+      const COLORS = ['#ff8a80','#ffb74d','#fff176','#81c784','#4dd0e1','#9575cd','#f06292','#4db6ac'];
+      const GOAL = 6;
 
       showIntro();
 
+      // ---------- מסך פתיחה ----------
       function showIntro() {
         RG.stopAudio();
+        document.body.classList.remove('playing');
         const cards = words.map((w, i) =>
           `<div class="wcard" data-i="${i}"><span class="we">${w.emoji}</span><span class="ww">${w.word}</span></div>`
         ).join('');
-        stage.innerHTML =
+        const intro = document.getElementById('intro');
+        intro.innerHTML =
           `<div class="prompt">בואי נכיר את האות</div>
            <div class="card">
              <div class="big-letter" id="bl">${letter}</div>
-             <div class="gallery" id="gal">${cards}</div>
+             <div class="gallery">${cards}</div>
              <div class="hint">לחצי על האות או על תמונה כדי לשמוע 🔊</div>
            </div>
-           <button class="go-btn" id="go">אני מוכנה! ➡️</button>`;
+           <button class="go-btn" id="go">🚀 קדימה לתפוס אותיות!</button>`;
         document.getElementById('bl').onclick = () => RG.playLetter(letter);
-        document.querySelectorAll('.wcard').forEach(el => {
-          el.onclick = () => { el.animate([{transform:'scale(1.15)'},{transform:'scale(1)'}],{duration:250});
-                               RG.playWord(letter, words[+el.dataset.i]); };
+        intro.querySelectorAll('.wcard').forEach(el => {
+          el.onclick = () => RG.playWord(letter, words[+el.dataset.i]);
         });
-        document.getElementById('go').onclick = startPractice;
-        setTimeout(async () => { await RG.playLetter(letter);
-          setTimeout(() => RG.playWord(letter, words[0]), 250); }, 400);
+        document.getElementById('go').onclick = startGame;
+        setTimeout(() => RG.playLetter(letter), 400);
       }
 
-      function startPractice() { round = 0; correct = 0; nextRound(); }
+      // ---------- משחק החלל ----------
+      let fallers = [], running = false, raf = null, last = 0, sinceSpawn = 0;
+      let correct = 0, wrong = 0, shipX = 0;
+      const play = document.getElementById('play');
+      const ship = document.getElementById('ship');
+      const beam = document.getElementById('beam');
 
-      function nextRound() {
+      function updateHud() {
+        document.getElementById('hud').innerHTML =
+          `תפסי את האות <b>${letter}</b> <span class="sfx" id="sfx">🔊</span>
+           <span class="sc">${correct}/${GOAL} ⭐</span>`;
+        document.getElementById('sfx').onclick = () => RG.playLetter(letter);
+      }
+
+      function startGame() {
         RG.stopAudio();
-        if (round >= ROUNDS) {
-          RG.finish({ stationId: station.id, correct, total: ROUNDS, replay: showIntro });
-          return;
-        }
-        locked = false;
-        const distractors = RG.pickDistractors(2, [letter]);
-        const opts = RG.shuffle([letter, ...distractors]);
-        stage.innerHTML =
-          `<div class="prompt">איפה האות <b style="color:#ef6c00">${letter}</b>?</div>
-           <div class="progress-dots">${dotsHTML()}</div>
-           <div class="options" id="opts"></div>
-           <div class="hint">שמעת? לחצי על האות הנכונה</div>`;
-        const grid = document.getElementById('opts');
-        opts.forEach(l => {
-          const b = document.createElement('div');
-          b.className = 'opt'; b.textContent = l;
-          b.onclick = () => choose(l, b);
-          grid.appendChild(b);
-        });
+        document.body.classList.add('playing');
+        fallers.forEach(f => f.el.remove()); fallers = [];
+        correct = 0; wrong = 0; running = true; last = 0; sinceSpawn = 0.6;
+        updateHud();
+        shipX = play.clientWidth / 2;
+        positionShip();
         setTimeout(() => RG.playLetter(letter), 300);
+        raf = requestAnimationFrame(frame);
       }
 
-      function dotsHTML() {
-        let h = '';
-        for (let i = 0; i < ROUNDS; i++) h += `<span class="dot ${i < round ? 'on' : ''}"></span>`;
-        return h;
+      function positionShip() {
+        ship.style.left = (shipX - ship.offsetWidth / 2) + 'px';
+        beam.style.left = shipX + 'px';
       }
 
-      function choose(l, el) {
-        if (locked) return;
-        if (l === letter) {
-          locked = true;
-          el.classList.add('correct');
-          correct++; round++;
+      function movePointer(clientX) {
+        const r = play.getBoundingClientRect();
+        const half = ship.offsetWidth / 2;
+        shipX = Math.max(half, Math.min(r.width - half, clientX - r.left));
+        positionShip();
+      }
+      play.addEventListener('pointermove', e => { if (running) movePointer(e.clientX); });
+      play.addEventListener('pointerdown', e => { if (running) movePointer(e.clientX); });
+      window.addEventListener('keydown', e => {
+        if (!running) return;
+        if (e.key === 'ArrowRight') { shipX += 40; positionShipClamped(); }
+        if (e.key === 'ArrowLeft')  { shipX -= 40; positionShipClamped(); }
+      });
+      function positionShipClamped() {
+        const half = ship.offsetWidth / 2;
+        shipX = Math.max(half, Math.min(play.clientWidth - half, shipX));
+        positionShip();
+      }
+
+      function spawn() {
+        const isTarget = Math.random() < 0.5;
+        let ch = letter;
+        if (!isTarget) {
+          do { ch = allLetters[Math.floor(Math.random() * allLetters.length)]; }
+          while (ch === letter);
+        }
+        const size = 48 + Math.floor(Math.random() * 18);
+        const el = document.createElement('div');
+        el.className = 'faller';
+        el.textContent = ch;
+        el.style.width = el.style.height = size + 'px';
+        el.style.fontSize = Math.round(size * 0.6) + 'px';
+        el.style.background = COLORS[Math.floor(Math.random() * COLORS.length)];
+        const x = size / 2 + Math.random() * (play.clientWidth - size);
+        el.style.left = (x - size / 2) + 'px';
+        el.style.top = (-size) + 'px';
+        play.appendChild(el);
+        fallers.push({ el, x, y: -size, size, isTarget: ch === letter, dead: false });
+      }
+
+      function frame(t) {
+        if (!running) return;
+        if (!last) last = t;
+        const dt = Math.min(50, t - last) / 1000; last = t;
+        sinceSpawn += dt;
+        if (sinceSpawn > 0.85) { sinceSpawn = 0; spawn(); }
+
+        const playH = play.clientHeight;
+        const shipTop = playH - ship.offsetHeight - 10;
+        const half = ship.offsetWidth / 2;
+        for (const f of fallers) {
+          if (f.dead) continue;
+          f.y += 105 * dt;
+          f.el.style.top = f.y + 'px';
+          const reachedShip = f.y + f.size >= shipTop && f.y < playH;
+          if (reachedShip && Math.abs(f.x - shipX) < half + f.size / 2) {
+            grab(f);
+          } else if (f.y > playH + 50) {
+            f.dead = true; f.el.remove();
+          }
+        }
+        fallers = fallers.filter(f => !f.dead || f.el.isConnected);
+        raf = requestAnimationFrame(frame);
+      }
+
+      function grab(f) {
+        f.dead = true;
+        if (f.isTarget) {
+          correct++;
           RG.ding();
-          setTimeout(nextRound, 800);
+          f.el.classList.add('pop');
+          setTimeout(() => f.el.remove(), 350);
+          updateHud();
+          if (correct >= GOAL) win();
         } else {
-          el.classList.add('wrong');
+          wrong++;
           RG.buzz();
-          setTimeout(() => el.classList.remove('wrong'), 450);
+          f.el.classList.add('bad');
+          setTimeout(() => f.el.remove(), 350);
         }
       }
+
+      function win() {
+        running = false;
+        if (raf) cancelAnimationFrame(raf);
+        fallers.forEach(f => f.el.remove()); fallers = [];
+        RG.finish({ stationId: station.id, correct: GOAL, total: GOAL + wrong, replay: showIntro });
+      }
+
+      window.addEventListener('resize', () => { if (running) positionShipClamped(); });
     }
   </script>
 </body>
