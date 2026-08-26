@@ -202,21 +202,21 @@ function buildReadingStations() {
   const stations = [];
   READING_GROUPS.forEach(group => {
     const L = group.letters.slice();
-    // תחנה אחת של "הכרת האות" לכל קבוצה — המשחק רץ בסיבובים על כל אותיות הקבוצה
+    // סדר התחנות בקבוצה: היכרות → ציד → מה שמעת → צליל פותח → זיכרון → סיכום → כתיבה
     stations.push({ id: `${group.id}_meet`, type: 'meet', groupId: group.id, groupName: group.name,
       title: TYPE_META.meet.title, emoji: TYPE_META.meet.emoji, letters: L.slice() });
-    stations.push({ id: `${group.id}_write`, type: 'write', groupId: group.id, groupName: group.name,
-      title: TYPE_META.write.title, emoji: TYPE_META.write.emoji, letters: L.slice() });
-    stations.push({ id: `${group.id}_sound`, type: 'sound', groupId: group.id, groupName: group.name,
-      title: TYPE_META.sound.title, emoji: TYPE_META.sound.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_hunt`, type: 'hunt', groupId: group.id, groupName: group.name,
       title: TYPE_META.hunt.title, emoji: TYPE_META.hunt.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_hear`, type: 'hear', groupId: group.id, groupName: group.name,
       title: TYPE_META.hear.title, emoji: TYPE_META.hear.emoji, letters: L.slice() });
+    stations.push({ id: `${group.id}_sound`, type: 'sound', groupId: group.id, groupName: group.name,
+      title: TYPE_META.sound.title, emoji: TYPE_META.sound.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_memory`, type: 'memory', groupId: group.id, groupName: group.name,
       title: TYPE_META.memory.title, emoji: TYPE_META.memory.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_quiz`, type: 'quiz', groupId: group.id, groupName: group.name,
       title: TYPE_META.quiz.title, emoji: TYPE_META.quiz.emoji, isBoss: true, letters: L.slice() });
+    stations.push({ id: `${group.id}_write`, type: 'write', groupId: group.id, groupName: group.name,
+      title: TYPE_META.write.title, emoji: TYPE_META.write.emoji, letters: L.slice() });
   });
 
   // --- האתגר הגדול: שלבי סיכום שמערבבים את כל האותיות ---
