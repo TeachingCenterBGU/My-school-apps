@@ -26,6 +26,7 @@
   .cell:active{transform:scale(.96);}
   .cell.right{border-color:#4caf50;animation:cheer .6s;background:#eaffea;}
   .cell.wrong{border-color:#e53935;animation:shake .4s;}
+  .cell.sel{box-shadow:0 0 0 5px #ffd54f;}
   @keyframes cheer{0%,100%{transform:scale(1)}40%{transform:scale(1.12)}}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
   .hint{color:#8a5a72;font-weight:700;font-size:.9rem;margin-top:12px;}
@@ -37,10 +38,10 @@
     <div class="instr">שלוש מילים מתחילות באותו צליל —<br>מצאו את היוצאת דופן! 🔍</div>
     <div class="progress" id="prog"></div>
     <div class="shelf" id="shelf"></div>
-    <div class="hint">געו בתמונה כדי לשמוע אותה 👆</div>
+    <div class="hint">געו בתמונה לשמוע · געו שוב לבחור ✓</div>
   </div>
 
-  <script src="../phono-data.js?v=17"></script>
+  <script src="../phono-data.js?v=19"></script>
   <script src="../reading-progress.js?v=16"></script>
   <script src="../reading-engine.js?v=16"></script>
   <script src="../reading-voices.js?v=18"></script>
@@ -79,7 +80,11 @@
       shelfEl.innerHTML='';
       r.cells.forEach(c=>{
         const el=document.createElement('div'); el.className='cell'; el.textContent=c.w.emoji;
-        el.addEventListener('click', ()=>{ PG.playWord(c.w); if(!locked) setTimeout(()=>choose(c,el,r),120); });
+        el.addEventListener('click', ()=>{
+          if(locked) return;
+          if(el.classList.contains('sel')){ choose(c,el,r); }
+          else { shelfEl.querySelectorAll('.cell.sel').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); PG.playWord(c.w); }
+        });
         shelfEl.appendChild(el);
       });
     }
@@ -90,7 +95,7 @@
         locked=true; correct++; el.classList.add('right'); PG.ding();
         setTimeout(next, 900);
       }else{
-        el.classList.add('wrong'); PG.buzz();
+        el.classList.remove('sel'); el.classList.add('wrong'); PG.buzz();
         try{ gtag('event','phono_odd_error',{common:r.common, picked:c.w.init}); }catch(e){}
         setTimeout(()=>el.classList.remove('wrong'), 450);
       }

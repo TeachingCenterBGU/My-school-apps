@@ -37,6 +37,7 @@
   .opt:active{transform:scale(.96);}
   .opt.right{border-color:#4caf50;animation:cheer .6s;background:#eaffea;}
   .opt.wrong{border-color:#e53935;animation:shake .4s;}
+  .opt.sel{box-shadow:0 0 0 5px #ffd54f;}
   @keyframes cheer{0%,100%{transform:scale(1)}40%{transform:scale(1.12)}}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 </style>
@@ -44,14 +45,14 @@
 <body>
   <div class="stage">
     <div class="wiz" id="wiz"></div>
-    <div class="instr">הקשיבו לצלילים המקוטעים —<br>איזו מילה מסתתרת? ✨</div>
+    <div class="instr">הקשיבו לצלילים המקוטעים —<br>איזו מילה מסתתרת? ✨<br><span style="font-weight:700;color:#8a7fb8;font-size:.8em">געו לשמוע · געו שוב לבחור ✓</span></div>
     <div class="progress" id="prog"></div>
     <div class="pieces" id="pieces"></div>
     <button class="playbtn" id="play">🔊 שמעו את הצלילים</button>
     <div class="opts" id="opts"></div>
   </div>
 
-  <script src="../phono-data.js?v=17"></script>
+  <script src="../phono-data.js?v=19"></script>
   <script src="../reading-progress.js?v=16"></script>
   <script src="../reading-engine.js?v=16"></script>
   <script src="../reading-voices.js?v=18"></script>
@@ -118,7 +119,11 @@
       optsEl.innerHTML='';
       r.opts.forEach(o=>{
         const el=document.createElement('div'); el.className='opt'; el.textContent=o.w.emoji;
-        el.addEventListener('click', ()=>choose(o,el));
+        el.addEventListener('click', ()=>{
+          if(locked) return;
+          if(el.classList.contains('sel')){ choose(o,el); }
+          else { optsEl.querySelectorAll('.opt.sel').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); PG.playWord(o.w); }
+        });
         optsEl.appendChild(el);
       });
       setTimeout(playParts, 500);
@@ -132,7 +137,7 @@
         PG.ding(); PG.playWord(o.w);
         setTimeout(next, 1100);
       }else{
-        el.classList.add('wrong'); PG.buzz(); PG.playWord(o.w);
+        el.classList.remove('sel'); el.classList.add('wrong'); PG.buzz(); PG.playWord(o.w);
         setTimeout(()=>el.classList.remove('wrong'), 450);
       }
     }

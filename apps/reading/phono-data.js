@@ -141,7 +141,7 @@ const PHONO_WORDS = [
 
   // ---- ה ----
   { word: 'הַר',            emoji: '⛰️', audio: 'har.mp3', syl: 1, init: 'ה', rime: '' },
-  { word: 'הֶגֶה',          emoji: '🛞', audio: '', syl: 2, init: 'ה', rime: '' },
+  { word: 'הֶלִיקוֹפְּטֶר', emoji: '🚁', audio: '', syl: 5, init: 'ה', rime: '' },
   { word: 'הִיפּוֹפּוֹטָם', emoji: '🦛', audio: '', syl: 5, init: 'ה', rime: '' },
 
   // ---- צ ----
@@ -154,7 +154,7 @@ const PHONO_WORDS = [
   { word: 'זֶבְּרָה', emoji: '🦓', audio: 'zebra.mp3', syl: 2, init: 'ז', rime: 'ra' },
   { word: 'זְאֵב',   emoji: '🐺', audio: '', syl: 2, init: 'ז', rime: '' },
   { word: 'זְבוּב',  emoji: '🪰', audio: '', syl: 2, init: 'ז', rime: '' },
-  { word: 'זֵר',     emoji: '💐', audio: '', syl: 1, init: 'ז', rime: '' },
+  { word: 'זַיִת',   emoji: '🫒', audio: '', syl: 2, init: 'ז', rime: '' },
 
   // ---- י ----
   { word: 'יַנְשׁוּף', emoji: '🦉', audio: 'yanshuf.mp3', syl: 2, init: 'י', rime: '' },

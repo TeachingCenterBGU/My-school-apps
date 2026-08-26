@@ -36,6 +36,7 @@
   .door .knob{position:absolute;top:50%;right:10px;width:12px;height:12px;border-radius:50%;background:#ffd76a;}
   .door.right{animation:cheer .6s;border-color:#4caf50;}
   .door.wrong{animation:shake .4s;border-color:#e53935;}
+  .door.sel{box-shadow:0 0 0 5px #ffd54f, 0 10px 20px rgba(0,0,0,.22);}
   @keyframes cheer{0%,100%{transform:translateY(0)}40%{transform:translateY(-12px)}}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
   .guard{font-size:2.6rem;margin-top:2px;}
@@ -43,7 +44,7 @@
 </head>
 <body>
   <div class="stage">
-    <div class="instr">מצאו את הדלת עם המילה שמתחרזת! 🎵</div>
+    <div class="instr">מצאו את הדלת עם המילה שמתחרזת! 🎵<br><span style="font-weight:700;color:#8a7fb8;font-size:.82em">געו לשמוע · געו שוב לבחור ✓</span></div>
     <div class="progress" id="prog"></div>
     <div class="hero">
       <div class="guard" id="guard"></div>
@@ -53,7 +54,7 @@
     <div class="doors" id="doors"></div>
   </div>
 
-  <script src="../phono-data.js?v=17"></script>
+  <script src="../phono-data.js?v=19"></script>
   <script src="../reading-progress.js?v=16"></script>
   <script src="../reading-engine.js?v=16"></script>
   <script src="../reading-voices.js?v=18"></script>
@@ -93,7 +94,11 @@
       opts.forEach(o=>{
         const d=document.createElement('div'); d.className='door';
         d.innerHTML=`<div class="win">${o.w.emoji}</div><span class="knob"></span>`;
-        d.addEventListener('click', ()=>{ PG.playWord(o.w); choose(o.ok,d); });
+        d.addEventListener('click', ()=>{
+          if(locked) return;
+          if(d.classList.contains('sel')){ choose(o.ok, d); }
+          else { doorsEl.querySelectorAll('.door.sel').forEach(x=>x.classList.remove('sel')); d.classList.add('sel'); PG.playWord(o.w); }
+        });
         doorsEl.appendChild(d);
       });
       setTimeout(()=>PG.playWord(r.prompt), 350);
@@ -105,7 +110,7 @@
         locked=true; correct++; el.classList.add('right'); PG.ding();
         setTimeout(next, 850);
       }else{
-        el.classList.add('wrong'); PG.buzz();
+        el.classList.remove('sel'); el.classList.add('wrong'); PG.buzz();
         setTimeout(()=>el.classList.remove('wrong'), 450);
       }
     }
