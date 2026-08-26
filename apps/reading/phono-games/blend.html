@@ -54,34 +54,16 @@
   <script src="../phono-data.js?v=17"></script>
   <script src="../reading-progress.js?v=16"></script>
   <script src="../reading-engine.js?v=16"></script>
+  <script src="../reading-voices.js?v=17"></script>
   <script src="../phono-engine.js?v=17"></script>
   <script>
     const station = PG.currentStation() || { id:'ph-blend-final', mixed:true };
     PG.mountTopBar('קסם החיבור ✨');
     document.getElementById('wiz').innerHTML = PG.unicorn(58);
 
-    // בנק "חיבור" — מילים מחולקות לחלקים שה-TTS יכול לבטא בבירור.
-    // (כשיהיו הקלטות של צלילים נפרדים אפשר לרדת לרמת פונמה בודדת.)
-    const BLEND = [
-      { word:'מְכוֹנִית', emoji:'🚗', audio:'mechonit.mp3', init:'מ', parts:['מְכוֹ','נִית'] },
-      { word:'מְנוֹרָה',  emoji:'💡', audio:'', init:'מ', parts:['מְנוֹ','רָה'] },
-      { word:'שָׁעוֹן',   emoji:'⏰', audio:'', init:'ש', parts:['שָׁ','עוֹן'] },
-      { word:'שֻׁלְחָן',  emoji:'🍽️', audio:'', init:'ש', parts:['שֻׁל','חָן'] },
-      { word:'רַכֶּבֶת',  emoji:'🚂', audio:'rakevet.mp3', init:'ר', parts:['רַ','כֶּ','בֶת'] },
-      { word:'לִימוֹן',   emoji:'🍋', audio:'', init:'ל', parts:['לִי','מוֹן'] },
-      { word:'סִירָה',    emoji:'⛵', audio:'', init:'ס', parts:['סִי','רָה'] },
-      { word:'בַּלּוֹן',  emoji:'🎈', audio:'', init:'ב', parts:['בַּ','לּוֹן'] },
-      { word:'בָּנָנָה',  emoji:'🍌', audio:'', init:'ב', parts:['בָּ','נָ','נָה'] },
-      { word:'פַּרְפַּר', emoji:'🦋', audio:'', init:'פ', parts:['פַּר','פַּר'] },
-      { word:'פִּיצָה',   emoji:'🍕', audio:'', init:'פ', parts:['פִּי','צָה'] },
-      { word:'דֻּבְדְּבָן', emoji:'🍒', audio:'', init:'ד', parts:['דֻּבְ','דְּבָן'] },
-      { word:'תַּפּוּחַ',  emoji:'🍎', audio:'tapuach.mp3', init:'ט', parts:['תַּ','פּוּחַ'] },
-      { word:'קֶשֶׁת',    emoji:'🌈', audio:'', init:'ק', parts:['קֶ','שֶׁת'] },
-      { word:'גָּמָל',    emoji:'🐪', audio:'gamal.mp3', init:'ג', parts:['גָּ','מָל'] },
-      { word:'גְּלִידָה', emoji:'🍦', audio:'', init:'ג', parts:['גְּלִי','דָה'] },
-      { word:'זֶבְּרָה',  emoji:'🦓', audio:'zebra.mp3', init:'ז', parts:['זֶבְּ','רָה'] },
-      { word:'נָמֵר',     emoji:'🐆', audio:'', init:'נ', parts:['נָ','מֵר'] },
-    ];
+    // בנק "חיבור" — מוגדר ב-phono-data.js (משותף עם האולפן). חלקי הברות
+    // שאפשר לבטא בבירור; אפשר להקליט כל חלק באולפן (part:).
+    const BLEND = window.PHONO_BLEND;
 
     const sounds = (station.sounds && station.sounds.length) ? station.sounds : null;
     const pool = sounds ? BLEND.filter(w=>sounds.includes(w.init)) : BLEND.slice();
@@ -122,7 +104,7 @@
       (function step(){
         if(i>=parts.length){ playing=false; return; }
         renderPieces(parts, i+1);
-        PG.speak(parts[i]);
+        PG.playPart(parts[i]);
         i++;
         setTimeout(step, 950);
       })();

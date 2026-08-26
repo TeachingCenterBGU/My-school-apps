@@ -262,12 +262,46 @@ function buildPhonoStations() {
 const PHONO_STATIONS = buildPhonoStations();
 function getPhonoStationById(id) { return PHONO_STATIONS.find(s => s.id === id) || null; }
 
+// ============================================================
+//  בנק "קסם החיבור" — מילים מחולקות לחלקים (הברות) שאפשר לבטא בבירור.
+//  parts = חלקי המילה שמושמעים בזה אחר זה. audio = הקלטת המילה השלמה.
+//  אפשר להקליט באולפן גם את המילה (word:) וגם כל חלק (part:).
+// ============================================================
+const PHONO_BLEND = [
+  { word:'מְכוֹנִית', emoji:'🚗', audio:'mechonit.mp3', init:'מ', parts:['מְכוֹ','נִית'] },
+  { word:'מְנוֹרָה',  emoji:'💡', audio:'', init:'מ', parts:['מְנוֹ','רָה'] },
+  { word:'שָׁעוֹן',   emoji:'⏰', audio:'', init:'ש', parts:['שָׁ','עוֹן'] },
+  { word:'שֻׁלְחָן',  emoji:'🍽️', audio:'', init:'ש', parts:['שֻׁל','חָן'] },
+  { word:'רַכֶּבֶת',  emoji:'🚂', audio:'rakevet.mp3', init:'ר', parts:['רַ','כֶּ','בֶת'] },
+  { word:'לִימוֹן',   emoji:'🍋', audio:'', init:'ל', parts:['לִי','מוֹן'] },
+  { word:'סִירָה',    emoji:'⛵', audio:'', init:'ס', parts:['סִי','רָה'] },
+  { word:'בַּלּוֹן',  emoji:'🎈', audio:'', init:'ב', parts:['בַּ','לּוֹן'] },
+  { word:'בָּנָנָה',  emoji:'🍌', audio:'', init:'ב', parts:['בָּ','נָ','נָה'] },
+  { word:'פַּרְפַּר', emoji:'🦋', audio:'', init:'פ', parts:['פַּר','פַּר'] },
+  { word:'פִּיצָה',   emoji:'🍕', audio:'', init:'פ', parts:['פִּי','צָה'] },
+  { word:'דֻּבְדְּבָן', emoji:'🍒', audio:'', init:'ד', parts:['דֻּבְ','דְּבָן'] },
+  { word:'תַּפּוּחַ',  emoji:'🍎', audio:'tapuach.mp3', init:'ט', parts:['תַּ','פּוּחַ'] },
+  { word:'קֶשֶׁת',    emoji:'🌈', audio:'', init:'ק', parts:['קֶ','שֶׁת'] },
+  { word:'גָּמָל',    emoji:'🐪', audio:'gamal.mp3', init:'ג', parts:['גָּ','מָל'] },
+  { word:'גְּלִידָה', emoji:'🍦', audio:'', init:'ג', parts:['גְּלִי','דָה'] },
+  { word:'זֶבְּרָה',  emoji:'🦓', audio:'zebra.mp3', init:'ז', parts:['זֶבְּ','רָה'] },
+  { word:'נָמֵר',     emoji:'🐆', audio:'', init:'נ', parts:['נָ','מֵר'] },
+];
+// כל חלקי המילה הייחודיים (לאולפן ההקלטות)
+function phonoBlendParts() {
+  const seen = {}, out = [];
+  PHONO_BLEND.forEach(w => w.parts.forEach(p => { if (!seen[p]) { seen[p] = 1; out.push(p); } }));
+  return out;
+}
+
 // חשיפה גלובלית
 window.PHONO_SOUNDS = PHONO_SOUNDS;
 window.PHONO_WORDS = PHONO_WORDS;
 window.PHONO_GROUPS = PHONO_GROUPS;
 window.PHONO_TYPE_META = PHONO_TYPE_META;
 window.PHONO_STATIONS = PHONO_STATIONS;
+window.PHONO_BLEND = PHONO_BLEND;
+window.phonoBlendParts = phonoBlendParts;
 window.getPhonoStationById = getPhonoStationById;
 window.phonoStripNikud = phonoStripNikud;
 window.phonoShuffle = phonoShuffle;

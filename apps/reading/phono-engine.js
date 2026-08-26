@@ -16,13 +16,26 @@ const PG = (function () {
     return window.getPhonoStationById ? window.getPhonoStationById(id) : null;
   }
 
+  // השמעת מקור אודיו ישיר (dataURL של הקלטה מהאולפן), עם עצירת אודיו קודם
+  function playVoice(src) {
+    if (!RG.soundOn || !src) return false;
+    try { RG.stopAudio(); const a = new Audio(src); a.play(); return true; } catch (e) { return false; }
+  }
+  function voice(key) { const v = window.READING_VOICES; return (v && v[key]) || null; }
+
   // השמעת מילה (אובייקט מהבנק: {word, emoji, audio}) — הקלטה→TTS דרך RG
   function playWord(w) { if (w) RG.playWord(null, w); }
 
-  // השמעת "צליל" פותח (פונמה). כרגע קול סינתטי לפי PHONO_SOUNDS[..].say;
-  // בהמשך אפשר להוסיף הקלטה אמיתית (אולפן) ולהשמיע אותה כאן במקום.
+  // השמעת "צליל" פותח (פונמה). סדר עדיפות: הקלטת אולפן (sound:X) → קול סינתטי.
   function playSound(sound) {
+    if (playVoice(voice('sound:' + sound))) return;
     RG.speak(window.phonoSoundSay ? phonoSoundSay(sound) : sound);
+  }
+
+  // השמעת חלק מילה לחיבור. עדיפות: הקלטת אולפן (part:חלק) → קול סינתטי.
+  function playPart(part) {
+    if (playVoice(voice('part:' + part))) return;
+    RG.speak(part);
   }
 
   function speak(t) { RG.speak(t); }
@@ -94,7 +107,7 @@ const PG = (function () {
   }
 
   return {
-    currentStation, playWord, playSound, speak,
+    currentStation, playWord, playSound, playPart, speak,
     mountTopBar, mountBackground, finish, reportProgress,
     // מעבירים הלאה כלים שימושיים של RG
     unicorn: RG.unicorn, confetti: RG.confetti, ding: RG.ding, buzz: RG.buzz,
