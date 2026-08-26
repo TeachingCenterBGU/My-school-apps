@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+    <!-- Google Analytics (מזהה האתר הגדול) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-W58S98V8J0');
+    </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>אולפן ההקלטות · מסע האותיות</title>
@@ -88,7 +96,7 @@
     </div>
   </div>
 
-  <script src="reading-data.js?v=15"></script>
+  <script src="reading-data.js?v=16"></script>
   <script>
     const EXAMPLE_BASE = '../../letters/';
     let db = null, mem = null, mediaStream = null, rec = null, activeBtn = null, total = 0;
@@ -129,7 +137,7 @@
         d.words.forEach(w => words.push({ key: 'word:' + w.word, big: w.emoji, sub: w.word, example: w.audio }));
       });
       const phrases = (window.READING_PHRASES || []).map(p =>
-        ({ key: 'phrase:' + p.key, big: '💬', sub: p.text, example: '' }));
+        ({ key: 'phrase:' + p.key, big: '💬', sub: p.f || p.text, example: '' }));
       return { letters, words, phrases };
     }
 

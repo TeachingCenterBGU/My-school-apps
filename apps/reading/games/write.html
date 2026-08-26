@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+    <!-- Google Analytics (מזהה האתר הגדול) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-W58S98V8J0');
+    </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>כתיבת האות</title>
@@ -51,10 +59,11 @@
     <div class="mascot" id="mascot"></div>
   </div>
 
-  <script src="../reading-data.js?v=15"></script>
-  <script src="../reading-progress.js?v=15"></script>
-  <script src="../reading-voices.js?v=15"></script>
-  <script src="../reading-engine.js?v=15"></script>
+  <script src="../reading-data.js?v=16"></script>
+  <script src="../reading-progress.js?v=16"></script>
+  <script src="../reading-profile.js?v=16"></script>
+  <script src="../reading-voices.js?v=16"></script>
+  <script src="../reading-engine.js?v=16"></script>
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
