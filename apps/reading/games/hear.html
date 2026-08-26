@@ -41,10 +41,10 @@
   <div class="hud" id="hud"></div>
   <div class="sea" id="sea"></div>
 
-  <script src="../reading-data.js?v=10"></script>
-  <script src="../reading-progress.js?v=10"></script>
-  <script src="../reading-voices.js?v=10"></script>
-  <script src="../reading-engine.js?v=10"></script>
+  <script src="../reading-data.js?v=11"></script>
+  <script src="../reading-progress.js?v=11"></script>
+  <script src="../reading-voices.js?v=11"></script>
+  <script src="../reading-engine.js?v=11"></script>
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
@@ -56,13 +56,13 @@
       RG.mountTopBar('איזו אות שמעת?', { bg: false });
       const sea = document.getElementById('sea');
       const letters = station.letters;
+      const mixed = !!station.mixed;                 // אתגר גדול: אותיות מוגרלות בכל סיבוב
       const ROUNDS = 6;
-      let round = 0, correct = 0, target = null, locked = false;
+      let round = 0, correct = 0, target = null, locked = false, currentActive = null;
       let bubbles = [], raf = null, lastT = 0;
 
       buildDeco();
-      // בועה לכל אות, פעמיים — כך שהיעד תמיד קיים על המסך
-      requestAnimationFrame(() => { spawnBubbles(); newRound(); raf = requestAnimationFrame(loop); });
+      requestAnimationFrame(() => { newRound(); raf = requestAnimationFrame(loop); });
 
       function buildDeco() {
         ['🌿','🪸','🐚','🌿','🐠','🐟'].forEach((e, i) => {
@@ -78,9 +78,10 @@
         sea.appendChild(m);
       }
 
-      function spawnBubbles() {
+      function spawnBubbles(set) {
+        bubbles.forEach(b => b.el.remove()); bubbles = [];
         const W = sea.clientWidth, H = sea.clientHeight;
-        const list = letters.concat(letters); // פעמיים כל אות
+        const list = set.concat(set); // פעמיים כל אות
         list.forEach(ch => {
           const size = 58 + Math.random() * 16;
           const el = document.createElement('div');
@@ -122,7 +123,10 @@
         RG.stopAudio();
         locked = false;
         if (round >= ROUNDS) return finishGame();
-        target = letters[Math.floor(Math.random() * letters.length)];
+        const active = mixed ? RG.shuffle(letters).slice(0, 4) : letters;
+        const k = active.slice().sort().join('');
+        if (k !== currentActive) { currentActive = k; spawnBubbles(active); }
+        target = active[Math.floor(Math.random() * active.length)];
         updateHud();
         setTimeout(() => RG.playLetter(target), 350);
       }

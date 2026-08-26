@@ -73,10 +73,10 @@
     <div class="mascot" id="mascot"></div>
   </div>
 
-  <script src="../reading-data.js?v=10"></script>
-  <script src="../reading-progress.js?v=10"></script>
-  <script src="../reading-voices.js?v=10"></script>
-  <script src="../reading-engine.js?v=10"></script>
+  <script src="../reading-data.js?v=11"></script>
+  <script src="../reading-progress.js?v=11"></script>
+  <script src="../reading-voices.js?v=11"></script>
+  <script src="../reading-engine.js?v=11"></script>
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
@@ -88,9 +88,10 @@
       RG.mountTopBar('אתגר הסיכום ' + (station.groupName || ''), { bg: false });
       document.getElementById('mascot').innerHTML = RG.unicorn(58);
       const letters = station.letters;
+      const mixed = !!station.mixed;                 // אתגר גדול: מגרילים אותיות בכל סיבוב
       const ROUNDS = 8;
       let correct = 0, wrong = 0, combo = 0, bestCombo = 0;
-      let target = null, curWord = null, kind = null, locked = false;
+      let target = null, curWord = null, kind = null, locked = false, active = letters;
 
       newRound();
 
@@ -98,7 +99,8 @@
         RG.stopAudio();
         locked = false;
         if (correct >= ROUNDS) return win();
-        target = letters[Math.floor(Math.random() * letters.length)];
+        active = mixed ? RG.shuffle(letters).slice(0, 4) : letters;
+        target = active[Math.floor(Math.random() * active.length)];
         kind = Math.random() < 0.5 ? 'hear' : 'word';
         curWord = pickWord(target);
 
@@ -116,7 +118,7 @@
 
         const runes = document.getElementById('runes');
         runes.innerHTML = '';
-        RG.shuffle(letters).forEach(l => {
+        RG.shuffle(active).forEach(l => {
           const b = document.createElement('div');
           b.className = 'rune';
           b.textContent = l;

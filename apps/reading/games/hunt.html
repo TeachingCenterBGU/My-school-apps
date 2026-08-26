@@ -41,10 +41,10 @@
   <div class="hud" id="hud"></div>
   <div class="scene" id="scene"></div>
 
-  <script src="../reading-data.js?v=10"></script>
-  <script src="../reading-progress.js?v=10"></script>
-  <script src="../reading-voices.js?v=10"></script>
-  <script src="../reading-engine.js?v=10"></script>
+  <script src="../reading-data.js?v=11"></script>
+  <script src="../reading-progress.js?v=11"></script>
+  <script src="../reading-voices.js?v=11"></script>
+  <script src="../reading-engine.js?v=11"></script>
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
@@ -58,7 +58,7 @@
       const groupLetters = station.letters;
       const allLetters = Object.keys(READING_LETTERS);
       const COLORS = ['#e53935','#fb8c00','#fdd835','#43a047','#1e88e5','#8e24aa','#d81b60','#00897b','#6d4c41'];
-      const waves = RG.shuffle(groupLetters).slice(0, 4);
+      const waves = RG.shuffle(groupLetters).slice(0, station.mixed ? 5 : 4);
       let waveIdx = 0, totalTargets = 0, wrongTaps = 0;
 
       buildDeco();
