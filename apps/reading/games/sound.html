@@ -68,10 +68,10 @@
     <div class="houses" id="houses"></div>
   </div>
 
-  <script src="../reading-data.js?v=10"></script>
-  <script src="../reading-progress.js?v=10"></script>
-  <script src="../reading-voices.js?v=10"></script>
-  <script src="../reading-engine.js?v=10"></script>
+  <script src="../reading-data.js?v=11"></script>
+  <script src="../reading-progress.js?v=11"></script>
+  <script src="../reading-voices.js?v=11"></script>
+  <script src="../reading-engine.js?v=11"></script>
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
@@ -82,13 +82,13 @@
     } else {
       RG.mountTopBar('צליל פותח', { bg: false });
       const letters = station.letters;
+      const mixed = !!station.mixed;                 // אתגר גדול: אותיות מוגרלות בכל סיבוב
       const ROOFS = { wall: ['#ef9a9a','#90caf9','#a5d6a7','#ffcc80','#ce93d8','#80deea'],
                       roof: ['#c62828','#1565c0','#2e7d32','#e65100','#6a1b9a','#00838f'] };
       const ROUNDS = 6;
-      let round = 0, correct = 0, target = null, curWord = null, locked = false;
+      let round = 0, correct = 0, target = null, curWord = null, locked = false, currentActive = null;
 
       buildScene();
-      buildHouses();
       nextRound();
 
       function buildScene() {
@@ -105,10 +105,10 @@
         stage.appendChild(m);
       }
 
-      function buildHouses() {
+      function buildHouses(set) {
         const wrap = document.getElementById('houses');
         wrap.innerHTML = '';
-        letters.forEach((l, i) => {
+        set.forEach((l, i) => {
           const h = document.createElement('div');
           h.className = 'house';
           h.style.setProperty('--wall', ROOFS.wall[i % ROOFS.wall.length]);
@@ -126,7 +126,10 @@
           RG.finish({ stationId: station.id, correct, total: ROUNDS, replay: () => location.reload() });
           return;
         }
-        target = letters[Math.floor(Math.random() * letters.length)];
+        const active = mixed ? RG.shuffle(letters).slice(0, 4) : letters;
+        const k = active.slice().sort().join('');
+        if (k !== currentActive) { currentActive = k; buildHouses(active); }
+        target = active[Math.floor(Math.random() * active.length)];
         curWord = pickWord(target);
         const pic = document.getElementById('pic');
         pic.className = 'pic';

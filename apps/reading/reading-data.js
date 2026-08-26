@@ -182,24 +182,44 @@ function buildReadingStations() {
     sound: { title: 'צליל פותח', emoji: '🔤' },
     hunt: { title: 'ציד האותיות', emoji: '🔍' },
     hear: { title: 'איזו אות שמעת?', emoji: '👂' },
+    memory: { title: 'זיכרון', emoji: '🧩' },
     quiz: { title: 'אתגר הסיכום', emoji: '🏆' },
   };
   const stations = [];
   READING_GROUPS.forEach(group => {
+    const L = group.letters.slice();
     // תחנה אחת של "הכרת האות" לכל קבוצה — המשחק רץ בסיבובים על כל אותיות הקבוצה
     stations.push({ id: `${group.id}_meet`, type: 'meet', groupId: group.id, groupName: group.name,
-      title: TYPE_META.meet.title, emoji: TYPE_META.meet.emoji, letters: group.letters.slice() });
+      title: TYPE_META.meet.title, emoji: TYPE_META.meet.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_write`, type: 'write', groupId: group.id, groupName: group.name,
-      title: TYPE_META.write.title, emoji: TYPE_META.write.emoji, letters: group.letters.slice() });
+      title: TYPE_META.write.title, emoji: TYPE_META.write.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_sound`, type: 'sound', groupId: group.id, groupName: group.name,
-      title: TYPE_META.sound.title, emoji: TYPE_META.sound.emoji, letters: group.letters.slice() });
+      title: TYPE_META.sound.title, emoji: TYPE_META.sound.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_hunt`, type: 'hunt', groupId: group.id, groupName: group.name,
-      title: TYPE_META.hunt.title, emoji: TYPE_META.hunt.emoji, letters: group.letters.slice() });
+      title: TYPE_META.hunt.title, emoji: TYPE_META.hunt.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_hear`, type: 'hear', groupId: group.id, groupName: group.name,
-      title: TYPE_META.hear.title, emoji: TYPE_META.hear.emoji, letters: group.letters.slice() });
+      title: TYPE_META.hear.title, emoji: TYPE_META.hear.emoji, letters: L.slice() });
+    stations.push({ id: `${group.id}_memory`, type: 'memory', groupId: group.id, groupName: group.name,
+      title: TYPE_META.memory.title, emoji: TYPE_META.memory.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_quiz`, type: 'quiz', groupId: group.id, groupName: group.name,
-      title: TYPE_META.quiz.title, emoji: TYPE_META.quiz.emoji, isBoss: true, letters: group.letters.slice() });
+      title: TYPE_META.quiz.title, emoji: TYPE_META.quiz.emoji, isBoss: true, letters: L.slice() });
   });
+
+  // --- האתגר הגדול: שלבי סיכום שמערבבים את כל האותיות ---
+  // בכל שלב מוגרלות אותיות אחרות מכל האלף-בית (mixed), והזיכרון מכסה את כולן (full).
+  const ALL = READING_GROUPS.reduce((a, g) => a.concat(g.letters), []);
+  const F = 'final', FN = 'האתגר הגדול';
+  stations.push({ id: 'final_sound', type: 'sound', mixed: true, groupId: F, groupName: FN,
+    title: 'צליל פותח — הכל', emoji: '🔤', letters: ALL.slice() });
+  stations.push({ id: 'final_hunt', type: 'hunt', mixed: true, groupId: F, groupName: FN,
+    title: 'ציד האותיות — הכל', emoji: '🔍', letters: ALL.slice() });
+  stations.push({ id: 'final_hear', type: 'hear', mixed: true, groupId: F, groupName: FN,
+    title: 'איזו אות שמעת — הכל', emoji: '👂', letters: ALL.slice() });
+  stations.push({ id: 'final_memory', type: 'memory', full: true, groupId: F, groupName: FN,
+    title: 'זיכרון — כל האותיות', emoji: '🧩', letters: ALL.slice() });
+  stations.push({ id: 'final_quiz', type: 'quiz', mixed: true, isBoss: true, groupId: F, groupName: FN,
+    title: 'קרב הסיום הגדול', emoji: '👑', letters: ALL.slice() });
+
   return stations;
 }
 
