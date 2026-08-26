@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <!-- Google Analytics (מזהה האתר הגדול) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-W58S98V8J0');
+    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>אוזניים של קסם 🦻</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&family=Secular+One&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#3a2a12;overflow-x:hidden;
+       background:linear-gradient(180deg,#e7d9ff 0%,#d9f0ff 30%,#d6f5ee 65%,#fff0d8 100%);
+       min-height:100vh;padding-bottom:60px;}
+  .sky{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+  .sky .floaty{position:absolute;opacity:.7;animation:drift linear infinite;}
+  @keyframes drift{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-22px) rotate(10deg)}100%{transform:translateY(0) rotate(0)}}
+  .sky .hill{position:absolute;bottom:0;width:60vw;height:26vh;border-radius:50% 50% 0 0;opacity:.35;}
+  .map,header{position:relative;z-index:2;}
+
+  header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+         padding:10px 14px;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);box-shadow:0 2px 12px rgba(0,0,0,.08);}
+  header .home{width:44px;height:44px;border-radius:50%;border:2px solid #b39ddb;background:#fff;
+       font-size:1.3em;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#5e35b1;}
+  header .title{font-weight:800;font-size:1.2em;color:#5a3d1e;display:flex;align-items:center;gap:7px;}
+  header .stars{font-weight:800;color:#f9a825;background:#fff;border-radius:50px;padding:6px 14px;
+       box-shadow:0 2px 6px rgba(0,0,0,.08);font-size:1.05em;}
+  .reset{position:fixed;bottom:14px;left:14px;z-index:30;background:rgba(255,255,255,.9);
+       border:2px solid #d1c4e9;border-radius:50px;padding:8px 14px;font-family:inherit;
+       font-size:.9em;color:#9575cd;cursor:pointer;}
+
+  .hero{position:relative;z-index:2;text-align:center;padding:16px 16px 2px;}
+  .hero .uni{display:flex;justify-content:center;animation:heroBob 2.4s ease-in-out infinite;}
+  @keyframes heroBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(2deg)}}
+  .hero h1{font-family:'Secular One',system-ui,sans-serif;margin:4px 0 2px;
+       font-size:clamp(1.35rem,5.8vw,2.2rem);line-height:1.15;padding:0 10px;overflow-wrap:break-word;
+       background:linear-gradient(90deg,#8f6ed5,#5e9dff,#39c6a6,#ffb703,#ff5ca8);
+       -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));}
+  .hero .sub{font-weight:800;color:#7a5cc0;font-size:1.02rem;letter-spacing:.3px;}
+
+  .map{max-width:720px;margin:0 auto;padding:10px 12px 60px;position:relative;}
+  .road{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:visible;}
+
+  .group-banner{display:flex;flex-direction:column;align-items:center;gap:2px;margin:26px auto 14px;
+       background:#fff;border-radius:22px;padding:10px 20px;box-shadow:0 4px 12px rgba(0,0,0,.10);
+       font-weight:800;color:#5a3d1e;max-width:340px;position:relative;z-index:1;text-align:center;}
+  .group-banner .gname{font-size:1.05em;}
+  .group-banner .gsounds{color:#7e57c2;letter-spacing:3px;font-size:1.1em;}
+  .group-banner .ghint{font-weight:600;color:#9e9e9e;font-size:.8em;line-height:1.2;margin-top:2px;}
+  .group-banner.final{background:linear-gradient(90deg,#fff3c4,#ffe08a);border:2px solid #ffcf4d;}
+  .group-banner.intro{background:linear-gradient(90deg,#e0f7f1,#d3ecff);}
+
+  .row{display:flex;justify-content:center;margin:14px 0;position:relative;z-index:1;}
+  .node-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;
+       text-decoration:none;color:#5a3d1e;transition:transform .15s;}
+  .node-wrap:active{transform:scale(.94);}
+
+  .node{width:94px;height:94px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+       font-size:2.7rem;font-weight:800;position:relative;border:5px solid rgba(255,255,255,.9);
+       box-shadow:inset 0 9px 12px rgba(255,255,255,.6), inset 0 -12px 16px rgba(0,0,0,.14),
+                  0 7px 0 rgba(0,0,0,.10), 0 13px 22px rgba(0,0,0,.18);}
+  .node .glyph{filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));position:relative;z-index:1;}
+  .node.syll{background:radial-gradient(circle at 34% 28%,#ffe7c2,#ffb45a);color:#b85c00;}
+  .node.rhyme{background:radial-gradient(circle at 34% 28%,#d8efff,#79bdff);color:#0d5aa8;}
+  .node.catch{background:radial-gradient(circle at 34% 28%,#d3f7d8,#86dd98);color:#1f7a37;}
+  .node.odd{background:radial-gradient(circle at 34% 28%,#ffdcef,#ff9ec9);color:#a3155e;}
+  .node.blend{background:radial-gradient(circle at 34% 28%,#eadfff,#b39bf0);color:#4a2f9e;}
+  .node.blend.big{background:radial-gradient(circle at 34% 28%,#fff0b0,#ffcb3d);color:#b3660a;
+       border-color:#ffd76a;box-shadow:inset 0 9px 12px rgba(255,255,255,.6),inset 0 -12px 16px rgba(0,0,0,.14),
+                  0 0 0 3px #ffb300,0 7px 0 rgba(0,0,0,.10),0 13px 22px rgba(0,0,0,.2);}
+
+  .node.done::after{content:"✓";position:absolute;top:-6px;right:-6px;background:#4caf50;color:#fff;
+       width:26px;height:26px;border-radius:50%;font-size:1rem;display:flex;align-items:center;
+       justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+  .node.locked{background:#e0e0e0;color:#bdbdbd;box-shadow:0 8px 0 rgba(0,0,0,.06);}
+  .node.locked::after{content:"🔒";position:absolute;font-size:1.6rem;}
+  .node.locked .glyph{visibility:hidden;}
+
+  .node{animation:nodepop .4s backwards;}
+  @keyframes nodepop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+  .node.current{animation:bob 1.2s ease-in-out infinite;}
+  .rider{position:absolute;top:-46px;left:0;right:0;display:flex;justify-content:center;
+       z-index:3;animation:bob 1.1s ease-in-out infinite;pointer-events:none;}
+  .node.current::before{content:"";position:absolute;inset:-8px;border-radius:50%;
+       border:4px solid #7e57c2;animation:ring 1.4s ease-out infinite;}
+  @keyframes ring{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.35);opacity:0}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+  .caption{font-size:.85em;font-weight:700;text-align:center;max-width:112px;line-height:1.15;}
+  .ministars{font-size:.8em;letter-spacing:1px;height:1em;}
+  .ministars .f{color:#ffb300;}
+  .ministars .e{color:#cfcfcf;}
+
+  .start-hint{text-align:center;color:#8d6e63;margin:0 auto 8px;max-width:320px;font-size:.95em;}
+  .finale{text-align:center;margin:20px auto;font-size:2.4rem;}
+</style>
+</head>
+<body>
+  <div class="sky" id="sky"></div>
+  <header>
+    <a class="home" href="index.html" title="חזרה למסלולים">🏠</a>
+    <span class="title"><span class="logo" id="logo"></span>אוזניים של קסם</span>
+    <span class="stars" id="totalStars">⭐ 0</span>
+  </header>
+
+  <div class="hero">
+    <div class="uni" id="heroUni"></div>
+    <h1>אוזניים של קסם</h1>
+    <div class="sub">🦻 משחקים עם צלילים — בלי אותיות!</div>
+  </div>
+
+  <p class="start-hint" id="startHint"></p>
+  <div class="map" id="map"></div>
+  <button class="reset" id="reset">🔄 להתחיל מחדש</button>
+  <div class="finale">🏁</div>
+
+  <script src="phono-data.js?v=17"></script>
+  <script src="reading-progress.js?v=16"></script>
+  <script src="reading-engine.js?v=16"></script>
+  <script>
+    document.getElementById('logo').innerHTML = RG.unicorn(32);
+    document.getElementById('heroUni').innerHTML = RG.unicorn(84);
+
+    const GAME_FILE = { syll:'phono-games/syllables.html', rhyme:'phono-games/rhyme.html',
+                        catch:'phono-games/initial.html', odd:'phono-games/odd.html',
+                        blend:'phono-games/blend.html' };
+    const map = document.getElementById('map');
+    const AMP = Math.max(70, map.clientWidth / 2 - 104);
+    const stations = PHONO_STATIONS;
+    const groupById = id => PHONO_GROUPS.find(g => g.id === id);
+
+    // ProgressForPhono — עוטף isUnlocked כדי לעבוד מול תחנות המסלול הפונולוגי
+    function isUnlocked(id) {
+      const idx = stations.findIndex(s => s.id === id);
+      if (idx <= 0) return true;
+      return ReadingProgress.isDone(stations[idx - 1].id);
+    }
+
+    let currentIdx = stations.findIndex(s => isUnlocked(s.id) && !ReadingProgress.isDone(s.id));
+    if (currentIdx === -1) currentIdx = stations.length;
+
+    let lastGroup = null, nodeIndex = 0, currentEl = null;
+
+    stations.forEach((st, i) => {
+      if (st.groupId !== lastGroup) {
+        lastGroup = st.groupId;
+        const banner = document.createElement('div');
+        banner.className = 'group-banner';
+        const g = groupById(st.groupId);
+        if (g) {
+          banner.innerHTML = `<span class="gname">${g.emoji} ${g.name}</span>
+                              <span class="gsounds">${g.sounds.map(s=>phonoSoundLabel(s)).join(' · ')}</span>
+                              <span class="ghint">${g.hint}</span>`;
+        } else if (st.groupId === 'intro') {
+          banner.classList.add('intro');
+          banner.innerHTML = `<span class="gname">🎬 מתחילים!</span>
+                              <span class="ghint">הברות וחרוזים — הכי קל וכיף</span>`;
+        } else {
+          banner.classList.add('final');
+          banner.innerHTML = `<span class="gname">👑 אלוף הצלילים</span>
+                              <span class="ghint">מחברים צלילים למילים — כל הצלילים ביחד</span>`;
+        }
+        map.appendChild(banner);
+      }
+
+      const done = ReadingProgress.isDone(st.id);
+      const unlocked = isUnlocked(st.id) || done;
+      const stars = ReadingProgress.starsOf(st.id);
+
+      const row = document.createElement('div');
+      row.className = 'row';
+      const wrap = document.createElement(unlocked ? 'a' : 'div');
+      wrap.className = 'node-wrap';
+      wrap.style.transform = `translateX(${Math.round(Math.sin(nodeIndex * 0.8) * AMP)}px)`;
+      nodeIndex++;
+      if (unlocked) wrap.href = GAME_FILE[st.type] + '?station=' + encodeURIComponent(st.id);
+
+      const node = document.createElement('div');
+      const big = st.groupId === 'final' ? ' big' : '';
+      node.className = 'node ' + st.type + big + (done ? ' done' : '') + (!unlocked ? ' locked' : '');
+      node.style.animationDelay = Math.min(i * 0.03, 1.2) + 's';
+      if (i === currentIdx) {
+        node.classList.add('current');
+        const rider = document.createElement('div');
+        rider.className = 'rider'; rider.innerHTML = RG.unicorn(48);
+        wrap.appendChild(rider);
+      }
+      const glyph = document.createElement('span');
+      glyph.className = 'glyph'; glyph.textContent = st.emoji;
+      node.appendChild(glyph);
+
+      const caption = document.createElement('div');
+      caption.className = 'caption';
+      caption.textContent = (PHONO_TYPE_META[st.type] || {}).short || st.title;
+
+      const ms = document.createElement('div');
+      ms.className = 'ministars';
+      if (done) {
+        let h = '';
+        for (let k = 1; k <= 3; k++) h += `<span class="${k <= stars ? 'f' : 'e'}">${k <= stars ? '★' : '☆'}</span>`;
+        ms.innerHTML = h;
+      }
+
+      wrap.appendChild(node); wrap.appendChild(caption); wrap.appendChild(ms);
+      row.appendChild(wrap); map.appendChild(row);
+      if (i === currentIdx) currentEl = wrap;
+    });
+
+    function drawRoad() {
+      const old = map.querySelector('.road'); if (old) old.remove();
+      const nodes = [...map.querySelectorAll('.node')];
+      if (nodes.length < 2) return;
+      const mrect = map.getBoundingClientRect();
+      const pts = nodes.map(n => { const r = n.getBoundingClientRect();
+        return { x: r.left - mrect.left + r.width / 2, y: r.top - mrect.top + r.height / 2 }; });
+      let d = `M ${pts[0].x} ${pts[0].y}`;
+      for (let i = 1; i < pts.length; i++) {
+        const xc = (pts[i-1].x + pts[i].x) / 2, yc = (pts[i-1].y + pts[i].y) / 2;
+        d += ` Q ${pts[i-1].x} ${pts[i-1].y} ${xc} ${yc}`;
+      }
+      d += ` L ${pts[pts.length-1].x} ${pts[pts.length-1].y}`;
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('class', 'road');
+      const w = map.clientWidth, h = map.scrollHeight;
+      svg.setAttribute('width', w); svg.setAttribute('height', h);
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      const mk = (width, color, dash) => {
+        const p = document.createElementNS(ns, 'path');
+        p.setAttribute('d', d); p.setAttribute('fill', 'none');
+        p.setAttribute('stroke', color); p.setAttribute('stroke-width', width);
+        p.setAttribute('stroke-linecap', 'round'); p.setAttribute('stroke-linejoin', 'round');
+        if (dash) p.setAttribute('stroke-dasharray', dash);
+        return p;
+      };
+      svg.appendChild(mk(34, 'rgba(255,255,255,.6)'));
+      svg.appendChild(mk(22, '#c7b6ef'));
+      svg.appendChild(mk(3, 'rgba(255,255,255,.95)', '2 18'));
+      map.insertBefore(svg, map.firstChild);
+    }
+    requestAnimationFrame(drawRoad);
+    window.addEventListener('load', () => setTimeout(drawRoad, 120));
+    window.addEventListener('resize', () => setTimeout(drawRoad, 150));
+
+    let total = 0; stations.forEach(s => total += ReadingProgress.starsOf(s.id));
+    document.getElementById('totalStars').textContent = '⭐ ' + total;
+
+    const hint = document.getElementById('startHint');
+    if (currentIdx >= stations.length) hint.textContent = 'סיימת את כל המסע! אפשר לחזור ולשחק שוב 🎧';
+    else if (total === 0) hint.textContent = 'לחצי על התחנה הזוהרת כדי להתחיל ✨';
+    else hint.textContent = 'ממשיכים מכאן! 👇';
+    if (currentEl) setTimeout(() => currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+
+    (function fillSky() {
+      const sky = document.getElementById('sky');
+      const emojis = ['🎵','🎧','✨','🫧','🎶','⭐','🦻','🎵'];
+      for (let i = 0; i < 12; i++) {
+        const f = document.createElement('div');
+        f.className = 'floaty'; f.textContent = emojis[i % emojis.length];
+        f.style.top = Math.random() * 95 + 'vh'; f.style.left = Math.random() * 92 + 'vw';
+        f.style.fontSize = (1.4 + Math.random() * 2.0) + 'rem';
+        f.style.animationDuration = (5 + Math.random() * 6) + 's';
+        f.style.animationDelay = (-Math.random() * 6) + 's';
+        sky.appendChild(f);
+      }
+      [['#c9b6f0','-10vw'],['#9fd8ec','55vw']].forEach(([c, left]) => {
+        const h = document.createElement('div'); h.className = 'hill';
+        h.style.background = c; h.style.left = left; sky.appendChild(h);
+      });
+    })();
+
+    // מוחקים רק את התחנות של המסלול הפונולוגי (לא נוגעים במסלול האותיות)
+    document.getElementById('reset').onclick = () => {
+      if (confirm('להתחיל את מסלול הצלילים מחדש? הכוכבים של המסלול הזה יימחקו.')) {
+        const data = ReadingProgress._load();
+        stations.forEach(s => { delete data[s.id]; });
+        try { localStorage.setItem('reading_progress_v1', JSON.stringify(data)); } catch (e) {}
+        location.reload();
+      }
+    };
+  </script>
+</body>
+</html>
