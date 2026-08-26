@@ -3,177 +3,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>חדר הבריחה של האותיות</title>
+<title>מסע האוצרות</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
 <style>
   *{box-sizing:border-box;}
   html,body{margin:0;height:100%;}
-  body{font-family:'Heebo',system-ui,sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;
-       background:radial-gradient(120% 80% at 50% 0%,#4a2c66,#2a1836 60%,#1b1026);}
-  .room{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
-        padding:10px 12px 16px;overflow:hidden;}
+  body{font-family:'Heebo',system-ui,sans-serif;color:#2a3b2a;min-height:100vh;display:flex;flex-direction:column;}
+  .hud{text-align:center;font-weight:800;font-size:1.15em;color:#2e7d32;padding:8px;background:rgba(255,255,255,.85);}
+  .hud .big{color:#ef6c00;font-size:1.5em;vertical-align:-2px;}
+  .hud .sfx{cursor:pointer;}
+  .hud .sc{background:#2e7d32;color:#fff;border-radius:50px;padding:2px 12px;margin-inline-start:6px;font-size:.85em;}
+  .hud .nm{color:#7a5cc0;font-size:.8em;}
 
-  /* התיבה + המנעולים */
-  .top{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2;}
-  .chest{font-size:4.4rem;line-height:1;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));transition:transform .3s;}
-  .chest.open{animation:chestPop .6s forwards;}
-  @keyframes chestPop{40%{transform:scale(1.25) rotate(-6deg)}100%{transform:scale(1.1)}}
-  .locks{display:flex;gap:8px;}
-  .lock{font-size:1.8rem;transition:transform .25s,opacity .25s;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));}
-  .lock.current{animation:lockPulse 1s infinite;}
-  .lock.done{opacity:.35;transform:scale(.85);}
-  @keyframes lockPulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px) scale(1.12)}}
-  .hint{color:#e5d6ff;font-weight:800;font-size:1.05em;text-align:center;}
-
-  /* קלף השאלה */
-  .qcard{background:rgba(255,255,255,.96);color:#3a2a12;border-radius:24px;padding:14px 20px;text-align:center;
-         box-shadow:0 12px 30px rgba(0,0,0,.45);cursor:pointer;min-width:180px;z-index:2;transition:transform .15s;}
-  .qcard.flash{animation:cardFlash .4s;}
-  @keyframes cardFlash{50%{transform:scale(1.06)}}
-  .qcard .ptitle{font-weight:800;color:#7e57c2;font-size:1.02rem;}
-  .qcard .emo{font-size:4rem;display:block;line-height:1;margin-top:2px;}
-  .qcard .word{font-size:1.6rem;font-weight:800;color:#555;}
-  .qcard .earbig{font-size:4rem;}
-  .qcard .say{font-size:.85rem;color:#999;margin-top:2px;}
-
-  /* רוּנוֹת (אותיות) */
-  .runes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;width:100%;max-width:440px;z-index:2;}
-  .rune{width:70px;height:70px;border-radius:18px;display:flex;align-items:center;justify-content:center;
-        font-size:2.6rem;font-weight:800;color:#fff;cursor:pointer;
-        background:linear-gradient(160deg,#b98cff,#7e57c2);
-        box-shadow:0 6px 0 #5e35b1,0 0 16px rgba(180,140,255,.5);transition:transform .1s;}
-  .rune:active{transform:translateY(5px);box-shadow:0 1px 0 #5e35b1;}
-  .rune.correct{background:linear-gradient(160deg,#66bb6a,#43a047);box-shadow:0 6px 0 #2e7d32,0 0 24px #7bed9f;animation:cardFlash .4s;}
-  .rune.wrong{background:linear-gradient(160deg,#ef5350,#c62828);box-shadow:0 6px 0 #8e0000;animation:shake .4s;}
-  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-
-  .spark{position:absolute;z-index:5;font-size:1.7rem;pointer-events:none;animation:rise .8s forwards;}
-  @keyframes rise{to{transform:translateY(-90px) scale(1.4);opacity:0}}
-  .mascot{position:absolute;bottom:6px;left:8px;z-index:1;pointer-events:none;animation:cheer 1.2s ease-in-out infinite;}
-  @keyframes cheer{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
+  .scene{position:relative;flex:1;width:100%;overflow:hidden;touch-action:none;
+         background:linear-gradient(180deg,#bfe9ff 0%,#dff3ff 22%,#c8ef9e 52%,#96d86a 100%);}
+  .watermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+             font-weight:800;font-size:44vh;color:rgba(255,255,255,.30);z-index:0;pointer-events:none;user-select:none;}
+  .deco{position:absolute;bottom:-4px;pointer-events:none;user-select:none;z-index:0;}
+  .item{position:absolute;z-index:2;display:flex;align-items:center;justify-content:center;border-radius:50%;
+        background:rgba(255,255,255,.85);box-shadow:0 3px 8px rgba(0,0,0,.18);}
+  .item.got{animation:got .45s forwards;}
+  @keyframes got{60%{transform:scale(1.4)}100%{transform:scale(0);opacity:0}}
+  .item.no{animation:no .35s;}
+  @keyframes no{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+  .uni{position:absolute;z-index:4;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25));}
+  .spark{position:absolute;z-index:5;font-size:1.5rem;pointer-events:none;animation:rise .7s forwards;}
+  @keyframes rise{to{transform:translateY(-40px) scale(1.4);opacity:0}}
+  .banner{position:absolute;top:8px;right:50%;transform:translateX(50%);z-index:3;
+          background:rgba(255,255,255,.9);border-radius:40px;padding:4px 16px;font-weight:800;color:#5a3d1e;
+          box-shadow:0 3px 8px rgba(0,0,0,.12);white-space:nowrap;}
 </style>
 </head>
 <body>
-  <div class="room" id="room">
-    <div class="top">
-      <div class="chest" id="chest">🎁</div>
-      <div class="locks" id="locks"></div>
-      <div class="hint" id="hint">פתחי את כל המנעולים כדי לפתוח את התיבה!</div>
-    </div>
-    <div class="qcard" id="qcard" onclick="replay()"></div>
-    <div class="runes" id="runes"></div>
-    <div class="mascot" id="mascot"></div>
+  <div class="hud" id="hud"></div>
+  <div class="scene" id="scene">
+    <div class="watermark" id="wm"></div>
+    <div class="uni" id="uni"></div>
   </div>
 
-  <script src="../reading-data.js?v=14"></script>
-  <script src="../reading-progress.js?v=14"></script>
-  <script src="../reading-voices.js?v=14"></script>
-  <script src="../reading-engine.js?v=14"></script>
+  <script src="../reading-data.js?v=15"></script>
+  <script src="../reading-progress.js?v=15"></script>
+  <script src="../reading-voices.js?v=15"></script>
+  <script src="../reading-engine.js?v=15"></script>
   <script>
     RG.audioBase = '../../../letters/';
     const station = RG.currentStation();
-    const room = document.getElementById('room');
+    const scene = document.getElementById('scene');
 
     if (!station || station.type !== 'quiz') {
-      room.innerHTML = '<p style="padding:20px">לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
+      scene.innerHTML = '<p style="padding:20px">לא נמצאה תחנה. <a href="../journey.html">חזרה למפה</a></p>';
     } else {
-      RG.mountTopBar('חדר הבריחה ' + (station.groupName || ''), { bg: false });
-      document.getElementById('mascot').innerHTML = RG.unicorn(56);
-      const letters = station.letters;
+      RG.mountTopBar('מסע האוצרות ' + (station.groupName || ''), { bg: false });
+      const pool = station.letters;
       const mixed = !!station.mixed;
-      const LOCKS = 5;
-      let solved = 0, wrong = 0, target = null, curWord = null, kind = null, locked = false, active = letters;
+      const allLetters = Object.keys(READING_LETTERS);
+      const screens = mixed ? RG.shuffle(pool).slice(0, 5) : pool.slice();
 
-      renderLocks();
-      nextLock();
+      const uni = document.getElementById('uni');
+      uni.innerHTML = RG.unicorn(66);
+      const UR = 33, IR = 28;
+      let ux = 60, uy = 60, tx = 60, ty = 60;         // מיקום ויעד של היוניקורן
+      let items = [], screenIdx = 0, target = null, needed = 0, gotThis = 0;
+      let collectedAll = 0, wrongAll = 0, raf = null, lastT = 0, running = true;
 
-      function renderLocks() {
-        let h = '';
-        for (let i = 0; i < LOCKS; i++) {
-          const cls = i < solved ? 'done' : (i === solved ? 'current' : '');
-          h += `<span class="lock ${cls}">${i < solved ? '🔓' : '🔒'}</span>`;
-        }
-        document.getElementById('locks').innerHTML = h;
-      }
+      buildDeco();
+      requestAnimationFrame(() => { ux = tx = scene.clientWidth / 2; uy = ty = scene.clientHeight - 80;
+                                    setupScreen(); raf = requestAnimationFrame(frame); });
 
-      function nextLock() {
-        RG.stopAudio();
-        locked = false;
-        if (solved >= LOCKS) return escape();
-        active = mixed ? RG.shuffle(letters).slice(0, 4) : letters;
-        target = active[Math.floor(Math.random() * active.length)];
-        kind = Math.random() < 0.5 ? 'hear' : 'word';
-        curWord = pickWord(target);
-
-        const qcard = document.getElementById('qcard');
-        if (kind === 'hear') {
-          qcard.innerHTML = `<div class="ptitle">איזו אות שמעת?</div>
-                             <span class="earbig">🎧</span><div class="say">לחצי לשמוע שוב 🔊</div>`;
-        } else {
-          qcard.innerHTML = `<div class="ptitle">באיזה צליל מתחילה המילה?</div>
-                             <span class="emo">${curWord.emoji}</span>
-                             <span class="word">${curWord.word}</span>
-                             <div class="say">לחצי לשמוע שוב 🔊</div>`;
-        }
-        const runes = document.getElementById('runes');
-        runes.innerHTML = '';
-        RG.shuffle(active).forEach(l => {
-          const b = document.createElement('div');
-          b.className = 'rune'; b.textContent = l;
-          b.onclick = () => choose(l, b);
-          runes.appendChild(b);
+      function buildDeco() {
+        ['🌳','🌲','🌳','🌲','🌳'].forEach((t, i) => {
+          const d = document.createElement('div'); d.className = 'deco'; d.textContent = t;
+          d.style.fontSize = (58 + Math.random() * 26) + 'px'; d.style.left = (i * 21 + Math.random() * 5) + '%';
+          scene.appendChild(d);
         });
-        renderLocks();
-        setTimeout(playPrompt, 400);
       }
 
-      function playPrompt() { if (kind === 'hear') RG.playLetter(target); else RG.playWord(target, curWord); }
-      window.replay = playPrompt;
+      // הזזת היוניקורן לפי האצבע
+      function setTarget(e) { const r = scene.getBoundingClientRect(); tx = e.clientX - r.left; ty = e.clientY - r.top; }
+      scene.addEventListener('pointerdown', e => { if (running) setTarget(e); });
+      scene.addEventListener('pointermove', e => { if (running && (e.buttons || e.pressure)) setTarget(e); });
 
-      function choose(l, el) {
-        if (locked) return;
-        if (l === target) {
-          locked = true;
-          solved++;
-          el.classList.add('correct');
-          document.getElementById('qcard').classList.add('flash');
-          RG.ding();
-          burst(el);
-          renderLocks();
-          setTimeout(() => RG.playLetter(target), 220);
-          setTimeout(nextLock, 950);
-        } else {
-          wrong++;
-          el.classList.add('wrong');
-          RG.buzz();
-          setTimeout(() => el.classList.remove('wrong'), 420);
+      function setupScreen() {
+        RG.stopAudio();
+        items.forEach(it => it.el.remove()); items = [];
+        target = screens[screenIdx];
+        const W = scene.clientWidth, H = scene.clientHeight;
+        document.getElementById('wm').textContent = target;
+
+        // אוצרות נכונים = מילים של האות; מסיחים = מילים של אותיות אחרות
+        const correct = RG.shuffle(letterWords(target)).slice(0, Math.min(3, letterWords(target).length));
+        needed = correct.length; gotThis = 0;
+        updateHud(0, needed);
+        const others = allLetters.filter(l => l !== target);
+        const distract = [];
+        for (let i = 0; i < 5; i++) { const l = others[Math.floor(Math.random() * others.length)]; distract.push({ l, w: pickWord(l) }); }
+
+        const list = RG.shuffle(
+          correct.map(w => ({ correct: true, letter: target, w }))
+            .concat(distract.map(d => ({ correct: false, letter: d.l, w: d.w }))));
+
+        const placed = [];
+        list.forEach(entry => {
+          const size = 52 + Math.random() * 10, r = size / 2;
+          let cx, cy, ok = false;
+          for (let t = 0; t < 60 && !ok; t++) {
+            cx = 10 + r + Math.random() * Math.max(1, W - 20 - 2 * r);
+            cy = 60 + r + Math.random() * Math.max(1, H - 150 - 2 * r);
+            ok = placed.every(p => Math.hypot(p.x - cx, p.y - cy) > r + p.r + 12)
+              && Math.hypot(cx - ux, cy - uy) > 90;
+          }
+          placed.push({ x: cx, y: cy, r });
+          const el = document.createElement('div');
+          el.className = 'item';
+          el.style.width = el.style.height = size + 'px';
+          el.style.left = (cx - r) + 'px'; el.style.top = (cy - r) + 'px';
+          el.style.fontSize = Math.round(size * 0.62) + 'px';
+          el.textContent = entry.w.emoji;
+          scene.appendChild(el);
+          items.push({ el, x: cx, y: cy, r, correct: entry.correct, letter: entry.letter, w: entry.w, cool: false });
+        });
+
+        setTimeout(() => RG.playLetter(target), 300);   // שם + צליל האות
+      }
+
+      function frame(t) {
+        if (!running) return;
+        if (!lastT) lastT = t;
+        lastT = t;
+        // הליכה חלקה לכיוון היעד
+        ux += (tx - ux) * 0.16; uy += (ty - uy) * 0.16;
+        const W = scene.clientWidth, H = scene.clientHeight;
+        ux = Math.max(UR, Math.min(W - UR, ux)); uy = Math.max(UR + 40, Math.min(H - UR, uy));
+        uni.style.left = (ux - 33) + 'px'; uni.style.top = (uy - 33) + 'px';
+
+        for (const it of items) {
+          if (it.got) continue;
+          const d = Math.hypot(it.x - ux, it.y - uy);
+          if (d < UR + it.r - 6) {
+            if (it.correct) collect(it);
+            else if (!it.cool) { it.cool = true; wrongAll++; RG.buzz(); it.el.classList.add('no');
+              setTimeout(() => { it.el.classList.remove('no'); it.cool = false; }, 700); }
+          }
+        }
+        raf = requestAnimationFrame(frame);
+      }
+
+      function collect(it) {
+        it.got = true;
+        it.el.classList.add('got');
+        setTimeout(() => it.el.remove(), 450);
+        RG.ding(); sparkle(it.x, it.y);
+        RG.playWord(it.letter, it.w);
+        gotThis++; collectedAll++;
+        updateHud(gotThis, needed);
+        if (gotThis >= needed) {
+          screenIdx++;
+          if (screenIdx >= screens.length) return win();
+          setTimeout(setupScreen, 850);
         }
       }
 
-      function burst(el) {
-        const a = room.getBoundingClientRect(), r = el.getBoundingClientRect();
-        for (let i = 0; i < 4; i++) {
-          const s = document.createElement('div');
-          s.className = 'spark'; s.textContent = ['🔑', '✨', '⭐'][i % 3];
-          s.style.left = (r.left - a.left + r.width / 2 - 12 + (Math.random() * 30 - 15)) + 'px';
-          s.style.top = (r.top - a.top - 6) + 'px';
-          s.style.animationDelay = (i * 0.05) + 's';
-          room.appendChild(s);
-          setTimeout(() => s.remove(), 850);
-        }
+      function sparkle(x, y) {
+        const s = document.createElement('div'); s.className = 'spark'; s.textContent = '⭐';
+        s.style.left = (x - 10) + 'px'; s.style.top = (y - 20) + 'px';
+        scene.appendChild(s); setTimeout(() => s.remove(), 700);
       }
 
-      function escape() {
-        const chest = document.getElementById('chest');
-        chest.textContent = '🎉'; chest.classList.add('open');
-        document.getElementById('hint').textContent = 'פתחת את התיבה! 💎';
-        RG.confetti(); RG.fanfare();
-        setTimeout(() => {
-          RG.finish({ stationId: station.id, correct: LOCKS, total: LOCKS + wrong,
-                      replay: () => { solved = 0; wrong = 0; chest.textContent = '🎁';
-                                      chest.classList.remove('open'); nextLock(); } });
-        }, 900);
+      function updateHud(got, need) {
+        const name = (READING_LETTERS[target] || {}).name || '';
+        document.getElementById('hud').innerHTML =
+          `אספי דברים שמתחילים ב-<span class="big">${target}</span> <span class="nm">(${name})</span>
+           <span class="sfx" id="sfx">🔊</span> <span class="sc">${got}/${need}</span>`;
+        document.getElementById('sfx').onclick = () => RG.playLetter(target);
+      }
+
+      function win() {
+        running = false;
+        if (raf) cancelAnimationFrame(raf);
+        items.forEach(it => it.el.remove()); items = [];
+        RG.finish({ stationId: station.id, correct: collectedAll, total: collectedAll + wrongAll,
+                    replay: () => location.reload() });
       }
     }
   </script>
