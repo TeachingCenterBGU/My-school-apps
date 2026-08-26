@@ -128,10 +128,10 @@
 
   <div class="finale">🏁</div>
 
-  <script src="reading-data.js?v=11"></script>
-  <script src="reading-progress.js?v=11"></script>
-  <script src="reading-voices.js?v=11"></script>
-  <script src="reading-engine.js?v=11"></script>
+  <script src="reading-data.js?v=14"></script>
+  <script src="reading-progress.js?v=14"></script>
+  <script src="reading-voices.js?v=14"></script>
+  <script src="reading-engine.js?v=14"></script>
   <script>
     document.getElementById('logo').innerHTML = RG.unicorn(34);
     document.getElementById('heroUni').innerHTML = RG.unicorn(84);
@@ -268,6 +268,7 @@
       if (st.type === 'write') return 'כתיבה';
       if (st.type === 'sound') return 'צליל פותח';
       if (st.type === 'memory') return 'זיכרון';
+      if (st.type === 'quiz') return 'בריחה';
       if (st.type === 'hunt') return 'ציד';
       if (st.type === 'hear') return 'מה שמעת?';
       if (st.type === 'quiz') return 'סיכום';

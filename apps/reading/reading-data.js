@@ -160,6 +160,20 @@ const READING_GROUPS = [
   { id: 'g6', name: 'קבוצה 6', emoji: '🏆', letters: ['פ', 'ז', 'ט'] },
 ];
 
+// --- משפטי עידוד (נאמרים במסך הסיום) ---
+// אפשר להקליט אותם באולפן; המנוע יגריל אחד מההקלטות הקיימות.
+// key = מזהה קבוע להקלטה; text = מה שנאמר (וגם גיבוי קולי סינתטי).
+const READING_PHRASES = [
+  { key: 'perfect',   text: 'מושלם!' },
+  { key: 'great',     text: 'כל הכבוד!' },
+  { key: 'done',      text: 'יופי, סיימת!' },
+  { key: 'excellent', text: 'מצוין!' },
+  { key: 'wow',       text: 'וואו, איזה יופי!' },
+  { key: 'champ',     text: 'את אלופה!' },
+  { key: 'nice',      text: 'עבודה יפה!' },
+  { key: 'go',        text: 'קדימה, את יכולה!' },
+];
+
 // --- עזרי מילים ---
 function letterWords(char) {
   const d = READING_LETTERS[char];
@@ -183,26 +197,26 @@ function buildReadingStations() {
     hunt: { title: 'ציד האותיות', emoji: '🔍' },
     hear: { title: 'איזו אות שמעת?', emoji: '👂' },
     memory: { title: 'זיכרון', emoji: '🧩' },
-    quiz: { title: 'אתגר הסיכום', emoji: '🏆' },
+    quiz: { title: 'חדר הבריחה', emoji: '🗝️' },
   };
   const stations = [];
   READING_GROUPS.forEach(group => {
     const L = group.letters.slice();
-    // תחנה אחת של "הכרת האות" לכל קבוצה — המשחק רץ בסיבובים על כל אותיות הקבוצה
+    // סדר התחנות בקבוצה: היכרות → ציד → מה שמעת → צליל פותח → זיכרון → סיכום → כתיבה
     stations.push({ id: `${group.id}_meet`, type: 'meet', groupId: group.id, groupName: group.name,
       title: TYPE_META.meet.title, emoji: TYPE_META.meet.emoji, letters: L.slice() });
-    stations.push({ id: `${group.id}_write`, type: 'write', groupId: group.id, groupName: group.name,
-      title: TYPE_META.write.title, emoji: TYPE_META.write.emoji, letters: L.slice() });
-    stations.push({ id: `${group.id}_sound`, type: 'sound', groupId: group.id, groupName: group.name,
-      title: TYPE_META.sound.title, emoji: TYPE_META.sound.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_hunt`, type: 'hunt', groupId: group.id, groupName: group.name,
       title: TYPE_META.hunt.title, emoji: TYPE_META.hunt.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_hear`, type: 'hear', groupId: group.id, groupName: group.name,
       title: TYPE_META.hear.title, emoji: TYPE_META.hear.emoji, letters: L.slice() });
+    stations.push({ id: `${group.id}_sound`, type: 'sound', groupId: group.id, groupName: group.name,
+      title: TYPE_META.sound.title, emoji: TYPE_META.sound.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_memory`, type: 'memory', groupId: group.id, groupName: group.name,
       title: TYPE_META.memory.title, emoji: TYPE_META.memory.emoji, letters: L.slice() });
     stations.push({ id: `${group.id}_quiz`, type: 'quiz', groupId: group.id, groupName: group.name,
       title: TYPE_META.quiz.title, emoji: TYPE_META.quiz.emoji, isBoss: true, letters: L.slice() });
+    stations.push({ id: `${group.id}_write`, type: 'write', groupId: group.id, groupName: group.name,
+      title: TYPE_META.write.title, emoji: TYPE_META.write.emoji, letters: L.slice() });
   });
 
   // --- האתגר הגדול: שלבי סיכום שמערבבים את כל האותיות ---
@@ -218,7 +232,7 @@ function buildReadingStations() {
   stations.push({ id: 'final_memory', type: 'memory', full: true, groupId: F, groupName: FN,
     title: 'זיכרון — כל האותיות', emoji: '🧩', letters: ALL.slice() });
   stations.push({ id: 'final_quiz', type: 'quiz', mixed: true, isBoss: true, groupId: F, groupName: FN,
-    title: 'קרב הסיום הגדול', emoji: '👑', letters: ALL.slice() });
+    title: 'חדר הבריחה הגדול', emoji: '👑', letters: ALL.slice() });
 
   return stations;
 }
@@ -236,6 +250,7 @@ function lettersUpToStation(stationId) {
 
 // חשיפה גלובלית
 window.READING_LETTERS = READING_LETTERS;
+window.READING_PHRASES = READING_PHRASES;
 window.READING_GROUPS = READING_GROUPS;
 window.READING_STATIONS = READING_STATIONS;
 window.letterWords = letterWords;

@@ -144,6 +144,15 @@ const RG = (function () {
     } catch (e) { /* לא נורא */ }
   }
 
+  // משפט עידוד: מגריל אחת מהקלטות המשפחה שקיימות; אחרת קול סינתטי של הטקסט
+  function praise(fallbackText) {
+    if (!soundOn) return;
+    const V = window.READING_VOICES || {};
+    const keys = (window.READING_PHRASES || []).map(p => 'phrase:' + p.key).filter(k => V[k]);
+    if (keys.length) { playSrc(V[keys[Math.floor(Math.random() * keys.length)]]); return; }
+    if (fallbackText) speak(fallbackText);
+  }
+
   // --- אפקטים קוליים ב-WebAudio (בלי תלות באינטרנט) ---
   function ctx() {
     if (!audioCtx) {
@@ -353,7 +362,7 @@ const RG = (function () {
       if (typeof opts.replay === 'function') opts.replay();
       else location.reload();
     });
-    speak(msg);
+    praise(msg);
     return stars;
   }
 
@@ -376,7 +385,7 @@ const RG = (function () {
   return {
     get soundOn() { return soundOn; },
     set audioBase(v) { audioBase = v; },
-    injectStyle, playLetter, playWord, speak, stopAudio,
+    injectStyle, playLetter, playWord, speak, praise, stopAudio,
     ding, buzz, fanfare, confetti, unicorn,
     mountTopBar, mountBackground, starsForAccuracy, finish,
     currentStation, shuffle, pickDistractors,
