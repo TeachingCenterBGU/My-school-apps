@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <!-- Google Analytics (מזהה האתר הגדול) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-W58S98V8J0');
+    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>מסע הקריאה של ענת 🦄</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&family=Secular+One&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#3a2a12;min-height:100vh;overflow-x:hidden;
+       background:linear-gradient(180deg,#bfe9ff 0%,#d6f5ee 30%,#fff0d8 70%,#ffe1c2 100%);padding-bottom:60px;}
+  .sky{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+  .sky .f{position:absolute;opacity:.7;animation:drift linear infinite;}
+  @keyframes drift{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(-20px) rotate(10deg)}100%{transform:translateY(0) rotate(0)}}
+
+  header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+         padding:10px 14px;background:rgba(255,255,255,.85);backdrop-filter:blur(6px);box-shadow:0 2px 12px rgba(0,0,0,.08);}
+  header .home{width:44px;height:44px;border-radius:50%;border:2px solid #ffb74d;background:#fff;font-size:1.3em;
+       display:flex;align-items:center;justify-content:center;text-decoration:none;color:#e65100;}
+  header .who{background:#fff;border:2px solid #b39ddb;border-radius:50px;padding:7px 14px;font-weight:800;
+       color:#5e35b1;cursor:pointer;font-family:inherit;font-size:.95em;}
+
+  .wrap{position:relative;z-index:2;max-width:640px;margin:0 auto;padding:14px 16px;}
+  .hero{text-align:center;padding:8px 8px 6px;}
+  .hero .uni{display:flex;justify-content:center;animation:bob 2.4s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(2deg)}}
+  .hero h1{font-family:'Secular One',system-ui,sans-serif;margin:4px 0 2px;font-size:clamp(1.5rem,7vw,2.6rem);line-height:1.12;
+       background:linear-gradient(90deg,#ff7a59,#ffb703,#39c6a6,#8f6ed5,#ff5ca8);
+       -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));}
+  .greet{font-weight:800;color:#7a5cc0;font-size:1.15rem;margin-top:4px;}
+
+  .tracks-title{text-align:center;font-weight:800;color:#5a3d1e;margin:16px 0 8px;font-size:1.1rem;}
+  .tracks{display:grid;gap:14px;}
+  .track{display:flex;align-items:center;gap:14px;background:#fff;border-radius:24px;padding:16px 18px;text-decoration:none;
+       color:#3a2a12;box-shadow:0 8px 20px rgba(0,0,0,.10);border:3px solid #ffd59e;transition:transform .15s;position:relative;}
+  .track:active{transform:scale(.98);}
+  .track .ico{font-size:3rem;line-height:1;flex:none;width:64px;height:64px;border-radius:20px;display:flex;
+       align-items:center;justify-content:center;background:radial-gradient(circle at 34% 28%,#fff3d6,#ffd07a);}
+  .track .tx .t{font-weight:800;font-size:1.25rem;color:#c85f00;}
+  .track .tx .s{color:#8d6e63;font-size:.95rem;}
+  .track .go{margin-inline-start:auto;font-size:1.6rem;color:#ff9800;}
+  .track.write .ico{background:radial-gradient(circle at 34% 28%,#e0f0ff,#8ec5ff);}
+  .track.write{border-color:#bfe3ff;} .track.write .tx .t{color:#0d5aa8;}
+  .track.niqqud .ico{background:radial-gradient(circle at 34% 28%,#e9e0ff,#b79bf0);}
+  .track.niqqud{border-color:#ddd0ff;} .track.niqqud .tx .t{color:#5e35b1;}
+  .track.soon{opacity:.75;cursor:default;}
+  .track.soon .go{display:none;}
+  .badge{position:absolute;top:10px;left:12px;background:#ffcc80;color:#7a4a00;font-weight:800;font-size:.78rem;
+       border-radius:40px;padding:2px 10px;}
+
+  /* מסך "מי משחק/ת" */
+  .overlay{position:fixed;inset:0;background:rgba(30,20,10,.55);display:none;align-items:center;justify-content:center;
+       z-index:100;padding:20px;}
+  .overlay.show{display:flex;}
+  .modal{background:#fff;border-radius:28px;padding:24px 22px;max-width:360px;width:92%;text-align:center;
+       box-shadow:0 20px 50px rgba(0,0,0,.3);animation:pop .4s cubic-bezier(.175,.885,.32,1.275);}
+  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal h2{margin:.2em 0;color:#e65100;}
+  .modal input{width:100%;font-family:inherit;font-size:1.2rem;text-align:center;padding:12px;border:3px solid #ffcc80;
+       border-radius:16px;margin:10px 0;}
+  .gsel{display:flex;gap:12px;margin:6px 0 4px;}
+  .gbtn{flex:1;border:3px solid #ddd;border-radius:18px;padding:14px 6px;font-family:inherit;font-weight:800;font-size:1.1rem;
+       cursor:pointer;background:#fafafa;}
+  .gbtn.girl.on{border-color:#ff5ca8;background:#ffe6f2;color:#ad1457;}
+  .gbtn.boy.on{border-color:#4da3ff;background:#e6f2ff;color:#0d5aa8;}
+  .save{margin-top:14px;background:#ff9800;color:#fff;border:none;border-radius:50px;padding:14px 34px;font-size:1.25rem;
+       font-weight:800;font-family:inherit;cursor:pointer;box-shadow:0 5px 0 #e67e00;}
+  .save:active{transform:translateY(3px);box-shadow:none;}
+</style>
+</head>
+<body>
+  <div class="sky" id="sky"></div>
+  <header>
+    <a class="home" href="../../kindergarten.html" title="חזרה לגן">🏠</a>
+    <button class="who" id="whoBtn">👤 מי משחק/ת?</button>
+  </header>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="uni" id="uni"></div>
+      <h1>מסע הקריאה<br>של ענת</h1>
+      <div class="greet" id="greet"></div>
+    </div>
+
+    <div class="tracks-title">בחרו מסלול 👇</div>
+    <div class="tracks">
+      <a class="track" href="journey.html">
+        <span class="ico">🔤</span>
+        <span class="tx"><span class="t">מסע האותיות</span><span class="s">מכירים את כל האותיות ומשחקים איתן</span></span>
+        <span class="go">‹</span>
+      </a>
+      <div class="track write soon">
+        <span class="badge">בקרוב</span>
+        <span class="ico">✍️</span>
+        <span class="tx"><span class="t">אותיות בכתב</span><span class="s">לומדים לכתוב את האותיות</span></span>
+      </div>
+      <div class="track niqqud soon">
+        <span class="badge">בקרוב</span>
+        <span class="ico">🔵</span>
+        <span class="tx"><span class="t">ניקוד ותנועות</span><span class="s">התנועות, וגם התפקיד של א־ה־ו־י</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h2>מי משחק/ת היום? 🦄</h2>
+      <input id="nameIn" type="text" placeholder="השם שלי" maxlength="12" autocomplete="off">
+      <div class="gsel">
+        <button class="gbtn girl" id="gGirl">👧 בת</button>
+        <button class="gbtn boy" id="gBoy">👦 בן</button>
+      </div>
+      <button class="save" id="saveBtn">יאללה! ➡️</button>
+    </div>
+  </div>
+
+  <script src="reading-profile.js?v=16"></script>
+  <script src="reading-engine.js?v=16"></script>
+  <script>
+    document.getElementById('uni').innerHTML = RG.unicorn(96);
+    // רקע מרחף
+    (function(){const sky=document.getElementById('sky');['☁️','⭐','🎈','🌈','✨','🦋'].forEach((e,i)=>{
+      const f=document.createElement('div');f.className='f';f.textContent=e;f.style.top=Math.random()*90+'vh';
+      f.style.left=Math.random()*92+'vw';f.style.fontSize=(1.4+Math.random()*1.8)+'rem';
+      f.style.animationDuration=(5+Math.random()*6)+'s';f.style.animationDelay=(-Math.random()*6)+'s';sky.appendChild(f);});})();
+
+    let pendingGender = ReadingProfile.gender();
+
+    function refreshGreet() {
+      const g = ReadingProfile.gender();
+      const hi = g === 'm' ? 'ברוך הבא' : 'ברוכה הבאה';
+      document.getElementById('greet').textContent = `${hi}, ${ReadingProfile.name()}! 👋`;
+    }
+    function markGender() {
+      document.getElementById('gGirl').classList.toggle('on', pendingGender === 'f');
+      document.getElementById('gBoy').classList.toggle('on', pendingGender === 'm');
+    }
+    function openWho() {
+      pendingGender = ReadingProfile.gender();
+      document.getElementById('nameIn').value = ReadingProfile.isSet() ? ReadingProfile.name() : '';
+      markGender();
+      document.getElementById('overlay').classList.add('show');
+      setTimeout(() => document.getElementById('nameIn').focus(), 100);
+    }
+    document.getElementById('whoBtn').onclick = openWho;
+    document.getElementById('gGirl').onclick = () => { pendingGender = 'f'; markGender(); };
+    document.getElementById('gBoy').onclick = () => { pendingGender = 'm'; markGender(); };
+    document.getElementById('saveBtn').onclick = () => {
+      const nm = document.getElementById('nameIn').value.trim();
+      ReadingProfile.set(nm || 'ענת', pendingGender);
+      document.getElementById('overlay').classList.remove('show');
+      refreshGreet();
+    };
+
+    refreshGreet();
+    if (!ReadingProfile.isSet()) openWho();   // בפעם הראשונה שואלים
+  </script>
+</body>
+</html>

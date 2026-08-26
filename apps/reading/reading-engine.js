@@ -144,13 +144,19 @@ const RG = (function () {
     } catch (e) { /* לא נורא */ }
   }
 
-  // משפט עידוד: מגריל אחת מהקלטות המשפחה שקיימות; אחרת קול סינתטי של הטקסט
-  function praise(fallbackText) {
+  // משפט עידוד — מותאם למגדר (מ-ReadingProfile). מגריל הקלטת משפחה מתאימה;
+  // אם אין — קול סינתטי בנוסח הנכון (זכר/נקבה).
+  function praise() {
     if (!soundOn) return;
+    const g = (window.ReadingProfile ? window.ReadingProfile.gender() : 'f');
     const V = window.READING_VOICES || {};
-    const keys = (window.READING_PHRASES || []).map(p => 'phrase:' + p.key).filter(k => V[k]);
-    if (keys.length) { playSrc(V[keys[Math.floor(Math.random() * keys.length)]]); return; }
-    if (fallbackText) speak(fallbackText);
+    const phrases = window.READING_PHRASES || [];
+    // הקלטות מתאימות: משפט ניטרלי לכולם; משפט מגדרי רק אם המשחק/ת נקבה (ההקלטות בנקבה)
+    const recKeys = phrases.filter(p => V['phrase:' + p.key] && (p.neutral || g === 'f')).map(p => 'phrase:' + p.key);
+    if (recKeys.length) { playSrc(V[recKeys[Math.floor(Math.random() * recKeys.length)]]); return; }
+    if (!phrases.length) return;
+    const p = phrases[Math.floor(Math.random() * phrases.length)];
+    speak(g === 'm' ? (p.m || p.f) : (p.f || p.m));
   }
 
   // --- אפקטים קוליים ב-WebAudio (בלי תלות באינטרנט) ---
