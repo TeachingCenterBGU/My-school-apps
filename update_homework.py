@@ -8,8 +8,9 @@ MASHOV_PASS = os.environ["MASHOV_PASS"]
 MASHOV_SEMEL = os.environ["MASHOV_SEMEL"]
 
 KIDS_MAPPING = {
-    "יעל": 3,      
-    "מעיין": 5     
+    "מעיין": 6,    # ו'
+    "יעל": 4,      # ד'
+    "ענת": 1       # א'
 }
 
 BASE_URL = "https://web.mashov.info/api"
@@ -48,7 +49,7 @@ def update_homework():
         print(f"❌ Connection error: {e}")
         return []
 
-    login_data = {"semel": MASHOV_SEMEL, "year": 2026, "username": MASHOV_ID, "password": MASHOV_PASS, "loginType": 1}
+    login_data = {"semel": MASHOV_SEMEL, "year": 2027, "username": MASHOV_ID, "password": MASHOV_PASS, "loginType": 1}
     
     login_resp = dirty_session.post(f"{BASE_URL}/login", json=login_data, headers=headers)
     if login_resp.status_code != 200:
