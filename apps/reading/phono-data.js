@@ -73,6 +73,7 @@ const PHONO_WORDS = [
   { word: 'לֵב',      emoji: '❤️', audio: '', syl: 1, init: 'ל', rime: '' },
   { word: 'לְטָאָה',  emoji: '🦎', audio: '', syl: 3, init: 'ל', rime: '' },
   { word: 'לַיְלָה',   emoji: '🌙', audio: '', syl: 2, init: 'ל', rime: '' },
+  { word: 'לֶחֶם',    emoji: '🥖', audio: '', syl: 2, init: 'ל', rime: '' },
 
   // ---- ס ----
   { word: 'סוּס',       emoji: '🐴', audio: 'sus.mp3', syl: 1, init: 'ס', rime: 'us', parts: ['ס','ו','ס'] },
@@ -126,7 +127,6 @@ const PHONO_WORDS = [
 
   // ---- ח (ח+כ רפה) ----
   { word: 'חָתוּל', emoji: '🐱', audio: 'chatul.mp3', syl: 2, init: 'ח', rime: '' },
-  { word: 'חַלָּה',  emoji: '🥖', audio: '', syl: 2, init: 'ח', rime: '' },
   { word: 'חוֹף',   emoji: '🏖️', audio: '', syl: 1, init: 'ח', rime: '' },
   { word: 'חָצִיל', emoji: '🍆', audio: '', syl: 2, init: 'ח', rime: '' },
 
