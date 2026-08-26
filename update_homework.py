@@ -162,7 +162,7 @@ def add_personal_tasks(tasks_list):
     if today.weekday() == 4:
         tasks_list.append({
             "id": f"custom-tree-{today.strftime('%Y%m%d')}", # מזהה ייחודי לפי תאריך
-            "grade": 3,
+            "grade": 4,
             "subject": "משימה ביתית",
             "task": "🪴 להשקות את העץ במרפסת",
             "date": today.strftime("%d/%m")
