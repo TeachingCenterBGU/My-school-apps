@@ -59,7 +59,6 @@ const READING_LETTERS = {
   ]},
   'ח': { name: 'חֵית', letterAudio: 'chet_1.mp3', words: [
     { word: 'חָתוּל',    emoji: '🐱', audio: 'chatul.mp3' },
-    { word: 'חַלָּה',    emoji: '🥖', audio: '' },
     { word: 'חַדְקֶרֶן', emoji: '🦄', audio: '' },
     { word: 'חֻלְצָה',   emoji: '👕', audio: '' },
   ]},
@@ -86,6 +85,7 @@ const READING_LETTERS = {
     { word: 'לִימוֹן',   emoji: '🍋', audio: '' },
     { word: 'לֵב',       emoji: '❤️', audio: '' },
     { word: 'לִוְיָתָן',  emoji: '🐋', audio: '' },
+    { word: 'לֶחֶם',     emoji: '🥖', audio: '' },
   ]},
   'מ': { name: 'מֵם', letterAudio: 'mem_1.mp3', words: [
     { word: 'מְכוֹנִית', emoji: '🚗', audio: 'mechonit.mp3' },
