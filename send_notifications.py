@@ -175,7 +175,7 @@ def main():
     sent_count = 0
     skip_count = 0
     
-    grade_names = {3: "ג'", 5: "ה'"}
+    grade_names = {1: "א'", 3: "ג'", 4: "ד'", 5: "ה'", 6: "ו'"}
     
     for uid, user_info in users_data.items():
         grade = user_info.get('grade')

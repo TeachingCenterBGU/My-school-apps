@@ -47,7 +47,6 @@ function detectPageGrade() {
     if (path.includes('kindergarten')) return 0;
     return null;
 }
-}
 
 // --- מצב אורח ---
 
@@ -189,18 +188,24 @@ function showGradeSelection() {
                 <h2 style="margin: 0 0 6px 0; font-size: 1.3em; color: #333;">שלום ${currentDisplayName}!</h2>
                 <p style="margin: 0 0 22px 0; color: #666; font-size: 0.95em;">באיזו כיתה את/ה?</p>
                 <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <button onclick="selectGrade(3)" class="grade-select-btn" style="
-                        padding: 14px; font-size: 1.15em; border: 2px solid #ec407a;
-                        border-radius: 14px; background: #fce4ec; color: #c2185b;
+                    <button onclick="selectGrade(1)" class="grade-select-btn" style="
+                        padding: 14px; font-size: 1.15em; border: 2px solid #66bb6a;
+                        border-radius: 14px; background: #e8f5e9; color: #2e7d32;
                         cursor: pointer; font-family: inherit; font-weight: bold;
                         transition: all 0.2s;
-                    ">כיתה ג' 🍬</button>
-                    <button onclick="selectGrade(5)" class="grade-select-btn" style="
-                        padding: 14px; font-size: 1.15em; border: 2px solid #5c6bc0;
-                        border-radius: 14px; background: #e8eaf6; color: #3949ab;
+                    ">כיתה א' 🌱</button>
+                    <button onclick="selectGrade(4)" class="grade-select-btn" style="
+                        padding: 14px; font-size: 1.15em; border: 2px solid #29b6f6;
+                        border-radius: 14px; background: #e1f5fe; color: #0277bd;
                         cursor: pointer; font-family: inherit; font-weight: bold;
                         transition: all 0.2s;
-                    ">כיתה ה' 🦋</button>
+                    ">כיתה ד' 🐬</button>
+                    <button onclick="selectGrade(6)" class="grade-select-btn" style="
+                        padding: 14px; font-size: 1.15em; border: 2px solid #7e57c2;
+                        border-radius: 14px; background: #ede7f6; color: #4527a0;
+                        cursor: pointer; font-family: inherit; font-weight: bold;
+                        transition: all 0.2s;
+                    ">כיתה ו' 🚀</button>
                 </div>
                 <p style="margin: 18px 0 0 0; color: #aaa; font-size: 0.8em;">
                     אפשר לשנות אחר כך דרך הלחיצה על השם
@@ -274,7 +279,7 @@ async function changeGrade() {
         justify-content: center; z-index: 9998;
     `;
 
-    const gradeNames = { 3: "ג'", 5: "ה'" };
+    const gradeNames = { 1: "א'", 3: "ג'", 4: "ד'", 5: "ה'", 6: "ו'" };
     const currentGradeName = gradeNames[currentUserGrade] || "?";
 
     overlay.innerHTML = `
@@ -284,18 +289,24 @@ async function changeGrade() {
                 עכשיו רשומה לכיתה ${currentGradeName}
             </p>
             <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="doChangeGrade(3)" style="
-                    padding: 10px 20px; border: 2px solid #ec407a; border-radius: 12px;
-                    background: ${currentUserGrade === 3 ? '#ec407a' : '#fce4ec'};
-                    color: ${currentUserGrade === 3 ? 'white' : '#c2185b'};
+                <button onclick="doChangeGrade(1)" style="
+                    padding: 10px 18px; border: 2px solid #66bb6a; border-radius: 12px;
+                    background: ${currentUserGrade === 1 ? '#66bb6a' : '#e8f5e9'};
+                    color: ${currentUserGrade === 1 ? 'white' : '#2e7d32'};
                     cursor: pointer; font-family: inherit; font-weight: bold; font-size: 1em;
-                ">ג' 🍬</button>
-                <button onclick="doChangeGrade(5)" style="
-                    padding: 10px 20px; border: 2px solid #5c6bc0; border-radius: 12px;
-                    background: ${currentUserGrade === 5 ? '#5c6bc0' : '#e8eaf6'};
-                    color: ${currentUserGrade === 5 ? 'white' : '#3949ab'};
+                ">א' 🌱</button>
+                <button onclick="doChangeGrade(4)" style="
+                    padding: 10px 18px; border: 2px solid #29b6f6; border-radius: 12px;
+                    background: ${currentUserGrade === 4 ? '#29b6f6' : '#e1f5fe'};
+                    color: ${currentUserGrade === 4 ? 'white' : '#0277bd'};
                     cursor: pointer; font-family: inherit; font-weight: bold; font-size: 1em;
-                ">ה' 🦋</button>
+                ">ד' 🐬</button>
+                <button onclick="doChangeGrade(6)" style="
+                    padding: 10px 18px; border: 2px solid #7e57c2; border-radius: 12px;
+                    background: ${currentUserGrade === 6 ? '#7e57c2' : '#ede7f6'};
+                    color: ${currentUserGrade === 6 ? 'white' : '#4527a0'};
+                    cursor: pointer; font-family: inherit; font-weight: bold; font-size: 1em;
+                ">ו' 🚀</button>
             </div>
             <button onclick="document.getElementById('grade-change-overlay').remove()" style="
                 margin-top: 14px; border: none; background: none; color: #999;
@@ -331,7 +342,7 @@ function showUserBadge() {
     const existing = document.getElementById("user-badge");
     if (existing) existing.remove();
 
-    const gradeNames = { 3: "ג'", 5: "ה'" };
+    const gradeNames = { 1: "א'", 3: "ג'", 4: "ד'", 5: "ה'", 6: "ו'" };
     const gradeLabel = currentUserGrade ? ` · כיתה ${gradeNames[currentUserGrade] || currentUserGrade}` : '';
 
     const badge = document.createElement("div");
@@ -451,10 +462,10 @@ async function renderHomework(grade, containerId) {
 
     // אם המשתמש רשום לכיתה אחרת — לא מציגים שיעורי בית כאן
     if (currentUserGrade && currentUserGrade !== grade) {
-        const gradeNames = { 3: "ג'", 5: "ה'" };
+        const gradeNames = { 1: "א'", 3: "ג'", 4: "ד'", 5: "ה'", 6: "ו'" };
         const pageName = gradeNames[grade] || grade;
         const myGradeName = gradeNames[currentUserGrade] || currentUserGrade;
-        const myGradeLink = currentUserGrade === 3 ? 'grade-3.html' : 'grade-5.html';
+        const myGradeLink = 'grade-' + currentUserGrade + '.html';
         container.innerHTML = `
             <p style="text-align:center; color:#888; margin:0; font-size: 0.95em;">
                 🔒 את/ה רשומה לכיתה ${myGradeName}
