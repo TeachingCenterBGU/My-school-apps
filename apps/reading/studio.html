@@ -82,6 +82,18 @@
     <div id="lettersList"></div>
     <h2>מילים</h2>
     <div id="wordsList"></div>
+
+    <div class="note" style="margin-top:22px;border-color:#7fdcc4;background:#f0fbf7;">
+      🦻 <b>מסלול הצלילים (מודעות פונולוגית)</b> — ההקלטות הבאות משדרגות את המשחקים
+      "אוזניים של קסם". הצלילים הבודדים הכי חשובים: הם מחליפים את הקול הסינתטי שלא
+      מבטא עיצור בודד יפה. הקליטו צליל <b>מתמשך ונקי</b> (למשל "מְמְמ", "שְׁשְׁ").
+    </div>
+    <h2>🔊 צלילים בודדים</h2>
+    <div id="soundsList"></div>
+    <h2>🖼️ מילים — מסלול הצלילים</h2>
+    <div id="phonoWordsList"></div>
+    <h2>✨ חלקי מילה (לקסם החיבור)</h2>
+    <div id="partsList"></div>
   </div>
 
   <div id="overlay">
@@ -97,6 +109,7 @@
   </div>
 
   <script src="reading-data.js?v=16"></script>
+  <script src="phono-data.js?v=17"></script>
   <script>
     const EXAMPLE_BASE = '../../letters/';
     let db = null, mem = null, mediaStream = null, rec = null, activeBtn = null, total = 0;
@@ -138,7 +151,24 @@
       });
       const phrases = (window.READING_PHRASES || []).map(p =>
         ({ key: 'phrase:' + p.key, big: '💬', sub: p.f || p.text, example: '' }));
-      return { letters, words, phrases };
+
+      // ---- מסלול הצלילים (מודעות פונולוגית) ----
+      const sndLabel = window.phonoSoundLabel || (s => s);
+      const sounds = Object.keys(window.PHONO_SOUNDS || {}).map(s =>
+        ({ key: 'sound:' + s, big: sndLabel(s), sub: 'הצליל ' + sndLabel(s), example: '' }));
+      // מילים חדשות שאין להן כבר הקלטה בבנק האותיות (לפי מפתח word:)
+      const letterWordKeys = new Set(words.map(w => w.key));
+      const seenW = {}, phonoWords = [];
+      (window.PHONO_WORDS || []).concat(window.PHONO_BLEND || []).forEach(w => {
+        const key = 'word:' + w.word;
+        if (letterWordKeys.has(key) || seenW[key]) return;
+        seenW[key] = 1;
+        phonoWords.push({ key, big: w.emoji, sub: w.word, example: w.audio || '' });
+      });
+      const parts = (window.phonoBlendParts ? phonoBlendParts() : []).map(p =>
+        ({ key: 'part:' + p, big: p, sub: 'חלק: ' + p, example: '' }));
+
+      return { letters, words, phrases, sounds, phonoWords, parts };
     }
 
     function rowEl(item) {
@@ -231,14 +261,16 @@
     // ---- init ----
     (async function init() {
       await initStore();
-      const { letters, words, phrases } = buildItems();
-      total = letters.length + words.length + phrases.length;
+      const { letters, words, phrases, sounds, phonoWords, parts } = buildItems();
+      total = letters.length + words.length + phrases.length + sounds.length + phonoWords.length + parts.length;
       const pl = document.getElementById('phrasesList');
       const ll = document.getElementById('lettersList'), wl = document.getElementById('wordsList');
+      const sl = document.getElementById('soundsList'), pwl = document.getElementById('phonoWordsList');
+      const ptl = document.getElementById('partsList');
       const existing = new Set(await idbKeys());
-      [...phrases].forEach(it => { const r = rowEl(it); pl.appendChild(r); markRow(r, existing.has(it.key)); });
-      [...letters].forEach(it => { const r = rowEl(it); ll.appendChild(r); markRow(r, existing.has(it.key)); });
-      [...words].forEach(it => { const r = rowEl(it); wl.appendChild(r); markRow(r, existing.has(it.key)); });
+      const fill = (arr, container) => arr.forEach(it => { const r = rowEl(it); container.appendChild(r); markRow(r, existing.has(it.key)); });
+      fill(phrases, pl); fill(letters, ll); fill(words, wl);
+      fill(sounds, sl); fill(phonoWords, pwl); fill(parts, ptl);
       updateProgress();
       document.getElementById('micStatus').textContent = 'לחצו 🎙️ ליד פריט כדי להתחיל (יתבקש אישור מיקרופון).';
 

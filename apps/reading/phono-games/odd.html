@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+      gtag('js',new Date());gtag('config','G-W58S98V8J0');</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>בלש הצלילים 🔍</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&family=Secular+One&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#4a1030;text-align:center;
+       background:linear-gradient(180deg,#ffe4f1 0%,#ffd0e6 100%);min-height:100vh;
+       -webkit-user-select:none;user-select:none;touch-action:manipulation;}
+  .stage{padding:16px 14px 40px;max-width:620px;margin:0 auto;}
+  .instr{font-weight:800;color:#a3155e;font-size:1.12rem;margin:6px 0 2px;line-height:1.3;}
+  .progress{color:#b06a8c;font-weight:700;font-size:.95rem;margin-bottom:8px;}
+  .detective{font-size:2.6rem;margin:2px 0;}
+
+  .shelf{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:420px;margin:10px auto 0;}
+  .cell{background:#fff;border-radius:22px;box-shadow:0 8px 18px rgba(0,0,0,.12);
+       aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:min(20vw,74px);
+       cursor:pointer;border:4px solid #ffb3d4;transition:transform .12s;}
+  .cell:active{transform:scale(.96);}
+  .cell.right{border-color:#4caf50;animation:cheer .6s;background:#eaffea;}
+  .cell.wrong{border-color:#e53935;animation:shake .4s;}
+  @keyframes cheer{0%,100%{transform:scale(1)}40%{transform:scale(1.12)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+  .hint{color:#8a5a72;font-weight:700;font-size:.9rem;margin-top:12px;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="detective" id="det"></div>
+    <div class="instr">שלוש מילים מתחילות באותו צליל —<br>מצאו את היוצאת דופן! 🔍</div>
+    <div class="progress" id="prog"></div>
+    <div class="shelf" id="shelf"></div>
+    <div class="hint">געו בתמונה כדי לשמוע אותה 👆</div>
+  </div>
+
+  <script src="../phono-data.js?v=17"></script>
+  <script src="../reading-progress.js?v=16"></script>
+  <script src="../reading-engine.js?v=16"></script>
+  <script src="../reading-voices.js?v=17"></script>
+  <script src="../phono-engine.js?v=17"></script>
+  <script>
+    const station = PG.currentStation() || { id:'ph-odd-p1', sounds:['מ','ש','ר','ל','ס'] };
+    PG.mountTopBar('בלש הצלילים 🔍');
+    document.getElementById('det').innerHTML = PG.unicorn(58);
+
+    // צלילים שיש להם לפחות 3 מילים (כדי לבנות שלישייה)
+    const allSounds = Object.keys(PHONO_SOUNDS).filter(s=>phonoWordsBySound(s).length>=3);
+    const groupSounds = ((station.sounds&&station.sounds.length)?station.sounds:allSounds)
+                          .filter(s=>phonoWordsBySound(s).length>=3);
+
+    function buildRounds(n){
+      const rounds=[];
+      for(let i=0;i<n;i++){
+        const common = phonoOne(groupSounds.length?groupSounds:allSounds);
+        const trio = phonoPick(phonoWordsBySound(common), 3);
+        let oddSound, oddWord, guard=0;
+        do { oddSound = phonoOne(allSounds); oddWord = phonoOne(phonoWordsBySound(oddSound)); guard++; }
+        while((oddSound===common || trio.some(w=>w.emoji===oddWord.emoji)) && guard<60);
+        const cells = phonoShuffle(trio.map(w=>({w,ok:false})).concat([{w:oddWord,ok:true}]));
+        rounds.push({ common, oddSound, cells });
+      }
+      return rounds;
+    }
+
+    let ROUNDS=buildRounds(6), idx=0, correct=0, locked=false;
+    const shelfEl=document.getElementById('shelf'), progEl=document.getElementById('prog');
+
+    function load(){
+      locked=false;
+      const r=ROUNDS[idx];
+      progEl.textContent = `תעלומה ${idx+1} מתוך ${ROUNDS.length}`;
+      shelfEl.innerHTML='';
+      r.cells.forEach(c=>{
+        const el=document.createElement('div'); el.className='cell'; el.textContent=c.w.emoji;
+        el.addEventListener('click', ()=>{ PG.playWord(c.w); if(!locked) setTimeout(()=>choose(c,el,r),120); });
+        shelfEl.appendChild(el);
+      });
+    }
+
+    function choose(c, el, r){
+      if(locked) return;
+      if(c.ok){
+        locked=true; correct++; el.classList.add('right'); PG.ding();
+        setTimeout(next, 900);
+      }else{
+        el.classList.add('wrong'); PG.buzz();
+        try{ gtag('event','phono_odd_error',{common:r.common, picked:c.w.init}); }catch(e){}
+        setTimeout(()=>el.classList.remove('wrong'), 450);
+      }
+    }
+
+    function next(){
+      idx++;
+      if(idx>=ROUNDS.length){
+        PG.finish({ stationId:station.id, correct, total:ROUNDS.length,
+          replay(){ idx=0;correct=0;ROUNDS=buildRounds(6);load(); }});
+        return;
+      }
+      load();
+    }
+    load();
+  </script>
+</body>
+</html>

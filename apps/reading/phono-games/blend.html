@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+      gtag('js',new Date());gtag('config','G-W58S98V8J0');</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>קסם החיבור ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&family=Secular+One&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#2a1a54;text-align:center;
+       background:linear-gradient(180deg,#efe6ff 0%,#e0d3ff 100%);min-height:100vh;
+       -webkit-user-select:none;user-select:none;touch-action:manipulation;}
+  .stage{padding:16px 14px 40px;max-width:620px;margin:0 auto;}
+  .instr{font-weight:800;color:#4a2f9e;font-size:1.1rem;margin:6px 0 2px;line-height:1.3;}
+  .progress{color:#8a7fb8;font-weight:700;font-size:.95rem;margin-bottom:6px;}
+  .wiz{font-size:2.6rem;}
+
+  .pieces{display:flex;gap:8px;justify-content:center;align-items:center;min-height:64px;margin:10px 0 2px;flex-wrap:wrap;}
+  .piece{background:#fff;border-radius:14px;padding:10px 16px;font-weight:800;font-size:1.5rem;color:#5e35b1;
+       box-shadow:0 5px 12px rgba(0,0,0,.12);border:3px solid #b39ddb;opacity:.35;transform:scale(.9);
+       transition:opacity .2s,transform .2s;min-width:48px;}
+  .piece.on{opacity:1;transform:scale(1.05);background:#f3ecff;}
+  .plus{font-size:1.4rem;color:#9575cd;font-weight:800;}
+  .playbtn{background:#7e57c2;color:#fff;border:none;border-radius:50px;padding:12px 26px;
+       font-family:inherit;font-weight:800;font-size:1.1rem;cursor:pointer;margin:8px 0 4px;
+       box-shadow:0 5px 0 #5e35b1;}
+  .playbtn:active{transform:translateY(3px);box-shadow:none;}
+
+  .opts{display:flex;gap:14px;justify-content:center;margin-top:12px;flex-wrap:wrap;}
+  .opt{background:#fff;border-radius:22px;box-shadow:0 8px 18px rgba(0,0,0,.12);
+       width:min(28vw,140px);height:min(28vw,140px);display:flex;align-items:center;justify-content:center;
+       font-size:min(15vw,66px);cursor:pointer;border:4px solid #cbb6f0;transition:transform .12s;}
+  .opt:active{transform:scale(.96);}
+  .opt.right{border-color:#4caf50;animation:cheer .6s;background:#eaffea;}
+  .opt.wrong{border-color:#e53935;animation:shake .4s;}
+  @keyframes cheer{0%,100%{transform:scale(1)}40%{transform:scale(1.12)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="wiz" id="wiz"></div>
+    <div class="instr">הקשיבו לצלילים המקוטעים —<br>איזו מילה מסתתרת? ✨</div>
+    <div class="progress" id="prog"></div>
+    <div class="pieces" id="pieces"></div>
+    <button class="playbtn" id="play">🔊 שמעו את הצלילים</button>
+    <div class="opts" id="opts"></div>
+  </div>
+
+  <script src="../phono-data.js?v=17"></script>
+  <script src="../reading-progress.js?v=16"></script>
+  <script src="../reading-engine.js?v=16"></script>
+  <script src="../reading-voices.js?v=17"></script>
+  <script src="../phono-engine.js?v=17"></script>
+  <script>
+    const station = PG.currentStation() || { id:'ph-blend-final', mixed:true };
+    PG.mountTopBar('קסם החיבור ✨');
+    document.getElementById('wiz').innerHTML = PG.unicorn(58);
+
+    // בנק "חיבור" — מוגדר ב-phono-data.js (משותף עם האולפן). חלקי הברות
+    // שאפשר לבטא בבירור; אפשר להקליט כל חלק באולפן (part:).
+    const BLEND = window.PHONO_BLEND;
+
+    const sounds = (station.sounds && station.sounds.length) ? station.sounds : null;
+    const pool = sounds ? BLEND.filter(w=>sounds.includes(w.init)) : BLEND.slice();
+    const targetPool = pool.length>=1 ? pool : BLEND.slice();
+
+    function buildRounds(n){
+      const rounds=[], used={};
+      let tries=0;
+      while(rounds.length<n && tries<200){
+        tries++;
+        const right = phonoOne(targetPool);
+        if(used[right.word] && Object.keys(used).length < targetPool.length) continue;
+        used[right.word]=1;
+        const distract = phonoShuffle(BLEND.filter(w=>w.emoji!==right.emoji)).slice(0,2);
+        rounds.push({ right, opts: phonoShuffle([{w:right,ok:true}].concat(distract.map(w=>({w,ok:false})))) });
+      }
+      return rounds;
+    }
+
+    let ROUNDS=buildRounds(6), idx=0, correct=0, locked=false, playing=false;
+    const piecesEl=document.getElementById('pieces'), optsEl=document.getElementById('opts'), progEl=document.getElementById('prog');
+
+    function renderPieces(parts, litCount){
+      piecesEl.innerHTML='';
+      parts.forEach((p,i)=>{
+        if(i>0){ const plus=document.createElement('span'); plus.className='plus'; plus.textContent='+'; piecesEl.appendChild(plus); }
+        const el=document.createElement('span'); el.className='piece'+(i<litCount?' on':''); el.textContent=p;
+        piecesEl.appendChild(el);
+      });
+    }
+
+    function playParts(){
+      if(playing) return;
+      playing=true;
+      const parts=ROUNDS[idx].right.parts;
+      renderPieces(parts,0);
+      let i=0;
+      (function step(){
+        if(i>=parts.length){ playing=false; return; }
+        renderPieces(parts, i+1);
+        PG.playPart(parts[i]);
+        i++;
+        setTimeout(step, 950);
+      })();
+    }
+
+    function load(){
+      locked=false;
+      const r=ROUNDS[idx];
+      progEl.textContent = `מילה ${idx+1} מתוך ${ROUNDS.length}`;
+      renderPieces(r.right.parts, 0);
+      optsEl.innerHTML='';
+      r.opts.forEach(o=>{
+        const el=document.createElement('div'); el.className='opt'; el.textContent=o.w.emoji;
+        el.addEventListener('click', ()=>choose(o,el));
+        optsEl.appendChild(el);
+      });
+      setTimeout(playParts, 500);
+    }
+
+    function choose(o, el){
+      if(locked) return;
+      if(o.ok){
+        locked=true; correct++; el.classList.add('right');
+        renderPieces(ROUNDS[idx].right.parts, ROUNDS[idx].right.parts.length);
+        PG.ding(); PG.playWord(o.w);
+        setTimeout(next, 1100);
+      }else{
+        el.classList.add('wrong'); PG.buzz(); PG.playWord(o.w);
+        setTimeout(()=>el.classList.remove('wrong'), 450);
+      }
+    }
+
+    function next(){
+      idx++;
+      if(idx>=ROUNDS.length){
+        PG.finish({ stationId:station.id, correct, total:ROUNDS.length,
+          replay(){ idx=0;correct=0;ROUNDS=buildRounds(6);load(); }});
+        return;
+      }
+      load();
+    }
+
+    document.getElementById('play').addEventListener('click', playParts);
+    load();
+  </script>
+</body>
+</html>

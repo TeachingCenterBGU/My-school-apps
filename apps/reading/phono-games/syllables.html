@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+      gtag('js',new Date());gtag('config','G-W58S98V8J0');</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>מכונת ההברות 🥁</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&family=Secular+One&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#3a2a12;text-align:center;
+       background:linear-gradient(180deg,#fff2d6 0%,#ffe0c2 100%);min-height:100vh;
+       -webkit-user-select:none;user-select:none;touch-action:manipulation;}
+  .stage{padding:16px 16px 40px;max-width:560px;margin:0 auto;}
+  .instr{font-weight:800;color:#b85c00;font-size:1.15rem;margin:6px 0 2px;}
+  .progress{color:#a1887f;font-weight:700;font-size:.95rem;margin-bottom:8px;}
+
+  .pic{background:#fff;border-radius:30px;box-shadow:0 10px 26px rgba(0,0,0,.12);
+       width:min(74vw,260px);height:min(74vw,260px);margin:6px auto 4px;display:flex;
+       align-items:center;justify-content:center;font-size:min(38vw,150px);cursor:pointer;
+       border:4px solid #ffd59e;transition:transform .12s;}
+  .pic:active{transform:scale(.96);}
+  .replay{background:#fff;border:2px solid #ffcc80;border-radius:50px;padding:8px 18px;
+       font-family:inherit;font-weight:800;color:#e67e00;font-size:1rem;cursor:pointer;margin:6px 0 2px;}
+
+  .dots{display:flex;gap:12px;justify-content:center;min-height:34px;margin:12px 0 6px;}
+  .dot{width:26px;height:26px;border-radius:50%;background:#ffd59e;box-shadow:0 3px 0 rgba(0,0,0,.1);
+       transform:scale(.55);opacity:.5;transition:transform .18s,opacity .18s;}
+  .dot.on{transform:scale(1);opacity:1;background:#ff9800;animation:pop .3s;}
+  @keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+
+  .drum{width:min(58vw,220px);height:min(38vw,150px);margin:8px auto 0;cursor:pointer;
+       display:flex;align-items:center;justify-content:center;font-size:min(28vw,110px);
+       filter:drop-shadow(0 8px 10px rgba(0,0,0,.18));transition:transform .08s;}
+  .drum:active,.drum.hit{transform:scale(.9) translateY(4px);}
+  .drum-label{font-weight:800;color:#8d6e63;margin-top:4px;font-size:1rem;}
+  .flash{animation:flash .5s;}
+  @keyframes flash{0%{filter:none}30%{filter:brightness(1.4)}100%{filter:none}}
+  .wrong{animation:shake .4s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="instr">כמה הברות במילה? תופפו! 🥁</div>
+    <div class="progress" id="prog"></div>
+    <div class="pic" id="pic" title="להשמיע שוב">❓</div>
+    <button class="replay" id="replay">🔊 שמעו שוב</button>
+    <div class="dots" id="dots"></div>
+    <div class="drum" id="drum">🥁</div>
+    <div class="drum-label">כל הקשה = הברה אחת</div>
+  </div>
+
+  <script src="../phono-data.js?v=17"></script>
+  <script src="../reading-progress.js?v=16"></script>
+  <script src="../reading-engine.js?v=16"></script>
+  <script src="../reading-voices.js?v=17"></script>
+  <script src="../phono-engine.js?v=17"></script>
+  <script>
+    const station = PG.currentStation() || { id:'ph-syll' };
+    PG.mountTopBar('מכונת ההברות 🥁');
+
+    // בונים 6 סיבובים: 2 עם הברה, 2 עם 2, 2 עם 3
+    function bucket(n, k){ return phonoPick(phonoWordsBySyl(n), k); }
+    let ROUNDS = phonoShuffle([].concat(bucket(1,2), bucket(2,2), bucket(3,2)));
+    let idx = 0, correct = 0, taps = 0, evalTimer = null, locked = false;
+
+    const picEl = document.getElementById('pic');
+    const dotsEl = document.getElementById('dots');
+    const drumEl = document.getElementById('drum');
+    const progEl = document.getElementById('prog');
+
+    // צליל תוף קצר (WebAudio)
+    let ac = null;
+    function drumSound(){
+      try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+        const o=ac.createOscillator(), g=ac.createGain();
+        o.type='sine'; o.frequency.setValueAtTime(180,ac.currentTime);
+        o.frequency.exponentialRampToValueAtTime(60,ac.currentTime+0.18);
+        g.gain.setValueAtTime(0.001,ac.currentTime);
+        g.gain.linearRampToValueAtTime(0.35,ac.currentTime+0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+0.25);
+        o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+0.28);
+      }catch(e){}
+    }
+
+    function renderDots(n, filled){
+      dotsEl.innerHTML='';
+      for(let i=0;i<n;i++){ const d=document.createElement('div');
+        d.className='dot'+(i<filled?' on':''); dotsEl.appendChild(d); }
+    }
+
+    function load(){
+      locked=false; taps=0;
+      const w = ROUNDS[idx];
+      progEl.textContent = `מילה ${idx+1} מתוך ${ROUNDS.length}`;
+      picEl.textContent = w.emoji;
+      // מציגים "מקומות" ריקים לפי מספר ההברות — רמז עדין
+      renderDots(w.syl, 0);
+      setTimeout(()=>PG.playWord(w), 350);
+    }
+
+    function tap(){
+      if(locked) return;
+      const w = ROUNDS[idx];
+      taps++;
+      drumSound();
+      drumEl.classList.remove('hit'); void drumEl.offsetWidth; drumEl.classList.add('hit');
+      // אם צריך יותר עיגולים מהמוצג — מרחיבים
+      if(taps > dotsEl.children.length) renderDots(taps, taps);
+      else for(let i=0;i<taps && i<dotsEl.children.length;i++) dotsEl.children[i].classList.add('on');
+      clearTimeout(evalTimer);
+      evalTimer = setTimeout(()=>evaluate(), 1100);
+    }
+
+    function evaluate(){
+      const w = ROUNDS[idx];
+      if(taps===0) return;
+      locked=true;
+      if(taps === w.syl){
+        correct++;
+        picEl.classList.add('flash'); PG.ding();
+        setTimeout(()=>{ picEl.classList.remove('flash'); next(); }, 750);
+      }else{
+        PG.buzz();
+        drumEl.classList.add('wrong');
+        // מראים את התשובה הנכונה: אומרים את המילה שוב לאט ומדגישים את מספר ההברות הנכון
+        renderDots(w.syl, 0);
+        let k=0;
+        const showTimer=setInterval(()=>{ if(k<w.syl){ dotsEl.children[k].classList.add('on'); drumSound(); k++; }
+          else { clearInterval(showTimer); } }, 480);
+        setTimeout(()=>{ drumEl.classList.remove('wrong'); next(); }, 480*w.syl + 900);
+      }
+    }
+
+    function next(){
+      idx++;
+      if(idx >= ROUNDS.length){
+        PG.finish({ stationId: station.id, correct, total: ROUNDS.length, replay(){ idx=0;correct=0;
+          ROUNDS=phonoShuffle([].concat(bucket(1,2),bucket(2,2),bucket(3,2))); load(); }});
+        return;
+      }
+      load();
+    }
+
+    drumEl.addEventListener('click', tap);
+    picEl.addEventListener('click', ()=>PG.playWord(ROUNDS[idx]));
+    document.getElementById('replay').addEventListener('click', ()=>PG.playWord(ROUNDS[idx]));
+    load();
+  </script>
+</body>
+</html>
