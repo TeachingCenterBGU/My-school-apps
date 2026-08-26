@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W58S98V8J0"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+      gtag('js',new Date());gtag('config','G-W58S98V8J0');</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>איזו אות שמעת? 👂</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Heebo',system-ui,sans-serif;color:#1b4a63;text-align:center;
+       background:linear-gradient(180deg,#eaf6ff,#dcecff);min-height:100vh;
+       -webkit-user-select:none;user-select:none;touch-action:manipulation;}
+  .stage{padding:16px 14px 40px;max-width:620px;margin:0 auto;}
+  .instr{font-weight:800;color:#1565c0;font-size:1.15rem;margin:6px 0 2px;}
+  .progress{color:#7aa5c8;font-weight:700;font-size:.95rem;margin-bottom:6px;}
+  .listen{background:#1565c0;color:#fff;border:none;border-radius:50px;padding:16px 30px;
+       font-family:inherit;font-weight:800;font-size:1.3rem;cursor:pointer;margin:10px 0 4px;box-shadow:0 5px 0 #0d47a1;}
+  .listen:active{transform:translateY(3px);box-shadow:none;}
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:14px;max-width:480px;margin:16px auto 0;}
+  .opt{background:#fff;border-radius:22px;box-shadow:0 8px 18px rgba(0,0,0,.12);aspect-ratio:1/1;
+       display:flex;align-items:center;justify-content:center;cursor:pointer;border:4px solid #bcdcff;transition:transform .12s;}
+  .opt:active{transform:scale(.96);}
+  .opt img{width:64%;height:64%;object-fit:contain;}
+  .opt.right{border-color:#4caf50;background:#eaffea;animation:cheer .6s;}
+  .opt.wrong{border-color:#e53935;animation:shake .4s;}
+  @keyframes cheer{0%,100%{transform:scale(1)}40%{transform:scale(1.1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+  .mascot{margin-top:10px;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="instr">הקשיבו — ואיזו אות בכתב זאת? 👂</div>
+    <div class="progress" id="prog"></div>
+    <button class="listen" id="listen">🔊 שמעו שוב</button>
+    <div class="opts" id="opts"></div>
+    <div class="mascot" id="mascot"></div>
+  </div>
+
+  <script src="../reading-data.js?v=16"></script>
+  <script src="../reading-progress.js?v=16"></script>
+  <script src="../reading-profile.js?v=16"></script>
+  <script src="../reading-voices.js?v=18"></script>
+  <script src="../reading-engine.js?v=16"></script>
+  <script src="../ktav-data.js?v=20"></script>
+  <script>
+    RG.audioBase = '../../../letters/';
+    const stage = document.getElementById('stage');
+    const id = new URLSearchParams(location.search).get('station');
+    const station = getKtavStationById(id);
+    const GL = station ? station.letters : [];
+
+    if (!station || !GL.length) {
+      stage.innerHTML = '<p style="padding:20px">לא נמצאה תחנה. <a href="../ktav.html">חזרה למפה</a></p>';
+    } else {
+      RG.mountTopBar('איזו אות שמעת? 👂', { bg: false });
+      const home = document.querySelector('.rg-topbar .rg-home');
+      if (home) { home.setAttribute('href', '../ktav.html'); home.setAttribute('title', 'חזרה למפה'); }
+      document.getElementById('mascot').innerHTML = RG.unicorn(52);
+
+      function playLetter(ch) {
+        const d = KTAV_LETTERS[ch];
+        if (d.base) RG.speak(d.name);          // סופית — אומרים את השם המלא
+        else RG.playLetter(ch);
+      }
+
+      // סיבובים: כל אות בקבוצה פעם אחת
+      let ROUNDS = ktavShuffle(GL), idx = 0, correct = 0, locked = false;
+      const optsEl = document.getElementById('opts'), progEl = document.getElementById('prog');
+
+      function optionSet(target) {
+        const others = ktavShuffle(GL.filter(c => c !== target));
+        const n = Math.min(GL.length, 4) - 1;
+        return ktavShuffle([target].concat(others.slice(0, n)));
+      }
+
+      function load() {
+        locked = false;
+        const target = ROUNDS[idx];
+        progEl.textContent = `שלב ${idx + 1} מתוך ${ROUNDS.length}`;
+        optsEl.innerHTML = '';
+        optionSet(target).forEach(ch => {
+          const el = document.createElement('div'); el.className = 'opt';
+          el.innerHTML = `<img src="../ktav/${KTAV_LETTERS[ch].img}" alt="${ch}">`;
+          el.addEventListener('click', () => choose(ch === target, el));
+          optsEl.appendChild(el);
+        });
+        setTimeout(() => playLetter(target), 300);
+      }
+
+      function choose(ok, el) {
+        if (locked) return;
+        if (ok) {
+          locked = true; correct++; el.classList.add('right'); RG.ding();
+          setTimeout(next, 850);
+        } else {
+          el.classList.add('wrong'); RG.buzz();
+          setTimeout(() => el.classList.remove('wrong'), 450);
+        }
+      }
+
+      function next() { idx++; if (idx >= ROUNDS.length) finish(); else load(); }
+
+      document.getElementById('listen').onclick = () => { if (!locked) playLetter(ROUNDS[idx]); };
+
+      function reportKtav() {
+        try {
+          const max = (window.KTAV_STATIONS || []).length * 3; if (!max) return;
+          let got = 0; KTAV_STATIONS.forEach(s => got += ReadingProgress.starsOf(s.id));
+          if (typeof window.saveAppScore === 'function') window.saveAppScore('reading-ktav', got, max);
+          else { const p = JSON.parse(localStorage.getItem('pending_scores') || '[]');
+            p.push({ appId: 'reading-ktav', score: got, total: max, timestamp: new Date().toISOString() });
+            localStorage.setItem('pending_scores', JSON.stringify(p)); }
+        } catch (e) {}
+      }
+
+      function finish() {
+        RG.injectStyle();
+        const stars = RG.starsForAccuracy(correct, ROUNDS.length);
+        ReadingProgress.record(station.id, stars);
+        reportKtav();
+        if (stars >= 2) { RG.confetti(); RG.fanfare(); } else RG.ding();
+        const msg = stars === 3 ? 'מושלם! 🌟' : stars === 2 ? 'כל הכבוד!' : 'יופי, סיימת!';
+        const overlay = document.createElement('div');
+        overlay.className = 'rg-overlay';
+        overlay.innerHTML =
+          `<div class="rg-card">
+             <div class="rg-mascot" style="display:flex;justify-content:center">${RG.unicorn(90)}</div>
+             <div class="rg-stars">
+               <span class="s ${stars>=1?'on':''}">⭐</span><span class="s ${stars>=2?'on':''}">⭐</span><span class="s ${stars>=3?'on':''}">⭐</span>
+             </div>
+             <h2>${msg}</h2>
+             <div class="rg-sub">${correct} מתוך ${ROUNDS.length} 🎉</div>
+             <div class="rg-btns">
+               <button class="rg-btn primary" id="k-again">🔁 עוד פעם</button>
+               <a class="rg-btn ghost" href="../ktav.html">🗺️ חזרה למפה</a>
+             </div>
+           </div>`;
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+        overlay.querySelector('#k-again').addEventListener('click', () => { overlay.remove(); ROUNDS = ktavShuffle(GL); idx = 0; correct = 0; load(); });
+        RG.praise();
+      }
+
+      load();
+    }
+  </script>
+</body>
+</html>

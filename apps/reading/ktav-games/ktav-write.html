@@ -6,7 +6,7 @@
       gtag('js',new Date());gtag('config','G-W58S98V8J0');</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>אות בכתב</title>
+<title>כתיבת האות ✍️</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;800&display=swap">
 <style>
@@ -16,6 +16,9 @@
        display:flex;flex-direction:column;background:linear-gradient(180deg,#eaf6ff,#dcecff);}
   .hud{text-align:center;font-weight:800;font-size:1.15em;color:#1565c0;padding:8px;background:rgba(255,255,255,.85);}
   .hud b{color:#0d47a1;font-size:1.15em;}
+  .dots{display:flex;gap:7px;justify-content:center;margin-top:5px;}
+  .dot{width:12px;height:12px;border-radius:50%;background:#bbdefb;}
+  .dot.on{background:#1565c0;}
   .cover{max-width:300px;margin:7px auto 0;height:12px;background:#e3f2fd;border-radius:10px;overflow:hidden;border:2px solid #90caf9;}
   .cover>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#42a5f5,#1565c0);transition:width .15s;}
 
@@ -55,27 +58,24 @@
   <script src="../reading-profile.js?v=16"></script>
   <script src="../reading-voices.js?v=18"></script>
   <script src="../reading-engine.js?v=16"></script>
-  <script src="../ktav-data.js?v=18"></script>
+  <script src="../ktav-data.js?v=20"></script>
   <script>
     RG.audioBase = '../../../letters/';
     const stage = document.getElementById('stage');
     const id = new URLSearchParams(location.search).get('station');
     const station = getKtavStationById(id);
+    const LETTERS = station ? (station.letters || (station.char ? [station.char] : [])) : [];
 
-    if (!station) {
+    if (!station || !LETTERS.length) {
       stage.innerHTML = '<p style="padding:20px">לא נמצאה תחנה. <a href="../ktav.html">חזרה למפה</a></p>';
     } else {
-      const data = KTAV_LETTERS[station.char];
-      const soundChar = ktavSoundChar(station.char);
-
-      // סרגל עליון — בית חוזר למפת הכתב
-      RG.mountTopBar('אות בכתב ✍️', { bg: false });
+      RG.mountTopBar('כתיבת האות ✍️', { bg: false });
       const home = document.querySelector('.rg-topbar .rg-home');
       if (home) { home.setAttribute('href', '../ktav.html'); home.setAttribute('title', 'חזרה למפה'); }
       document.getElementById('mascot').innerHTML = RG.unicorn(56);
 
-      const THRESH = 0.5;
-      let locked = false;
+      const THRESH = 0.45;
+      let idx = 0, done = 0, locked = false;
 
       const side = Math.max(240, Math.min(window.innerWidth - 28, window.innerHeight - 250, 460));
       const pad = document.getElementById('pad');
@@ -83,14 +83,9 @@
       const bg = document.getElementById('bg'), draw = document.getElementById('draw');
       [bg, draw].forEach(c => { c.width = side; c.height = side; });
       const bgc = bg.getContext('2d'), dc = draw.getContext('2d');
-
-      // אובייקטים לציור צורת האות
       const shape = document.createElement('canvas'); shape.width = shape.height = side;
       const sc = shape.getContext('2d');
-      const tint = document.createElement('canvas'); tint.width = tint.height = side;
-      const tc = tint.getContext('2d');
-      let letterIdx = [], letterCount = 1;
-
+      let letterIdx = [], letterCount = 1, inkPixels = [];
       const img = new Image();
 
       function fitRect(image) {
@@ -99,40 +94,48 @@
         const w = image.width * s, h = image.height * s;
         return { x: (side - w) / 2, y: (side - h) / 2, w, h };
       }
-
+      // מסכת ה"דיו" של האות — רק הפיקסלים הצבעוניים (עובד גם עם רקע לבן אטום)
       function buildShape() {
         sc.clearRect(0, 0, side, side);
         const r = fitRect(img);
         sc.drawImage(img, r.x, r.y, r.w, r.h);
         const md = sc.getImageData(0, 0, side, side).data;
-        letterIdx = [];
-        for (let i = 0; i < md.length; i += 4) if (md[i + 3] > 40) letterIdx.push(i + 3);
+        letterIdx = []; inkPixels = [];
+        for (let i = 0; i < md.length; i += 4) {
+          const a = md[i + 3], rr = md[i], gg = md[i + 1], bb = md[i + 2];
+          if (a > 40 && !(rr > 230 && gg > 230 && bb > 230)) { inkPixels.push(i); letterIdx.push(i + 3); }
+        }
         letterCount = Math.max(1, letterIdx.length);
       }
-
-      // ציור צורת האות בגוון אחיד (רפאים / הדגשה)
-      function drawGhost(color, alpha) {
-        tc.clearRect(0, 0, side, side);
-        tc.drawImage(shape, 0, 0);
-        tc.globalCompositeOperation = 'source-in';
-        tc.fillStyle = color; tc.fillRect(0, 0, side, side);
-        tc.globalCompositeOperation = 'source-over';
+      function drawGhost(col) {
+        const out = bgc.createImageData(side, side), od = out.data;
+        for (const i of inkPixels) { od[i] = col[0]; od[i + 1] = col[1]; od[i + 2] = col[2]; od[i + 3] = col[3]; }
         bgc.clearRect(0, 0, side, side);
-        bgc.globalAlpha = alpha; bgc.drawImage(tint, 0, 0); bgc.globalAlpha = 1;
+        bgc.putImageData(out, 0, 0);
       }
+
+      function curChar() { return LETTERS[idx]; }
+      function curData() { return KTAV_LETTERS[curChar()]; }
+      function playCur() { RG.playLetter(ktavSoundChar(curChar())); }
 
       function setupLetter() {
-        locked = false;
+        locked = true;                       // נעול עד שהתמונה נטענת
         dc.clearRect(0, 0, side, side);
-        buildShape();
-        drawGhost('#c3d9ef', 1);           // אות רפאים חיוורת לעקוב אחריה
+        bgc.clearRect(0, 0, side, side);
         updateHud(0);
-        setTimeout(() => RG.playLetter(soundChar), 350);
+        img.onload = () => {
+          buildShape();
+          drawGhost([120, 165, 220, 255]);   // אות רפאים כחולה
+          locked = false;
+          setTimeout(playCur, 350);
+        };
+        img.onerror = () => { locked = false; };
+        img.src = '../ktav/' + curData().img;
       }
 
-      // ציור באצבע/עכבר
+      // ציור
       let drawing = false, last = null;
-      dc.lineWidth = Math.round(side * 0.1);
+      dc.lineWidth = Math.round(side * 0.11);
       dc.lineCap = dc.lineJoin = 'round';
       dc.strokeStyle = '#ff6d00';
       function pt(e) { const r = draw.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
@@ -152,7 +155,7 @@
       draw.addEventListener('pointerleave', end);
 
       let lastCheck = 0;
-      function throttle() { const t = Date.now(); if (t - lastCheck > 180) { lastCheck = t; return true; } return false; }
+      function throttle() { const t = Date.now(); if (t - lastCheck > 160) { lastCheck = t; return true; } return false; }
 
       function checkCoverage() {
         const dd = dc.getImageData(0, 0, side, side).data;
@@ -166,8 +169,13 @@
       function success() {
         locked = true;
         RG.ding(); sparkle();
-        drawGhost('#ffb74d', 1);            // האות מודגשת בכתום
-        setTimeout(finishKtav, 950);
+        drawGhost([255, 152, 50, 255]);       // האות מודגשת בכתום
+        done++;
+        setTimeout(() => {
+          idx++;
+          if (idx >= LETTERS.length) finishStation();
+          else setupLetter();
+        }, 850);
       }
 
       function sparkle() {
@@ -178,17 +186,19 @@
       }
 
       function updateHud(cov) {
+        let dots = '';
+        for (let i = 0; i < LETTERS.length; i++) dots += `<span class="dot ${i < done ? 'on' : ''}"></span>`;
         document.getElementById('hud').innerHTML =
-          `עקבי עם האצבע על האות <b>${data.name}</b>
+          `עקבי עם האצבע על האות <b>${curData().name}</b>
            <span id="sfx" style="cursor:pointer">🔊</span>
+           <div class="dots">${dots}</div>
            <div class="cover"><i style="width:${Math.min(100, Math.round(cov / THRESH * 100))}%"></i></div>`;
-        document.getElementById('sfx').onclick = () => RG.playLetter(soundChar);
+        document.getElementById('sfx').onclick = playCur;
       }
 
       document.getElementById('clear').onclick = () => { if (!locked) { dc.clearRect(0, 0, side, side); updateHud(0); } };
-      document.getElementById('hear').onclick = () => RG.playLetter(soundChar);
+      document.getElementById('hear').onclick = () => { if (!locked) playCur(); };
 
-      // --- דיווח + מסך סיום (מותאם למסלול הכתב) ---
       function reportKtav() {
         try {
           const max = (window.KTAV_STATIONS || []).length * 3;
@@ -203,18 +213,11 @@
         } catch (e) {}
       }
 
-      function nextStationHref() {
-        const i = KTAV_STATIONS.findIndex(s => s.id === station.id);
-        const nx = KTAV_STATIONS[i + 1];
-        return nx ? ('ktav-write.html?station=' + encodeURIComponent(nx.id)) : null;
-      }
-
-      function finishKtav() {
+      function finishStation() {
         RG.injectStyle();
         ReadingProgress.record(station.id, 3);
         reportKtav();
         RG.confetti(); RG.fanfare();
-        const nx = nextStationHref();
         const overlay = document.createElement('div');
         overlay.className = 'rg-overlay';
         overlay.innerHTML =
@@ -222,22 +225,19 @@
              <div class="rg-mascot" style="display:flex;justify-content:center">${RG.unicorn(90)}</div>
              <div class="rg-stars"><span class="s on">⭐</span><span class="s on">⭐</span><span class="s on">⭐</span></div>
              <h2>כתבת יפה! ✍️</h2>
-             <div class="rg-sub">האות ${data.name}</div>
+             <div class="rg-sub">כתבת ${LETTERS.length} אותיות בכתב</div>
              <div class="rg-btns">
-               ${nx ? `<a class="rg-btn primary" href="${nx}">➡️ האות הבאה</a>` : ''}
-               <button class="rg-btn ${nx ? 'ghost' : 'primary'}" id="k-again">🔁 עוד פעם</button>
+               <button class="rg-btn primary" id="k-again">🔁 עוד פעם</button>
                <a class="rg-btn ghost" href="../ktav.html">🗺️ חזרה למפה</a>
              </div>
            </div>`;
         document.body.appendChild(overlay);
         requestAnimationFrame(() => overlay.classList.add('show'));
-        overlay.querySelector('#k-again').addEventListener('click', () => { overlay.remove(); setupLetter(); });
+        overlay.querySelector('#k-again').addEventListener('click', () => { overlay.remove(); idx = 0; done = 0; setupLetter(); });
         RG.praise();
       }
 
-      img.onload = setupLetter;
-      img.onerror = () => { stage.innerHTML = '<p style="padding:20px">התמונה לא נטענה 😕</p>'; };
-      img.src = '../ktav/' + data.img;
+      setupLetter();
     }
   </script>
 </body>

@@ -1,8 +1,14 @@
 // ============================================================
 // ktav-data.js  ·  מסלול "אותיות בכתב" (כתב יד עברי)
 // ------------------------------------------------------------
-// לכל אות יש תמונת צורת הכתב (PNG שקוף) בתיקייה apps/reading/ktav/ .
-// עוקבים עם האצבע על צורת הכתב. אין ניקוד — צורת האות בלבד.
+// לכל אות יש תמונת צורת הכתב (PNG) בתיקייה apps/reading/ktav/ .
+// אין ניקוד — צורת האות בלבד.
+//
+// המסלול בנוי בקבוצות, ולכל קבוצה כמה משחקים שמחברים בין
+// צורת האות בכתב לבין הצליל שלה:
+//   write – כתיבת האותיות של הקבוצה (עקיבה על צורת הכתב)
+//   hear  – שומעים שם/צליל אות ובוחרים את צורת הכתב הנכונה
+//   sound – שומעים מילה ובוחרים את צורת הכתב של האות הפותחת
 //
 // לכל אות:
 //   img  – שם קובץ התמונה בתיקייה ktav/
@@ -33,7 +39,6 @@ const KTAV_LETTERS = {
   'ר': { img: 'resh.png',  name: 'רֵישׁ' },
   'ש': { img: 'shin.png',  name: 'שִׁין' },
   'ת': { img: 'tav.png',   name: 'תָּו' },
-  // אותיות סופיות — הצליל להשמעה נלקח מהאות הרגילה (base)
   'ך': { img: 'kaf_sofit.png',   name: 'כַּף סוֹפִית',  base: 'כ' },
   'ם': { img: 'mem_sofit.png',   name: 'מֵם סוֹפִית',   base: 'מ' },
   'ן': { img: 'nun_sofit.png',   name: 'נוּן סוֹפִית',  base: 'נ' },
@@ -41,7 +46,6 @@ const KTAV_LETTERS = {
   'ץ': { img: 'tsadi_sofit.png', name: 'צָדִי סוֹפִית', base: 'צ' },
 };
 
-// קבוצות המסלול — 4-5 אותיות לקבוצה, לפי סדר הא-ב, וקבוצת סופיות בסוף
 const KTAV_GROUPS = [
   { id: 'k1', name: 'קבוצה ראשונה', emoji: '🌟', letters: ['א', 'ב', 'ג', 'ד', 'ה'] },
   { id: 'k2', name: 'קבוצה שנייה',  emoji: '🌈', letters: ['ו', 'ז', 'ח', 'ט', 'י'] },
@@ -51,24 +55,49 @@ const KTAV_GROUPS = [
   { id: 'k6', name: 'אותיות סופיות', emoji: '👑', letters: ['ך', 'ם', 'ן', 'ף', 'ץ'] },
 ];
 
-function ktavId(ch) { return 'ktav-' + (KTAV_LETTERS[ch].img.replace('.png', '')); }
+const KTAV_TYPE_META = {
+  write: { title: 'כתיבת האות',      emoji: '✍️', short: 'כתיבה' },
+  hear:  { title: 'איזו אות שמעת?',  emoji: '👂', short: 'מה שמעת' },
+  sound: { title: 'הצליל הפותח',     emoji: '🔤', short: 'צליל פותח' },
+};
 
+// אותיות סופיות: הצליל להשמעה נלקח מהאות הרגילה (base)
+function ktavSoundChar(ch) { const d = KTAV_LETTERS[ch] || {}; return d.base || ch; }
+
+// בניית התחנות: לכל קבוצה — כתיבה → מה שמעת → צליל פותח.
+// לקבוצת הסופיות אין "צליל פותח" (אין מילים שמתחילות באות סופית).
 function buildKtavStations() {
   const st = [];
-  KTAV_GROUPS.forEach(g => g.letters.forEach(ch => {
-    st.push({ id: ktavId(ch), type: 'ktav', char: ch, groupId: g.id });
-  }));
+  KTAV_GROUPS.forEach(g => {
+    st.push({ id: 'kt-write-' + g.id, type: 'write', groupId: g.id, letters: g.letters.slice() });
+    st.push({ id: 'kt-hear-' + g.id,  type: 'hear',  groupId: g.id, letters: g.letters.slice() });
+    if (g.id !== 'k6') {
+      st.push({ id: 'kt-sound-' + g.id, type: 'sound', groupId: g.id, letters: g.letters.slice() });
+    }
+  });
   return st;
 }
 
 const KTAV_STATIONS = buildKtavStations();
 function getKtavStationById(id) { return KTAV_STATIONS.find(s => s.id === id) || null; }
 
-// עזר: הצליל להשמעה (סופית → האות הרגילה)
-function ktavSoundChar(ch) { const d = KTAV_LETTERS[ch] || {}; return d.base || ch; }
+// מילה שמתחילה באות (למשחק "צליל פותח") — מתוך בנק האותיות של מסלול הדפוס
+function ktavPickWord(ch) {
+  const L = (window.READING_LETTERS || {})[ch];
+  if (!L || !L.words || !L.words.length) return null;
+  return L.words[Math.floor(Math.random() * L.words.length)];
+}
+
+// ערבוב + בחירה
+function ktavShuffle(a) { return a.slice().sort(() => Math.random() - 0.5); }
+function ktavPick(a, n) { return ktavShuffle(a).slice(0, n); }
 
 window.KTAV_LETTERS = KTAV_LETTERS;
 window.KTAV_GROUPS = KTAV_GROUPS;
+window.KTAV_TYPE_META = KTAV_TYPE_META;
 window.KTAV_STATIONS = KTAV_STATIONS;
 window.getKtavStationById = getKtavStationById;
 window.ktavSoundChar = ktavSoundChar;
+window.ktavPickWord = ktavPickWord;
+window.ktavShuffle = ktavShuffle;
+window.ktavPick = ktavPick;

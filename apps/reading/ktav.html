@@ -43,11 +43,12 @@
   .map{max-width:720px;margin:0 auto;padding:10px 12px 60px;position:relative;}
   .road{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:visible;}
 
-  .group-banner{display:flex;flex-direction:column;align-items:center;gap:2px;margin:26px auto 14px;
-       background:#fff;border-radius:22px;padding:10px 20px;box-shadow:0 4px 12px rgba(0,0,0,.10);
-       font-weight:800;color:#0d3b52;max-width:340px;position:relative;z-index:1;text-align:center;}
+  .group-banner{display:flex;flex-direction:column;align-items:center;gap:6px;margin:26px auto 14px;
+       background:#fff;border-radius:22px;padding:12px 20px;box-shadow:0 4px 12px rgba(0,0,0,.10);
+       font-weight:800;color:#0d3b52;max-width:360px;position:relative;z-index:1;text-align:center;}
   .group-banner .gname{font-size:1.05em;}
-  .group-banner .gletters{color:#1976d2;letter-spacing:5px;font-size:1.2em;}
+  .group-banner .gletters{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+  .group-banner .gletters img{width:34px;height:34px;object-fit:contain;}
   .group-banner.final{background:linear-gradient(90deg,#fff3c4,#ffe08a);border:2px solid #ffcf4d;}
 
   .row{display:flex;justify-content:center;margin:14px 0;position:relative;z-index:1;}
@@ -55,16 +56,19 @@
        text-decoration:none;color:#0d3b52;transition:transform .15s;}
   .node-wrap:active{transform:scale(.94);}
 
-  .node{width:94px;height:94px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-       position:relative;border:5px solid rgba(255,255,255,.9);background:radial-gradient(circle at 34% 28%,#eaf4ff,#a9d3ff);
+  .node{width:92px;height:92px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+       font-size:2.6rem;position:relative;border:5px solid rgba(255,255,255,.9);
        box-shadow:inset 0 9px 12px rgba(255,255,255,.6), inset 0 -12px 16px rgba(0,0,0,.14),
                   0 7px 0 rgba(0,0,0,.10), 0 13px 22px rgba(0,0,0,.18);}
-  .node img{width:62%;height:62%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));position:relative;z-index:1;}
+  .node .glyph{filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));position:relative;z-index:1;}
+  .node.write{background:radial-gradient(circle at 34% 28%,#d8efff,#79bdff);}
+  .node.hear{background:radial-gradient(circle at 34% 28%,#d3f7e2,#7fdcb0);}
+  .node.sound{background:radial-gradient(circle at 34% 28%,#eadfff,#b39bf0);}
   .node.done::after{content:"✓";position:absolute;top:-6px;right:-6px;background:#4caf50;color:#fff;
        width:26px;height:26px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2);}
   .node.locked{background:#e0e0e0;box-shadow:0 8px 0 rgba(0,0,0,.06);}
   .node.locked::after{content:"🔒";position:absolute;font-size:1.6rem;}
-  .node.locked img{visibility:hidden;}
+  .node.locked .glyph{visibility:hidden;}
 
   .node{animation:nodepop .4s backwards;}
   @keyframes nodepop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
@@ -74,7 +78,7 @@
   @keyframes ring{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.35);opacity:0}}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 
-  .caption{font-size:1.1em;font-weight:800;text-align:center;color:#0d3b52;line-height:1;}
+  .caption{font-size:.9em;font-weight:800;text-align:center;color:#0d3b52;line-height:1.1;}
   .ministars{font-size:.8em;letter-spacing:1px;height:1em;}
   .ministars .f{color:#ffb300;}
   .ministars .e{color:#cfcfcf;}
@@ -94,7 +98,7 @@
   <div class="hero">
     <div class="uni" id="heroUni"></div>
     <h1>אותיות בכתב</h1>
-    <div class="sub">✍️ לומדים לכתוב אות אחרי אות</div>
+    <div class="sub">✍️ כותבים, שומעים ומזהים את אותיות הכתב</div>
   </div>
 
   <p class="start-hint" id="startHint"></p>
@@ -102,20 +106,21 @@
   <button class="reset" id="reset">🔄 להתחיל מחדש</button>
   <div class="finale">🏁</div>
 
-  <script src="ktav-data.js?v=18"></script>
+  <script src="ktav-data.js?v=20"></script>
   <script src="reading-progress.js?v=16"></script>
   <script src="reading-engine.js?v=16"></script>
   <script>
     document.getElementById('logo').innerHTML = RG.unicorn(32);
     document.getElementById('heroUni').innerHTML = RG.unicorn(84);
 
+    const GAME_FILE = { write: 'ktav-games/ktav-write.html', hear: 'ktav-games/ktav-hear.html', sound: 'ktav-games/ktav-sound.html' };
     const map = document.getElementById('map');
     const AMP = Math.max(70, map.clientWidth / 2 - 104);
     const stations = KTAV_STATIONS;
     const groupById = id => KTAV_GROUPS.find(g => g.id === id);
 
-    function isUnlocked(id) {
-      const idx = stations.findIndex(s => s.id === id);
+    function isUnlocked(sid) {
+      const idx = stations.findIndex(s => s.id === sid);
       if (idx <= 0) return true;
       return ReadingProgress.isDone(stations[idx - 1].id);
     }
@@ -130,9 +135,9 @@
         lastGroup = st.groupId;
         const g = groupById(st.groupId);
         const banner = document.createElement('div');
-        banner.className = 'group-banner' + (g && g.id === 'k6' ? ' final' : '');
-        banner.innerHTML = `<span class="gname">${g.emoji} ${g.name}</span>
-                            <span class="gletters">${g.letters.join(' ')}</span>`;
+        banner.className = 'group-banner' + (g.id === 'k6' ? ' final' : '');
+        const imgs = g.letters.map(ch => `<img src="ktav/${KTAV_LETTERS[ch].img}" alt="${ch}">`).join('');
+        banner.innerHTML = `<span class="gname">${g.emoji} ${g.name}</span><span class="gletters">${imgs}</span>`;
         map.appendChild(banner);
       }
 
@@ -146,10 +151,10 @@
       wrap.className = 'node-wrap';
       wrap.style.transform = `translateX(${Math.round(Math.sin(nodeIndex * 0.8) * AMP)}px)`;
       nodeIndex++;
-      if (unlocked) wrap.href = 'ktav-games/ktav-write.html?station=' + encodeURIComponent(st.id);
+      if (unlocked) wrap.href = GAME_FILE[st.type] + '?station=' + encodeURIComponent(st.id);
 
       const node = document.createElement('div');
-      node.className = 'node' + (done ? ' done' : '') + (!unlocked ? ' locked' : '');
+      node.className = 'node ' + st.type + (done ? ' done' : '') + (!unlocked ? ' locked' : '');
       node.style.animationDelay = Math.min(i * 0.03, 1.2) + 's';
       if (i === currentIdx) {
         node.classList.add('current');
@@ -157,22 +162,17 @@
         rider.className = 'rider'; rider.innerHTML = RG.unicorn(48);
         wrap.appendChild(rider);
       }
-      const im = document.createElement('img');
-      im.src = 'ktav/' + KTAV_LETTERS[st.char].img;
-      im.alt = st.char;
-      node.appendChild(im);
+      const glyph = document.createElement('span');
+      glyph.className = 'glyph'; glyph.textContent = (KTAV_TYPE_META[st.type] || {}).emoji || '✍️';
+      node.appendChild(glyph);
 
       const caption = document.createElement('div');
       caption.className = 'caption';
-      caption.textContent = st.char;
+      caption.textContent = (KTAV_TYPE_META[st.type] || {}).short || '';
 
       const ms = document.createElement('div');
       ms.className = 'ministars';
-      if (done) {
-        let h = '';
-        for (let k = 1; k <= 3; k++) h += `<span class="${k <= stars ? 'f' : 'e'}">${k <= stars ? '★' : '☆'}</span>`;
-        ms.innerHTML = h;
-      }
+      if (done) { let h = ''; for (let k = 1; k <= 3; k++) h += `<span class="${k <= stars ? 'f' : 'e'}">${k <= stars ? '★' : '☆'}</span>`; ms.innerHTML = h; }
 
       wrap.appendChild(node); wrap.appendChild(caption); wrap.appendChild(ms);
       row.appendChild(wrap); map.appendChild(row);
@@ -219,8 +219,8 @@
     document.getElementById('totalStars').textContent = '⭐ ' + total;
 
     const hint = document.getElementById('startHint');
-    if (currentIdx >= stations.length) hint.textContent = 'כתבת את כל האותיות! אפשר לחזור ולתרגל שוב ✍️';
-    else if (total === 0) hint.textContent = 'לחצי על האות הזוהרת כדי להתחיל ✨';
+    if (currentIdx >= stations.length) hint.textContent = 'סיימת את כל המסע! אפשר לחזור ולתרגל שוב ✍️';
+    else if (total === 0) hint.textContent = 'לחצי על התחנה הזוהרת כדי להתחיל ✨';
     else hint.textContent = 'ממשיכים מכאן! 👇';
     if (currentEl) setTimeout(() => currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
 
