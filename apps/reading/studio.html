@@ -28,9 +28,9 @@
   .row{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:8px 12px;
        margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,.05);}
   .row.done{background:#eefaf0;}
-  .disp{min-width:66px;display:flex;flex-direction:column;align-items:center;}
+  .disp{min-width:80px;max-width:130px;display:flex;flex-direction:column;align-items:center;}
   .disp .big{font-size:2rem;font-weight:800;line-height:1;color:#e65100;}
-  .disp .sub{font-size:.85em;color:#777;margin-top:2px;white-space:nowrap;}
+  .disp .sub{font-size:.85em;color:#777;margin-top:2px;text-align:center;line-height:1.2;}
   .dot{width:12px;height:12px;border-radius:50%;background:#ddd;flex:none;}
   .dot.on{background:#43a047;}
   .row .btns{margin-inline-start:auto;display:flex;gap:6px;}
@@ -68,6 +68,8 @@
       בתיקייה <code>apps/reading/</code> (מחליף את הקיים) וממזגים — וזהו, הקול שלכם יופיע במשחקים.
       ההקלטות נשמרות בדפדפן הזה עד לייצוא.
     </div>
+    <h2>💬 משפטי עידוד (נאמרים בסוף שלב)</h2>
+    <div id="phrasesList"></div>
     <h2>אותיות (שם/צליל האות)</h2>
     <div id="lettersList"></div>
     <h2>מילים</h2>
@@ -86,7 +88,7 @@
     </div>
   </div>
 
-  <script src="reading-data.js?v=11"></script>
+  <script src="reading-data.js?v=12"></script>
   <script>
     const EXAMPLE_BASE = '../../letters/';
     let db = null, mem = null, mediaStream = null, rec = null, activeBtn = null, total = 0;
@@ -126,7 +128,9 @@
         letters.push({ key: 'letter:' + ch, big: ch, sub: d.name, example: d.letterAudio });
         d.words.forEach(w => words.push({ key: 'word:' + w.word, big: w.emoji, sub: w.word, example: w.audio }));
       });
-      return { letters, words };
+      const phrases = (window.READING_PHRASES || []).map(p =>
+        ({ key: 'phrase:' + p.key, big: '💬', sub: p.text, example: '' }));
+      return { letters, words, phrases };
     }
 
     function rowEl(item) {
@@ -219,10 +223,12 @@
     // ---- init ----
     (async function init() {
       await initStore();
-      const { letters, words } = buildItems();
-      total = letters.length + words.length;
+      const { letters, words, phrases } = buildItems();
+      total = letters.length + words.length + phrases.length;
+      const pl = document.getElementById('phrasesList');
       const ll = document.getElementById('lettersList'), wl = document.getElementById('wordsList');
       const existing = new Set(await idbKeys());
+      [...phrases].forEach(it => { const r = rowEl(it); pl.appendChild(r); markRow(r, existing.has(it.key)); });
       [...letters].forEach(it => { const r = rowEl(it); ll.appendChild(r); markRow(r, existing.has(it.key)); });
       [...words].forEach(it => { const r = rowEl(it); wl.appendChild(r); markRow(r, existing.has(it.key)); });
       updateProgress();

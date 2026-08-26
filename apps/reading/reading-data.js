@@ -160,6 +160,20 @@ const READING_GROUPS = [
   { id: 'g6', name: 'קבוצה 6', emoji: '🏆', letters: ['פ', 'ז', 'ט'] },
 ];
 
+// --- משפטי עידוד (נאמרים במסך הסיום) ---
+// אפשר להקליט אותם באולפן; המנוע יגריל אחד מההקלטות הקיימות.
+// key = מזהה קבוע להקלטה; text = מה שנאמר (וגם גיבוי קולי סינתטי).
+const READING_PHRASES = [
+  { key: 'perfect',   text: 'מושלם!' },
+  { key: 'great',     text: 'כל הכבוד!' },
+  { key: 'done',      text: 'יופי, סיימת!' },
+  { key: 'excellent', text: 'מצוין!' },
+  { key: 'wow',       text: 'וואו, איזה יופי!' },
+  { key: 'champ',     text: 'את אלופה!' },
+  { key: 'nice',      text: 'עבודה יפה!' },
+  { key: 'go',        text: 'קדימה, את יכולה!' },
+];
+
 // --- עזרי מילים ---
 function letterWords(char) {
   const d = READING_LETTERS[char];
@@ -236,6 +250,7 @@ function lettersUpToStation(stationId) {
 
 // חשיפה גלובלית
 window.READING_LETTERS = READING_LETTERS;
+window.READING_PHRASES = READING_PHRASES;
 window.READING_GROUPS = READING_GROUPS;
 window.READING_STATIONS = READING_STATIONS;
 window.letterWords = letterWords;
