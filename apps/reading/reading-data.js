@@ -197,7 +197,7 @@ function buildReadingStations() {
     hunt: { title: 'ציד האותיות', emoji: '🔍' },
     hear: { title: 'איזו אות שמעת?', emoji: '👂' },
     memory: { title: 'זיכרון', emoji: '🧩' },
-    quiz: { title: 'אתגר הסיכום', emoji: '🏆' },
+    quiz: { title: 'חדר הבריחה', emoji: '🗝️' },
   };
   const stations = [];
   READING_GROUPS.forEach(group => {
@@ -232,7 +232,7 @@ function buildReadingStations() {
   stations.push({ id: 'final_memory', type: 'memory', full: true, groupId: F, groupName: FN,
     title: 'זיכרון — כל האותיות', emoji: '🧩', letters: ALL.slice() });
   stations.push({ id: 'final_quiz', type: 'quiz', mixed: true, isBoss: true, groupId: F, groupName: FN,
-    title: 'קרב הסיום הגדול', emoji: '👑', letters: ALL.slice() });
+    title: 'חדר הבריחה הגדול', emoji: '👑', letters: ALL.slice() });
 
   return stations;
 }
