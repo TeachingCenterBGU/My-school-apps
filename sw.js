@@ -26,8 +26,8 @@ messaging.onBackgroundMessage((payload) => {
 
     self.registration.showNotification(title, {
         body: body,
-        icon: 'https://inbalbar.github.io/My-school-apps/icon192.png',
-        badge: 'https://inbalbar.github.io/My-school-apps/icon192.png',
+        icon: 'https://inbaltsa.github.io/My-school-apps/icon-192.png',
+        badge: 'https://inbaltsa.github.io/My-school-apps/icon-192.png',
         tag: 'homework-reminder',
         renotify: true,
         vibrate: [200, 100, 200],
@@ -85,13 +85,23 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+    const req = event.request;
+
+    // רק בקשות GET נשמרות ב-cache. POST וכו' (Firebase/Analytics) עוברות כרגיל
+    // לרשת — ניסיון cache.put על POST זורק שגיאה ומלכלך את ה-Console.
+    if (req.method !== 'GET') return;
+
     event.respondWith(
-        fetch(event.request)
+        fetch(req)
             .then(response => {
-                const clone = response.clone();
-                caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+                // שומרים ב-cache רק תגובות תקינות מאותו origin (לא cross-origin/שגיאות)
+                if (response && response.ok &&
+                    new URL(req.url).origin === self.location.origin) {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then(cache => cache.put(req, clone));
+                }
                 return response;
             })
-            .catch(() => caches.match(event.request))
+            .catch(() => caches.match(req))
     );
 });
