@@ -26,8 +26,8 @@ messaging.onBackgroundMessage((payload) => {
 
     self.registration.showNotification(title, {
         body: body,
-        icon: 'https://inbalbar.github.io/My-school-apps/icon192.png',
-        badge: 'https://inbalbar.github.io/My-school-apps/icon192.png',
+        icon: 'https://inbaltsa.github.io/My-school-apps/icon-192.png',
+        badge: 'https://inbaltsa.github.io/My-school-apps/icon-192.png',
         tag: 'homework-reminder',
         renotify: true,
         vibrate: [200, 100, 200],
