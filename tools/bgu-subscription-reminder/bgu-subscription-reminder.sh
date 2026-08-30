@@ -33,7 +33,7 @@ fi
 remote="$(git -C "$cwd" remote get-url origin 2>/dev/null || true)"
 
 # Not a BGUTeachingCenter project -> stay silent.
-printf '%s' "$remote" | grep -qi 'bguteachingcenter' || exit 0
+printf '%s' "$remote" | grep -qi 'teachingcenter' || exit 0
 
 # On UserPromptSubmit, only remind when you say you're back ("חזרתי").
 if [ "$event" = "UserPromptSubmit" ]; then
