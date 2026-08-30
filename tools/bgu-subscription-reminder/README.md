@@ -45,6 +45,30 @@ bash tools/bgu-subscription-reminder/install.sh
 
 דרישה: `jq` מותקן (`brew install jq` או `apt install jq`).
 
+### Windows (PowerShell)
+
+ב-Windows אין צורך ב-bash או ב-jq — יש גרסת PowerShell מלאה. מריצים פעם אחת
+מתוך תיקיית הפרויקט:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\bgu-subscription-reminder\install.ps1
+```
+
+זה מעתיק את `bgu-subscription-reminder.ps1` ל-`C:\Users\<user>\.claude\`, מוסיף
+את שני ההוקים ל-`settings.json` (עם גיבוי, בלי כפילויות), ואז פותחים `/hooks`
+פעם אחת (או מפעילים מחדש). בדיקה מהירה:
+
+```powershell
+$T = New-Item -ItemType Directory ([IO.Path]::GetTempPath() + [guid]::NewGuid())
+git -C $T.FullName init -q
+git -C $T.FullName remote add origin https://github.com/BGUTeachingCenter/x.git
+'{"hook_event_name":"SessionStart","cwd":"' + $T.FullName.Replace('\','\\') + '"}' |
+  powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.claude\bgu-subscription-reminder.ps1"
+Remove-Item -Recurse -Force $T.FullName
+```
+
+אם חוזרת שורת `systemMessage` עם 🔔 — הכול מחווט נכון.
+
 ### התקנה ידנית (בלי הסקריפט)
 
 מעתיקים את `bgu-subscription-reminder.sh` ל-`~/.claude/`, ומוסיפים ל-
